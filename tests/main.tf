@@ -24,10 +24,24 @@ resource "aws_route_table" "test" {
         Region = "${var.region}"
     }
 }
+resource "template_file" "leader-init" {
+    filename = "scripts/init-leaders.tpl"
+    vars {
+        region = "${var.region}"
+        service = "leaders"
+        secret_key = "${var.consul_secret_key}"
+        cidr_prefix_a = "${var.cidr_prefix_leader_a}"
+        cidr_prefix_c = "${var.cidr_prefix_leader_c}"
+        leader_count = 3
+        master_token = "${var.consul_master_token}"
+        client_token = "${var.consul_master_token}"
+    }
+}
 
 module "cleaders" {
     source = "../tf-modules/consul-leaders"
     ami = "${var.ami}"
+    name = "${var.name}"
     max_nodes = 5
     min_nodes = 3
     desired_capacity = 3
@@ -44,10 +58,11 @@ module "cleaders" {
     vpc_id = "${aws_vpc.test.id}"
     route_table_id = "${aws_route_table.test.id}"
     inbound_security_group = "${module.cleader-inbound-sg.id}"
+    user_data = "${template_file.leader-init.rendered}"
 }
 
-resource "template_file" "minion-init" {
-    filename = "scripts/init-minion.tpl"
+resource "template_file" "worker-init" {
+    filename = "scripts/init-worker.tpl"
     vars {
         region = "${var.region}"
         secret_key = "${var.consul_secret_key}"
@@ -56,7 +71,7 @@ resource "template_file" "minion-init" {
     }
 }
 
-resource "aws_security_group" "minion-service" {
+resource "aws_security_group" "worker-service" {
     name = "service-${var.name}-${var.region}"
     vpc_id = "${aws_vpc.test.id}"
     tags {
@@ -72,30 +87,28 @@ resource "aws_security_group" "minion-service" {
     }
 }
 
-module "cminions-a" {
+module "cworkers-a" {
     source = "../tf-modules/consul-cluster"
     ami = "${var.ami}"
+    name = "${var.name}"
     max_nodes = 5
     min_nodes = 3
     desired_capacity = 3
-    key_name = "${var.key_name}-minions"
-    key_file = "${var.key_file}"
+    key_name = "${var.key_name}-workers"
     ssh_pubkey = "${var.ssh_pubkey}"
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
     region = "${var.region}"
-    consul_secret_key = "${var.consul_secret_key}"
     cidr_minions_a = "${var.cidr_minions_a}"
     cidr_minions_c = "${var.cidr_minions_c}"
     vpc_id = "${aws_vpc.test.id}"
     route_table_id = "${aws_route_table.test.id}"
-    leader_dns = "${module.cleaders.leader_dns}"
-    inbound_security_group = "${module.cminion-inbound-sg.id}"
-    service_security_group = "${aws_security_group.minion-service.id}"
-    user_data = "${template_file.minion-init.rendered}"
+    inbound_security_group = "${module.cworker-inbound-sg.id}"
+    service_security_group = "${aws_security_group.worker-service.id}"
+    user_data = "${template_file.worker-init.rendered}"
 }
 
-# allow minion to leader
+# allow worker to leader
 module "cleader-inbound-sg" {
     source = "../tf-modules/consul-leader-sg"
     name = "inbound-${var.name}"
@@ -106,8 +119,8 @@ module "cleader-inbound-sg" {
     cidr_blocks = "${var.cidr_minions_a},${var.cidr_minions_c}"
 }
 
-# and allow leader to minion
-module "cminion-inbound-sg" {
+# and allow leader to worker
+module "cworker-inbound-sg" {
     source = "../tf-modules/consul-agent-sg"
     name = "inbound-${var.name}"
     vpc_id = "${aws_vpc.test.id}"
