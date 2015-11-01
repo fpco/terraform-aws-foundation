@@ -49,7 +49,14 @@ variable "cidr_minions_c" {
     default = "10.100.6.0/24"
     description = "The CIDR block for minion subnet c"
 }
-
+variable "cidr_redis_a" {
+    default = "10.100.7.0/24"
+    description = "The CIDR block for redis elasticache subnet a"
+}
+variable "cidr_redis_c" {
+    default = "10.100.8.0/24"
+    description = "The CIDR block for redis elasticache subnet c"
+}
 variable "region" {
     description = "AWS region to deploy to"
 }
