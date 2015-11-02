@@ -57,6 +57,14 @@ variable "cidr_redis_c" {
     default = "10.100.8.0/24"
     description = "The CIDR block for redis elasticache subnet c"
 }
+variable "cidr_manage_a" {
+    default = "10.100.9.0/24"
+    description = "The CIDR block for management cluster subnet a"
+}
+variable "cidr_manage_c" {
+    default = "10.100.10.0/24"
+    description = "The CIDR block for management cluster subnet c"
+}
 variable "region" {
     description = "AWS region to deploy to"
 }
