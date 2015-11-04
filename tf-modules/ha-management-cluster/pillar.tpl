@@ -1,0 +1,2 @@
+openntpd:
+  server: True
