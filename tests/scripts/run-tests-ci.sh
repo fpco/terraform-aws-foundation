@@ -12,17 +12,16 @@
 
 LOG_PREFIX="OPSTACK:"
 
-echo "$LOG_PREFIX going to pause for 450 seconds (7.5 minutes) while we wait for the clusters to come online"
-sleep 450
+echo "$LOG_PREFIX going to pause for 600 seconds (10 minutes) while we wait for the clusters to come online"
+sleep 600
 
-VPC_NAME="$1"
 SSH_CMD_PREFIX="ssh -i ./id_rsa -o StrictHostKeyChecking=no"
 echo "$LOG_PREFIX SSH command prefix looks like: $SSH_CMD_PREFIX"
 
 # these ASG names need to be changed in the module source -_-
-LEADER_ASG_NAME="leaders.consul.$VPC_NAME"
-WORKER_ASG_NAME="$VPC_NAME.consul-cluster"
-MANAGE_ASG_NAME="$VPC_NAME-management-tier.consul-cluster"
+LEADER_ASG_NAME="$(terraform output leader_asg_name)"
+WORKER_ASG_NAME="$(terraform output worker_asg_name)"
+MANAGE_ASG_NAME="$(terraform output manage_asg_name)"
 
 #######################################################################
 # leaders
@@ -46,7 +45,7 @@ echo "$LOG_PREFIX ping test leader and check it's member list:"
 $SSH_CMD_PREFIX ubuntu@$TEST_LEADER_IP "hostname && sudo consul members"
 
 echo "$LOG_PREFIX here's the full leader cloud-init-output.log.."
-$SSH_CMD_PREFIX ubuntu@$TEST_LEADER_IP "sudo cat /var/log/cloud-init-output.log"
+$SSH_CMD_PREFIX ubuntu@$TEST_LEADER_IP "sudo cat /var/log/cloud-init-output.log" > leader-cloud-init-output.log
 
 #######################################################################
 # workers
@@ -70,7 +69,7 @@ echo "$LOG_PREFIX ping test worker and check it's member list:"
 $SSH_CMD_PREFIX ubuntu@$TEST_WORKER_IP "hostname && sudo consul members"
 
 echo "$LOG_PREFIX here's the full worker cloud-init-output.log.."
-$SSH_CMD_PREFIX ubuntu@$TEST_WORKER_IP "sudo cat /var/log/cloud-init-output.log"
+$SSH_CMD_PREFIX ubuntu@$TEST_WORKER_IP "sudo cat /var/log/cloud-init-output.log" > worker-cloud-init-output.log
 
 #######################################################################
 # elasticache
@@ -80,11 +79,11 @@ $SSH_CMD_PREFIX ubuntu@$TEST_WORKER_IP "nc -vz $EC_URL 6379"
 
 #######################################################################
 # management
-echo "$LOG_PREFIX Lookup all details on Worker ASG"
+echo "$LOG_PREFIX Lookup all details on Management ASG"
 aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $MANAGE_ASG_NAME > MANAGE_ASG.json
 jq '.' < MANAGE_ASG.json
 
-echo "$LOG_PREFIX collect instance IDs from Worker ASG - output as a single line text file"
+echo "$LOG_PREFIX collect instance IDs from Management ASG and look up IPs"
 jq '.AutoScalingGroups[0] | {instance_id: .Instances[].InstanceId}' < MANAGE_ASG.json | jq -s '.[] | .instance_id' | sed 's/"//g' | tr '\n' ' ' > MANAGE_IDS.txt
 aws ec2 describe-instances \
   --instance-ids `cat MANAGE_IDS.txt` \
@@ -100,7 +99,7 @@ echo "$LOG_PREFIX ping test manage and check it's member list:"
 $SSH_CMD_PREFIX ubuntu@$TEST_MANAGE_IP "hostname && sudo consul members && sudo service openntpd status"
 
 echo "$LOG_PREFIX here's the full manage cloud-init-output.log.."
-$SSH_CMD_PREFIX ubuntu@$TEST_MANAGE_IP "sudo cat /var/log/cloud-init-output.log"
+$SSH_CMD_PREFIX ubuntu@$TEST_MANAGE_IP "sudo cat /var/log/cloud-init-output.log" > manage-cloud-init-output.log
 
 
 #######################################################################
