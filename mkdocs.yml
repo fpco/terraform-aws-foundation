@@ -1,0 +1,19 @@
+site_name: FPC Ops Stack
+theme: cosmo
+pages:
+  - Overview: index.md
+  - Architecture: arch.md
+  - Security: security.md
+  - How to:
+      - 'Overview': how-to/index.md
+      - 'Terraform Modules': how-to/tf-modules.md
+      - 'Saltstack Formula': how-to/salt-formula.md
+      - 'Continuous Integration': how-to/ci.md
+  - Administration:
+      - 'Overview': admin/overview.md
+      - 'Deployment': admin/deploy.md
+      - 'Update Salt Formula': admin/update-formula.md
+      - 'Create new users': admin/create-new-users.md
+      - 'Manage sudo': admin/manage-sudo.md
+  - For Developers: extend.md
+  - FAQ: faq.md
