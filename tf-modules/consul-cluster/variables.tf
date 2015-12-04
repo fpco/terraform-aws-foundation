@@ -25,6 +25,10 @@ variable "cluster_security_group_ids" {
     default = ""
     description = "String-list of IDs for security groups to associate with the cluster"
 }
+variable "load_balancers" {
+    default = ""
+    description = "The string list of names of load balancers to pass to the ASG module"
+}
 variable "max_nodes" {
     default = 9
     description = "The maximum number of nodes in each group"

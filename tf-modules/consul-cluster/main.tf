@@ -4,6 +4,7 @@ module "agent-asg" {
     ami = "${var.ami}"
     az_list = "${var.region}a, ${var.region}c"
     desired_capacity = "${var.desired_capacity}"
+    elb_names = "${var.load_balancers}"
     max_nodes = "${var.max_nodes}"
     min_nodes = "${var.min_nodes}"
     key_name = "${var.key_name}"
