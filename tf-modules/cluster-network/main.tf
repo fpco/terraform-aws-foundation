@@ -9,7 +9,7 @@ resource "aws_subnet" "a" {
     vpc_id = "${var.vpc_id}"
     tags {
         Name = "${var.name}-${var.region}-a"
-        Desc = "subnet for ${var.name}"
+        Desc = "${var.description}"
     }
 }
 resource "aws_subnet" "c" {
@@ -19,7 +19,7 @@ resource "aws_subnet" "c" {
     vpc_id = "${var.vpc_id}"
     tags {
         Name = "${var.name}-${var.region}-c"
-        Desc = "subnet for ${var.name}"
+        Desc = "${var.description}"
     }
 }
 # Routing table association for each minion subnet to the VPC GW

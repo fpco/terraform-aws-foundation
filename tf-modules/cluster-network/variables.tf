@@ -2,6 +2,10 @@ variable "name" {
     default = ""
     description = "The name of this network"
 }
+variable "description" {
+    default = ""
+    description = "The description to give the subnets created for this network"
+}
 variable "access_key" {
     description = "AWS key id"
 }
