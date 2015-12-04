@@ -66,12 +66,12 @@ module "manage_init" {
     extra_pillar = "${template_file.extra_pillar.rendered}"
 }
 resource "template_file" "extra_init" {
-    filename = "${path.module}/init.tpl"
+    template = "${path.module}/init.tpl"
     vars {
     }
 }
 resource "template_file" "extra_pillar" {
-    filename = "${path.module}/pillar.tpl"
+    template = "${path.module}/pillar.tpl"
     vars {
     }
 }

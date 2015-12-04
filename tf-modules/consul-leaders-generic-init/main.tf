@@ -1,6 +1,6 @@
 # render init script for a cluster of consul leaders using our template
 resource "template_file" "generic_init" {
-    filename = "${path.module}/init.tpl"
+    template = "${path.module}/init.tpl"
     vars {
         cidr_prefix_a = "${var.cidr_prefix_a}"
         cidr_prefix_c = "${var.cidr_prefix_c}"

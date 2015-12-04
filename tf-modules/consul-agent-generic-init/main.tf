@@ -1,6 +1,6 @@
 # render init script for a cluster using our generic template
 resource "template_file" "generic_init" {
-    filename = "${path.module}/init.tpl"
+    template = "${path.module}/init.tpl"
     vars {
         extra_init = "${var.extra_init}"
         extra_pillar = "${var.extra_pillar}"
