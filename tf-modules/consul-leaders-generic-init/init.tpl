@@ -3,7 +3,7 @@
 HN_PREFIX="${hostname_prefix}"
 INSTANCE_ID="`ec2metadata --instance-id`"
 HOSTNAME="$HN_PREFIX-$INSTANCE_ID"
-VERBOSE="--log-level=debug"
+VERBOSE="--log-level=${log_level}"
 PRIVATE_IP="`ec2metadata --local-ipv4`"
 LOG_PREFIX="OPSTACK:"
 
