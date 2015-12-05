@@ -26,6 +26,10 @@ variable "datacenter" {
     default = ""
     description = "Provided to consul as datacenter config, usual maps to AWS region"
 }
+variable "disable_consul_remote_exec" {
+    default = "True"
+    description = "True/False boolean pillar key (note case) for the consul salt formula"
+}
 variable "extra_pillar" {
     default = ""
     description = "YAML to insert as pillar in bootstrap.sls"

@@ -24,6 +24,7 @@ hostname: $HOSTNAME
 # setup consul
 consul:
   datacenter: ${datacenter}
+  disable_remote_exec: ${disable_remote_exec}
   secret_key: '${secret_key}'
   master_token: '${master_token}'
   client_token: '${client_token}'

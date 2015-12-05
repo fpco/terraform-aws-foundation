@@ -24,6 +24,7 @@ hostname: $HOSTNAME
 consul:
   client_token: ${consul_client_token}
   datacenter: ${region}
+  disable_remote_exec: ${disable_remote_exec}
   secret_key: ${consul_secret_key}
   leaders:
     - ${leader_dns}

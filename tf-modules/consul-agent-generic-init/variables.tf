@@ -26,6 +26,10 @@ variable "extra_init" {
     default = ""
     description = "shell/bash to append to node init via user_data"
 }
+variable "disable_consul_remote_exec" {
+    default = "True"
+    description = "True/False boolean pillar key (note case) for the consul salt formula"
+}
 variable "log_level" {
     default = "debug"
     description = "set log verbosity on node init, for CM with saltstack"
