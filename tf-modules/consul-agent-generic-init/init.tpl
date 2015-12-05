@@ -28,7 +28,8 @@ consul:
   secret_key: ${consul_secret_key}
   leaders:
     - ${leader_dns}
-  webui: True
+  webui: ${consul_webui}
+
 
 consul_template:
   client_token: ${consul_client_token}

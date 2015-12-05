@@ -10,6 +10,10 @@ variable "consul_client_token" {
     default = "UUID"
     description = "Client token for services on the node, connecting to consul as a client"
 }
+variable "consul_webui" {
+    default = "False"
+    description = "True/False boolean (note case) that maps to enable the webui via the consul:webui pillar key"
+}
 variable "leader_dns" {
     default = ""
     description = "DNS to find consul leaders to follow/join"

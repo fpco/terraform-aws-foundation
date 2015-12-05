@@ -83,6 +83,7 @@ consul:
     - ${cidr_prefix_c}.29
     - ${cidr_prefix_a}.30
     - ${cidr_prefix_c}.30
+  webui: ${consul_webui}
 
 consul_template:
   consul_addr: $PRIVATE_IP:8500

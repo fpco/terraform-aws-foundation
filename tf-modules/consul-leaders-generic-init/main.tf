@@ -5,6 +5,7 @@ resource "template_file" "generic_init" {
         cidr_prefix_a = "${var.cidr_prefix_a}"
         cidr_prefix_c = "${var.cidr_prefix_c}"
         client_token = "${var.consul_client_token}"
+        consul_webui = "${var.consul_webui}"
         datacenter = "${var.datacenter}"
         disable_remote_exec = "${var.disable_consul_remote_exec}"
         extra_init = "${var.extra_init}"

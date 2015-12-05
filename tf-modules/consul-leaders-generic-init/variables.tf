@@ -18,6 +18,10 @@ variable "consul_master_token" {
     default = "UUID"
     description = "Master token provided to consul leader as root ACL/token"
 }
+variable "consul_webui" {
+    default = "False"
+    description = "True/False boolean (note case) that maps to enable the webui via the consul:webui pillar key"
+}
 variable "leader_count" {
     default = "3"
     description = "Number of leaders to bootstral consul cluster"
