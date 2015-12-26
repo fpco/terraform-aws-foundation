@@ -17,3 +17,24 @@ module "management-cluster" {
     consul_leader_dns = "${module.cleaders.leader_dns}"
     security_group_ids = "${module.consul-agent-sg.id}, ${module.public-ssh-sg.id}"
 }
+
+# boxed security group for nomad leader services, no egress/custom rules
+module "nomad-server-sg" {
+    source = "../tf-source/nomad-server-sg"
+    name = "${var.name}-nomad-server-services"
+    vpc_id = "${var.vpc_id}"
+    region = "${var.region}"
+    access_key = "${var.access_key}"
+    secret_key = "${var.secret_key}"
+    cidr_blocks = "${var.cidr_a}, ${var.cidr_c}"
+}
+# boxed security group for nomad agents (leaders included), no egress/custom rules
+module "nomad-agent-sg" {
+    source = "../nomad-agent-sg"
+    name = "${var.name}-nomad-agent"
+    vpc_id = "${var.vpc_id}"
+    region = "${var.region}"
+    access_key = "${var.access_key}"
+    secret_key = "${var.secret_key}"
+    cidr_blocks = "${replace(var.worker_cidr_blocks, " ", "")}"
+}

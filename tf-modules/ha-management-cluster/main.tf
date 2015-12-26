@@ -24,12 +24,12 @@ resource "aws_security_group" "management_services" {
     name = "${var.name}-management-services"
     vpc_id = "${var.vpc_id}"
     # salt-master
-#   ingress {
-#       from_port = 4505
-#       to_port = 4506
-#       protocol = "tcp"
-#       cidr_blocks = ["${split(",", var.minion_cidr_blocks)}"]
-#   }
+    ingress {
+        from_port = 4505
+        to_port = 4506
+        protocol = "tcp"
+        cidr_blocks = ["${split(",", replace(var.worker_cidr_blocks, " ", ""))}"]
+    }
     # open port 123 (NTP) tcp/udp for the VPC
     ingress {
         from_port = 123
@@ -74,36 +74,4 @@ resource "template_file" "extra_pillar" {
     template = "${path.module}/pillar.tpl"
     vars {
     }
-}
-# boxed security group for nomad leader services, no egress/custom rules
-module "nomad-server-sg" {
-    source = "../nomad-server-sg"
-    name = "${var.name}-nomad-server-services"
-    vpc_id = "${var.vpc_id}"
-    region = "${var.region}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
-    cidr_blocks = "${var.cidr_a}, ${var.cidr_c}"
-}
-# boxed security group for nomad agents (leaders included), no egress/custom rules
-module "nomad-agent-sg" {
-    source = "../nomad-agent-sg"
-    name = "${var.name}-nomad-agent"
-    vpc_id = "${var.vpc_id}"
-    region = "${var.region}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
-    cidr_blocks = "${replace(var.worker_cidr_blocks, " ", "")}"
-}
-# boxed DNS set - zone / records for clusters of consul / nomad leaders
-module "nomad-server-dns" {
-    source = "../leader-dns"
-    name = "leaders"
-    domain = "nomad-server"
-    vpc_id = "${var.vpc_id}"
-    region = "${var.region}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
-    cidr_a = "${var.cidr_a}"
-    cidr_c = "${var.cidr_c}"
 }
