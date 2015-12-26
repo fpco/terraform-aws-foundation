@@ -29,8 +29,9 @@ consul:
   master_token: '${master_token}'
   client_token: '${client_token}'
   leader_count: '${leader_count}'
-  # can we shorten the list? check the CIDR math
   leaders:
+    - ${cidr_prefix_a}.4
+    - ${cidr_prefix_c}.4
     - ${cidr_prefix_a}.5
     - ${cidr_prefix_c}.5
     - ${cidr_prefix_a}.6
@@ -51,38 +52,6 @@ consul:
     - ${cidr_prefix_c}.13
     - ${cidr_prefix_a}.14
     - ${cidr_prefix_c}.14
-    - ${cidr_prefix_a}.15
-    - ${cidr_prefix_c}.15
-    - ${cidr_prefix_a}.16
-    - ${cidr_prefix_c}.16
-    - ${cidr_prefix_a}.17
-    - ${cidr_prefix_c}.17
-    - ${cidr_prefix_a}.18
-    - ${cidr_prefix_c}.18
-    - ${cidr_prefix_a}.19
-    - ${cidr_prefix_c}.19
-    - ${cidr_prefix_a}.20
-    - ${cidr_prefix_c}.20
-    - ${cidr_prefix_a}.21
-    - ${cidr_prefix_c}.21
-    - ${cidr_prefix_a}.22
-    - ${cidr_prefix_c}.22
-    - ${cidr_prefix_a}.23
-    - ${cidr_prefix_c}.23
-    - ${cidr_prefix_a}.24
-    - ${cidr_prefix_c}.24
-    - ${cidr_prefix_a}.25
-    - ${cidr_prefix_c}.25
-    - ${cidr_prefix_a}.26
-    - ${cidr_prefix_c}.26
-    - ${cidr_prefix_a}.27
-    - ${cidr_prefix_c}.27
-    - ${cidr_prefix_a}.28
-    - ${cidr_prefix_c}.28
-    - ${cidr_prefix_a}.29
-    - ${cidr_prefix_c}.29
-    - ${cidr_prefix_a}.30
-    - ${cidr_prefix_c}.30
   webui: ${consul_webui}
 
 consul_template:
