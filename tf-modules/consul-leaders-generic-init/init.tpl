@@ -29,6 +29,7 @@ consul:
   master_token: '${master_token}'
   client_token: '${client_token}'
   leader_count: '${leader_count}'
+  retry_interval: '3s'
   leaders:
     - ${cidr_prefix_a}.4
     - ${cidr_prefix_c}.4
