@@ -14,7 +14,10 @@ variable "region" {
 variable "vpc_id" {
     description = "The ID of the VPC to deploy to"
 }
-variable "cidr_blocks" {
-    description = "The list of CIDR IP blocks allowed to access the nomad server ports (as a string-list)"
+variable "server_cidr_blocks" {
+    description = "The list of CIDR IP blocks where nomad servers run (as a string-list)"
+}
+variable "worker_cidr_blocks" {
+    description = "The list of CIDR IP blocks where nomad agents run (as a string-list)"
 }
 
