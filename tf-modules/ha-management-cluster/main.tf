@@ -16,7 +16,7 @@ module "management-cluster" {
     cidr_minions_c = "${var.cidr_c}"
     vpc_id = "${var.vpc_id}"
     route_table_id = "${var.route_table_id}"
-    cluster_security_group_ids = "${var.security_group_ids}, ${aws_security_group.management_services.id}, ${module.nomad-server-sg.id}, ${module.nomad-agent-sg.id}"
+    cluster_security_group_ids = "${var.security_group_ids}, ${aws_security_group.management_services.id}"
     user_data = "${module.manage_init.user_data}"
 }
 # Security Group, for management-tier service

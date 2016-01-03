@@ -119,7 +119,7 @@ module "cworkers-a" {
     cidr_minions_c = "${var.cidr_minions_c}"
     vpc_id = "${module.test-vpc.id}"
     route_table_id = "${module.test-vpc.route_table_id}"
-    cluster_security_group_ids = "${module.management-cluster.nomad_agent_sg}, ${module.consul-agent-sg.id}, ${aws_security_group.worker-service.id}, ${module.public-ssh-sg.id}"
+    cluster_security_group_ids = "${module.nomad-agent-sg.id}, ${module.consul-agent-sg.id}, ${aws_security_group.worker-service.id}, ${module.public-ssh-sg.id}"
     user_data = "${module.worker-init.user_data}"
 }
 # provisioning for worker cluster

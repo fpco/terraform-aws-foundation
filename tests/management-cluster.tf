@@ -15,26 +15,27 @@ module "management-cluster" {
     consul_secret_key = "${var.consul_secret_key}"
     consul_client_token = "${var.consul_master_token}"
     consul_leader_dns = "${module.cleaders.leader_dns}"
-    security_group_ids = "${module.consul-agent-sg.id}, ${module.public-ssh-sg.id}"
+    security_group_ids = "${module.nomad-agent-sg.id}, ${module.consul-agent-sg.id}, ${module.public-ssh-sg.id}"
 }
 
 # boxed security group for nomad leader services, no egress/custom rules
 module "nomad-server-sg" {
     source = "../tf-modules/nomad-server-sg"
     name = "${var.name}-nomad-server-services"
-    vpc_id = "${var.vpc_id}"
+    vpc_id = "${module.test-vpc.id}"
     region = "${var.region}"
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
-    cidr_blocks = "${var.cidr_a}, ${var.cidr_c}"
+    server_cidr_blocks = "${var.cidr_prefix_leader_a}.0/28, ${var.cidr_prefix_leader_c}.0/28"
+    worker_cidr_blocks = "${var.cidr_manage_a}, ${var.cidr_manage_c}"
 }
 # boxed security group for nomad agents (leaders included), no egress/custom rules
 module "nomad-agent-sg" {
     source = "../tf-modules/nomad-agent-sg"
     name = "${var.name}-nomad-agent"
-    vpc_id = "${var.vpc_id}"
+    vpc_id = "${module.test-vpc.id}"
     region = "${var.region}"
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
-    cidr_blocks = "${replace(var.worker_cidr_blocks, " ", "")}"
+    cidr_blocks = "${module.test-vpc.cidr_block}"
 }
