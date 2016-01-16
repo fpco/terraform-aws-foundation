@@ -22,4 +22,8 @@ resource "aws_launch_configuration" "cluster" {
     key_name = "${var.key_name}"
     security_groups = ["${compact(split(",", replace(var.security_group_ids, " ", "")))}"]
     user_data = "${var.user_data}"
+    root_block_device {
+        volume_type = "${var.root_volume_type}"
+        volume_size = "${var.root_volume_size}"
+    }
 }

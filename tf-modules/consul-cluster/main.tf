@@ -20,6 +20,8 @@ module "agent-asg" {
     subnet_ids = "${module.cluster-net.id_a}, ${module.cluster-net.id_c}"
     security_group_ids = "${var.cluster_security_group_ids}"
     user_data = "${var.user_data}"
+    root_volume_type = "${var.root_volume_type}"
+    root_volume_size = "${var.root_volume_size}"
 }
 # and a multi-az network
 module "cluster-net" {

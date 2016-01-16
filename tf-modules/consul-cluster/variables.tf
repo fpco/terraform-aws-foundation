@@ -68,3 +68,11 @@ variable "public_ip" {
     default = "true"
     description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"
 }
+variable "root_volume_type" {
+    default = "gp2"
+    description = "Type of EBS volume to use for the root block device"
+}
+variable "root_volume_size" {
+    default = "15"
+    description = "Size (in GB) of EBS volume to use for the root block device"
+}

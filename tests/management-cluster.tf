@@ -16,6 +16,8 @@ module "management-cluster" {
     consul_client_token = "${var.consul_master_token}"
     consul_leader_dns = "${module.cleaders.leader_dns}"
     security_group_ids = "${module.nomad-agent-sg.id}, ${module.consul-agent-sg.id}, ${module.public-ssh-sg.id}"
+    root_volume_size = "10"
+    root_volume_type = "standard"
 }
 
 # boxed security group for nomad leader services, no egress/custom rules

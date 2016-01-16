@@ -26,6 +26,7 @@ module "cleaders" {
     route_table_id = "${module.test-vpc.route_table_id}"
     leader_security_group_ids = "${module.consul-agent-sg.id}, ${module.consul-leader-sg.id}, ${aws_security_group.leader-service.id}, ${module.public-ssh-sg.id}"
     user_data = "${module.leader-init.user_data}"
+    root_volume_size = "9"
 }
 # provision consul leaders
 module "leader-init" {
@@ -44,6 +45,7 @@ date
 consul --version
 salt-call --version
 uname -a
+df -h
 EOF
     #hostname_prefix = "custom"
 }
@@ -121,6 +123,8 @@ module "cworkers-a" {
     route_table_id = "${module.test-vpc.route_table_id}"
     cluster_security_group_ids = "${module.nomad-agent-sg.id}, ${module.consul-agent-sg.id}, ${aws_security_group.worker-service.id}, ${module.public-ssh-sg.id}"
     user_data = "${module.worker-init.user_data}"
+    root_volume_size = "10"
+    root_volume_type = "standard"
 }
 # provisioning for worker cluster
 module "worker-init" {
@@ -137,6 +141,7 @@ date
 consul --version
 salt-call --version
 uname -a
+df -h
 EOF
 }
 # boxed security group for consul agent service - allow whole VPC

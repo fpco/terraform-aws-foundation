@@ -74,3 +74,11 @@ variable "public_ip" {
     default = "true"
     description = "Boolean flag to enable/disable map_public_ip_on_launch in each aws_subnet"
 }
+variable "root_volume_type" {
+    default = "gp2"
+    description = "The type of EBS volume to use for the root block device"
+}
+variable "root_volume_size" {
+    default = "15"
+    description = "The size of the EBS volume (in GB) for the root block device"
+}

@@ -81,3 +81,11 @@ variable "elb_names" {
     default = ""
     description = "string-list of load balancers to associate with the ASG (by name)"
 }
+variable "root_volume_type" {
+    default = "gp2"
+    description = "The type of EBS volume to use for the root block device"
+}
+variable "root_volume_size" {
+    default = "15"
+    description = "The size of the EBS volume (in GB) for the root block device"
+}

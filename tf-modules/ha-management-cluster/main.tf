@@ -18,6 +18,8 @@ module "management-cluster" {
     route_table_id = "${var.route_table_id}"
     cluster_security_group_ids = "${var.security_group_ids}, ${aws_security_group.management_services.id}"
     user_data = "${module.manage_init.user_data}"
+    root_volume_type = "${var.root_volume_type}"
+    root_volume_size = "${var.root_volume_size}"
 }
 # Security Group, for management-tier service
 resource "aws_security_group" "management_services" {
