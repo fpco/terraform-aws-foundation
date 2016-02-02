@@ -38,3 +38,7 @@ variable "log_level" {
     default = "debug"
     description = "set log verbosity on node init, for CM with saltstack"
 }
+variable "retry_interval" {
+    default = "1s"
+    description = "passed to the consul agent, period to pause between attempts to join"
+}

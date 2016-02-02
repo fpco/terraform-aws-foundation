@@ -29,6 +29,7 @@ consul:
   leaders:
     - ${leader_dns}
   webui: ${consul_webui}
+  retry_interval: ${retry_interval}
 
 
 consul_template:

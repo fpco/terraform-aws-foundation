@@ -12,5 +12,6 @@ resource "template_file" "generic_init" {
         log_level = "${var.log_level}"
         region = "${var.region}"
         service = "${var.service}"
+        retry_interval = "${var.retry_interval}"
     }
 }
