@@ -51,9 +51,6 @@ echo "apply the hostname salt formula"
 $APPLY_FORMULA hostname $VERBOSE
 echo "restart dnsmasq to be sure it is online for consul"
 service dnsmasq restart
-echo "apply the consul.agent salt formula, then pause while consul joins"
+echo "apply the consul.service salt formula to run agent and join the cluster"
 $APPLY_FORMULA consul.service $VERBOSE
-sleep 5
-echo "apply consul-template formula to configure/run service"
-$APPLY_FORMULA consul.template-tool.service $VERBOSE
 ${extra_init}
