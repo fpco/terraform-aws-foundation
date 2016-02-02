@@ -34,6 +34,7 @@ consul:
 
 consul_template:
   client_token: ${consul_client_token}
+  log_level: ${log_level}
 
 ${extra_pillar}
 EOT
