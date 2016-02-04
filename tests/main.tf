@@ -6,6 +6,7 @@ module "test-vpc" {
     region = "${var.region}"
     vpc_cidr_prefix = "${var.vpc_cidr_prefix}"
 }
+
 # cluster of consul leaders
 module "cleaders" {
     source = "../tf-modules/consul-leaders"
@@ -168,6 +169,54 @@ module "public-ssh-sg" {
 # but we could easily create multiple keys, deploying select
 # keys to specific clusters
 resource "aws_key_pair" "tests" {
-    key_name = "${var.key_name}" 
+    key_name = "${var.key_name}"
     public_key = "${var.ssh_pubkey}"
+}
+
+########################
+### Test NAT Gateway ###
+########################
+# set up public and private subnets
+resource "aws_subnet" "public" {
+    vpc_id = "${module.test-vpc.id}"
+    cidr_block = "10.100.12.0/24"
+    map_public_ip_on_launch = true
+}
+resource "aws_subnet" "private" {
+    vpc_id = "${module.test-vpc.id}"
+    cidr_block = "10.100.13.0/24"
+    map_public_ip_on_launch = false
+}
+# set up nat gateway
+module "nat_gateway" {
+    source = "../tf-modules/nat_gateway"
+    subnet_id = "${aws_subnet.public.id}"
+}
+# route tables for above subnets
+resource "aws_route_table" "public" {
+    vpc_id = "${module.test-vpc.id}"
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = "${module.test-vpc.igw_id}"
+    }
+}
+resource "aws_route_table" "private" {
+    vpc_id = "${aws_vpc.vpc.id}"
+    route {
+        cidr_block = "0.0.0.0/0"
+        nat_gateway_id = "${module.nat_gateway.id}"
+    }
+}
+# Route Table Associations
+resource "aws_main_route_table_association" "main" {
+    vpc_id = "${aws_vpc.vpc.id}"
+    route_table_id = "${aws_route_table.public.id}"
+}
+resource "aws_route_table_association" "public" {
+    subnet_id = "${aws_subnet.public.id}"
+    route_table_id = "${aws_route_table.public.id}"
+}
+resource "aws_route_table_association" "private" {
+    subnet_id = "${aws_subnet.private.id}"
+    route_table_id = "${aws_route_table.private.id}"
 }
