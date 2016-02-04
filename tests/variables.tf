@@ -24,7 +24,10 @@ variable "access_key" {
 variable "secret_key" {
     description = "AWS key secret"
 }
-
+variable "token" {
+    default = ""
+    description = "MFA token for AWS provider"
+}
 variable "consul_secret_key" {
     description = "Secret key to secure cluster communication, generate this with `consul keygen`"
 }
