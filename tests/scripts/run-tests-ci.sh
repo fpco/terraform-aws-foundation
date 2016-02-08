@@ -101,10 +101,16 @@ $SSH_CMD_PREFIX ubuntu@$TEST_MANAGE_IP "hostname && sudo consul members && sudo 
 echo "$LOG_PREFIX here's the full manage cloud-init-output.log.."
 $SSH_CMD_PREFIX ubuntu@$TEST_MANAGE_IP "sudo cat /var/log/cloud-init-output.log" > manage-cloud-init-output.log
 
-
 #######################################################################
+# nat module
+BASTION_DNS="$(terraform output bastion_dns)"
+PRIVATE_DNS="$(terraform output private_dns)"
+
+ssh -i ~/.ssh/consul-leader-asg -A -t ubuntu@$BASTION_DNS \
+ssh -i /home/ubuntu/.ssh/consul-leader-asg -A ubuntu@$PRIVATE_DNS \
+'ping -c 1 google.com'
+
 # DONE!
 
 echo "$LOG_PREFIX directory listing.."
 ls -alh
-

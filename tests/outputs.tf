@@ -10,3 +10,9 @@ output "worker_asg_name" {
 output "manage_asg_name" {
     value = "${module.management-cluster.asg_name}"
 }
+output "bastion_dns" {
+    value = "${aws_instance.ssh-bastion.public_dns}"
+}
+output "private_dns" {
+    value = "${aws_instance.private-instance.public_dns}"
+}

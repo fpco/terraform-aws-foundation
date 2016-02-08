@@ -220,3 +220,135 @@ resource "aws_route_table_association" "private" {
     subnet_id = "${aws_subnet.private.id}"
     route_table_id = "${aws_route_table.private.id}"
 }
+# Security groups
+resource "aws_security_group" "public-subnet" {
+	name = "$nat-test-public-subnet"
+	vpc_id = "${module.test-vpc.id}"
+	description = "Allow SSH from Internet, Pass to Private subnet"
+	# allow SSH, icmp from anywhere
+    ingress {
+        from_port = 22
+        to_port = 22
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    ingress {
+        from_port = -1
+        to_port = -1
+        protocol = "icmp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+	# pass to private subnet
+    egress {
+        from_port = 22
+        to_port = 22
+        protocol = "tcp"
+        cidr_blocks = ["${aws_subnet.private.cidr_block}"]
+    }
+    egress {
+        from_port = -1
+        to_port = -1
+        protocol = "icmp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+	tags {
+		Name = "nat-test-public-subnet"
+		Description = "Allow SSH from Internet, Pass to Private subnet"
+	}
+}
+resource "aws_security_group" "private-subnet" {
+	name = "nat-test-private-subnet"
+	vpc_id = "${module.test-vpc.id}"
+	description = "Allow SSH/HTTP/HTTPS from Public Subnet, Outbound HTTP/HTTPS to internet"
+	# allow SSH from public subnet
+	ingress {
+		from_port = 22
+		to_port = 22
+		protocol = "tcp"
+		cidr_blocks = ["${aws_subnet.public.cidr_block}"]
+	}
+	# allow icmp from public subnet
+	ingress {
+		from_port = -1
+		to_port = -1
+		protocol = "icmp"
+		cidr_blocks = ["${aws_subnet.public.cidr_block}"]
+	}
+	# outbound http/https
+	egress {
+		from_port = 80
+		to_port = 80
+		protocol = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+	egress {
+		from_port = 443
+		to_port = 443
+		protocol = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+	# outbound icmp
+	egress {
+		from_port = -1
+		to_port = -1
+		protocol = "icmp"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+	tags {
+		Name = "nat-test-private-subnet"
+		Description = "Allow SSH from Public Subnet, Outbound icmp to internet"
+	}
+}
+# instances
+resource "aws_instance" "ssh-bastion" {
+	ami = "${var.ami}"
+    name = "nat-test-ssh-bastion"
+	associate_public_ip_address = true
+	instance_type = "t2.micro"
+	availability_zone = "${aws_subnet.public.availability_zone}"
+	depends_on = ["aws_key_pair.tests"]
+	key_name = "${var.key_name}"
+	security_groups = ["${aws_security_group.public-subnet.id}"]
+	subnet_id = "${aws_subnet.public.id}"
+	count = 1
+	root_block_device = {
+		volume_type = "gp2"
+		volume_size = "15"
+		delete_on_termination = true
+	}
+	provisioner "file" {
+		source = "${var.key_file}"
+		destination = "/home/ubuntu/.ssh/${var.key_name}"
+		connection {
+			user = "ubuntu"
+			key_file = "${var.key_file}"
+		}
+	}
+	provisioner "remote-exec" {
+		inline = [
+		"chown ubuntu:ubuntu /home/ubuntu/.ssh/${var.key_name}",
+		"chmod 400 /home/ubuntu/.ssh/${var.key_name}"
+		]
+		connection {
+			user = "ubuntu"
+			key_file = "${var.key_file}"
+		}
+	}
+}
+resource "aws_instance" "private-instance" {
+	ami = "${var.ami}"
+    name = "nat-test-private-instance"
+	associate_public_ip_address = true
+	instance_type = "t2.micro"
+	availability_zone = "${aws_subnet.private.availability_zone}"
+	depends_on = ["aws_key_pair.tests"]
+	key_name = "${var.key_name}"
+	security_groups = ["${aws_security_group.private-subnet.id}"]
+	subnet_id = "${aws_subnet.private.id}"
+	count = 1
+	root_block_device = {
+		volume_type = "gp2"
+		volume_size = "15"
+		delete_on_termination = true
+	}
+}
