@@ -104,10 +104,13 @@ $SSH_CMD_PREFIX ubuntu@$TEST_MANAGE_IP "sudo cat /var/log/cloud-init-output.log"
 #######################################################################
 # nat module
 BASTION_DNS="$(terraform output bastion_dns)"
-PRIVATE_DNS="$(terraform output private_dns)"
+PRIVATE_INSTANCE_DNS="$(terraform output private_instance_dns)"
+KEY_FILE="$(terraform output key_file)"
+KEY_NAME="$(terraform output key_name)"
+eval KEY_FILE=$KEY_FILE #this is needed to evaluate the tilde properly
 
-ssh -i ~/.ssh/consul-leader-asg -A -t ubuntu@$BASTION_DNS \
-ssh -i /home/ubuntu/.ssh/consul-leader-asg -A ubuntu@$PRIVATE_DNS \
+ssh -i $KEY_FILE -A -t ubuntu@$BASTION_DNS \
+ssh -i /home/ubuntu/.ssh/$KEY_NAME -A ubuntu@$PRIVATE_INSTANCE_DNS \
 'ping -c 1 google.com'
 
 # DONE!

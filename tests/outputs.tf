@@ -13,6 +13,12 @@ output "manage_asg_name" {
 output "bastion_dns" {
     value = "${aws_instance.ssh-bastion.public_dns}"
 }
-output "private_dns" {
+output "private_instance_dns" {
     value = "${aws_instance.private-instance.public_dns}"
+}
+output "key_file" {
+    value = "${var.key_file}"
+}
+output "key_name" {
+    value = "${var.key_name}"
 }
