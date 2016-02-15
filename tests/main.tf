@@ -189,8 +189,11 @@ resource "aws_subnet" "private" {
 }
 # set up nat gateway
 module "nat_gateway" {
-    source = "../tf-modules/nat_gateway"
+    source = "../tf-modules/nat-gateway"
     subnet_id = "${aws_subnet.public.id}"
+    access_key = "${var.access_key}"
+    secret_key = "${var.secret_key}"
+    region = "${var.region}"
 }
 # route tables for above subnets
 resource "aws_route_table" "public" {
@@ -201,7 +204,7 @@ resource "aws_route_table" "public" {
     }
 }
 resource "aws_route_table" "private" {
-    vpc_id = "${aws_vpc.vpc.id}"
+    vpc_id = "${module.test-vpc.id}"
     route {
         cidr_block = "0.0.0.0/0"
         nat_gateway_id = "${module.nat_gateway.id}"
@@ -209,7 +212,7 @@ resource "aws_route_table" "private" {
 }
 # Route Table Associations
 resource "aws_main_route_table_association" "main" {
-    vpc_id = "${aws_vpc.vpc.id}"
+    vpc_id = "${module.test-vpc.id}"
     route_table_id = "${aws_route_table.public.id}"
 }
 resource "aws_route_table_association" "public" {
@@ -302,7 +305,6 @@ resource "aws_security_group" "private-subnet" {
 # instances
 resource "aws_instance" "ssh-bastion" {
 	ami = "${var.ami}"
-    name = "nat-test-ssh-bastion"
 	associate_public_ip_address = true
 	instance_type = "t2.micro"
 	availability_zone = "${aws_subnet.public.availability_zone}"
@@ -334,10 +336,12 @@ resource "aws_instance" "ssh-bastion" {
 			key_file = "${var.key_file}"
 		}
 	}
+    tags {
+        Name = "nat-test-ssh-bastion"
+    }
 }
 resource "aws_instance" "private-instance" {
 	ami = "${var.ami}"
-    name = "nat-test-private-instance"
 	associate_public_ip_address = true
 	instance_type = "t2.micro"
 	availability_zone = "${aws_subnet.private.availability_zone}"
@@ -351,4 +355,7 @@ resource "aws_instance" "private-instance" {
 		volume_size = "15"
 		delete_on_termination = true
 	}
+    tags {
+        Name = "nat-test-private-instance"
+    }
 }
