@@ -12,11 +12,15 @@
 
 LOG_PREFIX="OPSTACK:"
 
+KEY_FILE="$(terraform output key_file)"
+KEY_NAME="$(terraform output key_name)"
+eval KEY_FILE=$KEY_FILE # this is needed to properly evaluate a tilde (if present)
+
+SSH_CMD_PREFIX="ssh -i $KEY_FILE -o StrictHostKeyChecking=no"
+echo "$LOG_PREFIX SSH command prefix looks like: $SSH_CMD_PREFIX"
+
 echo "$LOG_PREFIX going to pause for 600 seconds (10 minutes) while we wait for the clusters to come online"
 sleep 600
-
-SSH_CMD_PREFIX="ssh -i ./id_rsa -o StrictHostKeyChecking=no"
-echo "$LOG_PREFIX SSH command prefix looks like: $SSH_CMD_PREFIX"
 
 # these ASG names need to be changed in the module source -_-
 LEADER_ASG_NAME="$(terraform output leader_asg_name)"
@@ -105,13 +109,15 @@ $SSH_CMD_PREFIX ubuntu@$TEST_MANAGE_IP "sudo cat /var/log/cloud-init-output.log"
 # nat module
 BASTION_DNS="$(terraform output bastion_dns)"
 PRIVATE_INSTANCE_DNS="$(terraform output private_instance_dns)"
-KEY_FILE="$(terraform output key_file)"
-KEY_NAME="$(terraform output key_name)"
-eval KEY_FILE=$KEY_FILE #this is needed to evaluate the tilde properly
+BASTION_SSH="ssh -o StrictHostKeyChecking=no -A -i $KEY_FILE ubuntu@$BASTION_DNS -W %h:%p"
 
-ssh -i $KEY_FILE -A -t ubuntu@$BASTION_DNS \
-ssh -i /home/ubuntu/.ssh/$KEY_NAME -A ubuntu@$PRIVATE_INSTANCE_DNS \
-'ping -c 1 google.com'
+echo "ping google from our test instance behind NAT, in a private subnet.."
+echo "use $KEY_NAME and $KEY_FILE to tunnel through $BASTION_DNS to hit $PRIVATE_INSTANCE_DNS.."
+echo "Here is the EC2 instance in the private subnet:"
+ssh -o StrictHostKeyChecking=no    \
+    -o ProxyCommand="$BASTION_SSH" \
+    -i $KEY_FILE                   \
+       ubuntu@$PRIVATE_INSTANCE_DNS 'hostname && uname -a && ping -c 1 google.com'
 
 # DONE!
 

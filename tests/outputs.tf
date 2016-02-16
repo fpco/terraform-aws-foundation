@@ -14,7 +14,7 @@ output "bastion_dns" {
     value = "${aws_instance.ssh-bastion.public_dns}"
 }
 output "private_instance_dns" {
-    value = "${aws_instance.private-instance.public_dns}"
+    value = "${aws_instance.private-instance.private_dns}"
 }
 output "key_file" {
     value = "${var.key_file}"
