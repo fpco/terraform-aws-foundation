@@ -42,7 +42,7 @@ resource "aws_elasticache_cluster" "redis" {
 }
 
 resource "aws_elasticache_subnet_group" "redis" {
-    name = "${var.name}-redis-ec-${var.region}"
+    name = "${var.name}-${var.region}"
     description = "Redis on Elasticache for ${var.name}"
     subnet_ids = ["${aws_subnet.a.id}", "${aws_subnet.c.id}"]
 }
