@@ -21,6 +21,7 @@ module "leader-asg" {
     user_data = "${var.user_data}"
     root_volume_type = "${var.root_volume_type}"
     root_volume_size = "${var.root_volume_size}"
+    public_ip = "${var.public_ip}"
 }
 #
 module "cluster-net" {
