@@ -82,3 +82,7 @@ variable "root_volume_size" {
     default = "15"
     description = "The size of the EBS volume (in GB) for the root block device"
 }
+variable "load_balancers" {
+    default = ""
+    description = "The string list of names of load balancers to pass to the ASG module"
+}
