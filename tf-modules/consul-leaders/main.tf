@@ -3,6 +3,7 @@ module "leader-asg" {
     source = "../asg"
     ami = "${var.ami}"
     az_list = "${var.region}a, ${var.region}c"
+    instance_type = "${var.instance_type}"
     desired_capacity = "${var.desired_capacity}"
     max_nodes = "${var.max_nodes}"
     min_nodes = "${var.min_nodes}"
