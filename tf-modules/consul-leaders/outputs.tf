@@ -1,3 +1,9 @@
+output "net_a" {
+    value = "${module.cluster-net.id_a}"
+}
+output "net_c" {
+    value = "${module.cluster-net.id_c}"
+}
 output "cidr_a" {
     value = "${module.cluster-net.cidr_a}"
 }
