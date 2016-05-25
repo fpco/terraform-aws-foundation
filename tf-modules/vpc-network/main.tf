@@ -24,3 +24,9 @@ resource "aws_route_table" "core" {
         Region = "${var.region}"
     }
 }
+# For more details on this next bit, see the notes section here:
+# http://www.terraform.io/docs/providers/aws/r/main_route_table_assoc.html
+resource "aws_main_route_table_association" "core" {
+    vpc_id = "${aws_vpc.core.id}"
+    route_table_id = "${aws_route_table.core.id}"
+}
