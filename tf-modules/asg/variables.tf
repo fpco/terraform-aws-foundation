@@ -26,14 +26,6 @@ variable "user_data" {
     default = ""
     description = "The user_data string to pass to cloud-init"
 }
-variable "cidr_a" {
-    default = ""
-    description = "The CIDR block for subnet a, eg: 10.100.7.0/24"
-}
-variable "cidr_c" {
-    default = ""
-    description = "The CIDR block for subnet c, eg: 10.100.8.0/24"
-}
 variable "max_nodes" {
     default = 9
     description = "The maximum number of nodes in each group"
@@ -54,12 +46,6 @@ variable "secret_key" {
 }
 variable "region" {
     description = "AWS region to deploy to"
-}
-variable "vpc_id" {
-    description = "The ID of the VPC to deploy to"
-}
-variable "route_table_id" {
-    description = "The ID of the routing table to use"
 }
 variable "public_ip" {
     default = "true"

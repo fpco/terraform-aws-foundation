@@ -13,8 +13,6 @@ module "leader-asg" {
     suffix = "consul-leaders"
     cidr_a = "${module.cluster-net.cidr_a}"
     cidr_c = "${module.cluster-net.cidr_c}"
-    vpc_id = "${var.vpc_id}"
-    route_table_id = "${var.route_table_id}"
     region = "${var.region}"
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
