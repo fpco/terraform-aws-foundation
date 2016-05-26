@@ -1,3 +1,4 @@
 *.tfstate*
 .terraform
 *.sw[o,p]
+auth.tfvars
