@@ -47,7 +47,7 @@
     },
     {
       "type": "shell",
-      "execute_command": "sudo -S sh '{{.Path}}'",
+      "execute_command": "sudo -H -S sh '{{.Path}}'",
         "scripts": [
           "scripts/root-ssh-setup.sh",
           "scripts/base.sh",
