@@ -8,7 +8,3 @@ sshd_config:
   X11Forwarding: 'no'
   PasswordAuthentication: 'no'
   AuthenticationMethods: 'publickey'
-
-# fpco's docker formula
-docker:
-  version: '1.7.1'
