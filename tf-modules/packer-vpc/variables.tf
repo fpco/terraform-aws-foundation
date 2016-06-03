@@ -40,3 +40,6 @@ variable "ssh_user" {
 #
 variable "access_key" {}
 variable "secret_key" {}
+variable "token" {
+    default = ""
+}
