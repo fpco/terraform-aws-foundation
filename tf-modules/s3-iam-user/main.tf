@@ -3,7 +3,7 @@ resource "aws_iam_user" "s3-user" {
     path = "/"
 }
 resource "aws_iam_policy" "s3-user" {
-    name = "${var.bucket_name}_${var.name}_all_access"
+    name = "${var.name}_s3_bucket_access"
     policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -13,9 +13,7 @@ resource "aws_iam_policy" "s3-user" {
             "Action": [
                 "s3:ListBucket"
             ],
-            "Resource": [
-                "arn:aws:s3:::${var.bucket_name}"
-            ]
+            "Resource": ["${join("\",\"",formatlist("arn:aws:s3:::%s",split(",", var.bucket_names)))}"]
         },
         {
             "Effect": "Allow",
@@ -25,16 +23,14 @@ resource "aws_iam_policy" "s3-user" {
                 "s3:GetObject",
                 "s3:CreateMultipartUpload"
             ],
-            "Resource": [
-                "arn:aws:s3:::${var.bucket_name}/*"
-            ]
+            "Resource": ["${join("\",\"",formatlist("arn:aws:s3:::%s/*",split(",", var.bucket_names)))}"]
         }
     ]
 }
 EOF
 }
 resource "aws_iam_policy_attachment" "s3-user" {
-    name = "${var.bucket_name}_${var.name}_all_access_attachment"
+    name = "${var.name}_s3_bucket_access"
     users = ["${aws_iam_user.s3-user.name}"]
     groups = []
     policy_arn = "${aws_iam_policy.s3-user.arn}"
@@ -51,7 +47,7 @@ provider "aws" {
 variable "name" {
     description = "the name of the user"
 }
-variable "bucket_name" {
+variable "bucket_names" {
     description = "the name of the bucket to grant access to"
 }
 variable "access_key" {}
