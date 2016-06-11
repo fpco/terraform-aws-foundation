@@ -51,9 +51,11 @@ echo "extension_modules: /srv/salt-ext" > /etc/salt/minion.d/extension_modules.c
 wget --output-document=/usr/lib/python2.7/dist-packages/salt/utils/locales.py https://raw.githubusercontent.com/saltstack/salt/2015.8/salt/utils/locales.py
 # there are files in _states and _modules we want to sync and make available,
 # that is where we have our pip state/module source we've imported from upstream
-mv /tmp/top.sls /srv/salt-git/fpco-salt-formula/
 mkdir -p /srv/salt-ext/states /srv/salt-ext/modules
+echo "sync salt modules/states/etc from the salt file roots to the minion cache"
 salt-call --local saltutil.sync_all --log-level=debug
+# run a second time, just in case the first did nothing..
+salt-call --local saltutil.sync_all
 echo "formula:"
 ls -alh /srv/salt-deb/*/_*
 ls -alh /srv/salt-git/*/_*
