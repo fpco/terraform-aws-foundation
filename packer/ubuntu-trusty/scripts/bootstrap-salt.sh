@@ -46,27 +46,39 @@ END_ALIAS
 # the user gave us pillar .sls as uploads, move them into place for salt
 mv /tmp/pillar /srv/
 
-# the following is a hack to a) allow us to continue running 2015.5 for it's ext_pillar module
-# and b) get the pip state/module from 2015.8, which doesn't break pip
-echo "extension_modules: /srv/salt-ext" > /etc/salt/minion.d/extension_modules.conf
-wget --output-document=/usr/lib/python2.7/dist-packages/salt/utils/locales.py https://raw.githubusercontent.com/saltstack/salt/2015.8/salt/utils/locales.py
-# there are files in _states and _modules we want to sync and make available,
-# that is where we have our pip state/module source we've imported from upstream
-mkdir -p /srv/salt-ext/states /srv/salt-ext/modules
-echo "sync salt modules/states/etc from the salt file roots to the minion cache"
-salt-call --local saltutil.sync_all --log-level=debug
-# run a second time, just in case the first did nothing..
-salt-call --local saltutil.sync_all
-echo "formula:"
-ls -alh /srv/salt-deb/*/_*
-ls -alh /srv/salt-git/*/_*
-
 # all of /srv/* is root only, and not world readable
 chown -R root:root /srv
 chmod -R o-rwx /srv
 
-
-ls -alh /srv/*
+echo "minion formula:"
+ls -alh /srv/*/* /srv/*/*/_*
+echo "minion configs:"
 ls -alh /etc/salt/*
-cat /etc/salt/minion
 cat /etc/salt/minion.d/*
+echo "version check:"
+salt-call --version
+
+# the following is a hack to a) allow us to continue running 2015.5 for it's
+# ext_pillar module, and b) get the pip state/module from 2015.8, which doesn't
+# break pip
+wget --output-document=/usr/lib/python2.7/dist-packages/salt/utils/locales.py https://raw.githubusercontent.com/saltstack/salt/2015.8/salt/utils/locales.py
+# I really, really don't understand why this sleep works, but without it, the
+# sync_all in this production build fails to sync anything. If you are interested
+# in the details, see https://github.com/saltstack/salt/issues/34080
+echo "pause to give time before we run sync_all"
+sleep 60
+# only needed for the moment, while fpco-salt-formula puts consul ext_pillar
+# into this directory "manually", once that module is imported into the repo,
+# this snippet/hack could be removed. Here's the catch, that module cannot be
+# imported until we use a version of salt (or a version of the saltutils.sync_all
+# module) which supports sync'ing pillar modules on masterless hosts. See this
+# for context: https://github.com/saltstack/salt/issues/33645
+mkdir /srv/salt-ext
+cat <<EOF > /etc/salt/minion.d/ext_mods.conf
+extension_modules: /srv/salt-ext
+EOF
+# there are files in _states and _modules we want to sync and make available,
+# that is where we have our pip state/module source we've imported from upstream
+echo "sync salt modules/states/etc from the salt file roots to the minion cache"
+salt-call --local saltutil.sync_all
+ls -alh /srv/salt-ext/*
