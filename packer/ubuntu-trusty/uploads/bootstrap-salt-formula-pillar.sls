@@ -9,13 +9,16 @@ file_roots_git:
   install:
     openssh-formula:
       url: https://github.com/saltstack-formulas/openssh-formula
-      rev: '1b74efd'
+      rev: '7eefd1a'
     fail2ban-formula:
       url: https://github.com/saltstack-formulas/fail2ban-formula
-      rev: '105cf31'
-  # fpco-salt-formula:
-  #   url: git@github.com:fpco/fpco-salt-formula.git
-  #   rev: 'develop'
+      rev: '6114274'
+    fpco-salt-formula:
+      url: git@github.com:fpco/fpco-salt-formula.git
+      rev: 'master'
+    logentries-salt-formula:
+      url: git@github.com:fpco/logentries-salt-formula.git
+      rev: 'master'
   # hashicorp-salt-formula:
   #   url: git@github.com:fpco/hashicorp-salt-formula.git
   #   rev: 'develop'
