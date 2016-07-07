@@ -31,6 +31,7 @@ mv /tmp/bootstrap-salt-formula-pillar.sls /srv/bootstrap-salt-formula/pillar/boo
 
 # bootstrap salt formula!
 salt-call --local                                           \
+          --log-level=debug                                 \
           --file-root   /srv/bootstrap-salt-formula/formula \
           --pillar-root /srv/bootstrap-salt-formula/pillar  \
           --config-dir  /srv/bootstrap-salt-formula/conf    \
