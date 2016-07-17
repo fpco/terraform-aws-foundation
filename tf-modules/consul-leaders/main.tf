@@ -11,8 +11,6 @@ module "leader-asg" {
     key_name = "${var.key_name}"
     name = "${var.name}"
     suffix = "consul-leaders"
-    cidr_a = "${module.cluster-net.cidr_a}"
-    cidr_c = "${module.cluster-net.cidr_c}"
     region = "${var.region}"
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
