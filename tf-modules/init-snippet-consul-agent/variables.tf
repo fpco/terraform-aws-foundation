@@ -1,3 +1,7 @@
+variable "bootstrap_pillar_file" {
+    default = "/srv/pillar/bootstrap.sls"
+    description = "path, to the 'bootstrap' pillar file"
+}
 variable "consul_secret_key" {
     description = "Secret key provided to consul, for cluster crypto"
 }
@@ -5,9 +9,11 @@ variable "consul_client_token" {
     description = "Client token for services on the node, connecting to consul as a client"
 }
 variable "init_prefix" {
+    default = ""
     description = "initial init (shellcode) to prefix this snippet with"
 }
 variable "init_suffix" {
+    default = ""
     description = "init (shellcode) to append to the end of this snippet"
 }
 variable "disable_consul_remote_exec" {
