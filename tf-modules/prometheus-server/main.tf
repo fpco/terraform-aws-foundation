@@ -69,8 +69,6 @@ bash -c "salt-call --local mount.mount /prometheus /dev/xvdf1 mkmnt=True"
 salt-call --local mount.set_fstab /prometheus /dev/xvdf1 ext4
 END_INIT
     prometheus_pillar = <<END_PILLAR
-prometheus:
-  config: |
-    foo: bar
+${var.prometheus_pillar}
 END_PILLAR
 }

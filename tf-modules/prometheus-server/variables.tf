@@ -45,6 +45,10 @@ variable "data_volume_iops" {
     default = ""
     description = "The amount of IOPS to provision for the EBS block device"
 }
+variable "prometheus_pillar" {
+    default = ""
+    description = "YAML to pass to prometheus saltstack formula (pillar)"
+}
 variable "init_prefix" {
     default = ""
     description = "init shell to run before attaching the EBS volume"
