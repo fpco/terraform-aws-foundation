@@ -3,6 +3,7 @@ variable "bootstrap_pillar_file" {
     description = "path, to the 'bootstrap' pillar file"
 }
 variable "consul_addr" {
+    default = "127.0.0.1:8500"
     description = "Address to consul, in the form host:port"
 }
 variable "consul_client_token" {
@@ -25,7 +26,7 @@ variable "log_prefix" {
     description = "string to prefix log messages with"
 }
 resource "template_file" "init-snippet" {
-    template = "${path.module}/init.tpl"
+    template = "${path.module}/snippet.tpl"
     vars {
         bootstrap_pillar_file = "${var.bootstrap_pillar_file}"
         consul_addr = "${var.consul_addr}"
