@@ -4,14 +4,11 @@
     "vpc_id": "vpc-a1b2c3d4",
     "subnet_id": "subnet-a1b2c3d4",
     "region": "us-east-1",
+    "ami_name": "base-host",
     "copy_to_a": "us-west-1",
     "copy_to_b": "us-west-2",
     "description": "Stock Ubuntu 14.04 + FPC common base for SOA-driven infrastructure",
     "os_version": "Ubuntu Trusty",
-    "release": "14.04 LTS",
-    "git_rev": "shortrev",
-    "build_id": "ci-build-key",
-    "aws_access_key": "FOOBAR",
-    "aws_secret_key": "FOOBAR",
-    "aws_session_token": "FOOBAR"
+    "os_release": "14.04 LTS",
+    "build_id": "ci-build-key"
 }
