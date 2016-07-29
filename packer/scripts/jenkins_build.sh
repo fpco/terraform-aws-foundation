@@ -1,7 +1,6 @@
 #!/bin/sh
 
-PACKER_DIR=fpco-terraform-aws/packer/$BUILD
-cd $PACKER_DIR
+cd packer/$BUILD
 
 cat <<EOT > variables.json
 {
