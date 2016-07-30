@@ -2,6 +2,14 @@
 
 cd packer/$BUILD
 
+# move SSH key into place for packer upload
+echo "move $SSH_KEY_FILE --> uploads/id_rsa"
+if [ -z "$SSH_KEY_FILE" ]; then
+  echo "no key file found, not uploading"
+else
+  mv $SSH_KEY_FILE uploads/id_rsa
+fi
+
 cat <<EOT > variables.json
 {
     "ami_name": "$NAME",
