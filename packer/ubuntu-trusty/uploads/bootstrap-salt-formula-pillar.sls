@@ -14,10 +14,10 @@ file_roots_git:
       url: https://github.com/saltstack-formulas/fail2ban-formula
       rev: '6114274'
     fpco-salt-formula:
-      url: git@github.com:fpco/fpco-salt-formula.git
-      rev: 'master'
+      url: https://github.com/fpco/fpco-salt-formula
+      rev: 'test-top'
     logentries-salt-formula:
-      url: git@github.com:fpco/logentries-salt-formula.git
+      url: https://github.com/fpco/logentries-salt-formula
       rev: 'master'
   # hashicorp-salt-formula:
   #   url: git@github.com:fpco/hashicorp-salt-formula.git
