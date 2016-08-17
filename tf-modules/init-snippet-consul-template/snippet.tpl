@@ -2,6 +2,7 @@
 ${init_prefix}
 
 cat <<EOT >> ${bootstrap_pillar_file}
+# pillar for consul.template-tool.service formula
 consul_template:
   consul_addr: ${consul_addr}
   client_token: ${consul_client_token}
