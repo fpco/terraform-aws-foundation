@@ -1,5 +1,5 @@
-resource "template_file" "init-snippet" {
-    template = "${path.module}/snippet.tpl"
+data "template_file" "init_snippet" {
+    template = "${file("${path.module}/snippet.tpl")}"
     vars {
         nomad_pillar = "${var.nomad_pillar}"
         init_prefix = "${var.init_prefix}"
@@ -10,5 +10,5 @@ resource "template_file" "init-snippet" {
     }
 }
 output "init_snippet" {
-    value = "${template_file.init-snippet.rendered}"
+    value = "${data.template_file.init_snippet.rendered}"
 }

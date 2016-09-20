@@ -30,8 +30,8 @@ variable "volume_id" {
     description = "ID of the EBS volume to attach"
 }
 # render init script for a cluster using our generic template
-resource "template_file" "init-snippet" {
-    template = "${path.module}/snippet.tpl"
+data "template_file" "init_snippet" {
+    template = "${file("${path.module}/snippet.tpl")}"
     vars {
         device_path = "${var.device_path}"
         init_prefix = "${var.init_prefix}"
@@ -44,5 +44,5 @@ resource "template_file" "init-snippet" {
     }
 }
 output "init_snippet" {
-    value = "${template_file.init-snippet.rendered}"
+    value = "${data.template_file.init_snippet.rendered}"
 }

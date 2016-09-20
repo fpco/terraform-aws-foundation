@@ -13,8 +13,8 @@ variable "init_suffix" {
 variable "pillar" {
     description = "salt pillar to write out to bootstrap.sls"
 }
-resource "template_file" "init-snippet" {
-    template = "${path.module}/init.tpl"
+data "template_file" "init_snippet" {
+    template = "${file("${path.module}/snippet.tpl")}"
     vars {
         bootstrap_pillar_file = "${var.bootstrap_pillar_file}"
         init_prefix = "${var.init_prefix}"
@@ -23,5 +23,5 @@ resource "template_file" "init-snippet" {
     }
 }
 output "init_snippet" {
-    value = "${template_file.init-snippet.rendered}"
+    value = "${data.template_file.init_snippet.rendered}"
 }

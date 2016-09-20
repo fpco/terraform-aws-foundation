@@ -1,5 +1,5 @@
-resource "template_file" "init-snippet" {
-    template = "${path.module}/snippet.tpl"
+data "template_file" "init_snippet" {
+    template = "${file("${path.module}/snippet.tpl")}"
     vars {
         cidr_prefix_a = "${var.cidr_prefix_a}"
         cidr_prefix_c = "${var.cidr_prefix_c}"
@@ -17,5 +17,5 @@ resource "template_file" "init-snippet" {
     }
 }
 output "init_snippet" {
-    value = "${template_file.init-snippet.rendered}"
+    value = "${data.template_file.init_snippet.rendered}"
 }

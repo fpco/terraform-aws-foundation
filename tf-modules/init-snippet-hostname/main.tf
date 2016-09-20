@@ -23,8 +23,8 @@ variable "log_prefix" {
     description = "string to prefix log messages with"
 }
 # render init script for a cluster using our generic template
-resource "template_file" "init_snippet" {
-    template = "${path.module}/snippet.tpl"
+data "template_file" "init_snippet" {
+    template = "${file("${path.module}/snippet.tpl")}"
     vars {
         bootstrap_pillar_file = "${var.bootstrap_pillar_file}"
         hostname_prefix = "${var.hostname_prefix}"
@@ -35,5 +35,5 @@ resource "template_file" "init_snippet" {
     }
 }
 output "init_snippet" {
-    value = "${template_file.init_snippet.rendered}"
+    value = "${data.template_file.init_snippet.rendered}"
 }
