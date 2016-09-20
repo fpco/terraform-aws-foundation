@@ -1,5 +1,4 @@
 variable "name" {
-    default = ""
     description = "The name of this auto-scaling cluster, this should be unique"
 }
 variable "suffix" {
