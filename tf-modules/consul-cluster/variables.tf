@@ -1,9 +1,7 @@
 variable "name" {
-    default = ""
     description = "The name of this auto-scaling cluster, this should be unique"
 }
 variable "key_name" {
-    default = ""
     description = "The name of the (AWS) SSH key to associate with the instance"
 }
 variable "ami" {
