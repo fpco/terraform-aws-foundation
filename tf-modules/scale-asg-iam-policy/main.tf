@@ -9,7 +9,8 @@ resource "aws_iam_policy" "main" {
   "Statement": [
     {
       "Action": [
-        "autoscaling:SetDesiredCapacity"
+        "autoscaling:SetDesiredCapacity",
+        "autoscaling:DescribeAutoScalingGroups"
       ],
       "Effect": "Allow",
       "Resource": "*"
