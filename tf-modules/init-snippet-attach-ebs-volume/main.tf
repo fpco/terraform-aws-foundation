@@ -21,6 +21,7 @@ variable "log_prefix" {
 }
 variable "region" {
     description = "AWS region the volume is in"
+    default = ""
 }
 variable "wait_interval" {
     default = "5"

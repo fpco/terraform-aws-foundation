@@ -38,8 +38,12 @@ variable "ssh_user" {
     description = "The SSH user to connect to the instance with"
 }
 #
-variable "access_key" {}
-variable "secret_key" {}
+variable "access_key" {
+    default = ""
+}
+variable "secret_key" {
+    default = ""
+}
 variable "token" {
     default = ""
 }

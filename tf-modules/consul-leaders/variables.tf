@@ -35,9 +35,11 @@ variable "desired_capacity" {
 }
 variable "access_key" {
     description = "AWS key id"
+    default = ""
 }
 variable "secret_key" {
     description = "AWS key secret"
+    default = ""
 }
 variable "consul_secret_key" {
     description = "Secret key to secure cluster communication, generate this with `consul keygen`"
@@ -63,6 +65,7 @@ variable "cidr_mask" {
 }
 variable "region" {
     description = "AWS region to deploy to"
+    default = ""
 }
 variable "vpc_id" {
     description = "The ID of the experimental VPC to deploy to, depends on the AWS region"

@@ -4,9 +4,11 @@ variable "name" {
 }
 variable "access_key" {
     description = "AWS key id"
+    default = ""
 }
 variable "secret_key" {
     description = "AWS key secret"
+    default = ""
 }
 variable "allowed_cidr_blocks" {
     default = "0.0.0.0/0"
@@ -14,6 +16,7 @@ variable "allowed_cidr_blocks" {
 }
 variable "region" {
     description = "AWS region to deploy to"
+    default = ""
 }
 variable "vpc_id" {
     description = "The ID of the VPC to deploy to"

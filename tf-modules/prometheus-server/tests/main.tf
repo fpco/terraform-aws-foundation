@@ -92,6 +92,7 @@ variable "ssh_pubkey" {
 }
 variable "region" {
     description = "The AWS region to deploy to"
+    default = ""
 }
 variable "az" {
     description = "The AWS Availability Zone (AZ) to create the instance in"
@@ -106,6 +107,12 @@ variable "account_arn" {
 variable "data_volume_snapshot_id" {
     default = ""
 }
-variable "access_key" {}
-variable "secret_key" {}
-variable "token" {}
+variable "access_key" {
+    default = ""
+}
+variable "secret_key" {
+    default = ""
+}
+variable "token" {
+    default = ""
+}

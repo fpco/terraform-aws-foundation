@@ -69,6 +69,7 @@ variable "security_group_ids" {
 }
 variable "region" {
     description = "The AWS region to deploy to"
+    default = ""
 }
 variable "az" {
     description = "The AWS Availability Zone (AZ) to create the instance in"
@@ -80,6 +81,10 @@ variable "load_balancers" {
 variable "account_arn" {
     description = "The AWS account number, for IAM role assigned to the ASG"
 }
-variable "access_key" {}
-variable "secret_key" {}
+variable "access_key" {
+    default = ""
+}
+variable "secret_key" {
+    default = ""
+}
 

@@ -39,12 +39,15 @@ variable "desired_capacity" {
 }
 variable "access_key" {
     description = "AWS key id"
+    default = ""
 }
 variable "secret_key" {
     description = "AWS key secret"
+    default = ""
 }
 variable "region" {
     description = "AWS region to deploy to"
+    default = ""
 }
 variable "public_ip" {
     default = "true"

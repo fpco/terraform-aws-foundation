@@ -3,6 +3,7 @@ variable "name" {
 }
 variable "region" {
     description = "The AWS region to deploy to"
+    default = ""
 }
 variable "az" {
     description = "The AWS Availability Zone (AZ) to create the instance in"
@@ -34,5 +35,9 @@ variable "iops" {
 variable "account_arn" {
     description = "The AWS account number, for IAM role assigned to the instance created"
 }
-variable "access_key" {}
-variable "secret_key" {}
+variable "access_key" {
+    default = ""
+}
+variable "secret_key" {
+    default = ""
+}

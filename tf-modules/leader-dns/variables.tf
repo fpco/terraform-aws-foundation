@@ -21,9 +21,11 @@ variable "region" {
 }
 variable "access_key" {
     description = "AWS key id"
+    default = ""
 }
 variable "secret_key" {
     description = "AWS key secret"
+    default = ""
 }
 variable "ttl" {
     default = "300"
