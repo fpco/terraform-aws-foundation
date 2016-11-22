@@ -31,8 +31,8 @@ provider "aws" { }
 
 module "s3-remote-state-bucket" {
     source      = "../../../../fpco-terraform-aws/tf-modules/s3-remote-state"
-    iam_users   = ""
-    iam_groups  = ""
+    iam_users   = "${var.iam_users}"
+    iam_groups  = "${var.iam_groups}"
     bucket_name = "${var.bucket_name}"
 }
 
