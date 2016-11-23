@@ -50,7 +50,10 @@ resource "aws_iam_group" "setup-mfa" {
 data "aws_iam_policy_document" "admin" {
   statement {
     effect = "Allow"
-    actions = ["*"]
+    actions = [
+      "*",
+      "aws-portal:*",
+      "support:*"]
     resources = ["*"]
     condition {
       test = "Bool"
