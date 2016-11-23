@@ -1,5 +1,5 @@
 #======================================================================
-# meta-inf.tf
+# iam.tf
 # Meta-infrastructure - IAM users, groups, etc. not specific to the
 # product itself.
 #======================================================================
