@@ -3,3 +3,4 @@
 *.sw[o,p]
 auth.tfvars
 docs/saltstack/*.md
+site
