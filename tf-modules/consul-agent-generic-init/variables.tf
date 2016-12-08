@@ -3,11 +3,9 @@ variable "service" {
     description = "Primary role serviced by nodes in this cluster"
 }
 variable "consul_secret_key" {
-    default = "FOOBAR=="
     description = "Secret key provided to consul, for cluster crypto"
 }
 variable "consul_client_token" {
-    default = "UUID"
     description = "Client token for services on the node, connecting to consul as a client"
 }
 variable "consul_webui" {
@@ -15,7 +13,6 @@ variable "consul_webui" {
     description = "True/False boolean (note case) that maps to enable the webui via the consul:webui pillar key"
 }
 variable "leader_dns" {
-    default = ""
     description = "DNS to find consul leaders to follow/join"
 }
 variable "datacenter" {
@@ -34,7 +31,7 @@ variable "disable_consul_remote_exec" {
     description = "True/False boolean pillar key (note case) for the consul salt formula"
 }
 variable "log_level" {
-    default = "debug"
+    default = "info"
     description = "set log verbosity on node init, for CM with saltstack"
 }
 variable "retry_interval" {
