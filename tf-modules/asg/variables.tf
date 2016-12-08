@@ -37,18 +37,6 @@ variable "desired_capacity" {
     default = 7
     description = "The desired number of nodes in each group"
 }
-variable "access_key" {
-    description = "AWS key id"
-    default = ""
-}
-variable "secret_key" {
-    description = "AWS key secret"
-    default = ""
-}
-variable "region" {
-    description = "AWS region to deploy to"
-    default = ""
-}
 variable "public_ip" {
     default = "true"
     description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"

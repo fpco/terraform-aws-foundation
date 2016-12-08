@@ -2,7 +2,7 @@
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {
-        Name = "${var.name}-${var.region}-consul-leader"
+        Name = "${var.name}-consul-leader"
         Description = "Allow TCP and UDP ports to consul leaders in ${var.name}"
     }
     # Server RPC, used by servers to handle incoming requests from other agents. TCP only.

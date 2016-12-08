@@ -11,9 +11,6 @@ module "agent-asg" {
     key_name = "${var.key_name}"
     name = "${var.name}"
     suffix = "cluster"
-    region = "${var.region}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
     subnet_ids = "${module.cluster-net.id_a}, ${module.cluster-net.id_c}"
     security_group_ids = "${var.cluster_security_group_ids}"
     user_data = "${var.user_data}"
@@ -29,8 +26,6 @@ module "cluster-net" {
     cidr_a = "${var.cidr_minions_a}"
     cidr_c = "${var.cidr_minions_c}"
     region = "${var.region}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
     public_ip = "${var.public_ip}"
 }
 

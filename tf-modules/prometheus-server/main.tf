@@ -1,8 +1,3 @@
-provider "aws" {
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
-    region = "${var.region}"
-}
 module "prometheus-data" {
     source = "../persistent-ebs"
     name = "${var.name}-prometheus-data"
@@ -14,8 +9,6 @@ module "prometheus-data" {
     encrypted = "${var.data_volume_encrypted}"
     kms_key_id = "${var.data_volume_kms_key_id}"
     snapshot_id = "${var.data_volume_snapshot_id}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
     account_arn = "${var.account_arn}"
 }
 module "prometheus-server" {
@@ -27,10 +20,7 @@ module "prometheus-server" {
     instance_type = "${var.instance_type}"
     ami = "${var.ami}"
     subnet_ids = "${var.subnet_id}"
-    region = "${var.region}"
     az_list = "${var.region}${var.az}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
     public_ip = "${var.public_ip}"
     key_name = "${var.key_name}"
     elb_names = "${var.load_balancers}"

@@ -1,10 +1,10 @@
 # define security group for the custom services and egress on the leader
 resource "aws_security_group" "main" {
-    name = "${var.name}-${var.region}"
+    name = "${var.name}"
     vpc_id = "${var.vpc_id}"
     tags {
-        Name = "${var.name}-${var.region}"
-        Description = "Allow open egress for ${var.name}-${var.region}"
+        Name = "${var.name}"
+        Description = "Allow open egress for ${var.name}"
     }
     # unrestricted outbound
     egress {

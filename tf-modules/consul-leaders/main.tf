@@ -11,9 +11,6 @@ module "leader-asg" {
     key_name = "${var.key_name}"
     name = "${var.name}"
     suffix = "consul-leaders"
-    region = "${var.region}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
     subnet_ids = "${module.cluster-net.id_a}, ${module.cluster-net.id_c}"
     security_group_ids = "${var.leader_security_group_ids}"
     user_data = "${var.user_data}"
@@ -30,7 +27,5 @@ module "cluster-net" {
     cidr_a = "${var.cidr_prefix_a}.0/${var.cidr_mask}"
     cidr_c = "${var.cidr_prefix_c}.0/${var.cidr_mask}"
     region = "${var.region}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
     public_ip = "${var.public_ip}"
 }

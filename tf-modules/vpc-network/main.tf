@@ -10,7 +10,6 @@ resource "aws_internet_gateway" "core" {
     vpc_id = "${aws_vpc.core.id}"
     tags {
         Name = "${var.name}"
-        Region = "${var.region}"
     }
 }
 resource "aws_route_table" "core" {
@@ -21,7 +20,6 @@ resource "aws_route_table" "core" {
     }
     tags {
         Name = "${var.name}"
-        Region = "${var.region}"
     }
 }
 # For more details on this next bit, see the notes section here:

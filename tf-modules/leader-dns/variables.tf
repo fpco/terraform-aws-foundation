@@ -15,18 +15,6 @@ variable "cidr_a" {
 variable "cidr_c" {
     description = "CIDR IP block for leader subnet c, expected to be a /28"
 }
-variable "region" {
-    default = ""
-    description = "The AWS region"
-}
-variable "access_key" {
-    description = "AWS key id"
-    default = ""
-}
-variable "secret_key" {
-    description = "AWS key secret"
-    default = ""
-}
 variable "ttl" {
     default = "300"
     description = "TTL to set in aws_route53_record"

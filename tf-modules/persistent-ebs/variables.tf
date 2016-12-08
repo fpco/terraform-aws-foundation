@@ -35,9 +35,3 @@ variable "iops" {
 variable "account_arn" {
     description = "The AWS account number, for IAM role assigned to the instance created"
 }
-variable "access_key" {
-    default = ""
-}
-variable "secret_key" {
-    default = ""
-}

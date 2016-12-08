@@ -23,7 +23,7 @@ hostname: $HOSTNAME
 # setup consul
 consul:
   client_token: ${consul_client_token}
-  datacenter: ${region}
+  datacenter: ${datacenter}
   disable_remote_exec: ${disable_remote_exec}
   secret_key: ${consul_secret_key}
   leaders:
