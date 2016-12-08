@@ -1,5 +1,4 @@
 variable "name" {
-    default = "test"
     description = "A short identifier to use in the name of the security group"
 }
 variable "vpc_id" {

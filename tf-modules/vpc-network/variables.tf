@@ -1,9 +1,7 @@
 variable "name" {
-    default = ""
     description = "The name of this network"
 }
 variable "vpc_cidr_prefix" {
-    default = ""
     description = "The prefix to the VPC CIDR block, eg: 10.100"
 }
 variable "enable_dns_hostnames" {

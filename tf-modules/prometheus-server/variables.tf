@@ -69,7 +69,6 @@ variable "security_group_ids" {
 }
 variable "region" {
     description = "The AWS region to deploy to"
-    default = ""
 }
 variable "az" {
     description = "The AWS Availability Zone (AZ) to create the instance in"
