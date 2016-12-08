@@ -2,7 +2,7 @@
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {
-        Name = "${var.name}-${var.region}-consul-agent"
+        Name = "${var.name}-consul-agent"
         Description = "Allow TCP and UDP ports to consul agent in ${var.name}"
     }
     # Serf LAN, used to handle gossip in the LAN. Required by all agents. TCP and UDP.

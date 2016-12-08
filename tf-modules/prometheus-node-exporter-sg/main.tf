@@ -2,8 +2,8 @@
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {
-        Name = "${var.name}-${var.region}-prometheus-node-exporter"
-        Description = "Allow prometheus server access to node-exporter in ${var.name}-${var.region}"
+        Name = "${var.name}-prometheus-node-exporter"
+        Description = "Allow prometheus server access to node-exporter in ${var.name}"
     }
     # the prometheus node-exporter listens on 9100
     ingress {

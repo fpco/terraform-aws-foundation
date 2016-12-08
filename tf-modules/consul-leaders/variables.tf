@@ -33,14 +33,6 @@ variable "desired_capacity" {
     default = 7
     description = "The desired number of nodes in the auto-scaling group"
 }
-variable "access_key" {
-    description = "AWS key id"
-    default = ""
-}
-variable "secret_key" {
-    description = "AWS key secret"
-    default = ""
-}
 variable "consul_secret_key" {
     description = "Secret key to secure cluster communication, generate this with `consul keygen`"
 }

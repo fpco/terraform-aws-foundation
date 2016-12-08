@@ -10,7 +10,7 @@ resource "template_file" "generic_init" {
         disable_remote_exec = "${var.disable_consul_remote_exec}"
         leader_dns = "${var.leader_dns}"
         log_level = "${var.log_level}"
-        region = "${var.region}"
+        datacenter = "${var.datacenter}"
         service = "${var.service}"
         retry_interval = "${var.retry_interval}"
     }

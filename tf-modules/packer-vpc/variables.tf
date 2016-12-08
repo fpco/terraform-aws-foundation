@@ -37,13 +37,3 @@ variable "ssh_user" {
     default = "ubuntu"
     description = "The SSH user to connect to the instance with"
 }
-#
-variable "access_key" {
-    default = ""
-}
-variable "secret_key" {
-    default = ""
-}
-variable "token" {
-    default = ""
-}

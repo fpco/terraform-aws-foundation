@@ -2,7 +2,7 @@
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {
-        Name = "${var.name}-${var.region}-nomad-server"
+        Name = "${var.name}-nomad-server"
         Description = "Allow 4646/4647 (TCP, HTTP/RPC) to both worker/servers, and 4848 (serf, tcp/udp) to servers only in ${var.name}"
     }
     # open port 4646/4647 (nomad-server) tcp for the leaders

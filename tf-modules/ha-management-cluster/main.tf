@@ -9,8 +9,6 @@ module "management-cluster" {
     min_nodes = "2"
     desired_capacity = "3"
     key_name = "${var.key_name}"
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
     region = "${var.region}"
     cidr_minions_a = "${var.cidr_a}"
     cidr_minions_c = "${var.cidr_c}"
@@ -59,8 +57,8 @@ resource "aws_security_group" "management_services" {
 # provision the management cluster
 module "manage_init" {
     source = "../consul-agent-generic-init"
-    region = "${var.region}"
     service = "manage"
+    datacenter = "${var.region}"
     consul_secret_key = "${var.consul_secret_key}"
     consul_client_token = "${var.consul_client_token}"
     leader_dns = "${var.consul_leader_dns}"

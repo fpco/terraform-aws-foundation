@@ -14,14 +14,6 @@ variable "engine_version" {
     default = "2.8.22"
     description = "See http://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/SelectEngine.html"
 }
-variable "access_key" {
-    description = "AWS key id"
-    default = ""
-}
-variable "secret_key" {
-    description = "AWS key secret"
-    default = ""
-}
 variable "region" {
     description = "AWS region to deploy to"
     default = ""

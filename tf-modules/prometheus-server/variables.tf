@@ -81,10 +81,3 @@ variable "load_balancers" {
 variable "account_arn" {
     description = "The AWS account number, for IAM role assigned to the ASG"
 }
-variable "access_key" {
-    default = ""
-}
-variable "secret_key" {
-    default = ""
-}
-

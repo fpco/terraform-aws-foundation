@@ -18,8 +18,7 @@ variable "leader_dns" {
     default = ""
     description = "DNS to find consul leaders to follow/join"
 }
-variable "region" {
-    default = ""
+variable "datacenter" {
     description = "The AWS region, provided to consul as datacenter"
 }
 variable "extra_pillar" {

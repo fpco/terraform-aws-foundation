@@ -6,14 +6,6 @@ variable "description" {
     default = ""
     description = "The description to give the subnets created for this network"
 }
-variable "access_key" {
-    description = "AWS key id"
-    default = ""
-}
-variable "secret_key" {
-    description = "AWS key secret"
-    default = ""
-}
 variable "cidr_a" {
     default = ""
     description = "The CIDR block for subnet a, eg: 10.100.7.0/24"

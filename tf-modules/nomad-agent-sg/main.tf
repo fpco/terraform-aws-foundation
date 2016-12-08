@@ -2,7 +2,7 @@
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {
-        Name = "${var.name}-${var.region}-nomad-agent"
+        Name = "${var.name}-nomad-agent"
         Description = "Allow port 4646 (TCP/HTTP) to nomad agents in ${var.name}"
     }
     # open port 4646 (nomad http) tcp
