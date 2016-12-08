@@ -2,5 +2,6 @@
 .terraform
 *.sw[o,p]
 auth.tfvars
+docs/modules/*.md
 docs/saltstack/*.md
 site
