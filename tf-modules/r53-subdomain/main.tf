@@ -1,3 +1,9 @@
+/**
+ *## Route 53 Subdomain
+ *
+ * This module simplifies the code in creating a subdomain under an existing
+ * domain.
+ */
 variable "name" {
     description = "name (FQDN) of the subdomain"
 }

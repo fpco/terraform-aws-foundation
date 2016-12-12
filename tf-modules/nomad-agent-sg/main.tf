@@ -1,4 +1,10 @@
-# Security group to cover Nomad Agents
+/**
+ *##Nomad Agent Security Group
+ *
+ * Security group for the Nomad agents.
+ *
+ * NOTE: need to make the agent port range (20000 to 60000) a variable.
+ */
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {

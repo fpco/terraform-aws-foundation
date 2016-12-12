@@ -1,3 +1,7 @@
+/**
+ *## Scale Auto-Scaling Groups
+ *
+ */
 variable "name" { }
 
 resource "aws_iam_policy" "main" {

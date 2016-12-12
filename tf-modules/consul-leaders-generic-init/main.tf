@@ -1,3 +1,12 @@
+/**
+ *## Consul Leader Init
+ *
+ *Based on Saltstack, and boxed/packaged with quite a few assumptions. If you
+ *need something more composable, see the `init-snippet-*` modules.
+ *
+ *NOTE: deprecated, or should be written to use the relevnat init-snippet
+ *modules.
+ */
 # render init script for a cluster of consul leaders using our template
 resource "template_file" "generic_init" {
     template = "${path.module}/init.tpl"

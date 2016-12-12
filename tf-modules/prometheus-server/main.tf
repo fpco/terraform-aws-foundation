@@ -1,3 +1,7 @@
+/**
+ *## Prometheus Server
+ *
+ */
 module "prometheus-data" {
     source = "../persistent-ebs"
     name = "${var.name}-prometheus-data"
