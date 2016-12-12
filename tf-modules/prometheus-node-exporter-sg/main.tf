@@ -1,4 +1,8 @@
-# Security group to cover Prometheus' node-exporter
+/**
+ *##Prometheus Node Exporter Security Group
+ *
+ * Security group for the Prometheus node exporter.
+ */
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {

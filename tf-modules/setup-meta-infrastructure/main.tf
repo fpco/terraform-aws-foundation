@@ -1,21 +1,25 @@
-#======================================================================
-# iam.tf
-# Meta-infrastructure - IAM users, groups, etc. not specific to the
-# product itself.
-#======================================================================
+/**
+ *## MFA and IAM
+ *
+ * This module provides a "boxed" set of IAM groups and policies suitable
+ * for managing account access through IAM and leveraging MFA.
+ *
+ * NOTE: need to document each group, policy, and the resulting permissions
+ */
 
 #----------------------------------------------------------------------
 # Outputs
 #----------------------------------------------------------------------
 
+//`name` exported from the `admin` `aws_iam_group`
 output "admin-group-name" {
   value = "${aws_iam_group.admin.name}"
 }
-
+//`name` exported from the `power-user` `aws_iam_group`
 output "power-user-group-name" {
   value = "${aws_iam_group.power-user.name}"
 }
-
+//`name` exported from the `setup-mfa` `aws_iam_group`
 output "setup-mfa-group-name" {
   value = "${aws_iam_group.setup-mfa.name}"
 }

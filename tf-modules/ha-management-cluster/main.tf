@@ -1,3 +1,9 @@
+/**
+ *## Highly Available Management Cluster
+ *
+ *Not completed, WIP.
+ *
+ */
 # create management cluster, the cluster to manage the others
 module "management-cluster" {
     source = "../consul-cluster"

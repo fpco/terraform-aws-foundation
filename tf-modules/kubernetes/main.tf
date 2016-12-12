@@ -1,3 +1,7 @@
+/**
+ *## Kubernetes
+ *
+ */
 resource "aws_autoscaling_group" "master" {
   name                 = "master-${var.region}a.masters.${var.fqdn}"
   launch_configuration = "${aws_launch_configuration.master.id}"

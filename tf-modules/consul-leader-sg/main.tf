@@ -1,4 +1,13 @@
-# Security group to cover Consul Leaders
+/**
+ *## Consul Leaders Security Group
+ *
+ *Boxed security group for use with a cluster of consul leaders. These are the
+ *ingress rules for leaders connecting to other leaders.
+ *
+ *See `consul-agents-sg` for Agents, or `consul-leaders-wan-sg` for the
+ *cross-WAN leader communication.
+ *
+ */
 resource "aws_security_group" "main" {
     vpc_id = "${var.vpc_id}"
     tags {

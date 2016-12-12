@@ -1,4 +1,8 @@
-# AWS Managed NAT Gateway
+/**
+ *## AWS Managed NAT Gateway
+ *
+ *Wraps `aws_eip` and `aws_nat_gateway`.
+ */
 resource "aws_eip" "nat" {
     vpc = true
 }
