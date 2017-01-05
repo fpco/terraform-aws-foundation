@@ -9,6 +9,7 @@ aws ec2 attach-volume                \
           --instance-id $$INSTANCE_ID \
           --device ${device_path}
 
+ls ${device_path}
 while [ $$? -ne 0 ]; do
   sleep ${wait_interval}
   ls ${device_path}
