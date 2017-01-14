@@ -57,8 +57,5 @@ else
 fi
 
 # write out that info to our JSON file, to be picked up by CI as an artifact
-#DOCKER_INFO="{\"infra-docs\":{\"by_git_sha\":\"$DOC_IMG_BY_SHA\",\"by_branch\": \"$DOC_IMG_BY_BRANCH\"}}"
-#echo $DOCKER_INFO > $ARTIFACTS/docker-images.json
-#echo "docker image info:"
-#cat $ARTIFACTS/docker-images.json
-
+DOCKER_INFO="{\"$DOCKER_IMG_NAME\":{\"by_git_sha\":\"$DOC_IMG_BY_SHA\",\"by_branch\": \"$DOC_IMG_BY_BRANCH\"}}"
+echo $DOCKER_INFO > $ARTIFACTS/docker-images.json
