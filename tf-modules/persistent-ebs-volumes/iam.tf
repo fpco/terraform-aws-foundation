@@ -1,0 +1,47 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {
+  current = true
+}
+
+# resource "aws_iam_role" "attach-ebs-role" {
+#   count = "${var.volume_count}"
+#   name = "${var.name_prefix}-attach-ebs-${count.index}"
+#   assume_role_policy = <<END_POLICY
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": "sts:AssumeRole",
+#       "Principal": {
+#         "Service": "ec2.amazonaws.com"
+#       },
+#       "Effect": "Allow",
+#       "Sid": ""
+#     }
+#   ]
+# }
+# END_POLICY
+# }
+#
+resource "aws_iam_policy" "ebs-volume-policy" {
+  count = "${var.volume_count}"
+  name = "${var.name_prefix}-ebs-volume-${count.index}"
+  policy = <<END_POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AttachVolume",
+        "ec2:DetachVolume"
+      ],
+      "Resource": [
+        "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:volume/${element(aws_ebs_volume.volumes.*.id, count.index)}",
+        "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*"
+      ]
+    }
+  ]
+}
+END_POLICY
+}
