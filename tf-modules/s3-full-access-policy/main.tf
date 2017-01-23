@@ -29,7 +29,9 @@ resource "aws_iam_policy" "s3-full-access" {
         {
             "Effect": "Allow",
             "Action": [
-                "s3:ListBucket"
+                "s3:ListBucket",
+                "s3:GetBucketLocation",
+                "s3:ListBucketMultipartUploads"
             ],
             "Resource": ["${join("\",\"",formatlist("arn:aws:s3:::%s",split(",", var.bucket_names)))}"]
         },
@@ -39,7 +41,10 @@ resource "aws_iam_policy" "s3-full-access" {
                 "s3:ListObjects",
                 "s3:PutObject",
                 "s3:GetObject",
-                "s3:CreateMultipartUpload"
+                "s3:DeleteObject",
+                "s3:CreateMultipartUpload",
+                "s3:ListMultipartUploadParts",
+                "s3:AbortMultipartUpload"
             ],
             "Resource": ["${join("\",\"",formatlist("arn:aws:s3:::%s/*",split(",", var.bucket_names)))}"]
         }
