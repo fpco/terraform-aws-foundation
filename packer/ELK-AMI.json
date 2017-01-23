@@ -1,0 +1,42 @@
+{
+    "variables": {
+        "aws_access_key": "",
+        "aws_secret_key": "",
+        "region": ""
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "access_key": "{{user `aws_access_key`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "region": "{{user `region`}}",
+        "instance_type": "t2.micro",
+        "ssh_username": "ubuntu",
+        "source_ami_filter": {
+            "filters": {
+                "virtualization-type": "hvm",
+                "name": "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*",
+                "root-device-type": "ebs"
+            },
+            "owners": ["099720109477"],
+            "most_recent": true
+        },
+        "ami_name": "ELK stack {{timestamp}}",
+        "ami_description": "Ubuntu based AMI that has everyhing needed for ELK stack installed: Elasticsearch/Logstash/Kibana as well as all the dependencies: JAVA and discovery-ec2 plugin."
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "inline": [
+            "sleep 30",
+            "wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -",
+            "sudo apt-get install -y apt-transport-https",
+            "echo \"deb https://artifacts.elastic.co/packages/5.x/apt stable main\" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list",
+            "sudo apt-get update -q",
+            "sudo apt-get install -y awscli",
+            "sudo apt-get install -y openjdk-8-jre",
+            "sudo apt-get install -y elasticsearch",
+            "sudo apt-get install -y logstash",
+            "sudo apt-get install -y kibana",
+            "sudo /usr/share/elasticsearch/bin/elasticsearch-plugin install -b discovery-ec2"
+        ]
+    }]    
+}

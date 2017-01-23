@@ -1,0 +1,21 @@
+network.host: _ec2_
+node:
+  name: "${node_name}"
+  master: false
+  data: true
+  ingest: true
+http.port: 9200
+transport.tcp.port: 9300
+
+# discovery-ec2
+cloud.aws.region: ${region}
+cloud.node.auto_attributes: true
+cluster.routing.allocation.awareness.attributes: aws_availability_zone
+discovery:
+  zen.hosts_provider: ec2
+  ec2:
+    groups: ${security_groups}
+    host_type: private_ip
+    availability_zones: ${availability_zones}
+    tag.cluster: ${cluster_tag}
+
