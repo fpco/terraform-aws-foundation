@@ -57,7 +57,7 @@ variable "key_name" {
 }
 
 variable "ca_cert" {
-  description = "CA certificate file path. Configures Logstash to trust to trust clients with certificates signed by this CA"
+  description = "CA certificate file path. Configures Logstash to trust clients with certificates signed by this CA"
 }
 
 variable "server_cert" {

@@ -188,9 +188,10 @@ resource "aws_subnet" "private" {
     map_public_ip_on_launch = false
 }
 # set up nat gateway
-module "nat_gateway" {
-    source = "../tf-modules/nat-gateway"
-    subnet_id = "${aws_subnet.public.id}"
+module "nat_gateways" {
+    source = "../tf-modules/nat-gateways"
+    nat_count = 1
+    subnet_id = ["${aws_subnet.public.id}"]
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
     region = "${var.region}"
@@ -207,7 +208,7 @@ resource "aws_route_table" "private" {
     vpc_id = "${module.test-vpc.id}"
     route {
         cidr_block = "0.0.0.0/0"
-        nat_gateway_id = "${module.nat_gateway.id}"
+        nat_gateway_id = "${element(module.nat_gateways.*.id, 0)}"
     }
 }
 # Route Table Associations
