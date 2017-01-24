@@ -5,6 +5,7 @@ if [ -f /.dockerenv ]; then
 else
   VPN_TUNNEL=./vpn-tunnel
 fi
+test -z "${VPN_TUNN}" && VPN_TUNN="tun0"
 INFO="
 Usage: $(basename "$0") [INTERVAL]
 
@@ -28,7 +29,7 @@ VPN_TUNNEL=/etc/init.d/vpn-tunnel
 
 # Check if VPN's interface exist in the current environment, otherwise start VPN
 function check_interface(){
-  STATUS_IF=$(ip addr show | grep "tun0" | awk -F: '{print $2}')
+  STATUS_IF=$(ip addr show | grep "${VPN_TUNN}" | awk -F: '{print $2}')
   test -z "$STATUS_IF" && $VPN_TUNNEL restart ; sleep 2    # give it some time to restart
 }
 
@@ -36,7 +37,7 @@ function check_interface(){
 # Restart VPN's in case there is no response from ICMP packets
 function check_vpn(){
 
-  if [ "$STATUS_IF" = "tun0" ]; then
+  if [ "$STATUS_IF" = "${VPN_TUNN}" ]; then
     count=$(ping -c ${COUNT} ${TEST_HOST} | grep 'received' \
                | awk -F',' '{ print $2 }' | awk '{ print $1 }')
     test "$count" = "0" && $VPN_TUNNEL restart

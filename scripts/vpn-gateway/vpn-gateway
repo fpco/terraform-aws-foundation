@@ -67,9 +67,12 @@ function start_vpn(){
     VPN_HOST=$(awk '/^hostname/{print $2}' $CONF_FILE)
     VPN_USER=$(awk '/^username/{print $2}' $CONF_FILE)
     VPN_PASS=$(awk '/^password/{print $2}' $CONF_FILE)
+    VPN_TUNN=$(awk '/^tunnel/{print $2}' $CONF_FILE)
+    VPN_INT=$(awk '/^interface/{print $2}' $CONF_FILE)
     docker run --net=host --privileged -d -v $(dirname $(readlink -f /etc/resolv.conf)):/etc-host \
            -e VPC_CIDR="${VPC_CIDR}" -e VPN_HOST="${VPN_HOST}" \
            -e VPN_USER="${VPN_USER}" -e VPN_PASS="${VPN_PASS}" \
+           -e VPN_TUNN="${VPN_TUNN}" -e VPN_INT="${VPN_INT}" \
            $VPN_IMAGE vpn-runner.sh > $CONTAINER_ID
     let "attempt=30"
     check_status
@@ -93,7 +96,7 @@ function start_vpn(){
 function stop_vpn(){
 
   if [ -f "$CONTAINER_ID" ]; then
-    docker stop $(cat $CONTAINER_ID)
+    docker stop $(cat $CONTAINER_ID) > /dev/null
     log_success_msg "Stopped docker container: $(cat $CONTAINER_ID | head -c 12)"
     rm -f $CONTAINER_ID
   else
@@ -104,7 +107,7 @@ function stop_vpn(){
 function kill_vpn(){
 
   if [ -f "$CONTAINER_ID" ]; then
-    docker stop $(cat $CONTAINER_ID)
+    docker stop $(cat $CONTAINER_ID) > /dev/null
     log_success_msg "Killed docker container: $(cat $CONTAINER_ID | head -c 12)"
     rm -f $CONTAINER_ID
   else
