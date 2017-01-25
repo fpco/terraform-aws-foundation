@@ -3,15 +3,18 @@ RESOLV_FILE="/etc/resolv.conf"
 HOST_RESOLV_FILE=""
 PIDFILE="/var/run/openconnect.pid"
 TEMP_LOG=$(mktemp "/tmp/vpn-tunnel-XXXXXX.txt")
-VPN_TUNN="tun0"
 INFO="
 
 Usage: $(basename "$0") (start|stop|kill|status|restart) [/path/to/vpn-credentials.sh]
 
 Credentials for VPN should be supplied through environment variables VPN_HOST,
-VPN_USER and VPN_PASS, as well as VPC_CIDR, otherwise starting VPN will fail.
+VPN_USER and VPN_PASS, otherwise starting VPN will fail.
 
 "
+test -z "${VPN_TUNN}" && VPN_TUNN="tun0"
+test -z "${INTERFACE}" && INTERFACE="eth0"
+VPN_MODE="gateway"
+
 # Make sure we have credentials available.
 if [ "$1" = "start" ] || [ "$1" = "restart" ]; then
   if [ -z "${VPN_HOST}" ]; then
@@ -22,10 +25,10 @@ if [ "$1" = "start" ] || [ "$1" = "restart" ]; then
     echo "Missing vpn credentials." >&2
     exit 2
   fi
-  if [ -z "${VPC_CIDR}" ]; then
-    echo "Missing VPC CIDR." >&2
-    exit 2
-  fi
+fi
+if [ "$1" = "start" ] && [ -z "${VPC_CIDR}" ]; then
+  VPN_MODE="client"
+  echo "VPC CIDR is missing, routing setup will be skipped. Working as a VPN client only."
 fi
 # In case we are running inside docker container we need to update host's
 # resolv.conf as well.
@@ -35,26 +38,30 @@ fi
 
 
 function flush_iptables(){
-  # Flush all the rules in IPfilter and NAT tables
-  /sbin/iptables --flush
-  /sbin/iptables --delete-chain
-  /sbin/iptables --table nat --flush
-  /sbin/iptables --table nat --delete-chain
-  /sbin/iptables --table mangle --flush
-  /sbin/iptables --table mangle --delete-chain
+  if [ "${VPN_MODE}" = "gateway" ]; then
+    # Flush all the rules in IPfilter and NAT tables
+    /sbin/iptables --flush
+    /sbin/iptables --delete-chain
+    /sbin/iptables --table nat --flush
+    /sbin/iptables --table nat --delete-chain
+    /sbin/iptables --table mangle --flush
+    /sbin/iptables --table mangle --delete-chain
+  fi
 }
 
 # Establish routing rules to set up VPN/NAT tunnel
 function exec_iptables(){
+  if [ "${VPN_MODE}" = "gateway" ]; then
 
-  flush_iptables
+    flush_iptables
 
-  # Setup postrouting rules
-  /sbin/iptables -A POSTROUTING -t nat -o $VPN_TUNN -j MASQUERADE
-  /sbin/iptables -A POSTROUTING -t nat -s $VPC_CIDR -o eth0 -j MASQUERADE
+    # Setup postrouting rules
+    /sbin/iptables -A POSTROUTING -t nat -o $VPN_TUNN -j MASQUERADE
+    /sbin/iptables -A POSTROUTING -t nat -s $VPC_CIDR -o $INTERFACE -j MASQUERADE
 
-  ### ALLOW - VPC CIDR
-  /sbin/iptables -A INPUT -p all -s $VPC_CIDR -j ACCEPT
+    ### ALLOW - VPC CIDR
+    /sbin/iptables -A INPUT -p all -s $VPC_CIDR -j ACCEPT
+  fi
 }
 
 # Cleanup after killing the connection and restore original config.
@@ -80,7 +87,7 @@ function connect_vpn(){
       cp $RESOLV_FILE $HOST_RESOLV_FILE.backup
       echo "Backed up $RESOLV_FILE."
     fi        
-    echo "${VPN_PASS}" | openconnect --pid-file=$PIDFILE -b -s '/usr/share/vpnc-scripts/vpnc-script' --user="${VPN_USER}" --passwd-on-stdin ${VPN_HOST} > $TEMP_LOG 2>&1
+    echo "${VPN_PASS}" | openconnect --pid-file=$PIDFILE -i $VPN_TUNN -b -s '/usr/share/vpnc-scripts/vpnc-script' --user="${VPN_USER}" --passwd-on-stdin ${VPN_HOST} > $TEMP_LOG 2>&1
     if [ -n "$HOST_RESOLV_FILE" ]; then
       cp $RESOLV_FILE $HOST_RESOLV_FILE
     fi
