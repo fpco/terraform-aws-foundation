@@ -6,7 +6,7 @@ variable "volume_count" {
 }
 variable "azs" {
   type = "list"
-  description = "The AWS Availability Zones (AZs) to create the volumes in"
+  description = "AWS Availability Zones (AZs) to create the volumes in"
 }
 variable "volume_type" {
   default = "gp2"
@@ -18,15 +18,25 @@ variable "size" {
 }
 variable "snapshot_ids" {
   type = "list"
-  description = "The ID of the snapshot to base the EBS block device on"
+  description = "IDs of the snapshots to base the EBS block devices on"
 }
-## TODO: had to disable optional encryption. Terraform 8 does extra regex
-## validation on kms_key_id, i.e. empty string are no longer accepted.
-# variable "encrypted" {
-#   default = "true"
-#   description = "Boolean, whether or not to encrypt the EBS block device"
-# }
-# variable "kms_key_id" {
-#   default = ""
-#   description = "ID of the KMS key to use when encyprting the EBS block device"
-# }
+variable "encrypted" {
+  default = "false"
+  description = "Boolean, whether or not to encrypt EBS block devices"
+}
+variable "kms_key_id" {
+  default = ""
+  description = "ID of the KMS key to use when encrypting EBS block devices"
+}
+variable "device_name" {
+  default = "/dev/xvdf"
+  description = "Setting for volume mount snipppet. Name of device volume should be mounted as"
+}
+variable "wait_interval" {
+  default = 1
+  description = "Setting for volume mount snipppet. Number of seconds to wait between retries"
+}
+variable "max_wait" {
+  default = 60
+  description = "Setting for volume mount snipppet. Maximum number of seconds to wait for volume to be mounted before exiting with an error"
+}

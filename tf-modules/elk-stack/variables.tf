@@ -41,7 +41,7 @@ variable "elasticsearch_master_node_count" {
 }
 
 variable "elasticsearch_master_node_instance_type" {
-  default = "t2.small"
+  default = "t2.micro"
   description = "Instance type to use for master nodes."
 }
 
@@ -61,7 +61,7 @@ variable "elasticsearch_data_node_count" {
 }
 
 variable "elasticsearch_data_node_instance_type" {
-  default = "t2.small"
+  default = "t2.micro"
   description = "Instance type to use for data nodes."
 }
 
@@ -76,7 +76,7 @@ variable "elasticsearch_data_node_snapshot_ids" {
 }
 
 variable "logstash_kibana_instance_type" {
-  default = "t2.small"
+  default = "t2.micro"
   description = "Instance type to use for servers running Kibana+Logstash."
 }
 

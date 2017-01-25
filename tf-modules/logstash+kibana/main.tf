@@ -50,8 +50,8 @@ resource "aws_autoscaling_group" "logstash-kibana-asg" {
   availability_zones   = ["${var.vpc_azs}"]
   vpc_zone_identifier  = ["${var.subnet_ids}"]
   name                 = "${var.name_prefix}-logstash-kibana-asg"
-  max_size             = "${var.max_server_count}"
   min_size             = "${var.min_server_count}"
+  max_size             = "${var.max_server_count}"
   desired_capacity     = "${var.desired_server_count}"
   launch_configuration = "${aws_launch_configuration.logstash-kibana-lc.name}"
   health_check_type    = "ELB"

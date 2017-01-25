@@ -13,7 +13,8 @@ module "master-node-ebs-volumes" {
   azs          = ["${var.vpc_azs}"]
   size         = "${var.master_node_ebs_size}"
   snapshot_ids = ["${var.master_node_snapshot_ids}"]
-  #encrypted    = "false"
+  encrypted    = "false"
+  device_name  = "/dev/xvdf"
 }
 
 resource "aws_iam_role_policy_attachment" "master-node-attach-ebs-volume" {
@@ -71,7 +72,7 @@ data "template_file" "master-node-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    volume_id     = "${element(module.master-node-ebs-volumes.volume_ids, count.index)}"
+    mount_snippet = "${element(module.master-node-ebs-volumes.volume_mount_snippets, count.index)}"
     device_name   = "/dev/xvdf"
     mount_point   = "/mnt/elasticsearch"
     wait_interval = 1

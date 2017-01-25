@@ -15,7 +15,8 @@ module "data-node-ebs-volumes" {
   azs          = ["${var.vpc_azs}"]
   size         = "${var.data_node_ebs_size}"
   snapshot_ids = ["${var.data_node_snapshot_ids}"]
-  #encrypted    = "false"
+  encrypted    = "false"
+  device_name  = "/dev/xvdf"
 }
 
 resource "aws_iam_role_policy_attachment" "data-node-attach-ebs-volume" {
@@ -71,7 +72,7 @@ data "template_file" "data-node-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    volume_id     = "${element(module.data-node-ebs-volumes.volume_ids, count.index)}"
+    mount_snippet = "${element(module.data-node-ebs-volumes.volume_mount_snippets, count.index)}"
     device_name   = "/dev/xvdf"
     mount_point   = "/mnt/elasticsearch"
     wait_interval = 1

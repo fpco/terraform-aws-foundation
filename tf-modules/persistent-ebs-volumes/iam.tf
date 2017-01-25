@@ -3,26 +3,6 @@ data "aws_region" "current" {
   current = true
 }
 
-# resource "aws_iam_role" "attach-ebs-role" {
-#   count = "${var.volume_count}"
-#   name = "${var.name_prefix}-attach-ebs-${count.index}"
-#   assume_role_policy = <<END_POLICY
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Action": "sts:AssumeRole",
-#       "Principal": {
-#         "Service": "ec2.amazonaws.com"
-#       },
-#       "Effect": "Allow",
-#       "Sid": ""
-#     }
-#   ]
-# }
-# END_POLICY
-# }
-#
 resource "aws_iam_policy" "ebs-volume-policy" {
   count = "${var.volume_count}"
   name = "${var.name_prefix}-ebs-volume-${count.index}"

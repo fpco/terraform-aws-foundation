@@ -20,12 +20,13 @@ variable "data_node_count" {
 }
 
 variable "master_node_instance_type" {
-  default = "t2.small"
+  description = "Master nodes EC2 instance type"
+  default = "t2.micro"
 }
 
 variable "data_node_instance_type" {
   description = "Data nodes EC2 instance type"
-  default = "t2.small"
+  default = "t2.micro"
 }
 
 variable "master_node_snapshot_ids" {
