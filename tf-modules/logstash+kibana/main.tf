@@ -46,43 +46,43 @@ module "logstash" {
 }
 
 
-resource "aws_autoscaling_group" "logstash-kibana-asg" {
-  availability_zones   = ["${var.vpc_azs}"]
-  vpc_zone_identifier  = ["${var.subnet_ids}"]
-  name                 = "${var.name_prefix}-logstash-kibana-asg"
-  min_size             = "${var.min_server_count}"
-  max_size             = "${var.max_server_count}"
-  desired_capacity     = "${var.desired_server_count}"
-  launch_configuration = "${aws_launch_configuration.logstash-kibana-lc.name}"
-  health_check_type    = "ELB"
-  load_balancers       = ["${module.logstash.elb_name}", "${module.kibana.elb_name}"]
+# resource "aws_autoscaling_group" "logstash-kibana-asg" {
+#   availability_zones   = ["${var.vpc_azs}"]
+#   vpc_zone_identifier  = ["${var.subnet_ids}"]
+#   name                 = "${var.name_prefix}-logstash-kibana-asg"
+#   min_size             = "${var.min_server_count}"
+#   max_size             = "${var.max_server_count}"
+#   desired_capacity     = "${var.desired_server_count}"
+#   launch_configuration = "${aws_launch_configuration.logstash-kibana-lc.name}"
+#   health_check_type    = "ELB"
+#   load_balancers       = ["${module.logstash.elb_name}", "${module.kibana.elb_name}"]
 
-  tag = [{
-    key                 = "Name"
-    value               = "${var.name_prefix}-logstash-kibana"
-    propagate_at_launch = true
-  }]
+#   tag = [{
+#     key                 = "Name"
+#     value               = "${var.name_prefix}-logstash-kibana"
+#     propagate_at_launch = true
+#   }]
 
-}
+# }
 
 
-resource "aws_launch_configuration" "logstash-kibana-lc" {
+# resource "aws_launch_configuration" "logstash-kibana-lc" {
 
-  name_prefix          = "${var.name_prefix}-logstash-kibana-lc-"
-  image_id             = "${var.ami}"
-  instance_type        = "${var.instance_type}"
-  key_name             = "${var.key_name}"
-  security_groups      = ["${module.logstash.security_group_id}", "${module.kibana.security_group_id}"]
-  user_data            = <<USER_DATA
-#!/bin/bash
-${module.logstash.setup_snippet}
-${module.kibana.setup_snippet}
-USER_DATA
+#   name_prefix          = "${var.name_prefix}-logstash-kibana-lc-"
+#   image_id             = "${var.ami}"
+#   instance_type        = "${var.instance_type}"
+#   key_name             = "${var.key_name}"
+#   security_groups      = ["${module.logstash.security_group_id}", "${module.kibana.security_group_id}"]
+#   user_data            = <<USER_DATA
+# #!/bin/bash
+# ${module.logstash.setup_snippet}
+# ${module.kibana.setup_snippet}
+# USER_DATA
 
-  associate_public_ip_address = true
+#   associate_public_ip_address = true
 
-  lifecycle = {
-    create_before_destroy = true
-  }
+#   lifecycle = {
+#     create_before_destroy = true
+#   }
   
-}
+# }
