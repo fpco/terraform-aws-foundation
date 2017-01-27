@@ -6,6 +6,10 @@
 variable "bucket_name" {
     description = "the name to give the bucket"
 }
+variable "iam_roles" {
+    default     = ""
+    description = "comma separated string-list of role names, full access to bucket"
+}
 variable "iam_users" {
     default     = ""
     description = "comma separated string-list of user names, full access to bucket"
@@ -14,7 +18,6 @@ variable "iam_groups" {
     default     = ""
     description = "comma separated string-list of group names, full access to bucket"
 }
-
 resource "aws_s3_bucket" "remote-state" {
     bucket = "${var.bucket_name}"
     acl    = "private"
@@ -29,6 +32,7 @@ module "remote-state-full-access-policy" {
 }
 resource "aws_iam_policy_attachment" "remote-state-admin" {
     name   = "${module.remote-state-full-access-policy.name}"
+    roles  = ["${compact(split(",", replace(var.iam_roles,  " ", "")))}"]
     users  = ["${compact(split(",", replace(var.iam_users,  " ", "")))}"]
     groups = ["${compact(split(",", replace(var.iam_groups, " ", "")))}"]
     policy_arn = "${module.remote-state-full-access-policy.arn}"
@@ -57,7 +61,10 @@ output "iam_policy_name" {
 output "url" {
     value = "https://s3-${aws_s3_bucket.remote-state.region}.amazonaws.com/${aws_s3_bucket.remote-state.id}"
 }
-//Export `iam_users` variable (list of IAM users with access to the bucket)
+//Export `iam_roles` variable (list of IAM roles with access to the bucket)
+output "iam_roles" {
+    value = "${var.iam_roles}"
+}//Export `iam_users` variable (list of IAM users with access to the bucket)
 output "iam_users" {
     value = "${var.iam_users}"
 }
