@@ -36,9 +36,12 @@ cat <<EOF > /etc/logstash/conf.d/logstash.conf
 ${config}
 EOF
 
-# TODO: create a cron job for pulling dynamic config
-echo "${credstash_get_cmd} -n ${credstash_dynamic_config_name}"
-${credstash_get_cmd} -n ${credstash_dynamic_config_name} > /etc/logstash/conf.d/logstash-dynamic.conf
+# Create a cron job for pulling dynamic config
+TMP_CRON=$$(mktemp "/tmp/dyn-config-cron-job-XXXXXX.txt")
+crontab -l > $$TMP_CRON
+echo "${credstash_dynamic_config_cron} '${credstash_get_cmd} -n ${credstash_dynamic_config_name} 2>/dev/null >/etc/logstash/conf.d/logstash-dynamic.conf'" >> $$TMP_CRON
+crontab $$TMP_CRON
+rm $$TMP_CRON
 
 systemctl daemon-reload
 systemctl enable logstash.service

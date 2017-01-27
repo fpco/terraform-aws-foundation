@@ -7,9 +7,9 @@ output "get_cmd" {
   value = "${data.template_file.credstash-get-cmd.rendered}"
 }
 // Credstash put command with region, table and kms key values set.
-# output "put_cmd" {
-#   value = "${data.template_file.credstash-put-cmd.rendered}"
-# }
+output "put_cmd" {
+  value = "${data.template_file.credstash-put-cmd.rendered}"
+}
 // Secret Reader policy
 output "reader_policy_arn" {
   value = "${aws_iam_policy.reader-policy.arn}"
@@ -23,14 +23,9 @@ data "template_file" "credstash-get-cmd" {
   template = "credstash -r ${var.region == "" ? data.aws_region.current.name : var.region} -t ${var.table_name} get"
 }
 
-# data "template_file" "credstash-put-cmd" {
-#   template = "credstash -r ${region} -t ${table} put -k ${kms_key}"
-#   vals {
-#     region  = 
-#     table   = "${var.table_name}"
-#     kms_key = "${var.kms_key_arn}"
-#   }
-# }
+data "template_file" "credstash-put-cmd" {
+  template = "credstash -r ${var.region == "" ? data.aws_region.current.name : var.region} -t ${var.table_name} put -k ${var.kms_key_arn}"
+}
 
 data "template_file" "credstash-install-snippet" {
   template = <<END_TEMPLATE

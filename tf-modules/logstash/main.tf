@@ -62,6 +62,7 @@ data "template_file" "logstash-setup" {
     credstash_get_cmd             = "${module.credstash-reader.get_cmd}"
     credstash_server_key_name     = "${var.credstash_server_key_name}"
     credstash_dynamic_config_name = "${var.credstash_dynamic_config_name}"
+    credstash_dynamic_config_cron = "${var.credstash_dynamic_config_poll_schedule}"
     config                        = "${data.template_file.logstash-config.rendered}"
     extra_settings                = "${var.extra_settings}"
     extra_setup_snippet           = "${var.extra_setup_snippet}"

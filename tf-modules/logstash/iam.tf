@@ -16,7 +16,10 @@ resource "aws_iam_role_policy_attachment" "credstash-reader-policy-attachment" {
 }
 
 resource "aws_iam_role" "logstash-role" {
-  name  = "${var.name_prefix}-logstash-role"
+  provisioner "local-exec" {
+    command = "../credstash/create-grant.sh create reader ${var.credstash_kms_key_arn} ${aws_iam_role.logstash-role.arn}"
+  }
+  name_prefix  = "${var.name_prefix}-logstash-role-"
   assume_role_policy = <<END_POLICY
 {
   "Version": "2012-10-17",
