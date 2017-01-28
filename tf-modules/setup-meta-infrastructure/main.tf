@@ -61,6 +61,11 @@ variable "setup_mfa_group_members" {
   default = []
 }
 
+variable "set_password_policy" {
+  description = "Set to 0 to disable setting the account password policy"
+  default = 1
+}
+
 #----------------------------------------------------------------------
 # Outputs
 #----------------------------------------------------------------------
@@ -453,6 +458,7 @@ resource "aws_iam_group_membership" "setup-mfa" {
 #----------------------------------------------------------------------
 
 resource "aws_iam_account_password_policy" "default-password-policy" {
+  count = "${var.set_password_policy}"
   minimum_password_length        = 12
   max_password_age               = 90
   require_lowercase_characters   = true
