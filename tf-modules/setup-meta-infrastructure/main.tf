@@ -238,6 +238,22 @@ data "aws_iam_policy_document" "power-user-with-mfa" {
       values = ["true"]
     }
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:ListAccount*",
+      "iam:GetAccount*",
+      "iam:ListUsers",
+      "iam:ListRoles",
+      "organizations:DescribeOrganization"
+    ]
+    resources = ["*"]
+    condition {
+      test = "Bool"
+      variable = "aws:MultiFactorAuthPresent"
+      values = ["true"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "power-user-with-mfa" {
@@ -252,6 +268,17 @@ data "aws_iam_policy_document" "power-user-no-mfa" {
     not_actions = [
       "iam:*",
       "organizations:*"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:ListAccount*",
+      "iam:GetAccount*",
+      "iam:ListUsers",
+      "iam:ListRoles",
+      "organizations:DescribeOrganization"
     ]
     resources = ["*"]
   }
