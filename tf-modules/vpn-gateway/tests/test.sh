@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # Deploy VPC, ec2 instance running `vpn-gateway` service and ec2-instance within
 # the same VPC and validate that connection to internal sites, which are available
 # on VPN.

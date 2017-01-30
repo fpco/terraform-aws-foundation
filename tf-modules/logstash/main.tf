@@ -150,8 +150,8 @@ resource "aws_autoscaling_group" "logstash-asg" {
   min_size             = "${var.min_server_count}"
   desired_capacity     = "${var.desired_server_count}"
   launch_configuration = "${aws_launch_configuration.logstash-lc.name}"
-  health_check_type    = "EC2" # "ELB" -- development mode
-  load_balancers       = ["${aws_elb.logstash-elb.name}"]
+  health_check_type    = "ELB"
+  load_balancers       = ["${concat(list(aws_elb.logstash-elb.name), var.extra_elbs)}"]
 
   tag = [{
     key                 = "Name"
@@ -168,8 +168,7 @@ resource "aws_launch_configuration" "logstash-lc" {
   image_id             = "${var.ami}"
   instance_type        = "${var.instance_type}"
   key_name             = "${var.key_name}"
-  # TODO:  add extra_security groups
-  security_groups      = ["${aws_security_group.logstash-sg.id}"]
+  security_groups      = ["${concat(list(aws_security_group.logstash-sg.id), var.extra_security_groups)}"]
   iam_instance_profile = "${aws_iam_instance_profile.logstash-profile.id}"
   user_data            = <<USER_DATA
 #!/bin/bash

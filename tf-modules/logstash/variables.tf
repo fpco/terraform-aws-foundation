@@ -93,5 +93,10 @@ variable "extra_settings" {
 
 variable "extra_security_groups" {
   default = []
-  description = "Security groups, besides the default one, to be used fo logstash instances"
+  description = "Security groups, besides the default one, to be used for Logstash instances"
+}
+
+variable "extra_elbs" {
+  default = []
+  description = "Elastic Load Balancers, besides the default one, to be used for Logstash scaling group"
 }

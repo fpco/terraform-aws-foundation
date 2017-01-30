@@ -17,6 +17,8 @@ http.host: "$${LOCAL_IP}"
 path.data: /var/lib/logstash
 path.config: /etc/logstash/conf.d
 path.logs: /var/log/logstash
+config.reload.automatic: true
+config.reload.interval: 30
 ${extra_settings}
 EOF
 
@@ -37,9 +39,14 @@ ${config}
 EOF
 
 # Create a cron job for pulling dynamic config
+cat <<EOF > /etc/logstash/credstash-cronjob.sh
+#!/bin/bash
+${credstash_get_cmd} -n ${credstash_dynamic_config_name} 2>/dev/null >/etc/logstash/conf.d/logstash-dynamic.conf
+EOF
+chmod a+x /etc/logstash/credstash-cronjob.sh
 TMP_CRON=$$(mktemp "/tmp/dyn-config-cron-job-XXXXXX.txt")
 crontab -l > $$TMP_CRON
-echo "${credstash_dynamic_config_cron} '${credstash_get_cmd} -n ${credstash_dynamic_config_name} 2>/dev/null >/etc/logstash/conf.d/logstash-dynamic.conf'" >> $$TMP_CRON
+echo "${credstash_dynamic_config_cron} /etc/logstash/credstash-cronjob.sh" >> $$TMP_CRON
 crontab $$TMP_CRON
 rm $$TMP_CRON
 

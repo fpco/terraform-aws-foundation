@@ -114,7 +114,7 @@ resource "aws_key_pair" "elk-key" {
 resource "aws_instance" "control-instance" {
   count                       = "${var.deploy_control_instance}"
   ami                         = "${data.aws_ami.ubuntu.id}" # "${var.ami}"
-  instance_type               = "t2.small"
+  instance_type               = "t2.nano"
   subnet_id                   = "${module.vpc.public_subnet_ids[0]}"
   vpc_security_group_ids      = ["${aws_security_group.control-instance-sg.id}"]
   key_name                    = "${aws_key_pair.elk-key.key_name}"
