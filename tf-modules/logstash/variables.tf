@@ -110,7 +110,7 @@ variable "credstash_dynamic_config_name" {
 }
 
 variable "credstash_dynamic_config_poll_schedule" {
-  default = "*/5 * * * *"
+  default = "* * * * *"
   description = "Cron schedule for polling logstash dynamic configuration using credstash. Default is every 5 minutes"  
 }
 
