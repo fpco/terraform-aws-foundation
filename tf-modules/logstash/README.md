@@ -11,6 +11,12 @@ case of Logstash it will be server private SSL key.
 
 * Github repo with usage instructions: [credstash](https://github.com/fugue/credstash)
 
+Once credstash is installed it also requires an initial setup (DynamoDB table
+and KMS Master key created). For this purpose `credstash-setup` module can be
+used, or it can be done manually by running `$ credstash setup`, which will
+create DynamoDB table, and manually creating KMS key with alias 'credstash`
+using AWS UI.
+
 ### Certstrap
 
 This tool is used to create Certificate Authority (CA), which will be used for
@@ -28,4 +34,20 @@ client and server can authenticate each other when receiving/pushing logs.
 
 In order for credstash to operate on the EC2 instance, the role that it assumes
 should be grated acces to the KMS, which is completely automated by the
-deployment process. Unfortunately it also requires a cleanup action
+deployment process. Unfortunately it also requires a cleanup action, which has
+to be done manually until trerraform 9 is released. Cleanup shell command is one
+of the outputs of this module and needs to be called before the
+destruction. However, this cleanup consists of revoking grants created for roles
+using credstash and is not critical, since roles are deleted during destruction,
+and can be done manually at any time. Revoke all grants that don't have a valid
+ARN as it's grantee.
+
+```bash
+$ KMS_KEY_ARN="arn:aws:kms:us-east-1:1234567890:key/b2fcd07b-..."
+$ GRANT_IDS=$(aws kms list-grants --key-id $KMS_KEY_ARN | \
+    jq -r '.Grants[]|select(.GranteePrincipal|startswith("arn:")|not).GrantId')
+$ for GrantId in $GRANT_IDS; do \
+      aws kms revoke-grant --key-id $KMS_KEY_ARN --grant-id $GrantId; \
+    done
+```
+

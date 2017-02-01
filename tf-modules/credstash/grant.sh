@@ -83,7 +83,7 @@ fi
 GRANTEE_NAME=$(echo "${2}" | awk -F ':' '{print $6}' | awk -F '/' '{print $2}')
 
 if [ "$MODE" = "create" ]; then
-  GRANT_CMD="aws kms create-grant --key-id $KMS_KEY_ID --grantee-principal $GRANTEE $OPERATIONS_ARGS"
+  GRANT_CMD="aws kms create-grant --key-id $KMS_KEY_ID --grantee-principal $GRANTEE $OPERATIONS_ARGS --name credstash:$GRANTEE_NAME"
   echo "Waiting for role ${GRANTEE_NAME} to become available."
   RESULT=$($GRANT_CMD 2>&1)
   while [ $? -ne 0 ]; do
