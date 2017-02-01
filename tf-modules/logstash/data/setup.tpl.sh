@@ -24,14 +24,8 @@ EOF
 
 mkdir /etc/logstash/ssl
 
-cat <<EOF > /etc/logstash/ssl/ca.crt
-${ca_cert}
-EOF
-
-cat <<EOF > /etc/logstash/ssl/server.crt
-${server_cert}
-EOF
-echo "Running: ${credstash_get_cmd} -n ${credstash_server_key_name}"
+${credstash_get_cmd} -n ${credstash_ca_cert_name} > /etc/logstash/ssl/ca.crt
+${credstash_get_cmd} -n ${credstash_server_cert_name} > /etc/logstash/ssl/server.crt
 ${credstash_get_cmd} -n ${credstash_server_key_name} > /etc/logstash/ssl/server.key
 
 cat <<EOF > /etc/logstash/conf.d/logstash.conf

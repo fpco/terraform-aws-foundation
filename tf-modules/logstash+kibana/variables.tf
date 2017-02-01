@@ -68,16 +68,28 @@ variable "logstash_server_cert" {
   description = "Path to certificate that Logstash will use to authenticate with the client"
 }
 
+variable "certstrap_depot_path" {
+  default = "certificates"
+  description = "Local path, where generated SSL certifcates will be stored in"
+}
+
+variable "certstrap_ca_common_name" {
+  default = "LogstashDev"
+  description = "Common Name to be used during CA certificate generation"
+}
+
+variable "certstrap_ca_passphrase" {
+  default = ""
+  description = "Passphrase for SSL Key encryption to be used during CA certificate generation"
+}
+
 variable "credstash_kms_key_arn" {
   description = "Master KMS key ARN for getting SSL server key using credstash"
 }
 
-variable "credstash_server_key_name" {
-  description = "Name of the SSL server key, to be used by credstash to pull the SSL key"
-}
-
-variable "credstash_dynamic_config_name" {
-  description = "This a key for credstash to be used to poll dynamic configuration for logstash, thus creating an ability to remotely update logstash fiters during runtime."
+variable "credstash_prefix" {
+  default = "dev-"
+  description = "Prefix to be used for all credstash credential names"
 }
 
 variable "credstash_dynamic_config_poll_schedule" {

@@ -51,17 +51,16 @@ resource "aws_route53_record" "logstash-elb" {
 }
 
 
-
 data "template_file" "logstash-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    ca_cert                       = "${file(var.ca_cert)}"
-    server_cert                   = "${file(var.server_cert)}"
     credstash_install_snippet     = "${module.credstash-reader.install_snippet}"
     credstash_get_cmd             = "${module.credstash-reader.get_cmd}"
-    credstash_server_key_name     = "${var.credstash_server_key_name}"
-    credstash_dynamic_config_name = "${var.credstash_dynamic_config_name}"
+    credstash_ca_cert_name        = "${var.credstash_prefix}${var.credstash_ca_cert_name}"
+    credstash_server_cert_name    = "${var.credstash_prefix}${var.credstash_server_cert_name}"
+    credstash_server_key_name     = "${var.credstash_prefix}${var.credstash_server_key_name}"
+    credstash_dynamic_config_name = "${var.credstash_prefix}${var.credstash_dynamic_config_name}"
     credstash_dynamic_config_cron = "${var.credstash_dynamic_config_poll_schedule}"
     config                        = "${data.template_file.logstash-config.rendered}"
     extra_settings                = "${var.extra_settings}"
