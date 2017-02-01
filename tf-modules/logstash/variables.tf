@@ -95,12 +95,12 @@ variable "credstash_ca_key_name" {
 }
 
 variable "credstash_server_key_name" {
-  default = "lostash-ssl-key"
+  default = "logstash-ssl-key"
   description = "Name of the SSL server key, which will be used by credstash to identify it"
 }
 
 variable "credstash_server_cert_name" {
-  default = "lostash-ssl-cert"
+  default = "logstash-ssl-cert"
   description = "Name of the SSL server certificate, which will be used by credstash to identify it"
 }
 
