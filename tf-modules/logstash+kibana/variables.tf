@@ -69,8 +69,8 @@ variable "logstash_server_cert" {
 }
 
 variable "certstrap_depot_path" {
-  default = "certificates"
-  description = "Local path, where generated SSL certifcates will be stored in"
+  default = ""
+  description = "Local path, where generated SSL certifcates will be stored in. Certificates will be removed from local file system if left empty and will only be retained in credential store"
 }
 
 variable "certstrap_ca_common_name" {

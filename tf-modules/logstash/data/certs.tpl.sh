@@ -1,13 +1,26 @@
 #!/bin/bash
-certstrap --depot-path "${depot_path}" init --common-name "${ca_common_name}" --passphrase "${ca_passphrase}"
-certstrap --depot-path "${depot_path}" request-cert --domain "${domain_name}" --passphrase ""
-certstrap --depot-path "${depot_path}" sign "${domain_name}" --CA "${ca_common_name}" --passphrase "${ca_passphrase}"
+
+if [ -z "${depot_path}" ]; then
+  DEPOT_PATH=$$(mktemp "/tmp/logstash-certificates-XXXXXX.txt")
+else
+  DEPOT_PATH="${depot_path}"
+fi
+
+certstrap --depot-path "$${DEPOT_PATH}" init --common-name "${ca_common_name}" --passphrase "${ca_passphrase}"
+certstrap --depot-path "$${DEPOT_PATH}" request-cert --domain "${domain_name}" --passphrase ""
+certstrap --depot-path "$${DEPOT_PATH}" sign "${domain_name}" --CA "${ca_common_name}" --passphrase "${ca_passphrase}"
 
 # Convert into PKCS8 format.
 
-openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in "${depot_path}/${domain_name}.key" -out "${depot_path}/${domain_name}.pkcs8.key"
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in "$${DEPOT_PATH}/${domain_name}.key" -out "$${DEPOT_PATH}/${domain_name}.pkcs8.key"
 
-${credstash_put_cmd} -a "${ca_cert_name}" "@${depot_path}/${ca_common_name}.crt"
-${credstash_put_cmd} -a "${ca_key_name}" "@${depot_path}/${ca_common_name}.key"
-${credstash_put_cmd} -a "${server_cert_name}" "@${depot_path}/${domain_name}.crt"
-${credstash_put_cmd} -a "${server_key_name}" "@${depot_path}/${domain_name}.pkcs8.key"
+${credstash_put_cmd} -a "${ca_cert_name}" "@$${DEPOT_PATH}/${ca_common_name}.crt"
+${credstash_put_cmd} -a "${ca_key_name}" "@$${DEPOT_PATH}/${ca_common_name}.key"
+${credstash_put_cmd} -a "${server_cert_name}" "@$${DEPOT_PATH}/${domain_name}.crt"
+${credstash_put_cmd} -a "${server_key_name}" "@$${DEPOT_PATH}/${domain_name}.pkcs8.key"
+
+# Remove temporary folder with generated certificates
+if [ -z "${depot_path}" ]; then
+  chmod -R u+Xrw "$${DEPOT_PATH}"
+  rm -R "$${DEPOT_PATH}"
+fi
