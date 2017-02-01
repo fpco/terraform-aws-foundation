@@ -84,17 +84,18 @@ GRANTEE_NAME=$(echo "${2}" | awk -F ':' '{print $6}' | awk -F '/' '{print $2}')
 
 if [ "$MODE" = "create" ]; then
   GRANT_CMD="aws kms create-grant --key-id $KMS_KEY_ID --grantee-principal $GRANTEE $OPERATIONS_ARGS"
-  printf "Waiting for role ${GRANTEE_NAME} to become available."
-  RESULT=$($GRANT_CMD 2> /dev/null)
+  echo "Waiting for role ${GRANTEE_NAME} to become available."
+  RESULT=$($GRANT_CMD 2>&1)
   while [ $? -ne 0 ]; do
     if [ "$TOTAL_SLEEP" -gt "$MAX_SLEEP" ]; then
-      printf "\nWas unable to find the role within limit time of $MAX_SLEEP seconds.\n"
+      echo "Was unable to find the role within limit time of $MAX_SLEEP seconds:"
+      echo "${RESULT}"
       exit 1
     fi
-    printf "."
+    echo "Still waiting for the role to become available: $TOTAL_SLEEP/$MAX_SLEEP ..."
     sleep $SLEEP_INTERVAL
     TOTAL_SLEEP=$((TOTAL_SLEEP + SLEEP_INTERVAL))
-    RESULT=$($GRANT_CMD 2> /dev/null)
+    RESULT=$($GRANT_CMD 2>&1)
   done
   printf "\nRole ${ROLE_NAME} is now available and grant was created for KMS Key.\n"
   echo "${RESULT}"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "${depot_path}" ]; then
-  DEPOT_PATH=$$(mktemp "/tmp/logstash-certificates-XXXXXX.txt")
+  DEPOT_PATH=$$(mktemp -d -t "logstash-XXXXXX")
 else
   DEPOT_PATH="${depot_path}"
 fi

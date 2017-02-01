@@ -73,7 +73,7 @@ variable "certstrap_ca_passphrase" {
 
 variable "credstash_table_name" {
   default = "credential-store"
-  description = "Master KMS key ARN for getting SSL server key using credstash"
+  description = "DynamoDB table used by credstash to store credentials"
 }
 
 variable "credstash_kms_key_arn" {

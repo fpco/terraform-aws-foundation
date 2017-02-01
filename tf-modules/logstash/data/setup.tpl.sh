@@ -38,7 +38,7 @@ cat <<EOF > /etc/logstash/credstash-cronjob.sh
 ${credstash_get_cmd} -n ${credstash_dynamic_config_name} 2>/dev/null >/etc/logstash/conf.d/logstash-dynamic.conf
 EOF
 chmod a+x /etc/logstash/credstash-cronjob.sh
-TMP_CRON=$$(mktemp "/tmp/dyn-config-cron-job-XXXXXX.txt")
+TMP_CRON=$$(mktemp -t "dyn-config-cron-job-XXXXXX.txt")
 crontab -l > $$TMP_CRON
 echo "${credstash_dynamic_config_cron} /etc/logstash/credstash-cronjob.sh" >> $$TMP_CRON
 crontab $$TMP_CRON
