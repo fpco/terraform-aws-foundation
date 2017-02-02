@@ -107,16 +107,28 @@ variable "logstash_dns_name" {
   description = "DNS name for Logstash"
 }
 
-variable "logstash_ca_cert" {
-  description = "CA certificate file path. Configures Logstash to trust clients with certificates signed by this CA"
+variable "certstrap_depot_path" {
+  default = ""
+  description = "Local path, where generated SSL certifcates will be stored in. Certificates will be removed from local file system if left empty and will only be retained in credential store"
 }
 
-variable "logstash_server_cert" {
-  description = "Path to certificate that Logstash will use to authenticate with the client"
+variable "certstrap_ca_common_name" {
+  default = "Logstash"
+  description = "Common Name to be used during CA certificate generation"
 }
 
-variable "logstash_server_key" {
-  description = "Path to key that Logstash will use to authenticate with the client"
+variable "certstrap_ca_passphrase" {
+  default = ""
+  description = "Passphrase for SSL Key encryption to be used during CA certificate generation"
+}
+
+variable "credstash_table_name" {
+  default = "credential-store"
+  description = "DynamoDB table used by credstash to store credentials"
+}
+
+variable "credstash_kms_key_arn" {
+  description = "Master KMS key ARN for getting SSL server key using credstash"
 }
 
 variable "priv_key_file" {

@@ -13,22 +13,22 @@ resource "aws_elb" "logstash-elb" {
   security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
   
   listener {
-    instance_port = 5044
+    instance_port     = 5044
     instance_protocol = "tcp"
-    lb_port = 5044
-    lb_protocol = "tcp"
+    lb_port           = 5044
+    lb_protocol       = "tcp"
   }
   health_check {
-    healthy_threshold = 2
+    healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout = 3
-    target = "TCP:5044"
-    interval = 30
+    timeout             = 3
+    target              = "TCP:5044"
+    interval            = 30
   }
 
-  cross_zone_load_balancing = true
-  idle_timeout = 60
-  connection_draining = true
+  cross_zone_load_balancing   = true
+  idle_timeout                = 60
+  connection_draining         = true
   connection_draining_timeout = 60
 
   tags {
@@ -40,27 +40,31 @@ resource "aws_elb" "logstash-elb" {
 
 resource "aws_route53_record" "logstash-elb" {
   zone_id = "${var.route53_zone_id}"
-  name = "${var.logstash_dns_name}"
-  type = "A"
+  name    = "${var.logstash_dns_name}"
+  type    = "A"
 
   alias {
-    name = "${aws_elb.logstash-elb.dns_name}"
-    zone_id = "${aws_elb.logstash-elb.zone_id}"
+    name                   = "${aws_elb.logstash-elb.dns_name}"
+    zone_id                = "${aws_elb.logstash-elb.zone_id}"
     evaluate_target_health = true
   }
 }
-
 
 
 data "template_file" "logstash-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    ca_cert = "${file(var.ca_cert)}"
-    server_cert = "${file(var.server_cert)}"
-    server_key = "${file(var.server_key)}"
-    config = "${data.template_file.logstash-config.rendered}"
-    extra_snippet = ""
+    credstash_install_snippet     = "${module.credstash-reader.install_snippet}"
+    credstash_get_cmd             = "${module.credstash-reader.get_cmd}"
+    credstash_ca_cert_name        = "${var.credstash_prefix}${var.credstash_ca_cert_name}"
+    credstash_server_cert_name    = "${var.credstash_prefix}${var.credstash_server_cert_name}"
+    credstash_server_key_name     = "${var.credstash_prefix}${var.credstash_server_key_name}"
+    credstash_dynamic_config_name = "${var.credstash_prefix}${var.credstash_dynamic_config_name}"
+    credstash_dynamic_config_cron = "${var.credstash_dynamic_config_poll_schedule}"
+    config                        = "${data.template_file.logstash-config.rendered}"
+    extra_settings                = "${var.extra_settings}"
+    extra_setup_snippet           = "${var.extra_setup_snippet}"
   }
 }
 
@@ -146,7 +150,7 @@ resource "aws_autoscaling_group" "logstash-asg" {
   desired_capacity     = "${var.desired_server_count}"
   launch_configuration = "${aws_launch_configuration.logstash-lc.name}"
   health_check_type    = "ELB"
-  load_balancers       = ["${aws_elb.logstash-elb.name}"]
+  load_balancers       = ["${concat(list(aws_elb.logstash-elb.name), var.extra_elbs)}"]
 
   tag = [{
     key                 = "Name"
@@ -158,15 +162,17 @@ resource "aws_autoscaling_group" "logstash-asg" {
 
 
 resource "aws_launch_configuration" "logstash-lc" {
-  count           = "${min(var.max_server_count, 1)}"
-  name_prefix     = "${var.name_prefix}-logstash-lc-"
-  image_id        = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  key_name        = "${var.key_name}"
-  security_groups = ["${aws_security_group.logstash-sg.id}"]
-  user_data       = <<USER_DATA
+  count                = "${min(var.max_server_count, 1)}"
+  name_prefix          = "${var.name_prefix}-logstash-lc-"
+  image_id             = "${var.ami}"
+  instance_type        = "${var.instance_type}"
+  key_name             = "${var.key_name}"
+  security_groups      = ["${concat(list(aws_security_group.logstash-sg.id), var.extra_security_groups)}"]
+  iam_instance_profile = "${aws_iam_instance_profile.logstash-profile.id}"
+  user_data            = <<USER_DATA
 #!/bin/bash
 ${data.template_file.logstash-setup.rendered}
+${var.extra_setup_snippet}
 USER_DATA
 
   associate_public_ip_address = true

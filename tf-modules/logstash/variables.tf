@@ -56,14 +56,80 @@ variable "key_name" {
   description = "SSH key name to use for connecting to all nodes"
 }
 
-variable "ca_cert" {
-  description = "CA certificate file path. Configures Logstash to trust clients with certificates signed by this CA"
+variable "certstrap_depot_path" {
+  default = ""
+  description = "Local path, where generated SSL certifcates will be stored in. Certificates will be removed from local file system if left empty and will only be retained in credential store"
 }
 
-variable "server_cert" {
-  description = "Path to certificate that Logstash will use to authenticate with the client"
+variable "certstrap_ca_common_name" {
+  default = "Logstash"
+  description = "Common Name to be used during CA certificate generation"
 }
 
-variable "server_key" {
-  description = "Path to key that Logstash will use to authenticate with the client"
+variable "certstrap_ca_passphrase" {
+  default = ""
+  description = "Passphrase for SSL Key encryption to be used during CA certificate generation"
+}
+
+variable "credstash_table_name" {
+  default = "credential-store"
+  description = "DynamoDB table used by credstash to store credentials"
+}
+
+variable "credstash_kms_key_arn" {
+  description = "Master KMS key ARN for getting SSL server key using credstash"
+}
+
+variable "credstash_prefix" {
+  default = "dev-"
+  description = "Prefix to be used for all names used by credstash"
+}
+variable "credstash_ca_cert_name" {
+  default = "logstash-ca-cert"
+  description = "CA certificate will be genrated and stored using credstash under this name. Logstash is configured to trust clients with certificates signed by this CA"
+}
+
+variable "credstash_ca_key_name" {
+  default = "logstash-ca-key"
+  description = "CA SSL Key that corresponds to CA certificate will be stored under this name"
+}
+
+variable "credstash_server_key_name" {
+  default = "logstash-ssl-key"
+  description = "Name of the SSL server key, which will be used by credstash to identify it"
+}
+
+variable "credstash_server_cert_name" {
+  default = "logstash-ssl-cert"
+  description = "Name of the SSL server certificate, which will be used by credstash to identify it"
+}
+
+variable "credstash_dynamic_config_name" {
+  default = "logstash-dynamic-conf"
+  description = "This a key for credstash to be used to poll dynamic configuration for logstash, thus creating an ability to remotely update logstash fiters during runtime."
+}
+
+variable "credstash_dynamic_config_poll_schedule" {
+  default = "* * * * *"
+  description = "Cron schedule for polling logstash dynamic configuration using credstash. Default is every 5 minutes"  
+}
+
+variable "extra_setup_snippet" {
+  default = ""
+  description = "Extra snippet to run after logstash has been installed and configured"
+}
+
+variable "extra_settings" {
+  default = ""
+  description = "Extra Logstash setting in YAML format"
+}
+
+variable "extra_security_groups" {
+  default = []
+  description = "Security groups, besides the default one, to be used for Logstash instances"
+}
+
+variable "extra_elbs" {
+  default = []
+  description = "Elastic Load Balancers, besides the default one, to be used for Logstash scaling group"
 }

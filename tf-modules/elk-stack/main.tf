@@ -82,26 +82,49 @@ module "elasticsearch" {
 }
 
 
-module "logstash-kibana" {
-  source = "../logstash+kibana"
+module "kibana" {
+  source = "../kibana"
 
   name_prefix          = "${var.name_prefix}"
   vpc_id               = "${module.vpc.vpc_id}"
   vpc_azs              = ["${var.vpc_azs}"]
   route53_zone_id      = "${var.route53_zone_id}"
-  subnet_ids           = ["${module.vpc.public_subnet_ids}"]
-  key_name             = "${aws_key_pair.elk-key.key_name}"
-  ami                  = "${data.aws_ami.ubuntu.id}"
-  instance_type        = "${var.logstash_kibana_instance_type}"
-  elasticsearch_url    = "http://${module.elasticsearch.elb_dns}:9200"
-  min_server_count     = "${var.logstash_kibana_min_server_count}"
-  max_server_count     = "${var.logstash_kibana_max_server_count}"
-  desired_server_count = "${var.logstash_kibana_desired_server_count}"
   kibana_dns_name      = "${var.kibana_dns_name}"
-  logstash_dns_name    = "${var.logstash_dns_name}"
-  logstash_ca_cert     = "${var.logstash_ca_cert}"
-  logstash_server_cert = "${var.logstash_server_cert}"
-  logstash_server_key  = "${var.logstash_server_key}"
+  subnet_ids           = ["${module.vpc.public_subnet_ids}"]
+  key_name             = ""
+  ami                  = ""
+  instance_type        = ""
+  elasticsearch_url    = "http://${module.elasticsearch.elb_dns}:9200"
+  min_server_count     = 0
+  max_server_count     = 0
+  desired_server_count = 0
+}
+
+module "logstash-kibana" {
+  source = "../logstash"
+
+  name_prefix              = "${var.name_prefix}-kibana"
+  vpc_id                   = "${module.vpc.vpc_id}"
+  subnet_ids               = ["${module.vpc.public_subnet_ids}"]
+  vpc_azs                  = ["${var.vpc_azs}"]
+  route53_zone_id          = "${var.route53_zone_id}"
+  logstash_dns_name        = "${var.logstash_dns_name}"
+  ami                      = "${data.aws_ami.ubuntu.id}"
+  instance_type            = "${var.logstash_kibana_instance_type}"
+  key_name                 = "${aws_key_pair.elk-key.key_name}"
+  elasticsearch_url        = "http://${module.elasticsearch.elb_dns}:9200"
+  min_server_count         = "${var.logstash_kibana_min_server_count}"
+  max_server_count         = "${var.logstash_kibana_max_server_count}"
+  desired_server_count     = "${var.logstash_kibana_desired_server_count}"
+  extra_security_groups    = ["${module.kibana.security_group_id}"]
+  extra_setup_snippet      = "${module.kibana.setup_snippet}"
+  extra_elbs               = ["${module.kibana.elb_name}"]
+  certstrap_depot_path     = "${var.certstrap_depot_path}"
+  certstrap_ca_common_name = "${var.certstrap_ca_common_name}"
+  certstrap_ca_passphrase  = "${var.certstrap_ca_passphrase}"
+  credstash_table_name     = "${var.credstash_table_name}"
+  credstash_kms_key_arn    = "${var.credstash_kms_key_arn}"
+  credstash_prefix         = "${var.name_prefix}-"
 }
 
 
@@ -114,7 +137,7 @@ resource "aws_key_pair" "elk-key" {
 resource "aws_instance" "control-instance" {
   count                       = "${var.deploy_control_instance}"
   ami                         = "${data.aws_ami.ubuntu.id}" # "${var.ami}"
-  instance_type               = "t2.small"
+  instance_type               = "t2.nano"
   subnet_id                   = "${module.vpc.public_subnet_ids[0]}"
   vpc_security_group_ids      = ["${aws_security_group.control-instance-sg.id}"]
   key_name                    = "${aws_key_pair.elk-key.key_name}"
@@ -160,24 +183,24 @@ output "control_instance_public_ip" {
   value = ["${aws_instance.control-instance.*.public_ip}"]
 }
 
-//Elasticseqarch Internal Load Balancer DNS.
+//Elasticsearch Internal Load Balancer DNS.
 output "elasticsearch_internal_elb_dns" {
   value = "${module.elasticsearch.elb_dns}"
 }
 
-//Logstash Load Balancer DNS. 
-output "logstash_elb_dns" {
-  value = "${module.logstash-kibana.logstash_elb_dns}"
-}
+# //Logstash Load Balancer DNS. 
+# output "logstash_elb_dns" {
+#   value = "${module.logstash-kibana.logstash_elb_dns}"
+# }
 
-//Kibana Load Balancer DNS. 
-output "kibana_elb_dns" {
-  value = "${module.logstash-kibana.kibana_elb_dns}"
-}
+# //Kibana Load Balancer DNS. 
+# output "kibana_elb_dns" {
+#   value = "${module.logstash-kibana.kibana_elb_dns}"
+# }
 
 //VPC ID
 output "vpc_id" {
-  value = ["${module.vpc.vpc_id}"]
+  value = "${module.vpc.vpc_id}"
 }
 
 //Public subnte IDS

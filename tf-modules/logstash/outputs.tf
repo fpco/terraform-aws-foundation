@@ -6,10 +6,12 @@ output "elb_name" {
   value = "${aws_elb.logstash-elb.name}"
 }
 
-output "security_group_id" {
-  value = "${aws_security_group.logstash-sg.id}"
+output "logstash_role_name" {
+  value = "${aws_iam_role.logstash-role.name}"
 }
 
-output "setup_snippet" {
-  value = "${data.template_file.logstash-setup.rendered}"
+// Until terraform 9 is released this is a cleanup action that needs to be
+//invoked prior to destruction
+output "kms_grant_revoke_cmd" {
+  value = "${path.module}/../credstash/grant.sh revoke ${var.credstash_kms_key_arn} ${aws_iam_role.logstash-role.arn}"
 }

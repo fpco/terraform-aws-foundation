@@ -4,7 +4,7 @@ TOTAL_SLEEP=0
 VOLUME_ID=${volume_id}
 INSTANCE_ID=$$(ec2metadata --instance-id)
 REGION=$$(ec2metadata --availability-zone | sed 's/.$//')
-echo "Attaching $$VOLUME_ID to instance $$INSTANCE_ID via the AWS API in ${region}"
+echo "Attaching $$VOLUME_ID to instance $$INSTANCE_ID via the AWS API in $${REGION}"
 aws --region=$${REGION}         \
     ec2 attach-volume           \
     --volume-id $$VOLUME_ID     \
