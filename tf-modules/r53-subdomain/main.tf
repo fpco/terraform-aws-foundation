@@ -14,9 +14,14 @@ variable "ttl" {
     default = 172800
     description = "TTL for the NS records created"
 }
+variable "vpc_id" {
+    default = ""
+    description = "The VPC ID to associate a private zone with (leave blank for public zone)"
+}
 
 resource "aws_route53_zone" "subdomain" {
     name = "${var.name}"
+    vpc_id = "${var.vpc_id}"
 }
 
 resource "aws_route53_record" "subdomain-NS" {
@@ -31,3 +36,8 @@ resource "aws_route53_record" "subdomain-NS" {
         "${aws_route53_zone.subdomain.name_servers.3}",
     ]
 }
+
+output "zone_id" {
+  value = "${aws_route53_zone.subdomain.zone_id}"
+}
+
