@@ -84,6 +84,8 @@ resource "null_resource" "bind" {
   count = "${length(var.private_ips)}"
   triggers {
     named_conf_options = "${var.named_conf_options}"
+    named_conf_local = "${var.named_conf_local}"
+    log_files = "${join("|", var.log_files)}"
     instance_id = "${aws_instance.bind.*.id[count.index]}"
   }
   connection {
@@ -94,10 +96,19 @@ resource "null_resource" "bind" {
     content = "${var.named_conf_options}"
     destination = "/tmp/named.conf.options"
   }
+  provisioner "file" {
+    content = "${var.named_conf_local}"
+    destination = "/tmp/named.conf.local"
+  }
   provisioner "remote-exec" {
     inline = [
       "sudo chown root:bind /tmp/named.conf.options",
-      "sudo mv /tmp/named.conf.options /etc/bind/named.conf.options",
+      "if test -s /tmp/named.conf.options; then sudo mv /tmp/named.conf.options /etc/bind/named.conf.options; else sudo rm /tmp/named.conf.options; fi",
+      "sudo chown root:bind /tmp/named.conf.local",
+      "if test -s /tmp/named.conf.local; then sudo mv /tmp/named.conf.local /etc/bind/named.conf.local; else sudo rm /tmp/named.conf.local; fi",
+      "${formatlist("sudo mkdir -p \"$(dirname '%s')\"", var.log_files)}",
+      "${formatlist("sudo touch \"$(dirname '%s')\"", var.log_files)}",
+      "${formatlist("sudo chown bind \"$(dirname '%s')\"", var.log_files)}",
       "sudo killall -HUP named",
     ]
   }

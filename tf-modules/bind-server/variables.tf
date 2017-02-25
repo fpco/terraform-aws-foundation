@@ -26,4 +26,13 @@ variable "name" {
 }
 variable "named_conf_options" {
   description = "Complete content of '/etc/bind/named.conf.options'."
+  default = ""
+}
+variable "named_conf_local" {
+  description = "Complete content of '/etc/bind/named.conf.local'."
+  default = ""
+}
+variable "log_files" {
+  description = "A list of configured log files.  These will be created with correct ownership before reloading configuration."
+  default = []
 }
