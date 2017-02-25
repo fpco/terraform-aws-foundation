@@ -64,7 +64,7 @@ resource "aws_instance" "bind" {
   private_ip             = "${var.private_ips[count.index]}"
   key_name               = "${var.key_name}"
   tags {
-    Name                 = "${var.name}-${count.index}"
+    Name                 = "${var.name}-${format("%02d", count.index)}"
   }
   provisioner "remote-exec" {
     connection {
