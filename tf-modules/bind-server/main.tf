@@ -63,6 +63,16 @@ resource "aws_instance" "bind" {
   vpc_security_group_ids = ["${var.security_group_ids}"]
   private_ip             = "${var.private_ips[count.index]}"
   key_name               = "${var.key_name}"
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = 8
+  }
+  # Instance auto-recovery (see cloudwatch metric alarm below) doesn't support
+  # instances with ephemeral storage, so this disables it.
+  ephemeral_block_device {
+    device_name = "/dev/sdb"
+    no_device = true
+  }
   tags {
     Name                 = "${var.name}-${format("%02d", count.index)}"
   }
@@ -112,4 +122,27 @@ resource "null_resource" "bind" {
       "sudo killall -HUP named",
     ]
   }
+}
+
+# Current AWS region
+data "aws_region" "current" {
+  current = true
+}
+
+# Cloudwatch alarm that recovers the instance after two minutes of system status check failure
+resource "aws_cloudwatch_metric_alarm" "auto-recover" {
+  count = "${length(var.private_ips)}"
+  alarm_name = "auto-recover-${aws_instance.bind.*.id[count.index]}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods = "2"
+  metric_name = "StatusCheckFailed_System"
+  dimensions {
+    InstanceId = "${aws_instance.bind.*.id[count.index]}"
+  }
+  namespace = "AWS/EC2"
+  period = "60"
+  statistic = "Minimum"
+  threshold = "0"
+  alarm_description = "Auto-recover the instance if the system status check fails for two minutes"
+  alarm_actions = ["arn:aws:automate:${data.aws_region.current.name}:ec2:recover"]
 }
