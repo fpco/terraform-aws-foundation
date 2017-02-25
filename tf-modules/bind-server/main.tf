@@ -69,8 +69,13 @@ resource "aws_instance" "bind" {
   }
   # Instance auto-recovery (see cloudwatch metric alarm below) doesn't support
   # instances with ephemeral storage, so this disables it.
+  # See https://github.com/hashicorp/terraform/issues/5388#issuecomment-282480864
   ephemeral_block_device {
     device_name = "/dev/sdb"
+    no_device = true
+  }
+  ephemeral_block_device {
+    device_name = "/dev/sdc"
     no_device = true
   }
   tags {
