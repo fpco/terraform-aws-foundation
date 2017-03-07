@@ -1,5 +1,5 @@
 variable "name_prefix" {
-  description = "Project name. It will pbe prepended to all resources."
+  description = "Project name. It will be prepended to all resources."
 }
 
 variable "region" {
@@ -22,12 +22,12 @@ variable "private_subnet_cidrs" {
 
 variable "azs" {
   type = "list"
-  description = "A list of Availaiblity zones in the region"
+  description = "A list of Availaiblity Zones in the region"
 }
 
 variable "extra_tags" {
   description = "Extra tags that will be added to VPC, DHCP Options, Internet Gateway, Subnets and Routing Table."
-  default = {} 
+  default = {}
 }
 
 variable "nat_count" {

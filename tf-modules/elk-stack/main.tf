@@ -70,7 +70,7 @@ module "elasticsearch" {
   vpc_public_subnet_cidrs   = ["${var.vpc_public_subnet_cidrs}"]
   vpc_private_subnet_cidrs  = ["${var.vpc_private_subnet_cidrs}"]
   vpc_private_subnet_ids    = ["${module.vpc.private_subnet_ids}"]
-  node_ami                  = "${data.aws_ami.ubuntu.id}" # "${var.ami}"
+  node_ami                  = "${data.aws_ami.ubuntu.id}"
   data_node_count           = "${var.elasticsearch_data_node_count}"
   data_node_ebs_size        = "${var.elasticsearch_data_node_ebs_size}"
   data_node_snapshot_ids    = ["${var.elasticsearch_data_node_snapshot_ids}"]
@@ -136,7 +136,7 @@ resource "aws_key_pair" "elk-key" {
 
 resource "aws_instance" "control-instance" {
   count                       = "${var.deploy_control_instance}"
-  ami                         = "${data.aws_ami.ubuntu.id}" # "${var.ami}"
+  ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "t2.nano"
   subnet_id                   = "${module.vpc.public_subnet_ids[0]}"
   vpc_security_group_ids      = ["${aws_security_group.control-instance-sg.id}"]
