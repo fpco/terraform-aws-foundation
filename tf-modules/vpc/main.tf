@@ -70,4 +70,5 @@ module "nat-gateways" {
   nat_count          = "${var.nat_count}"
   public_subnet_ids  = ["${module.subnets.public_ids}"]
   private_subnet_ids = ["${module.subnets.private_ids}"]
+  extra_tags         = "${var.extra_tags}"
 }

@@ -16,7 +16,7 @@ resource "aws_elb" "kibana-elb" {
   name = "${var.name_prefix}-kibana-elb"
   subnets       = ["${var.subnet_ids}"]
   security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
-  
+
   listener {
     instance_port = 5601
     instance_protocol = "http"
@@ -119,7 +119,7 @@ resource "aws_security_group" "kibana-elb-sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   ingress {
     from_port   = -1
     to_port     = -1
