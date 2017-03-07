@@ -3,7 +3,7 @@
  *
  * This module takes care of VPC deployment. Scenarios 1 and 2 are possible with
  * this module: http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenarios.html
- * 
+ *
  */
 resource "aws_vpc" "main" {
   cidr_block           = "${var.cidr}"
@@ -72,7 +72,7 @@ module "nat-gateways" {
   source     = "../nat-gateways"
   nat_count  = "${var.nat_count}"
   subnet_ids = ["${aws_subnet.public.*.id}"]
-}  
+}
 
 # Route tables. One per private subnet.
 resource "aws_route_table" "private" {

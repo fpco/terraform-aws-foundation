@@ -175,7 +175,7 @@ resource "aws_security_group" "control-instance-sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
 }
 
 //Control instance public IP address. If list is empty, control instance wasn't deployed.
@@ -188,12 +188,12 @@ output "elasticsearch_internal_elb_dns" {
   value = "${module.elasticsearch.elb_dns}"
 }
 
-# //Logstash Load Balancer DNS. 
+# //Logstash Load Balancer DNS.
 # output "logstash_elb_dns" {
 #   value = "${module.logstash-kibana.logstash_elb_dns}"
 # }
 
-# //Kibana Load Balancer DNS. 
+# //Kibana Load Balancer DNS.
 # output "kibana_elb_dns" {
 #   value = "${module.logstash-kibana.kibana_elb_dns}"
 # }
