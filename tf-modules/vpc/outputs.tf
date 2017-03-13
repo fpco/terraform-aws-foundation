@@ -5,12 +5,12 @@ output "vpc_id" {
 
 //List of private subnet ids. None created if list is empty.
 output "private_subnet_ids" {
-  value = ["${aws_subnet.private.*.id}"]
+  value = ["${module.subnets.private_ids}"]
 }
 
 //List of public subnet ids
 output "public_subnet_ids" {
-  value = ["${aws_subnet.public.*.id}"]
+  value = ["${module.subnets.public_ids}"]
 }
 
 // Route table id associated with public subnets

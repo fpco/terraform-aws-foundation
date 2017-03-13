@@ -37,24 +37,46 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+# module "vpc" {
+#   source = "../vpc"
 
-module "vpc" {
-  source = "../vpc"
+#   azs                  = ["${var.vpc_azs}"]
+#   cidr                 = "${var.vpc_cidr}"
+#   name_prefix          = "${var.name_prefix}"
+#   public_subnet_cidrs  = ["${var.vpc_public_subnet_cidrs}"]
+#   private_subnet_cidrs = ["${var.vpc_private_subnet_cidrs}"]
+#   region               = "${var.region}"
+#   extra_tags           = {}
+#   nat_count            = "${length(var.vpc_azs) % floor(max(var.elasticsearch_data_node_count, var.elasticsearch_master_node_count) + 1)}"
+# }
+# resource "aws_route53_zone_association" "e1c-net" {
+#   zone_id = "${var.route53_zone_id}"
+#   vpc_id  = "${module.vpc.vpc_id}"
+# }
 
-  azs                  = ["${var.vpc_azs}"]
-  cidr                 = "${var.vpc_cidr}"
+module "subnets" {
+  source               = "../subnets"
+  azs                  = "${var.vpc_azs}"
+  vpc_id               = "${var.vpc_id}"
   name_prefix          = "${var.name_prefix}"
-  public_subnet_cidrs  = ["${var.vpc_public_subnet_cidrs}"]
-  private_subnet_cidrs = ["${var.vpc_private_subnet_cidrs}"]
-  region               = "${var.region}"
-  extra_tags           = {}
-  nat_count            = "${length(var.vpc_azs) % floor(max(var.elasticsearch_data_node_count, var.elasticsearch_master_node_count) + 1)}"
+  public_subnet_cidrs  = "${var.vpc_public_subnet_cidrs}"
+  private_subnet_cidrs = "${var.vpc_private_subnet_cidrs}"
 }
 
+# Give internet to public subnets.
+resource "aws_route_table_association" "public-rta" {
+  count          = "${length(var.vpc_public_subnet_cidrs)}"
+  subnet_id      = "${element(module.subnets.public_ids, count.index)}"
+  route_table_id = "${var.vpc_route_table_id}"
+}
 
-resource "aws_route53_zone_association" "e1c-net" {
-  zone_id = "${var.route53_zone_id}"
-  vpc_id  = "${module.vpc.vpc_id}"
+module "nat-gateways" {
+  source             = "../nat-gateways"
+  vpc_id             = "${var.vpc_id}"
+  name_prefix        = "${var.name_prefix}"
+  nat_count          = "${length(var.vpc_azs) % floor(max(var.elasticsearch_data_node_count, var.elasticsearch_master_node_count) + 1)}"
+  public_subnet_ids  = ["${module.subnets.public_ids}"]
+  private_subnet_ids = ["${module.subnets.private_ids}"]
 }
 
 
@@ -63,14 +85,14 @@ module "elasticsearch" {
 
   name_prefix               = "${var.name_prefix}"
   region                    = "${var.region}"
-  vpc_id                    = "${module.vpc.vpc_id}"
+  vpc_id                    = "${var.vpc_id}"
   vpc_azs                   = ["${var.vpc_azs}"]
   route53_zone_id           = "${var.route53_zone_id}"
   key_name                  = "${aws_key_pair.elk-key.key_name}"
   vpc_public_subnet_cidrs   = ["${var.vpc_public_subnet_cidrs}"]
   vpc_private_subnet_cidrs  = ["${var.vpc_private_subnet_cidrs}"]
-  vpc_private_subnet_ids    = ["${module.vpc.private_subnet_ids}"]
-  node_ami                  = "${data.aws_ami.ubuntu.id}" # "${var.ami}"
+  vpc_private_subnet_ids    = ["${module.subnets.private_ids}"]
+  node_ami                  = "${data.aws_ami.ubuntu.id}"
   data_node_count           = "${var.elasticsearch_data_node_count}"
   data_node_ebs_size        = "${var.elasticsearch_data_node_ebs_size}"
   data_node_snapshot_ids    = ["${var.elasticsearch_data_node_snapshot_ids}"]
@@ -86,11 +108,11 @@ module "kibana" {
   source = "../kibana"
 
   name_prefix          = "${var.name_prefix}"
-  vpc_id               = "${module.vpc.vpc_id}"
+  vpc_id               = "${var.vpc_id}"
   vpc_azs              = ["${var.vpc_azs}"]
   route53_zone_id      = "${var.route53_zone_id}"
   kibana_dns_name      = "${var.kibana_dns_name}"
-  subnet_ids           = ["${module.vpc.public_subnet_ids}"]
+  subnet_ids           = ["${module.subnets.public_ids}"]
   key_name             = ""
   ami                  = ""
   instance_type        = ""
@@ -104,8 +126,8 @@ module "logstash-kibana" {
   source = "../logstash"
 
   name_prefix              = "${var.name_prefix}-kibana"
-  vpc_id                   = "${module.vpc.vpc_id}"
-  subnet_ids               = ["${module.vpc.public_subnet_ids}"]
+  vpc_id                   = "${var.vpc_id}"
+  subnet_ids               = ["${module.subnets.public_ids}"]
   vpc_azs                  = ["${var.vpc_azs}"]
   route53_zone_id          = "${var.route53_zone_id}"
   logstash_dns_name        = "${var.logstash_dns_name}"
@@ -136,9 +158,9 @@ resource "aws_key_pair" "elk-key" {
 
 resource "aws_instance" "control-instance" {
   count                       = "${var.deploy_control_instance}"
-  ami                         = "${data.aws_ami.ubuntu.id}" # "${var.ami}"
+  ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "t2.nano"
-  subnet_id                   = "${module.vpc.public_subnet_ids[0]}"
+  subnet_id                   = "${module.subnets.public_ids[0]}"
   vpc_security_group_ids      = ["${aws_security_group.control-instance-sg.id}"]
   key_name                    = "${aws_key_pair.elk-key.key_name}"
   associate_public_ip_address = true
@@ -152,7 +174,7 @@ resource "aws_instance" "control-instance" {
 resource "aws_security_group" "control-instance-sg" {
   count       = "${var.deploy_control_instance}"
   name        = "${var.name_prefix}-control-instance-sg"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
   description = "Allow SSH, ICMP, Elasticsearch TCP, Elasticsearch HTTP, and everything outbound."
 
   ingress {
@@ -175,7 +197,7 @@ resource "aws_security_group" "control-instance-sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
 }
 
 //Control instance public IP address. If list is empty, control instance wasn't deployed.
@@ -188,25 +210,16 @@ output "elasticsearch_internal_elb_dns" {
   value = "${module.elasticsearch.elb_dns}"
 }
 
-# //Logstash Load Balancer DNS. 
+# //Logstash Load Balancer DNS.
 # output "logstash_elb_dns" {
 #   value = "${module.logstash-kibana.logstash_elb_dns}"
 # }
 
-# //Kibana Load Balancer DNS. 
+# //Kibana Load Balancer DNS.
 # output "kibana_elb_dns" {
 #   value = "${module.logstash-kibana.kibana_elb_dns}"
 # }
 
-//VPC ID
-output "vpc_id" {
-  value = "${module.vpc.vpc_id}"
-}
-
-//Public subnte IDS
-output "public_subnet_ids" {
-  value = ["${module.vpc.public_subnet_ids}"]
-}
 
 //Running this command will setup SOCKS proxy to VPC through control instance.
 output "socket_cmd" {

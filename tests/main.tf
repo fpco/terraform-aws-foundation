@@ -190,10 +190,11 @@ resource "aws_subnet" "private" {
 # set up nat gateway
 module "nat_gateways" {
     source = "../tf-modules/nat-gateways"
+    vpc_id = "${module.test-vpc.id}"
+    name_prefix = "${var.name}"
     nat_count = 1
-    subnet_id = ["${aws_subnet.public.id}"]
-    access_key = "${var.access_key}"
-    secret_key = "${var.secret_key}"
+    public_subnet_ids = ["${aws_subnet.public.id}"]
+    private_subnet_ids = ["${aws_subnet.private.id}"]
     region = "${var.region}"
 }
 # route tables for above subnets
@@ -204,13 +205,6 @@ resource "aws_route_table" "public" {
         gateway_id = "${module.test-vpc.igw_id}"
     }
 }
-resource "aws_route_table" "private" {
-    vpc_id = "${module.test-vpc.id}"
-    route {
-        cidr_block = "0.0.0.0/0"
-        nat_gateway_id = "${element(module.nat_gateways.*.id, 0)}"
-    }
-}
 # Route Table Associations
 resource "aws_main_route_table_association" "main" {
     vpc_id = "${module.test-vpc.id}"
@@ -219,10 +213,6 @@ resource "aws_main_route_table_association" "main" {
 resource "aws_route_table_association" "public" {
     subnet_id = "${aws_subnet.public.id}"
     route_table_id = "${aws_route_table.public.id}"
-}
-resource "aws_route_table_association" "private" {
-    subnet_id = "${aws_subnet.private.id}"
-    route_table_id = "${aws_route_table.private.id}"
 }
 # Security groups
 resource "aws_security_group" "public-subnet" {

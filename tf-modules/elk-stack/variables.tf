@@ -14,9 +14,12 @@ variable "region" {
   description = "Region to deploy ELK stack in"
 }
 
-variable "vpc_cidr" {
-  description = "The CIDR range of the VPC"
-  default     = "172.16.0.0/21"
+variable "vpc_id" {
+  description = "VPC ID for the ELK stack"
+}
+
+variable "vpc_route_table_id" {
+  description = "ID of the route table, with which created subnets will be associated with"
 }
 
 variable "vpc_azs" {
