@@ -7,16 +7,16 @@ variable "bucket_name" {
     description = "the name to give the bucket"
 }
 variable "iam_roles" {
-    default     = ""
-    description = "comma separated string-list of role names, full access to bucket"
+    default     = []
+    description = "list of role names, full access to bucket"
 }
 variable "iam_users" {
-    default     = ""
-    description = "comma separated string-list of user names, full access to bucket"
+    default     = []
+    description = "list of user names, full access to bucket"
 }
 variable "iam_groups" {
-    default     = ""
-    description = "comma separated string-list of group names, full access to bucket"
+    default     = []
+    description = "list of group names, full access to bucket"
 }
 resource "aws_s3_bucket" "remote-state" {
     bucket = "${var.bucket_name}"
@@ -32,9 +32,9 @@ module "remote-state-full-access-policy" {
 }
 resource "aws_iam_policy_attachment" "remote-state-admin" {
     name   = "${module.remote-state-full-access-policy.name}"
-    roles  = ["${compact(split(",", replace(var.iam_roles,  " ", "")))}"]
-    users  = ["${compact(split(",", replace(var.iam_users,  " ", "")))}"]
-    groups = ["${compact(split(",", replace(var.iam_groups, " ", "")))}"]
+    roles  = "${compact(var.iam_roles)}"
+    users  = "${compact(var.iam_users)}"
+    groups = "${compact(var.iam_groups)}"
     policy_arn = "${module.remote-state-full-access-policy.arn}"
 }
 //`arn` exported from `aws_s3_bucket`
