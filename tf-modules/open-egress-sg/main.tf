@@ -4,10 +4,10 @@
  * Create a simple and reusable security group for "open egress".
  */
 resource "aws_security_group" "main" {
-    name = "${var.name}"
+    name = "${var.name}-open-egress"
     vpc_id = "${var.vpc_id}"
     tags {
-        Name = "${var.name}"
+        Name = "${var.name}-open-egress"
         Description = "Allow open egress for ${var.name}"
     }
     # unrestricted outbound
