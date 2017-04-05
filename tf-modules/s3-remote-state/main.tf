@@ -28,7 +28,7 @@ resource "aws_s3_bucket" "remote-state" {
 module "remote-state-full-access-policy" {
     source = "../s3-full-access-policy"
     name = "${var.bucket_name}-full-access"
-    bucket_names = "${aws_s3_bucket.remote-state.id}"
+    bucket_names = ["${aws_s3_bucket.remote-state.id}"]
 }
 resource "aws_iam_policy_attachment" "remote-state-admin" {
     name   = "${module.remote-state-full-access-policy.name}"

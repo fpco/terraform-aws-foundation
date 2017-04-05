@@ -6,7 +6,8 @@ variable "name" {
     description = "the name of the account or deployment to use with this policy"
 }
 variable "bucket_names" {
-    description = "the name of the buckets to grant access to"
+    description = "list of bucket names to grant access to"
+    type        = "list"
 }
 //`id` exported from `aws_iam_policy`
 output "id" {
@@ -30,7 +31,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       "s3:ListBucketMultipartUploads",
     ]
 
-    resources = ["${join("\",\"",formatlist("arn:aws:s3:::%s",split(",", var.bucket_names)))}"]
+    resources = ["${formatlist("arn:aws:s3:::%s",var.bucket_names)}"]
   }
 
   statement {
@@ -45,7 +46,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       "s3:AbortMultipartUpload"
     ]
 
-    resources = ["${join("\",\"",formatlist("arn:aws:s3:::%s/*",split(",", var.bucket_names)))}"]
+    resources = ["${formatlist("arn:aws:s3:::%s/*",var.bucket_names)}"]
   }
 }
 
