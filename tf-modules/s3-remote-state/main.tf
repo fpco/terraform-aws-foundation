@@ -6,17 +6,9 @@
 variable "bucket_name" {
     description = "the name to give the bucket"
 }
-variable "iam_roles" {
+variable "principals" {
     default     = []
-    description = "list of role names, full access to bucket"
-}
-variable "iam_users" {
-    default     = []
-    description = "list of user names, full access to bucket"
-}
-variable "iam_groups" {
-    default     = []
-    description = "list of group names, full access to bucket"
+    description = "list of user/role ARNs to get full access to the bucket"
 }
 resource "aws_s3_bucket" "remote-state" {
     bucket = "${var.bucket_name}"
@@ -25,17 +17,50 @@ resource "aws_s3_bucket" "remote-state" {
         enabled = true
     }
 }
-module "remote-state-full-access-policy" {
-    source = "../s3-full-access-policy"
-    name = "${var.bucket_name}-full-access"
-    bucket_names = ["${aws_s3_bucket.remote-state.id}"]
+data "aws_iam_policy_document" "s3-full-access" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:ListBucketMultipartUploads"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${compact(var.principals)}"]
+    }
+
+    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}"]
+  }
+
+  statement {
+    effect = "Allow"
+    # find an authoritative list of valid Actions for a AWS bucket policy,
+    # I haven't been able to locate one, and the two commented out are invalid
+    actions = [
+#     "s3:ListObjects",
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+#     "s3:CreateMultipartUpload",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["${compact(var.principals)}"]
+    }
+
+    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}/*"]
+  }
 }
-resource "aws_iam_policy_attachment" "remote-state-admin" {
-    name   = "${module.remote-state-full-access-policy.name}"
-    roles  = "${compact(var.iam_roles)}"
-    users  = "${compact(var.iam_users)}"
-    groups = "${compact(var.iam_groups)}"
-    policy_arn = "${module.remote-state-full-access-policy.arn}"
+
+resource "aws_s3_bucket_policy" "s3-full-access" {
+  bucket = "${aws_s3_bucket.remote-state.id}"
+  policy = "${data.aws_iam_policy_document.s3-full-access.json}"
 }
 //`arn` exported from `aws_s3_bucket`
 output "bucket_arn" {
@@ -49,26 +74,11 @@ output "bucket_id" {
 output "region" {
     value = "${aws_s3_bucket.remote-state.region}"
 }
-//`arn` exported from the "full access" IAM policy to the bucket
-output "iam_policy_arn" {
-    value = "${module.remote-state-full-access-policy.arn}"
-}
-//`name` exported from the "full access" IAM policy to the bucket
-output "iam_policy_name" {
-    value = "${module.remote-state-full-access-policy.name}"
-}
 //Derived URL to the S3 bucket
 output "url" {
     value = "https://s3-${aws_s3_bucket.remote-state.region}.amazonaws.com/${aws_s3_bucket.remote-state.id}"
 }
-//Export `iam_roles` variable (list of IAM roles with access to the bucket)
-output "iam_roles" {
-    value = "${var.iam_roles}"
-}//Export `iam_users` variable (list of IAM users with access to the bucket)
-output "iam_users" {
-    value = "${var.iam_users}"
-}
-//Export `iam_groups` variable (list of IAM groups with access to the bucket)
-output "iam_groups" {
-    value = "${var.iam_groups}"
+//Export `principals` variable (list of IAM user/role ARNs with access to the bucket)
+output "principals" {
+    value = "${var.principals}"
 }
