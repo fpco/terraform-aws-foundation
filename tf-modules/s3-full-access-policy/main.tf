@@ -3,28 +3,33 @@
  *
  */
 variable "name" {
-    description = "the name of the account or deployment to use with this policy"
+  description = "the name of the account or deployment to use with this policy"
 }
+
 variable "bucket_names" {
-    description = "list of bucket names to grant access to"
-    type        = "list"
+  description = "list of bucket names to grant access to"
+  type        = "list"
 }
+
 //`id` exported from `aws_iam_policy`
 output "id" {
-    value = "${aws_iam_policy.s3-full-access.id}"
+  value = "${aws_iam_policy.s3-full-access.id}"
 }
+
 //`arn` exported from `aws_iam_policy`
 output "arn" {
-    value = "${aws_iam_policy.s3-full-access.arn}"
+  value = "${aws_iam_policy.s3-full-access.arn}"
 }
+
 //`name` exported from `aws_iam_policy`
 output "name" {
-    value = "${aws_iam_policy.s3-full-access.name}"
+  value = "${aws_iam_policy.s3-full-access.name}"
 }
 
 data "aws_iam_policy_document" "s3-full-access" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "s3:ListBucket",
       "s3:GetBucketLocation",
@@ -36,6 +41,7 @@ data "aws_iam_policy_document" "s3-full-access" {
 
   statement {
     effect = "Allow"
+
     actions = [
       "s3:ListObjects",
       "s3:PutObject",
@@ -43,7 +49,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       "s3:DeleteObject",
       "s3:CreateMultipartUpload",
       "s3:ListMultipartUploadParts",
-      "s3:AbortMultipartUpload"
+      "s3:AbortMultipartUpload",
     ]
 
     resources = ["${formatlist("arn:aws:s3:::%s/*",var.bucket_names)}"]
@@ -51,6 +57,6 @@ data "aws_iam_policy_document" "s3-full-access" {
 }
 
 resource "aws_iam_policy" "s3-full-access" {
-    name = "${var.name}_s3_bucket_access"
-    policy = "${data.aws_iam_policy_document.s3-full-access.json}"
+  name   = "${var.name}_s3_bucket_access"
+  policy = "${data.aws_iam_policy_document.s3-full-access.json}"
 }
