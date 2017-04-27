@@ -10,11 +10,15 @@ variable "principals" {
     default     = []
     description = "list of user/role ARNs to get full access to the bucket"
 }
+variable "versioning" {
+    default     = "true"
+    description = "enables versioning for objects in the S3 bucket"
+}
 resource "aws_s3_bucket" "remote-state" {
     bucket = "${var.bucket_name}"
     acl    = "private"
     versioning {
-        enabled = true
+        enabled = "${var.versioning}"
     }
 }
 data "aws_iam_policy_document" "s3-full-access" {
