@@ -61,10 +61,66 @@ data "aws_iam_policy_document" "s3-full-access" {
     resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}/*"]
   }
 }
-
 resource "aws_s3_bucket_policy" "s3-full-access" {
   bucket = "${aws_s3_bucket.remote-state.id}"
   policy = "${data.aws_iam_policy_document.s3-full-access.json}"
+}
+data "aws_iam_policy_document" "bucket-full-access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:ListBucketMultipartUploads"
+    ]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload"
+    ]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}/*"]
+  }
+}
+resource "aws_iam_policy" "bucket-full-access" {
+  name = "s3-${var.bucket_name}-full-access"
+  policy = "${data.aws_iam_policy_document.bucket-full-access.json}"
+}
+data "aws_iam_policy_document" "bucket-full-access-with-mfa" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:ListBucketMultipartUploads"
+    ]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload"
+    ]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}/*"]
+    condition {
+      test = "Bool"
+      variable = "aws:MultiFactorAuthPresent"
+      values = ["true"]
+    }
+  }
+}
+resource "aws_iam_policy" "bucket-full-access-with-mfa" {
+  name = "s3-${var.bucket_name}-full-access-with-mfa"
+  policy = "${data.aws_iam_policy_document.bucket-full-access-with-mfa.json}"
 }
 //`arn` exported from `aws_s3_bucket`
 output "bucket_arn" {
@@ -85,4 +141,12 @@ output "url" {
 //Export `principals` variable (list of IAM user/role ARNs with access to the bucket)
 output "principals" {
     value = "${var.principals}"
+}
+//ARN of IAM policy that grants access to the bucket (without requiring MFA)
+output "bucket-full-access-policy-arn" {
+  value = "${aws_iam_policy.bucket-full-access.arn}"
+}
+//ARN of IAM policy that grants access to the bucket (with MFA required)
+output "bucket-full-access-with-mfa-policy-arn" {
+  value = "${aws_iam_policy.bucket-full-access-with-mfa.arn}"
 }
