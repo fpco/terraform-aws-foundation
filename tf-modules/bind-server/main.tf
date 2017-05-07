@@ -84,20 +84,27 @@ resource "aws_instance" "bind" {
   provisioner "remote-exec" {
     connection {
       host = "${self.private_ip}"
-      user = "ubuntu"
+      user = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
     }
     inline = [
-      "sudo apt-get update",
-      "sudo apt-get install -y bind9 dnsutils",
-      "sudo service bind9 start",
+      "${var.distro == "ubuntu" ? "sudo apt-get update && sudo apt-get install -y bind9 dnsutils && sudo service bind9 start" : "sudo yum install -y bind && sudo service named start"}",
     ]
   }
+}
+
+data "template_file" "config_root" {
+  template = "${var.distro == "ubuntu" ? "/etc/bind" : "/etc"}"
+}
+
+data "template_file" "config_owner" {
+  template = "${var.distro == "ubuntu" ? "root:bind" : "root:named"}"
 }
 
 # Contains provisioner that is triggered whenever named options are changed.
 resource "null_resource" "bind" {
   count = "${length(var.private_ips)}"
   triggers {
+    named_conf = "${var.named_conf}"
     named_conf_options = "${var.named_conf_options}"
     named_conf_local = "${var.named_conf_local}"
     log_files = "${join("|", var.log_files)}"
@@ -105,7 +112,11 @@ resource "null_resource" "bind" {
   }
   connection {
     host = "${aws_instance.bind.*.private_ip[count.index]}"
-    user = "ubuntu"
+    user = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
+  }
+  provisioner "file" {
+    content = "${var.named_conf}"
+    destination = "/tmp/named.conf"
   }
   provisioner "file" {
     content = "${var.named_conf_options}"
@@ -117,10 +128,12 @@ resource "null_resource" "bind" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo chown root:bind /tmp/named.conf.options",
-      "if test -s /tmp/named.conf.options; then sudo mv /tmp/named.conf.options /etc/bind/named.conf.options; else sudo rm /tmp/named.conf.options; fi",
-      "sudo chown root:bind /tmp/named.conf.local",
-      "if test -s /tmp/named.conf.local; then sudo mv /tmp/named.conf.local /etc/bind/named.conf.local; else sudo rm /tmp/named.conf.local; fi",
+      "sudo chown ${data.template_file.config_owner.rendered} /tmp/named.conf",
+      "${var.named_conf == "//" ? "sudo rm /tmp/named.conf" : "sudo mv /tmp/named.conf ${data.template_file.config_root.rendered}/named.conf"}",
+      "sudo chown ${data.template_file.config_owner.rendered} /tmp/named.conf.options",
+      "${var.named_conf_options == "//" ? "sudo rm /tmp/named.conf.options" : "sudo mv /tmp/named.conf.options ${data.template_file.config_root.rendered}/named.conf.options"}",
+      "sudo chown ${data.template_file.config_owner.rendered} /tmp/named.conf.local",
+      "${var.named_conf_local == "//" ? "sudo rm /tmp/named.conf.local" : "sudo mv /tmp/named.conf.local ${data.template_file.config_root.rendered}/named.conf.local"}",
       "${formatlist("sudo mkdir -p \"$(dirname '%s')\"", var.log_files)}",
       "${formatlist("sudo touch \"$(dirname '%s')\"", var.log_files)}",
       "${formatlist("sudo chown bind \"$(dirname '%s')\"", var.log_files)}",

@@ -5,5 +5,5 @@ output "instance_ids" {
 
 // Private IP address(es) of the DNS server(s)
 output "private_ips" {
-  value = ["${aws_instance.bind.*.private_ip}"]
+  value = ["${var.private_ips}"]
 }

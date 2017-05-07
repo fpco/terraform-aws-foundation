@@ -23,16 +23,23 @@ variable "key_name" {
 variable "name" {
   description = "Name prefix of the servers (will have server number appended)"
   default = "dns"
+variable "named_conf" {
+  description = "Complete content of '/etc/bind/named.conf'."
+  default = "//"
 }
 variable "named_conf_options" {
   description = "Complete content of '/etc/bind/named.conf.options'."
-  default = ""
+  default = "//"
 }
 variable "named_conf_local" {
   description = "Complete content of '/etc/bind/named.conf.local'."
-  default = ""
+  default = "//"
 }
 variable "log_files" {
   description = "A list of configured log files.  These will be created with correct ownership before reloading configuration."
   default = []
+}
+variable "distro" {
+  description = "Linux distribution that AMI runs: 'ubuntu' or 'amazon'"
+  default = "ubuntu"
 }
