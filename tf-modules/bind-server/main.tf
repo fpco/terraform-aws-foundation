@@ -79,7 +79,7 @@ resource "aws_instance" "bind" {
     no_device = true
   }
   tags {
-    Name                 = "${var.name}-${format("%02d", count.index)}"
+    Name = "${format(var.name == "" ? var.name_format : "${var.name}-%02d", count.index + 1)}"
   }
   provisioner "remote-exec" {
     connection {
@@ -150,7 +150,7 @@ data "aws_region" "current" {
 # Cloudwatch alarm that recovers the instance after two minutes of system status check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
   count = "${length(var.private_ips)}"
-  alarm_name = "auto-recover-${aws_instance.bind.*.id[count.index]}"
+  alarm_name = "${format(var.name == "" ? var.name_format : "${var.name}-%02d", count.index + 1)}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods = "2"
   metric_name = "StatusCheckFailed_System"

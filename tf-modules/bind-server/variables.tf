@@ -21,8 +21,13 @@ variable "key_name" {
   description = "SSH key-pair name to use for setup"
 }
 variable "name" {
-  description = "Name prefix of the servers (will have server number appended)"
-  default = "dns"
+  description = "Name prefix of the instances (will have server number appended).  One of 'name' or 'name_format' may be specified."
+  default = ""
+}
+variable "name_format" {
+  description = "Name format for instances.  One of 'name' or 'name_format' may be specified"
+  default = "dns-%02d"
+}
 variable "named_conf" {
   description = "Complete content of '/etc/bind/named.conf'."
   default = "//"
