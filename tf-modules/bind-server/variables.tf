@@ -20,6 +20,9 @@ variable "security_group_ids" {
 variable "key_name" {
   description = "SSH key-pair name to use for setup"
 }
+variable "ssh_key" {
+  description = "file path to the private key for SSH"
+}
 variable "name" {
   description = "Name prefix of the instances (will have server number appended).  One of 'name' or 'names' may be specified."
   default = "dns"

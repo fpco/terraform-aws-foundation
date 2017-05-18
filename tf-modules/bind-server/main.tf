@@ -85,6 +85,7 @@ resource "aws_instance" "bind" {
     connection {
       host = "${self.private_ip}"
       user = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
+      private_key = "${file(var.ssh_key)}"
     }
     inline = [
       "${var.distro == "ubuntu" ? "sudo apt-get update && sudo apt-get install -y bind9 dnsutils && sudo service bind9 start" : "sudo yum install -y bind && sudo service named start"}",
@@ -113,6 +114,7 @@ resource "null_resource" "bind" {
   connection {
     host = "${aws_instance.bind.*.private_ip[count.index]}"
     user = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
+    private_key = "${file(var.ssh_key)}"
   }
   provisioner "file" {
     content = "${var.named_conf}"
