@@ -72,19 +72,19 @@ resource "aws_instance" "bind" {
   # See https://github.com/hashicorp/terraform/issues/5388#issuecomment-282480864
   ephemeral_block_device {
     device_name = "/dev/sdb"
-    no_device = true
+    no_device   = true
   }
   ephemeral_block_device {
     device_name = "/dev/sdc"
-    no_device = true
+    no_device   = true
   }
   tags {
     Name = "${length(var.names) == 0 ? format("%s-%02d", var.name, count.index + 1) : var.names[count.index]}"
   }
   provisioner "remote-exec" {
     connection {
-      host = "${self.private_ip}"
-      user = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
+      host        = "${self.private_ip}"
+      user        = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
       private_key = "${file(var.ssh_key)}"
     }
     inline = [
@@ -105,27 +105,27 @@ data "template_file" "config_owner" {
 resource "null_resource" "bind" {
   count = "${length(var.private_ips)}"
   triggers {
-    named_conf = "${var.named_conf}"
+    named_conf         = "${var.named_conf}"
     named_conf_options = "${var.named_conf_options}"
-    named_conf_local = "${var.named_conf_local}"
-    log_files = "${join("|", var.log_files)}"
-    instance_id = "${aws_instance.bind.*.id[count.index]}"
+    named_conf_local   = "${var.named_conf_local}"
+    log_files          = "${join("|", var.log_files)}"
+    instance_id        = "${aws_instance.bind.*.id[count.index]}"
   }
   connection {
-    host = "${aws_instance.bind.*.private_ip[count.index]}"
-    user = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
+    host        = "${aws_instance.bind.*.private_ip[count.index]}"
+    user        = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
     private_key = "${file(var.ssh_key)}"
   }
   provisioner "file" {
-    content = "${var.named_conf}"
+    content     = "${var.named_conf}"
     destination = "/tmp/named.conf"
   }
   provisioner "file" {
-    content = "${var.named_conf_options}"
+    content     = "${var.named_conf_options}"
     destination = "/tmp/named.conf.options"
   }
   provisioner "file" {
-    content = "${var.named_conf_local}"
+    content     = "${var.named_conf_local}"
     destination = "/tmp/named.conf.local"
   }
   provisioner "remote-exec" {
@@ -151,18 +151,18 @@ data "aws_region" "current" {
 
 # Cloudwatch alarm that recovers the instance after two minutes of system status check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
-  count = "${length(var.private_ips)}"
-  alarm_name = "${length(var.names) == 0 ? format("%s-%02d", var.name, count.index) : var.names[count.index]}"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods = "2"
+  count       = "${length(var.private_ips)}"
+  alarm_name  = "${length(var.names) == 0 ? format("%s-%02d", var.name, count.index) : var.names[count.index]}"
   metric_name = "StatusCheckFailed_System"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
   dimensions {
     InstanceId = "${aws_instance.bind.*.id[count.index]}"
   }
   namespace = "AWS/EC2"
-  period = "60"
+  period    = "60"
   statistic = "Minimum"
   threshold = "0"
   alarm_description = "Auto-recover the instance if the system status check fails for two minutes"
-  alarm_actions = ["arn:aws:automate:${data.aws_region.current.name}:ec2:recover"]
+  alarm_actions     = ["arn:aws:automate:${data.aws_region.current.name}:ec2:recover"]
 }
