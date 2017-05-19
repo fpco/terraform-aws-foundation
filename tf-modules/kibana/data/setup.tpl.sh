@@ -7,8 +7,71 @@ LOCAL_IP=$$(ec2metadata --local-ipv4)
 mv /etc/kibana/kibana.yml /etc/kibana/kibana.yml.bak
 cat <<EOF > /etc/kibana/kibana.yml
 elasticsearch.url: "${elasticsearch_url}"
-server.host: "$${LOCAL_IP}"
+server.host: "localhost"
+server.port: 5602
 EOF
 systemctl daemon-reload
 systemctl enable kibana.service
 systemctl start kibana.service
+
+apt-get install -y nginx
+
+# Basic auth
+echo -n 'kibanaadmin:' >> /etc/nginx/.htpasswd
+echo "kibanaadmin" | openssl passwd -apr1 -stdin >> /etc/nginx/.htpasswd
+
+mkdir /var/www/html/kibana-status
+echo "Status: Initializing" > /var/www/html/kibana-status/index.html
+PUBLIC_DNS=$(ec2metadata --public-hostname)
+cat <<EOF > /etc/nginx/sites-available/kibana
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    return 301 https://\$$host\$$request_uri;
+}
+server {
+    listen 5601;
+    server_name $$PUBLIC_DNS;
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log info;
+    location / {
+        proxy_pass http://localhost:5602;
+        proxy_set_header Host \$$host;
+        proxy_set_header X-Real-IP \$$remote_addr;
+        proxy_set_header X-Forwarded-For \$$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$$scheme;
+        auth_basic "Restricted Space";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+}
+server {
+    listen 5603;
+    root /var/www/html/kibana-status;
+    location / {
+    }
+}
+EOF
+
+rm /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/kibana /etc/nginx/sites-enabled/kibana
+service nginx configtest
+service nginx reload
+
+
+# Create a cron job for checking the status of Kibana and nginx for ELB
+cat <<EOF > /etc/kibana/status-cronjob.sh
+#!/bin/bash
+service nginx status && curl localhost:5602 --output /dev/null --silent --fail
+if [ $? -ne 0 ]; then
+  /var/www/html/kibana-status/index.html
+else
+  echo "Status: Good" > /var/www/html/kibana-status/index.html
+fi
+EOF
+chmod a+x /etc/kibana/status-cronjob.sh
+TMP_CRON=$$(mktemp -t "kibana-status-XXXXXX.txt")
+crontab -l > $$TMP_CRON
+echo "*/5 * * * * /etc/kibana/status-cronjob.sh" >> $$TMP_CRON
+crontab $$TMP_CRON
+rm $$TMP_CRON

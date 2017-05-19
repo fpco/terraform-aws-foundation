@@ -3,7 +3,7 @@
  *
  * This module takes care of deployment of EC2 instances running Logstash using
  * an autoscaling group with a load balancer. It also adds an entry to Route53
- * for the Logstash load balancer. 
+ * for the Logstash load balancer.
  *
  */
 
@@ -11,13 +11,14 @@ resource "aws_elb" "logstash-elb" {
   name            = "${var.name_prefix}-logstash-elb"
   subnets         = ["${var.subnet_ids}"]
   security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
-  
+
   listener {
     instance_port     = 5044
     instance_protocol = "tcp"
     lb_port           = 5044
     lb_protocol       = "tcp"
   }
+
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -180,7 +181,7 @@ USER_DATA
   lifecycle = {
     create_before_destroy = true
   }
-  
+
 }
 
 

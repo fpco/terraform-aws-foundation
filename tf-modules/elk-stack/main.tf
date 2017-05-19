@@ -34,23 +34,6 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# module "vpc" {
-#   source = "../vpc"
-
-#   azs                  = ["${var.vpc_azs}"]
-#   cidr                 = "${var.vpc_cidr}"
-#   name_prefix          = "${var.name_prefix}"
-#   public_subnet_cidrs  = ["${var.vpc_public_subnet_cidrs}"]
-#   private_subnet_cidrs = ["${var.vpc_private_subnet_cidrs}"]
-#   region               = "${var.region}"
-#   extra_tags           = {}
-#   nat_count            = "${length(var.vpc_azs) % floor(max(var.elasticsearch_data_node_count, var.elasticsearch_master_node_count) + 1)}"
-# }
-# resource "aws_route53_zone_association" "e1c-net" {
-#   zone_id = "${var.route53_zone_id}"
-#   vpc_id  = "${module.vpc.vpc_id}"
-# }
-
 module "subnets" {
   source               = "../subnets"
   azs                  = "${var.vpc_azs}"
@@ -206,16 +189,6 @@ output "control_instance_public_ip" {
 output "elasticsearch_internal_elb_dns" {
   value = "${module.elasticsearch.elb_dns}"
 }
-
-# //Logstash Load Balancer DNS.
-# output "logstash_elb_dns" {
-#   value = "${module.logstash-kibana.logstash_elb_dns}"
-# }
-
-# //Kibana Load Balancer DNS.
-# output "kibana_elb_dns" {
-#   value = "${module.logstash-kibana.kibana_elb_dns}"
-# }
 
 
 //Running this command will setup SOCKS proxy to VPC through control instance.

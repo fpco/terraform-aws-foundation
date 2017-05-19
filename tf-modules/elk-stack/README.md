@@ -48,4 +48,12 @@ encrypted using KMS inside DynamoDB. Credstash requires manual KMS key creation,
 which can be done manually an AWS Console or way simpler just by using
 `tf-modules/credstash-setup` module. That module will create database table and
 KMS key, `kms_key_arn` of which will be produced by terrraform as output and
-needs to be supplied here as `credstash_kms_key_arn`.
+needs to be supplied here as `credstash_kms_key_arn`:
+
+```shell
+$ cd fpco-terraform-aws/tf-modules/credstash-setup
+$ terraform apply
+...
+$ terraform show | grep "arn =" | grep ":key/" | awk '{print $3}'
+arn:aws:kms:us-east-1:123456789:key/b467efac-3c9f-11e7-82ae-078fb13d1789
+```

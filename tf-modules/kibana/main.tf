@@ -16,7 +16,7 @@ resource "aws_elb" "kibana-elb" {
   name = "${var.name_prefix}-kibana-elb"
   subnets       = ["${var.subnet_ids}"]
   security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
-  
+
   listener {
     instance_port = 5601
     instance_protocol = "http"
@@ -25,11 +25,18 @@ resource "aws_elb" "kibana-elb" {
     ssl_certificate_id = "${data.aws_acm_certificate.kibana-cert.arn}"
   }
 
+  listener {
+    instance_port = 80
+    instance_protocol = "http"
+    lb_port = 80
+    lb_protocol = "http"
+  }
+
   health_check {
     healthy_threshold = 2
     unhealthy_threshold = 2
     timeout = 3
-    target = "HTTP:5601/"
+    target = "HTTP:5603/"
     interval = 30
   }
 
@@ -71,9 +78,26 @@ resource "aws_security_group" "kibana-sg" {
   vpc_id      = "${var.vpc_id}"
   description = "Allow ICMP, Kibana default port (5601) and everything outbound."
 
+  # Kibana
   ingress {
     from_port   = 5601
     to_port     = 5601
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Kibana status
+  ingress {
+    from_port   = 5603
+    to_port     = 5603
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Used for proper redirect to https
+  ingress {
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -114,12 +138,19 @@ resource "aws_security_group" "kibana-elb-sg" {
   }
 
   ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   ingress {
     from_port   = -1
     to_port     = -1

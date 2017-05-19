@@ -56,9 +56,14 @@ output "kms_key_alias" {
   value = "alias/${var.kms_key_name}"
 }
 
-//KMS Master key ARN which can be used by credstash to store/retrieve secrets. 
+//KMS Master key ARN.
 output "kms_key_arn" {
   value = "${aws_kms_alias.credstash-key.arn}"
+}
+
+//KMS Master key id which can be used by credstash to store/retrieve secrets.
+output "kms_key_arn" {
+  value = "${aws_kms_alias.credstash-key.key_id}"
 }
 
 //DynamoDB table ARN that can be used by credstash to store/retrieve secrets.
