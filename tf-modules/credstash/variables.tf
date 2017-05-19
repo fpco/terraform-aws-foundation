@@ -17,6 +17,7 @@ variable "create_writer_policy" {
 }
 
 variable "region" {
+  type = "string"
   default = ""
   description = "Region where DynamoDB with 'var.table_name' table is located. Current region will be used if empty"
 }

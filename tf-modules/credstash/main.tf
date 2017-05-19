@@ -9,11 +9,11 @@
 
 
 data "template_file" "credstash-get-cmd" {
-  template = "/usr/local/bin/credstash -r ${var.region == "" ? data.aws_region.current.name : var.region} -t ${var.table_name} get"
+  template = "/usr/local/bin/credstash -r ${coalesce(var.region, data.aws_region.current.name)} -t ${var.table_name} get"
 }
 
 data "template_file" "credstash-put-cmd" {
-  template = "/usr/local/bin/credstash -r ${var.region == "" ? data.aws_region.current.name : var.region} -t ${var.table_name} put -k ${var.kms_key_arn}"
+  template = "/usr/local/bin/credstash -r ${coalesce(var.region, data.aws_region.current.name)} -t ${var.table_name} put -k ${var.kms_key_arn}"
 }
 
 data "template_file" "credstash-install-snippet" {

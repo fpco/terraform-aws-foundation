@@ -8,7 +8,7 @@ data "aws_region" "current" {
 ## Writer Policy
 
 resource "aws_iam_policy" "writer-policy" {
-  count = "${(var.create_writer_policy && var.kms_key_arn != "") ? 1 : 0}"
+  count = "${var.create_writer_policy ? 1 : 0}"
   name = "${var.name_prefix}-credstash-writer"
   policy = <<END_POLICY
 {
@@ -26,7 +26,7 @@ resource "aws_iam_policy" "writer-policy" {
         "dynamodb:PutItem"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:dynamodb:${var.region == "" ? data.aws_region.current.name : var.region}:${var.account_id == "" ? data.aws_caller_identity.current.account_id : var.account_id}:table/${var.table_name}"
+      "Resource": "arn:aws:dynamodb:${coalesce(var.region, data.aws_region.current.name)}:${coalesce(var.account_id, data.aws_caller_identity.current.account_id)}:table/${var.table_name}"
     }
   ]
 }
@@ -37,7 +37,7 @@ END_POLICY
 ## Reader Policy
 
 resource "aws_iam_policy" "reader-policy" {
-  count = "${(var.create_reader_policy && var.kms_key_arn != "") ? 1 : 0}"
+  count = "${var.create_reader_policy ? 1 : 0}"
   name = "${var.name_prefix}-credstash-reader"
   policy = <<END_POLICY
 {
@@ -57,7 +57,7 @@ resource "aws_iam_policy" "reader-policy" {
         "dynamodb:Scan"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:dynamodb:${var.region == "" ? data.aws_region.current.name : var.region}:${var.account_id == "" ? data.aws_caller_identity.current.account_id : var.account_id}:table/${var.table_name}"
+      "Resource": "arn:aws:dynamodb:${coalesce(var.region, data.aws_region.current.name)}:${coalesce(var.account_id, data.aws_caller_identity.current.account_id)}:table/${var.table_name}"
     }
   ]
 }

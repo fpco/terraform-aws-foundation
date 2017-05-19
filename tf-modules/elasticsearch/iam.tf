@@ -1,13 +1,13 @@
 resource "aws_iam_instance_profile" "master-node-iam-profile" {
   count = "${var.master_node_count}"
   name = "${var.name_prefix}-master-node-profile-${count.index}"
-  roles = ["${element(aws_iam_role.master-node-role.*.name, count.index)}"]
+  role = "${element(aws_iam_role.master-node-role.*.name, count.index)}"
 }
 
 resource "aws_iam_instance_profile" "data-node-iam-profile" {
   count = "${var.data_node_count}"
   name = "${var.name_prefix}-data-node-profile-${count.index}"
-  roles = ["${element(aws_iam_role.data-node-role.*.name, count.index)}"]
+  role = "${element(aws_iam_role.data-node-role.*.name, count.index)}"
 }
 
 resource "aws_iam_role_policy_attachment" "master-node-attach-ec2-discovery" {

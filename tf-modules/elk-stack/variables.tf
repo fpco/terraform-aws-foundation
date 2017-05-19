@@ -1,16 +1,10 @@
-variable "access_key" {}
-
-variable "secret_key" {}
-
-variable "token" {}
-
 variable "name_prefix" {
   default = "elk-dev"
   description = "Prefix that will be added to names of all resources"
 }
 
 variable "region" {
-  default = "us-east-1"
+  default = "us-west-2"
   description = "Region to deploy ELK stack in"
 }
 
