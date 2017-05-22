@@ -8,8 +8,8 @@
  */
 
 resource "aws_elb" "logstash-elb" {
-  name            = "${var.name_prefix}-logstash-elb"
-  subnets         = ["${var.subnet_ids}"]
+  name            = "${var.name_prefix}-logstash"
+  subnets         = ["${var.public_subnet_ids}"]
   security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
 
   listener {
@@ -21,10 +21,10 @@ resource "aws_elb" "logstash-elb" {
 
   health_check {
     healthy_threshold   = 2
-    unhealthy_threshold = 2
+    unhealthy_threshold = 5
     timeout             = 3
-    target              = "TCP:5044"
-    interval            = 30
+    target              = "HTTP:8080/"
+    interval            = 60
   }
 
   cross_zone_load_balancing   = true
@@ -62,7 +62,6 @@ data "template_file" "logstash-setup" {
     credstash_server_cert_name    = "${var.credstash_prefix}${var.credstash_server_cert_name}"
     credstash_server_key_name     = "${var.credstash_prefix}${var.credstash_server_key_name}"
     credstash_dynamic_config_name = "${var.credstash_prefix}${var.credstash_dynamic_config_name}"
-    credstash_dynamic_config_cron = "${var.credstash_dynamic_config_poll_schedule}"
     config                        = "${data.template_file.logstash-config.rendered}"
     extra_settings                = "${var.extra_settings}"
     extra_setup_snippet           = "${var.extra_setup_snippet}"
@@ -77,31 +76,45 @@ data "template_file" "logstash-config" {
   }
 }
 
+data "aws_vpc" "current" {
+  id = "${var.vpc_id}"
+}
 
 resource "aws_security_group" "logstash-sg" {
-  name        = "${var.name_prefix}-logstash-sg"
+  name        = "${var.name_prefix}-logstash-instance"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow ICMP, SSH, Logstash Beat port (5044) and everything outbound."
+  description = "Allow ICMP, SSH, Logstash Beat port (5044), Lgstash HTTP health check (8080) from VPC CIRD. Also everything outbound."
+
+  tags {
+    Name = "${var.name_prefix}-logstash-nodes"
+  }
 
   ingress {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   egress {
@@ -114,9 +127,13 @@ resource "aws_security_group" "logstash-sg" {
 
 
 resource "aws_security_group" "logstash-elb-sg" {
-  name        = "${var.name_prefix}-logstash-elb-sg"
+  name        = "${var.name_prefix}-logstash-elb"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow ICMP, TCP (5044) and everything outbound."
+  description = "Allow ICMP, Logstash Beat port (5044) and everything outbound."
+
+  tags {
+    Name = "${var.logstash_dns_name}"
+  }
 
   ingress {
     from_port   = 5044
@@ -144,8 +161,8 @@ resource "aws_security_group" "logstash-elb-sg" {
 resource "aws_autoscaling_group" "logstash-asg" {
   count                = "${min(var.max_server_count, 1)}"
   availability_zones   = ["${var.vpc_azs}"]
-  vpc_zone_identifier  = ["${var.subnet_ids}"]
-  name                 = "${var.name_prefix}-logstash-asg"
+  vpc_zone_identifier  = ["${var.private_subnet_ids}"]
+  name                 = "${var.name_prefix}-logstash${var.name_suffix}-asg"
   max_size             = "${var.max_server_count}"
   min_size             = "${var.min_server_count}"
   desired_capacity     = "${var.desired_server_count}"
@@ -155,7 +172,7 @@ resource "aws_autoscaling_group" "logstash-asg" {
 
   tag = [{
     key                 = "Name"
-    value               = "${var.name_prefix}-logstash"
+    value               = "${var.name_prefix}-logstash${var.name_suffix}"
     propagate_at_launch = true
   }]
 
@@ -175,8 +192,6 @@ resource "aws_launch_configuration" "logstash-lc" {
 ${data.template_file.logstash-setup.rendered}
 ${var.extra_setup_snippet}
 USER_DATA
-
-  associate_public_ip_address = true
 
   lifecycle = {
     create_before_destroy = true

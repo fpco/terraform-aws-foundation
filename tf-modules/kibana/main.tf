@@ -13,12 +13,12 @@ data "aws_acm_certificate" "kibana-cert" {
 }
 
 resource "aws_elb" "kibana-elb" {
-  name = "${var.name_prefix}-kibana-elb"
-  subnets       = ["${var.subnet_ids}"]
+  name = "${var.name_prefix}-kibana"
+  subnets       = ["${var.public_subnet_ids}"]
   security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
 
   listener {
-    instance_port = 5601
+    instance_port = 5602
     instance_protocol = "http"
     lb_port = 443
     lb_protocol = "https"
@@ -34,10 +34,10 @@ resource "aws_elb" "kibana-elb" {
 
   health_check {
     healthy_threshold = 2
-    unhealthy_threshold = 2
+    unhealthy_threshold = 10 # TODO lower it down
     timeout = 3
     target = "HTTP:5603/"
-    interval = 30
+    interval = 60
   }
 
   cross_zone_load_balancing = true
@@ -72,18 +72,25 @@ data "template_file" "kibana-setup" {
   }
 }
 
+data "aws_vpc" "current" {
+  id = "${var.vpc_id}"
+}
 
 resource "aws_security_group" "kibana-sg" {
-  name        = "${var.name_prefix}-kibana-sg"
+  name        = "${var.name_prefix}-kibana-instance"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow ICMP, Kibana default port (5601) and everything outbound."
+  description = "Allow ICMP, SSH, HTTP, Kibana port (5602), Kibana healthcheck (5603) from VPC CIDR. Also everything outbound."
+
+  tags {
+    Name = "${var.name_prefix}-kibana-nodes"
+  }
 
   # Kibana
   ingress {
-    from_port   = 5601
-    to_port     = 5601
+    from_port   = 5602
+    to_port     = 5602
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   # Kibana status
@@ -91,7 +98,7 @@ resource "aws_security_group" "kibana-sg" {
     from_port   = 5603
     to_port     = 5603
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   # Used for proper redirect to https
@@ -99,21 +106,21 @@ resource "aws_security_group" "kibana-sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   egress {
@@ -126,9 +133,13 @@ resource "aws_security_group" "kibana-sg" {
 
 
 resource "aws_security_group" "kibana-elb-sg" {
-  name        = "${var.name_prefix}-kibana-elb-sg"
+  name        = "${var.name_prefix}-kibana-elb"
   vpc_id      = "${var.vpc_id}"
   description = "Allow ICMP, HTTPS and everything outbound."
+
+  tags {
+    Name = "${var.kibana_dns_name}"
+  }
 
   ingress {
     from_port   = 22
@@ -176,7 +187,7 @@ resource "aws_autoscaling_group" "kibana-asg" {
   desired_capacity     = "${var.desired_server_count}"
   launch_configuration = "${aws_launch_configuration.kibana-lc.name}"
   health_check_type    = "ELB"
-  vpc_zone_identifier  = ["${var.subnet_ids}"]
+  vpc_zone_identifier  = ["${var.private_subnet_ids}"]
   load_balancers       = ["${aws_elb.kibana-elb.name}"]
 
   tag = [{
@@ -199,8 +210,6 @@ resource "aws_launch_configuration" "kibana-lc" {
 #!/bin/bash
 ${data.template_file.kibana-setup.rendered}
 USER_DATA
-
-  associate_public_ip_address = true
 
   lifecycle = {
     create_before_destroy = true

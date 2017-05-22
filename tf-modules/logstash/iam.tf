@@ -40,8 +40,7 @@ resource "aws_iam_role" "logstash-role" {
   }
   ## This cleanup action requires at least terraform 0.9.0.
   ## See RFC: https://docs.google.com/document/d/15nEcV7fxskDgYrXoNMl6RYIo10PCiZGle7TP8xitrFE/edit#
-  ## and: https://github.com/hashicorp/terraform/issues/386
-  # UNTESTED: see if it works
+  ## and: https://github.com/hashicorp/terraform/issues/386 ## for documentation
   provisioner "local-exec" {
     when       = "destroy"
     on_failure = "continue"

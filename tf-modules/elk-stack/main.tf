@@ -43,7 +43,7 @@ module "subnets" {
   private_subnet_cidrs = "${var.vpc_private_subnet_cidrs}"
 }
 
-# Give internet to public subnets.
+# Associate public subnets with a route table so they will have access to an internet gateway.
 resource "aws_route_table_association" "public-rta" {
   count          = "${length(var.vpc_public_subnet_cidrs)}"
   subnet_id      = "${element(module.subnets.public_ids, count.index)}"
@@ -92,7 +92,8 @@ module "kibana" {
   vpc_azs              = ["${var.vpc_azs}"]
   route53_zone_id      = "${var.route53_zone_id}"
   kibana_dns_name      = "${var.kibana_dns_name}"
-  subnet_ids           = ["${module.subnets.public_ids}"]
+  public_subnet_ids    = ["${module.subnets.public_ids}"]
+  private_subnet_ids   = ["${module.subnets.private_ids}"]
   key_name             = ""
   ami                  = ""
   instance_type        = ""
@@ -105,9 +106,11 @@ module "kibana" {
 module "logstash-kibana" {
   source = "../logstash"
 
-  name_prefix              = "${var.name_prefix}-kibana"
+  name_prefix              = "${var.name_prefix}"
+  name_suffix              = "-kibana"
   vpc_id                   = "${var.vpc_id}"
-  subnet_ids               = ["${module.subnets.public_ids}"]
+  public_subnet_ids        = ["${module.subnets.public_ids}"]
+  private_subnet_ids       = ["${module.subnets.private_ids}"]
   vpc_azs                  = ["${var.vpc_azs}"]
   route53_zone_id          = "${var.route53_zone_id}"
   logstash_dns_name        = "${var.logstash_dns_name}"
@@ -179,6 +182,8 @@ resource "aws_security_group" "control-instance-sg" {
   }
 
 }
+
+
 
 //Control instance public IP address. If list is empty, control instance wasn't deployed.
 output "control_instance_public_ip" {

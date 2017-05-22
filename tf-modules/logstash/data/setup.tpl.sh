@@ -18,7 +18,7 @@ path.data: /var/lib/logstash
 path.config: /etc/logstash/conf.d
 path.logs: /var/log/logstash
 config.reload.automatic: true
-config.reload.interval: 30
+config.reload.interval: 60
 ${extra_settings}
 EOF
 
@@ -40,7 +40,7 @@ EOF
 chmod a+x /etc/logstash/credstash-cronjob.sh
 TMP_CRON=$$(mktemp -t "dyn-config-cron-job-XXXXXX.txt")
 crontab -l > $$TMP_CRON
-echo "${credstash_dynamic_config_cron} /etc/logstash/credstash-cronjob.sh" >> $$TMP_CRON
+echo "* * * * * /etc/logstash/credstash-cronjob.sh" >> $$TMP_CRON
 crontab $$TMP_CRON
 rm $$TMP_CRON
 

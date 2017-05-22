@@ -3,6 +3,11 @@ variable "name_prefix" {
   description = "Prefix that will be added to names of all resources"
 }
 
+variable "name_suffix" {
+  default = ""
+  description = "Suffix to use for Scaling Group, EC2 instances."
+}
+
 variable "ami" {
   description = "AMI to use for instances running Logstash"
 }
@@ -35,8 +40,13 @@ variable "vpc_azs" {
   type = "list"
 }
 
-variable "subnet_ids" {
-  description = "A list of subnet ids to deploy Logstash servers in"
+variable "private_subnet_ids" {
+  description = "A list of private subnet ids to deploy Logstash servers in"
+  type = "list"
+}
+
+variable "public_subnet_ids" {
+  description = "A list of public subnet ids to deploy Logstash ELB in"
   type = "list"
 }
 
@@ -107,11 +117,6 @@ variable "credstash_server_cert_name" {
 variable "credstash_dynamic_config_name" {
   default = "logstash-dynamic-conf"
   description = "This a key for credstash to be used to poll dynamic configuration for logstash, thus creating an ability to remotely update logstash fiters during runtime."
-}
-
-variable "credstash_dynamic_config_poll_schedule" {
-  default = "* * * * *"
-  description = "Cron schedule for polling logstash dynamic configuration using credstash. Default is every 5 minutes"  
 }
 
 variable "extra_setup_snippet" {

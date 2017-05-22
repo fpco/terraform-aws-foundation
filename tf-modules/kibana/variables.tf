@@ -32,8 +32,13 @@ variable "vpc_azs" {
   type = "list"
 }
 
-variable "subnet_ids" {
-  description = "A list of subnet ids to deploy Kibana servers in"
+variable "private_subnet_ids" {
+  description = "A list of private subnet ids to deploy Kibana servers in"
+  type = "list"
+}
+
+variable "public_subnet_ids" {
+  description = "A list of public subnet ids to deploy Kibana ELB in"
   type = "list"
 }
 

@@ -7,15 +7,13 @@
  * can be used to attache EBS volumes on boot.
  * Volumes created will be interleaved throughout the Avaialability Zones
  *
- * Terraform version 0.8.3 is required due to https://github.com/hashicorp/terraform/issues/10806
- *
  */
 resource "aws_ebs_volume" "volumes" {
   count             = "${var.volume_count}"
   availability_zone = "${element(var.azs, count.index)}"
   size              = "${var.size}"
   type              = "${var.volume_type}"
-  
+
   encrypted   = "${var.encrypted}"
   kms_key_id  = "${var.encrypted ? var.kms_key_id : ""}"
   snapshot_id = "${element(var.snapshot_ids, count.index)}"

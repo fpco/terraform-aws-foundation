@@ -39,7 +39,7 @@ case "$1" in
   --help)
     show_help
     exit 0
-    ;;  
+    ;;
   create)
     MODE="create"
     case "$2" in

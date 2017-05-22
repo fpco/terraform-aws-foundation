@@ -39,3 +39,63 @@ echo "path.logs: ${mount_point}/logs" >> /etc/elasticsearch/elasticsearch.yml
 systemctl daemon-reload
 systemctl enable elasticsearch.service
 systemctl start elasticsearch.service
+
+# Install curator (will only run on active master)
+
+pip install elasticsearch-curator
+useradd -r curator
+mkdir /var/log/curator/
+chown curator:curator /var/log/curator
+mkdir /etc/curator
+TMP_CRON=$(mktemp -t "curator-cron-job-XXXXXX.txt")
+echo '30 1 * * * /usr/local/bin/curator --config /etc/curator/config.yaml /etc/curator/actionfile.yaml' > $TMP_CRON
+crontab -u curator $TMP_CRON
+
+cat <<EOF > /etc/curator/config.yaml
+client:
+  hosts:
+    - localhost
+  port: 9200
+  url_prefix:
+  use_ssl: False
+  certificate:
+  client_cert:
+  client_key:
+  ssl_no_validate: False
+  http_auth:
+  timeout: 30
+  master_only: True
+
+logging:
+  loglevel: INFO
+  logfile: /var/log/curator/curator.log
+  logformat: default
+  blacklist: ['elasticsearch', 'urllib3']
+EOF
+
+cat <<EOF > /etc/curator/actionfile.yaml
+actions:
+  1:
+    action: delete_indices
+    description: >-
+      Delete indices older than 60 days (based on index name), for filebeat-
+      prefixed indices. Ignore the error if the filter does not result in an
+      actionable list of indices (ignore_empty_list) and exit cleanly.
+    options:
+      ignore_empty_list: True
+      timeout_override:
+      continue_if_exception: False
+      disable_action: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: filebeat-
+      exclude:
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: 60
+      exclude:
+EOF
