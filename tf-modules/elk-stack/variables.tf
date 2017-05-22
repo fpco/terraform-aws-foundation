@@ -16,6 +16,7 @@ variable "vpc_route_table_id" {
 }
 
 variable "vpc_azs" {
+  type = "list"
   description = "A list of availability zones. This is also the order in which nodes will be deployed in"
 }
 
@@ -138,4 +139,8 @@ variable "pub_key_file" {
 variable "deploy_control_instance" {
   default = 1
   description = "Deploy EC2 instance, which can further be used to connect to all private instances. 1 (deploy) or 0 (don't deploy)"
+}
+
+variable "control_instance_subnet_id" {
+  default = ""
 }

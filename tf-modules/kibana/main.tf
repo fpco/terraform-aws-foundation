@@ -14,7 +14,7 @@ data "aws_acm_certificate" "kibana-cert" {
 
 resource "aws_elb" "kibana-elb" {
   name            = "${var.name_prefix}-kibana"
-  subnets         = ["${var.internal ? var.private_subnet_ids : var.public_subnet_ids}"]
+  subnets         = ["${var.public_subnet_ids}"]
   security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
   internal        = "${var.internal}"
 

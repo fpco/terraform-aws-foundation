@@ -71,7 +71,7 @@ module "elasticsearch" {
   key_name                  = "${aws_key_pair.elk-key.key_name}"
   # vpc_public_subnet_cidrs   = ["${var.vpc_public_subnet_cidrs}"]
   # vpc_private_subnet_cidrs  = ["${var.vpc_private_subnet_cidrs}"]
-  vpc_private_subnet_ids    = ["${module.subnets.private_ids}"]
+  vpc_private_subnet_ids    = ["${var.vpc_private_subnet_ids}"]
   node_ami                  = "${data.aws_ami.ubuntu.id}"
   data_node_count           = "${var.elasticsearch_data_node_count}"
   data_node_ebs_size        = "${var.elasticsearch_data_node_ebs_size}"
@@ -143,7 +143,7 @@ resource "aws_instance" "control-instance" {
   count                       = "${var.deploy_control_instance}"
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "t2.nano"
-  subnet_id                   = "${module.subnets.public_ids[0]}"
+  subnet_id                   = "${var.vpc_public_subnet_ids[0]}"
   vpc_security_group_ids      = ["${aws_security_group.control-instance-sg.id}"]
   key_name                    = "${aws_key_pair.elk-key.key_name}"
   associate_public_ip_address = true
