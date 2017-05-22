@@ -51,9 +51,14 @@ variable "route53_zone_id" {
 }
 
 variable "elasticsearch_url" {
-  description = "Elasticsearch endpoint URL."
+  description = "Elasticsearch endpoint URL"
 }
 
 variable "key_name" {
-  description = "SSH key name to use for connecting to all nodes."
+  description = "SSH key name to use for connecting to all nodes"
+}
+
+variable "internal" {
+  default = true
+  description = "Set it to false if you want Kibana to be accessible by the outside world"
 }

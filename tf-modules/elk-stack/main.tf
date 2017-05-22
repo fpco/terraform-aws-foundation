@@ -34,30 +34,30 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-module "subnets" {
-  source               = "../subnets"
-  azs                  = "${var.vpc_azs}"
-  vpc_id               = "${var.vpc_id}"
-  name_prefix          = "${var.name_prefix}"
-  public_subnet_cidrs  = "${var.vpc_public_subnet_cidrs}"
-  private_subnet_cidrs = "${var.vpc_private_subnet_cidrs}"
-}
+# module "subnets" {
+#   source               = "../subnets"
+#   azs                  = "${var.vpc_azs}"
+#   vpc_id               = "${var.vpc_id}"
+#   name_prefix          = "${var.name_prefix}"
+#   public_subnet_cidrs  = "${var.vpc_public_subnet_cidrs}"
+#   private_subnet_cidrs = "${var.vpc_private_subnet_cidrs}"
+# }
 
-# Associate public subnets with a route table so they will have access to an internet gateway.
-resource "aws_route_table_association" "public-rta" {
-  count          = "${length(var.vpc_public_subnet_cidrs)}"
-  subnet_id      = "${element(module.subnets.public_ids, count.index)}"
-  route_table_id = "${var.vpc_route_table_id}"
-}
+# # Associate public subnets with a route table so they will have access to an internet gateway.
+# resource "aws_route_table_association" "public-rta" {
+#   count          = "${length(var.vpc_public_subnet_cidrs)}"
+#   subnet_id      = "${element(module.subnets.public_ids, count.index)}"
+#   route_table_id = "${var.vpc_route_table_id}"
+# }
 
-module "nat-gateways" {
-  source             = "../nat-gateways"
-  vpc_id             = "${var.vpc_id}"
-  name_prefix        = "${var.name_prefix}"
-  nat_count          = "${length(var.vpc_azs) % floor(max(var.elasticsearch_data_node_count, var.elasticsearch_master_node_count) + 1)}"
-  public_subnet_ids  = ["${module.subnets.public_ids}"]
-  private_subnet_ids = ["${module.subnets.private_ids}"]
-}
+# module "nat-gateways" {
+#   source             = "../nat-gateways"
+#   vpc_id             = "${var.vpc_id}"
+#   name_prefix        = "${var.name_prefix}"
+#   nat_count          = "${length(var.vpc_azs) % floor(max(var.elasticsearch_data_node_count, var.elasticsearch_master_node_count) + 1)}"
+#   public_subnet_ids  = ["${module.subnets.public_ids}"]
+#   private_subnet_ids = ["${module.subnets.private_ids}"]
+# }
 
 
 module "elasticsearch" {
@@ -69,8 +69,8 @@ module "elasticsearch" {
   vpc_azs                   = ["${var.vpc_azs}"]
   route53_zone_id           = "${var.route53_zone_id}"
   key_name                  = "${aws_key_pair.elk-key.key_name}"
-  vpc_public_subnet_cidrs   = ["${var.vpc_public_subnet_cidrs}"]
-  vpc_private_subnet_cidrs  = ["${var.vpc_private_subnet_cidrs}"]
+  # vpc_public_subnet_cidrs   = ["${var.vpc_public_subnet_cidrs}"]
+  # vpc_private_subnet_cidrs  = ["${var.vpc_private_subnet_cidrs}"]
   vpc_private_subnet_ids    = ["${module.subnets.private_ids}"]
   node_ami                  = "${data.aws_ami.ubuntu.id}"
   data_node_count           = "${var.elasticsearch_data_node_count}"
@@ -92,8 +92,8 @@ module "kibana" {
   vpc_azs              = ["${var.vpc_azs}"]
   route53_zone_id      = "${var.route53_zone_id}"
   kibana_dns_name      = "${var.kibana_dns_name}"
-  public_subnet_ids    = ["${module.subnets.public_ids}"]
-  private_subnet_ids   = ["${module.subnets.private_ids}"]
+  public_subnet_ids    = ["${var.vpc_public_subnet_ids}"]
+  private_subnet_ids   = ["${var.vpc_private_subnet_ids}"]
   key_name             = ""
   ami                  = ""
   instance_type        = ""
@@ -109,8 +109,8 @@ module "logstash-kibana" {
   name_prefix              = "${var.name_prefix}"
   name_suffix              = "-kibana"
   vpc_id                   = "${var.vpc_id}"
-  public_subnet_ids        = ["${module.subnets.public_ids}"]
-  private_subnet_ids       = ["${module.subnets.private_ids}"]
+  public_subnet_ids        = ["${var.vpc_public_subnet_ids}"]
+  private_subnet_ids       = ["${var.vpc_private_subnet_ids}"]
   vpc_azs                  = ["${var.vpc_azs}"]
   route53_zone_id          = "${var.route53_zone_id}"
   logstash_dns_name        = "${var.logstash_dns_name}"

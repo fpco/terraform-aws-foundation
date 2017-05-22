@@ -9,8 +9,9 @@
 
 resource "aws_elb" "logstash-elb" {
   name            = "${var.name_prefix}-logstash"
-  subnets         = ["${var.public_subnet_ids}"]
+  subnets         = ["${var.internal ? var.private_subnet_ids : var.public_subnet_ids}"]
   security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
+  internal        = "${var.internal}"
 
   listener {
     instance_port     = 5044
@@ -93,28 +94,32 @@ resource "aws_security_group" "logstash-sg" {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   egress {

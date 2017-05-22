@@ -138,3 +138,8 @@ variable "extra_elbs" {
   default = []
   description = "Elastic Load Balancers, besides the default one, to be used for Logstash scaling group"
 }
+
+variable "internal" {
+  default = true
+  description = "Set it to false if you want Logstash to be accessible by the outside world"
+}

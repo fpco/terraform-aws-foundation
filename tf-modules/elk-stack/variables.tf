@@ -4,7 +4,6 @@ variable "name_prefix" {
 }
 
 variable "region" {
-  default = "us-west-2"
   description = "Region to deploy ELK stack in"
 }
 
@@ -18,19 +17,17 @@ variable "vpc_route_table_id" {
 
 variable "vpc_azs" {
   description = "A list of availability zones. This is also the order in which nodes will be deployed in"
-  default     = ["us-east-1a", "us-east-1c", "us-east-1d"]
 }
 
-variable "vpc_private_subnet_cidrs" {
-  description = "The CIDR ranges for the VPC's private subnets"
-  default     = ["172.16.0.0/24", "172.16.1.0/24", "172.16.2.0/24"]
+variable "vpc_public_subnet_ids" {
+  type = "list"
+  description = "Public subnet ids, where Kibana and Logstash ELBs will be placed"
 }
 
-variable "vpc_public_subnet_cidrs" {
-  description = "The CIDR ranges for the VPC's public subnets"
-  default     = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
+variable "vpc_private_subnet_ids" {
+  type = "list"
+  description = "Private subnet ids, where Kibana, Logstash and ELasticsearch instances will be placed"
 }
-
 
 variable "elasticsearch_master_node_count" {
   description = "Number of master nodes in the cluster. It should be either 1, 3 or more, in order to deal with split brain"

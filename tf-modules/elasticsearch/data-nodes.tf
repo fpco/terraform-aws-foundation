@@ -99,7 +99,7 @@ resource "aws_elb" "coordinators-elb" {
   subnets         = ["${var.vpc_private_subnet_ids}"]
   security_groups = ["${aws_security_group.coordinators-elb-sg.id}"]
   internal        = true
-  
+
   listener {
     instance_port = 9200
     instance_protocol = "http"

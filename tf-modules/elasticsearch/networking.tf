@@ -8,14 +8,16 @@ resource "aws_security_group" "coordinators-elb-sg" {
     from_port   = 9200
     to_port     = 9200
     protocol    = "tcp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
 
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
 
   egress {
@@ -23,6 +25,7 @@ resource "aws_security_group" "coordinators-elb-sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -36,21 +39,24 @@ resource "aws_security_group" "master-node-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
 
   ingress {
     from_port   = 9300
     to_port     = 9300
     protocol    = "tcp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}"]
   }
 
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
 
   egress {
@@ -70,28 +76,32 @@ resource "aws_security_group" "data-node-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
 
   ingress {
     from_port   = 9200
     to_port     = 9200
     protocol    = "tcp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
 
   ingress {
     from_port   = 9300
     to_port     = 9300
     protocol    = "tcp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}"]
   }
 
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
 
   egress {

@@ -13,9 +13,10 @@ data "aws_acm_certificate" "kibana-cert" {
 }
 
 resource "aws_elb" "kibana-elb" {
-  name = "${var.name_prefix}-kibana"
-  subnets       = ["${var.public_subnet_ids}"]
+  name            = "${var.name_prefix}-kibana"
+  subnets         = ["${var.internal ? var.private_subnet_ids : var.public_subnet_ids}"]
   security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
+  internal        = "${var.internal}"
 
   listener {
     instance_port = 5602
@@ -76,6 +77,8 @@ data "aws_vpc" "current" {
   id = "${var.vpc_id}"
 }
 
+# TODO: restrict ingress CIDR to VPC and extra (VPN)
+
 resource "aws_security_group" "kibana-sg" {
   name        = "${var.name_prefix}-kibana-instance"
   vpc_id      = "${var.vpc_id}"
@@ -90,7 +93,8 @@ resource "aws_security_group" "kibana-sg" {
     from_port   = 5602
     to_port     = 5602
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   # Kibana status
@@ -98,7 +102,8 @@ resource "aws_security_group" "kibana-sg" {
     from_port   = 5603
     to_port     = 5603
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   # Used for proper redirect to https
@@ -106,21 +111,24 @@ resource "aws_security_group" "kibana-sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   ingress {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    cidr_blocks = ["0.0.0.0/0"]
+    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
   }
 
   egress {
