@@ -154,11 +154,11 @@ data "aws_region" "current" {
 
 # Cloudwatch alarm that recovers the instance after two minutes of system status check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
-  count       = "${length(var.private_ips)}"
-  alarm_name  = "${length(var.names) == 0 ? format("%s-%02d", var.name, count.index) : var.names[count.index]}"
+  count = "${length(compact(var.private_ips))}"
+  alarm_name = "${length(var.names) == 0 ? format("%s-%02d", var.name, count.index) : var.names[count.index]}"
   metric_name = "StatusCheckFailed_System"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods = "2"
   dimensions {
     InstanceId = "${aws_instance.bind.*.id[count.index]}"
   }
