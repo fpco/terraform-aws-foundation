@@ -81,6 +81,9 @@ resource "aws_instance" "bind" {
   tags {
     Name = "${length(var.names) == 0 ? format("%s-%02d", var.name, count.index + 1) : var.names[count.index]}"
   }
+  lifecycle {
+    ignore_changes = ["key_name"]
+  }
   provisioner "remote-exec" {
     connection {
       host        = "${self.private_ip}"
