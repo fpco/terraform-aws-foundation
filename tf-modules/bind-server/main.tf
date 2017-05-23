@@ -91,7 +91,7 @@ resource "aws_instance" "bind" {
       private_key = "${file(var.ssh_key)}"
     }
     inline = [
-      "${var.distro == "ubuntu" ? "sudo apt-get update && sudo apt-get install -y bind9 dnsutils && sudo service bind9 start" : "sudo yum install -y bind && sudo service named start"}",
+      "${var.distro == "ubuntu" ? "sudo apt-get update && sudo apt-get install -y bind9 dnsutils && sudo service bind9 start" : "sudo yum install -y bind && sudo service named start && sudo chkconfig named on"}",
     ]
   }
 }
