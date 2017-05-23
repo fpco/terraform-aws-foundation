@@ -34,30 +34,32 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# module "subnets" {
-#   source               = "../subnets"
-#   azs                  = "${var.vpc_azs}"
-#   vpc_id               = "${var.vpc_id}"
-#   name_prefix          = "${var.name_prefix}"
-#   public_subnet_cidrs  = "${var.vpc_public_subnet_cidrs}"
-#   private_subnet_cidrs = "${var.vpc_private_subnet_cidrs}"
-# }
+data "aws_vpc" "current" {
+  id = "${var.vpc_id}"
+}
 
-# # Associate public subnets with a route table so they will have access to an internet gateway.
-# resource "aws_route_table_association" "public-rta" {
-#   count          = "${length(var.vpc_public_subnet_cidrs)}"
-#   subnet_id      = "${element(module.subnets.public_ids, count.index)}"
-#   route_table_id = "${var.vpc_route_table_id}"
-# }
+# Temporary SSH sg
+resource "aws_security_group" "ssh" {
+  name = "${var.name_prefix}-ssh"
+  vpc_id = "${var.vpc_id}"
+  tags {
+    Name = "${var.name_prefix}-ssh"
+    Description = "Allow SSH to hosts in ${var.name_prefix}"
+  }
+  # SSH
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.public_cidrs}"]
+  }
+}
 
-# module "nat-gateways" {
-#   source             = "../nat-gateways"
-#   vpc_id             = "${var.vpc_id}"
-#   name_prefix        = "${var.name_prefix}"
-#   nat_count          = "${length(var.vpc_azs) % floor(max(var.elasticsearch_data_node_count, var.elasticsearch_master_node_count) + 1)}"
-#   public_subnet_ids  = ["${module.subnets.public_ids}"]
-#   private_subnet_ids = ["${module.subnets.private_ids}"]
-# }
+
+resource "aws_key_pair" "elk-key" {
+  key_name = "${var.name_prefix}-key"
+  public_key = "${file("${path.module}/${var.pub_key_file}")}"
+}
 
 
 module "elasticsearch" {
@@ -69,9 +71,9 @@ module "elasticsearch" {
   vpc_azs                   = ["${var.vpc_azs}"]
   route53_zone_id           = "${var.route53_zone_id}"
   key_name                  = "${aws_key_pair.elk-key.key_name}"
-  # vpc_public_subnet_cidrs   = ["${var.vpc_public_subnet_cidrs}"]
-  # vpc_private_subnet_cidrs  = ["${var.vpc_private_subnet_cidrs}"]
-  vpc_private_subnet_ids    = ["${var.vpc_private_subnet_ids}"]
+  public_subnet_ids         = ["${var.private_subnet_ids}"]
+  private_subnet_ids        = ["${var.private_subnet_ids}"]
+  extra_sg_ids              = ["${aws_security_group.ssh.id}"]
   node_ami                  = "${data.aws_ami.ubuntu.id}"
   data_node_count           = "${var.elasticsearch_data_node_count}"
   data_node_ebs_size        = "${var.elasticsearch_data_node_ebs_size}"
@@ -92,8 +94,8 @@ module "kibana" {
   vpc_azs              = ["${var.vpc_azs}"]
   route53_zone_id      = "${var.route53_zone_id}"
   kibana_dns_name      = "${var.kibana_dns_name}"
-  public_subnet_ids    = ["${var.vpc_public_subnet_ids}"]
-  private_subnet_ids   = ["${var.vpc_private_subnet_ids}"]
+  public_subnet_ids    = ["${var.public_subnet_ids}"]
+  private_subnet_ids   = ["${var.private_subnet_ids}"]
   key_name             = ""
   ami                  = ""
   instance_type        = ""
@@ -101,6 +103,7 @@ module "kibana" {
   min_server_count     = 0
   max_server_count     = 0
   desired_server_count = 0
+  elb_ingress_cidrs    = ["${var.public_cidrs}"]
 }
 
 module "logstash-kibana" {
@@ -109,8 +112,8 @@ module "logstash-kibana" {
   name_prefix              = "${var.name_prefix}"
   name_suffix              = "-kibana"
   vpc_id                   = "${var.vpc_id}"
-  public_subnet_ids        = ["${var.vpc_public_subnet_ids}"]
-  private_subnet_ids       = ["${var.vpc_private_subnet_ids}"]
+  public_subnet_ids        = ["${var.public_subnet_ids}"]
+  private_subnet_ids       = ["${var.private_subnet_ids}"]
   vpc_azs                  = ["${var.vpc_azs}"]
   route53_zone_id          = "${var.route53_zone_id}"
   logstash_dns_name        = "${var.logstash_dns_name}"
@@ -121,8 +124,9 @@ module "logstash-kibana" {
   min_server_count         = "${var.logstash_kibana_min_server_count}"
   max_server_count         = "${var.logstash_kibana_max_server_count}"
   desired_server_count     = "${var.logstash_kibana_desired_server_count}"
-  extra_security_groups    = ["${module.kibana.security_group_id}"]
+  extra_sg_ids             = ["${module.kibana.security_group_id}", "${aws_security_group.ssh.id}"]
   extra_setup_snippet      = "${module.kibana.setup_snippet}"
+  extra_elb_ingress_cidrs  = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_cidrs)}"]
   extra_elbs               = ["${module.kibana.elb_name}"]
   certstrap_depot_path     = "${var.certstrap_depot_path}"
   certstrap_ca_common_name = "${var.certstrap_ca_common_name}"
@@ -132,71 +136,3 @@ module "logstash-kibana" {
   credstash_prefix         = "${var.name_prefix}-"
 }
 
-
-resource "aws_key_pair" "elk-key" {
-  key_name = "${var.name_prefix}-key"
-  public_key = "${file("${path.module}/${var.pub_key_file}")}"
-}
-
-
-resource "aws_instance" "control-instance" {
-  count                       = "${var.deploy_control_instance}"
-  ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "t2.nano"
-  subnet_id                   = "${var.vpc_public_subnet_ids[0]}"
-  vpc_security_group_ids      = ["${aws_security_group.control-instance-sg.id}"]
-  key_name                    = "${aws_key_pair.elk-key.key_name}"
-  associate_public_ip_address = true
-
-  tags {
-    Name = "${var.name_prefix}-control-instance"
-  }
-
-}
-
-resource "aws_security_group" "control-instance-sg" {
-  count       = "${var.deploy_control_instance}"
-  name        = "${var.name_prefix}-control-instance-sg"
-  vpc_id      = "${var.vpc_id}"
-  description = "Allow SSH, ICMP, Elasticsearch TCP, Elasticsearch HTTP, and everything outbound."
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-}
-
-
-
-//Control instance public IP address. If list is empty, control instance wasn't deployed.
-output "control_instance_public_ip" {
-  value = ["${aws_instance.control-instance.*.public_ip}"]
-}
-
-//Elasticsearch Internal Load Balancer DNS.
-output "elasticsearch_internal_elb_dns" {
-  value = "${module.elasticsearch.elb_dns}"
-}
-
-
-//Running this command will setup SOCKS proxy to VPC through control instance.
-output "socket_cmd" {
-  value = "ssh -i ${var.priv_key_file} -D 8123 -f -C -q -N -o StrictHostKeyChecking=no -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null ubuntu@${aws_instance.control-instance.public_ip}"
-}

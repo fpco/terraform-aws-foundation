@@ -10,7 +10,7 @@
 resource "aws_elb" "logstash-elb" {
   name            = "${var.name_prefix}-logstash"
   subnets         = ["${var.public_subnet_ids}"]
-  security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
+  security_groups = ["${concat(list(aws_security_group.logstash-elb-sg.id), var.extra_elb_sg_ids)}"]
   internal        = "${var.internal}"
 
   listener {
@@ -81,10 +81,17 @@ data "aws_vpc" "current" {
   id = "${var.vpc_id}"
 }
 
+
+data "aws_subnet" "logstash-elb" {
+  count = "${length(var.public_subnet_ids)}"
+  id = "${var.public_subnet_ids[count.index]}"
+}
+
+
 resource "aws_security_group" "logstash-sg" {
   name        = "${var.name_prefix}-logstash-instance"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow ICMP, SSH, Logstash Beat port (5044), Lgstash HTTP health check (8080) from VPC CIRD. Also everything outbound."
+  description = "Allow Logstash Beat port (5044), Logstash HTTP health check (8080) for ELB. Also everything outbound."
 
   tags {
     Name = "${var.name_prefix}-logstash-nodes"
@@ -94,32 +101,14 @@ resource "aws_security_group" "logstash-sg" {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
   }
 
   ingress {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-    #cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
   }
 
   egress {
@@ -144,14 +133,7 @@ resource "aws_security_group" "logstash-elb-sg" {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${concat(data.aws_subnet.logstash-elb.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
   }
 
   egress {
@@ -190,7 +172,7 @@ resource "aws_launch_configuration" "logstash-lc" {
   image_id             = "${var.ami}"
   instance_type        = "${var.instance_type}"
   key_name             = "${var.key_name}"
-  security_groups      = ["${concat(list(aws_security_group.logstash-sg.id), var.extra_security_groups)}"]
+  security_groups      = ["${concat(list(aws_security_group.logstash-sg.id), var.extra_sg_ids)}"]
   iam_instance_profile = "${aws_iam_instance_profile.logstash-profile.id}"
   user_data            = <<USER_DATA
 #!/bin/bash

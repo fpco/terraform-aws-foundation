@@ -53,23 +53,38 @@ variable "vpc_id" {
 }
 
 variable "vpc_azs" {
-  description = "A list of availability zones to deploy subnets in"
-  default     = ["us-east-1a", "us-east-1d", "us-east-1c"]
-}
-
-variable "vpc_private_subnet_cidrs" {
-  description = "The CIDR ranges for the VPC's private subnets"
-  default     = ["172.16.0.0/24", "172.16.1.0/24", "172.16.2.0/24"]
-}
-
-variable "vpc_public_subnet_cidrs" {
-  description = "The CIDR ranges for the VPC's public subnets"
-  default     = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
-}
-
-variable "vpc_private_subnet_ids" {
   type = "list"
-  description = "IDs of private subnets."
+  description = "A list of availability zones to deploy subnets in"
+}
+
+variable "private_subnet_ids" {
+  type = "list"
+  description = "Private subnet ids where instances will be deployed in."
+}
+
+variable "public_subnet_ids" {
+  type = "list"
+  description = "Public subnet ids where ELB will be deployed in. Pass private subnet ids, if you expect elasticsearch to be a private resource only."
+}
+
+variable "extra_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to all Elasticvsearch nodes. This is a way to add extra services, such as SSH access for instance."
+}
+
+variable "extra_elb_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to Elasticsearch API Load Balancer"
+}
+
+variable "extra_elb_ingress_cidrs" {
+  default = []
+  description = "Extra CIDRs that are allowed to access Elasticsearch API. By default only CIDR from `public_subnet_ids` are allowed"
+}
+
+variable "internal" {
+  default = true
+  description = "Set it to false if you want Elasticsearch to be accessible by the outside world"
 }
 
 variable "route53_zone_id" {
@@ -82,5 +97,6 @@ variable "elasticsearch_dns_name" {
 }
 
 variable "key_name" {
-  description = "SSH key name to use for connecting to all nodes."
+  description = "SSH key name to use for connecting to all nodes"
 }
+

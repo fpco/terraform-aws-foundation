@@ -62,3 +62,19 @@ variable "internal" {
   default = true
   description = "Set it to false if you want Kibana to be accessible by the outside world"
 }
+
+variable "extra_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to all instances running Kibana. This is a way to add extra services, SSH access for instance."
+}
+
+variable "extra_elb_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to Kibana Load Balancer"
+}
+
+variable "elb_ingress_cidrs" {
+  default = []
+  description = "CIDRs that are allowed to access Kibana web UI. By default only CIDR from `public_subnet_ids` are allowed"
+}
+

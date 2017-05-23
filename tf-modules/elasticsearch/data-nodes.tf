@@ -32,7 +32,7 @@ resource "aws_launch_configuration" "data-node-lc" {
   instance_type        = "${var.data_node_instance_type}"
   iam_instance_profile = "${element(aws_iam_instance_profile.data-node-iam-profile.*.id, count.index)}"
   key_name             = "${var.key_name}"
-  security_groups      = ["${aws_security_group.data-node-sg.id}"]
+  security_groups      = ["${concat(list(aws_security_group.transport-sg.id, aws_security_group.elasticsearch-api-sg.id), var.extra_sg_ids)}"]
   user_data            = "${element(data.template_file.data-node-setup.*.rendered, count.index)}"
   lifecycle            = {
     create_before_destroy = true
@@ -50,8 +50,8 @@ resource "aws_autoscaling_group" "data-node-asg" {
   desired_capacity     = 1
   launch_configuration = "${element(aws_launch_configuration.data-node-lc.*.name, count.index)}"
   health_check_type    = "ELB"
-  vpc_zone_identifier  = ["${element(var.vpc_private_subnet_ids, count.index)}"]
-  load_balancers       = ["${aws_elb.coordinators-elb.name}"]
+  vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]
+  load_balancers       = ["${aws_elb.elasticsearch-elb.name}"]
   lifecycle            = {
     create_before_destroy = true
   }
@@ -88,17 +88,17 @@ data "template_file" "data-node-config" {
   vars {
     node_name          = "${var.name_prefix}-data-node-${count.index}-${element(var.vpc_azs, count.index)}"
     region             = "${var.region}"
-    security_groups    = "[${aws_security_group.master-node-sg.id}, ${aws_security_group.data-node-sg.id}]"
+    security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", var.vpc_azs)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
   }
 }
 
-resource "aws_elb" "coordinators-elb" {
-  name            = "${var.name_prefix}-coordinators-elb"
-  subnets         = ["${var.vpc_private_subnet_ids}"]
-  security_groups = ["${aws_security_group.coordinators-elb-sg.id}"]
-  internal        = true
+resource "aws_elb" "elasticsearch-elb" {
+  name            = "${var.name_prefix}-elasticsearch"
+  subnets         = ["${var.public_subnet_ids}"]
+  security_groups = ["${concat(list(aws_security_group.elasticsearch-elb-sg.id), var.extra_elb_sg_ids)}"]
+  internal        = "${var.internal}"
 
   listener {
     instance_port = 9200
@@ -109,26 +109,26 @@ resource "aws_elb" "coordinators-elb" {
 
   health_check {
     healthy_threshold = 2
-    unhealthy_threshold = 2
+    unhealthy_threshold = 3
     timeout = 3
     target = "HTTP:9200/"
-    interval = 30
+    interval = 60
   }
 
   cross_zone_load_balancing = true
-  idle_timeout = 30
-  connection_draining = false
+  idle_timeout              = 30
+  connection_draining       = false
 
 }
 
-resource "aws_route53_record" "coordinators-elb" {
+resource "aws_route53_record" "elasticsearch-elb" {
   zone_id = "${var.route53_zone_id}"
   name = "${var.elasticsearch_dns_name}"
   type = "A"
 
   alias {
-    name = "${aws_elb.coordinators-elb.dns_name}"
-    zone_id = "${aws_elb.coordinators-elb.zone_id}"
+    name = "${aws_elb.elasticsearch-elb.dns_name}"
+    zone_id = "${aws_elb.elasticsearch-elb.zone_id}"
     evaluate_target_health = true
   }
 }

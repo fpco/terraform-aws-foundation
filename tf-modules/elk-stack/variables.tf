@@ -20,14 +20,19 @@ variable "vpc_azs" {
   description = "A list of availability zones. This is also the order in which nodes will be deployed in"
 }
 
-variable "vpc_public_subnet_ids" {
+variable "public_subnet_ids" {
   type = "list"
   description = "Public subnet ids, where Kibana and Logstash ELBs will be placed"
 }
 
-variable "vpc_private_subnet_ids" {
+variable "private_subnet_ids" {
   type = "list"
   description = "Private subnet ids, where Kibana, Logstash and ELasticsearch instances will be placed"
+}
+
+variable "public_cidrs" {
+  default = []
+  description = "List of CIDRs that will have access to Kibana UI and SSH to EC2 instances"
 }
 
 variable "elasticsearch_master_node_count" {
@@ -89,6 +94,10 @@ variable "logstash_kibana_desired_server_count" {
   description = "Desired number of EC2 instances running Logstash+Kibana"
   default = 1
 }
+variable "logstash_extra_cidrs" {
+  description = "Extar CIDRs that will be allowed to connect to Logstash over Beat protocol"
+  default = []
+}
 
 variable "route53_zone_id" {
   description = "Route53 Zone id where ELB should get added a record to"
@@ -136,11 +145,8 @@ variable "pub_key_file" {
   description = "Path to the SSH public key file to use for connecting to all instances"
 }
 
-variable "deploy_control_instance" {
+variable "allow_ssh" {
   default = 1
-  description = "Deploy EC2 instance, which can further be used to connect to all private instances. 1 (deploy) or 0 (don't deploy)"
+  description = "Allow SSH access to EC2 instances."
 }
 
-variable "control_instance_subnet_id" {
-  default = ""
-}
