@@ -4,7 +4,6 @@ variable "name_prefix" {
 }
 
 variable "region" {
-  default = "us-west-2"
   description = "Region to deploy ELK stack in"
 }
 
@@ -17,20 +16,24 @@ variable "vpc_route_table_id" {
 }
 
 variable "vpc_azs" {
+  type = "list"
   description = "A list of availability zones. This is also the order in which nodes will be deployed in"
-  default     = ["us-east-1a", "us-east-1c", "us-east-1d"]
 }
 
-variable "vpc_private_subnet_cidrs" {
-  description = "The CIDR ranges for the VPC's private subnets"
-  default     = ["172.16.0.0/24", "172.16.1.0/24", "172.16.2.0/24"]
+variable "public_subnet_ids" {
+  type = "list"
+  description = "Public subnet ids, where Kibana and Logstash ELBs will be placed"
 }
 
-variable "vpc_public_subnet_cidrs" {
-  description = "The CIDR ranges for the VPC's public subnets"
-  default     = ["172.16.4.0/24", "172.16.5.0/24", "172.16.6.0/24"]
+variable "private_subnet_ids" {
+  type = "list"
+  description = "Private subnet ids, where Kibana, Logstash and ELasticsearch instances will be placed"
 }
 
+variable "public_cidrs" {
+  default = []
+  description = "List of CIDRs that will have access to Kibana UI and SSH to EC2 instances"
+}
 
 variable "elasticsearch_master_node_count" {
   description = "Number of master nodes in the cluster. It should be either 1, 3 or more, in order to deal with split brain"
@@ -91,6 +94,10 @@ variable "logstash_kibana_desired_server_count" {
   description = "Desired number of EC2 instances running Logstash+Kibana"
   default = 1
 }
+variable "logstash_extra_cidrs" {
+  description = "Extar CIDRs that will be allowed to connect to Logstash over Beat protocol"
+  default = []
+}
 
 variable "route53_zone_id" {
   description = "Route53 Zone id where ELB should get added a record to"
@@ -138,7 +145,8 @@ variable "pub_key_file" {
   description = "Path to the SSH public key file to use for connecting to all instances"
 }
 
-variable "deploy_control_instance" {
+variable "allow_ssh" {
   default = 1
-  description = "Deploy EC2 instance, which can further be used to connect to all private instances. 1 (deploy) or 0 (don't deploy)"
+  description = "Allow SSH access to EC2 instances."
 }
+

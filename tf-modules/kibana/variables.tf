@@ -51,9 +51,30 @@ variable "route53_zone_id" {
 }
 
 variable "elasticsearch_url" {
-  description = "Elasticsearch endpoint URL."
+  description = "Elasticsearch endpoint URL"
 }
 
 variable "key_name" {
-  description = "SSH key name to use for connecting to all nodes."
+  description = "SSH key name to use for connecting to all nodes"
 }
+
+variable "internal" {
+  default = true
+  description = "Set it to false if you want Kibana to be accessible by the outside world"
+}
+
+variable "extra_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to all instances running Kibana. This is a way to add extra services, SSH access for instance."
+}
+
+variable "extra_elb_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to Kibana Load Balancer"
+}
+
+variable "elb_ingress_cidrs" {
+  default = []
+  description = "CIDRs that are allowed to access Kibana web UI. By default only CIDR from `public_subnet_ids` are allowed"
+}
+

@@ -24,7 +24,7 @@ resource "aws_iam_role_policy_attachment" "master-node-attach-ebs-volume" {
 }
 
 # Master nodes count cannot change through cluster lifetime without manually
-# changing settings on existing nodes, namely changin `minimum_master_nodes` setting.
+# changing settings on existing nodes, namely changing `minimum_master_nodes` setting.
 resource "aws_launch_configuration" "master-node-lc" {
   count                = "${var.master_node_count}"
   name_prefix          = "${var.name_prefix}-master-nodes-lc-${count.index}-"
@@ -32,7 +32,8 @@ resource "aws_launch_configuration" "master-node-lc" {
   instance_type        = "${var.master_node_instance_type}"
   iam_instance_profile = "${element(aws_iam_instance_profile.master-node-iam-profile.*.id, count.index)}"
   key_name             = "${var.key_name}"
-  security_groups      = ["${aws_security_group.master-node-sg.id}"]
+  security_groups      = ["${concat(list(aws_security_group.transport-sg.id), var.extra_sg_ids)}"]
+  security_groups      = ["${aws_security_group.transport-sg.id}"]
   user_data            = "${element(data.template_file.master-node-setup.*.rendered, count.index)}"
   lifecycle            = {
     create_before_destroy = true
@@ -49,7 +50,7 @@ resource "aws_autoscaling_group" "master-node-asg" {
   desired_capacity     = 1
   launch_configuration = "${element(aws_launch_configuration.master-node-lc.*.name, count.index)}"
   health_check_type    = "EC2"
-  vpc_zone_identifier  = ["${element(var.vpc_private_subnet_ids, count.index)}"]
+  vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]
   lifecycle            = {
     create_before_destroy = true
   }
@@ -91,7 +92,7 @@ data "template_file" "master-node-config" {
     node_name          = "${var.name_prefix}-master-node-${count.index}-${element(var.vpc_azs, count.index)}"
     min_master_nodes   = "${(var.master_node_count / 2) + 1}"
     region             = "${var.region}"
-    security_groups    = "[${aws_security_group.master-node-sg.id}, ${aws_security_group.data-node-sg.id}]"
+    security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", var.vpc_azs)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
   }

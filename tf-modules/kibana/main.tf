@@ -13,9 +13,10 @@ data "aws_acm_certificate" "kibana-cert" {
 }
 
 resource "aws_elb" "kibana-elb" {
-  name = "${var.name_prefix}-kibana"
-  subnets       = ["${var.public_subnet_ids}"]
-  security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
+  name            = "${var.name_prefix}-kibana"
+  subnets         = ["${var.public_subnet_ids}"]
+  security_groups = ["${concat(list(aws_security_group.kibana-elb-sg.id), var.extra_elb_sg_ids)}"]
+  internal        = "${var.internal}"
 
   listener {
     instance_port = 5602
@@ -50,6 +51,11 @@ resource "aws_elb" "kibana-elb" {
   }
 }
 
+data "aws_subnet" "kibana-elb" {
+  count = "${length(var.public_subnet_ids)}"
+  id = "${var.public_subnet_ids[count.index]}"
+}
+
 
 resource "aws_route53_record" "kibana-elb" {
   zone_id = "${var.route53_zone_id}"
@@ -72,14 +78,11 @@ data "template_file" "kibana-setup" {
   }
 }
 
-data "aws_vpc" "current" {
-  id = "${var.vpc_id}"
-}
 
 resource "aws_security_group" "kibana-sg" {
   name        = "${var.name_prefix}-kibana-instance"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow ICMP, SSH, HTTP, Kibana port (5602), Kibana healthcheck (5603) from VPC CIDR. Also everything outbound."
+  description = "Allow inboud HTTP, Kibana port (5602), Kibana healthcheck (5603) from subnets where ELB is. Also everything outbound."
 
   tags {
     Name = "${var.name_prefix}-kibana-nodes"
@@ -87,40 +90,26 @@ resource "aws_security_group" "kibana-sg" {
 
   # Kibana
   ingress {
-    from_port   = 5602
-    to_port     = 5602
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    from_port       = 5602
+    to_port         = 5602
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
   }
 
   # Kibana status
   ingress {
-    from_port   = 5603
-    to_port     = 5603
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    from_port       = 5603
+    to_port         = 5603
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
   }
 
   # Used for proper redirect to https
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["${data.aws_vpc.current.cidr_block}"]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
   }
 
   egress {
@@ -135,38 +124,24 @@ resource "aws_security_group" "kibana-sg" {
 resource "aws_security_group" "kibana-elb-sg" {
   name        = "${var.name_prefix}-kibana-elb"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow ICMP, HTTPS and everything outbound."
+  description = "Allow HTTP, HTTPS and everything outbound."
 
   tags {
     Name = "${var.kibana_dns_name}"
   }
 
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.elb_ingress_cidrs}"]
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.elb_ingress_cidrs}"]
   }
 
   egress {
@@ -205,7 +180,7 @@ resource "aws_launch_configuration" "kibana-lc" {
   image_id        = "${var.ami}"
   instance_type   = "${var.instance_type}"
   key_name        = "${var.key_name}"
-  security_groups = ["${aws_security_group.kibana-sg.id}"]
+  security_groups = "${concat(list(aws_security_group.kibana-sg.id), var.extra_sg_ids)}"
   user_data       = <<USER_DATA
 #!/bin/bash
 ${data.template_file.kibana-setup.rendered}

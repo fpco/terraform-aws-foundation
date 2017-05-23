@@ -124,17 +124,32 @@ variable "extra_setup_snippet" {
   description = "Extra snippet to run after logstash has been installed and configured"
 }
 
+variable "extra_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to all instances running Logstash. This is a way to add extra services, SSH access for instance."
+}
+
+variable "extra_elb_sg_ids" {
+  default = []
+  description = "Extra Security Group IDs that will be added to Logstash Load Balancer"
+}
+
+variable "extra_elb_ingress_cidrs" {
+  default = []
+  description = "Extra CIDRs that are allowed to access Logstash. By default only CIDR from `public_subnet_ids` are allowed"
+}
+
 variable "extra_settings" {
   default = ""
   description = "Extra Logstash setting in YAML format"
 }
 
-variable "extra_security_groups" {
-  default = []
-  description = "Security groups, besides the default one, to be used for Logstash instances"
-}
-
 variable "extra_elbs" {
   default = []
   description = "Elastic Load Balancers, besides the default one, to be used for Logstash scaling group"
+}
+
+variable "internal" {
+  default = true
+  description = "Set it to false if you want Logstash to be accessible by the outside world"
 }
