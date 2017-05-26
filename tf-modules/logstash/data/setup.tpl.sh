@@ -28,14 +28,15 @@ ${credstash_get_cmd} -n ${credstash_ca_cert_name} > /etc/logstash/ssl/ca.crt
 ${credstash_get_cmd} -n ${credstash_server_cert_name} > /etc/logstash/ssl/server.crt
 ${credstash_get_cmd} -n ${credstash_server_key_name} > /etc/logstash/ssl/server.key
 
-cat <<EOF > /etc/logstash/conf.d/logstash.conf
+# Essential and minimal configuration for logstash (Beats and HTTP inputs and Elasticsearch output)
+cat <<EOF > /etc/logstash/conf.d/00-logstash.conf
 ${config}
 EOF
 
 # Create a cron job for pulling dynamic config
 cat <<EOF > /etc/logstash/credstash-cronjob.sh
 #!/bin/bash
-${credstash_get_cmd} -n ${credstash_dynamic_config_name} 2>/dev/null >/etc/logstash/conf.d/logstash-dynamic.conf
+${credstash_get_cmd} -n ${credstash_dynamic_config_name} 2>/dev/null >/etc/logstash/conf.d/30-logstash-dynamic.conf
 EOF
 chmod a+x /etc/logstash/credstash-cronjob.sh
 TMP_CRON=$$(mktemp -t "dyn-config-cron-job-XXXXXX.txt")

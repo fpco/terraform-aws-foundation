@@ -10,7 +10,7 @@ data "aws_subnet" "public" {
 }
 
 resource "aws_security_group" "transport-sg" {
-  name        = "${var.name_prefix}-master-node-sg"
+  name        = "${var.name_prefix}-transport"
   vpc_id      = "${var.vpc_id}"
   description = "Allow Elasticsearch Transport TCP (9300) and everything outbound."
 
@@ -19,9 +19,8 @@ resource "aws_security_group" "transport-sg" {
     to_port     = 9300
     protocol    = "tcp"
     cidr_blocks = ["${data.aws_subnet.private.*.cidr_block}"]
-    #cidr_blocks = ["0.0.0.0/0"]
-    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}"]
   }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -31,7 +30,7 @@ resource "aws_security_group" "transport-sg" {
 }
 
 resource "aws_security_group" "elasticsearch-api-sg" {
-  name        = "${var.name_prefix}-elasticsearch-api-sg"
+  name        = "${var.name_prefix}-elasticsearch-api"
   vpc_id      = "${var.vpc_id}"
   description = "Allow HTTP API (9200) inbound from ELB security group."
 
@@ -44,7 +43,7 @@ resource "aws_security_group" "elasticsearch-api-sg" {
 }
 
 resource "aws_security_group" "elasticsearch-elb-sg" {
-  name        = "${var.name_prefix}-elasticsearch-elb-sg"
+  name        = "${var.name_prefix}-elasticsearch-elb"
   vpc_id      = "${var.vpc_id}"
   description = "Allow HTTP API (9200) from private subnet and everything outbound."
 
@@ -53,9 +52,8 @@ resource "aws_security_group" "elasticsearch-elb-sg" {
     to_port     = 9200
     protocol    = "tcp"
     cidr_blocks = ["${concat(data.aws_subnet.public.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
-    #cidr_blocks = ["0.0.0.0/0"]
-    #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
   }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -63,117 +61,3 @@ resource "aws_security_group" "elasticsearch-elb-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-
-
-# resource "aws_security_group" "elasticsearch-elb-sg" {
-#   name        = "${var.name_prefix}-elasticsearch-elb-sg"
-#   vpc_id      = "${var.vpc_id}"
-#   description = "Allow ICMP, HTTP from private subnet and everything outbound."
-
-#   ingress {
-#     from_port   = 9200
-#     to_port     = 9200
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
-#   }
-
-#   ingress {
-#     from_port   = -1
-#     to_port     = -1
-#     protocol    = "icmp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
-
-# resource "aws_security_group" "master-node-sg" {
-#   name        = "${var.name_prefix}-master-node-sg"
-#   vpc_id      = "${var.vpc_id}"
-#   description = "Allow SSH, ICMP, Elasticsearch TCP, Elasticsearch HTTP, and everything outbound."
-
-#   ingress {
-#     from_port   = 22
-#     to_port     = 22
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
-#   }
-
-#   ingress {
-#     from_port   = 9300
-#     to_port     = 9300
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}"]
-#   }
-
-#   ingress {
-#     from_port   = -1
-#     to_port     = -1
-#     protocol    = "icmp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
-# resource "aws_security_group" "data-node-sg" {
-#   name        = "${var.name_prefix}-data-node-sg"
-#   vpc_id      = "${var.vpc_id}"
-#   description = "Allow SSH, ICMP, Elasticsearch TCP, Elasticsearch HTTP, and everything outbound."
-
-#   ingress {
-#     from_port   = 22
-#     to_port     = 22
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
-#   }
-
-#   ingress {
-#     from_port   = 9200
-#     to_port     = 9200
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
-#   }
-
-#   ingress {
-#     from_port   = 9300
-#     to_port     = 9300
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}"]
-#   }
-
-#   ingress {
-#     from_port   = -1
-#     to_port     = -1
-#     protocol    = "icmp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#     #cidr_blocks = ["${var.vpc_private_subnet_cidrs}", "${var.vpc_public_subnet_cidrs}"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }

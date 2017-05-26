@@ -40,6 +40,7 @@ data "aws_vpc" "current" {
 
 # Temporary SSH sg
 resource "aws_security_group" "ssh" {
+  count = "${var.allow_ssh > 0 ? 1 : 0}"
   name = "${var.name_prefix}-ssh"
   vpc_id = "${var.vpc_id}"
   tags {
