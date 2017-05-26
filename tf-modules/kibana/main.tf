@@ -12,6 +12,12 @@ data "aws_acm_certificate" "kibana-cert" {
   statuses = ["ISSUED"]
 }
 
+data "aws_subnet" "private" {
+  count  = "${length(var.public_subnet_ids)}"
+  id     = "${var.public_subnet_ids[count.index]}"
+  vpc_id = "${var.vpc_id}"
+}
+
 resource "aws_elb" "kibana-elb" {
   name            = "${var.name_prefix}-kibana"
   subnets         = ["${var.public_subnet_ids}"]
@@ -51,11 +57,6 @@ resource "aws_elb" "kibana-elb" {
   }
 }
 
-data "aws_subnet" "kibana-elb" {
-  count = "${length(var.public_subnet_ids)}"
-  id = "${var.public_subnet_ids[count.index]}"
-}
-
 
 resource "aws_route53_record" "kibana-elb" {
   zone_id = "${var.route53_zone_id}"
@@ -82,7 +83,7 @@ data "template_file" "kibana-setup" {
 resource "aws_security_group" "kibana-sg" {
   name        = "${var.name_prefix}-kibana-instance"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow inboud HTTP, Kibana port (5602), Kibana healthcheck (5603) from subnets where ELB is. Also everything outbound."
+  description = "Allow inboud HTTP, Kibana port (5602), Kibana healthcheck (5603) from ELB. Also everything outbound."
 
   tags {
     Name = "${var.name_prefix}-kibana-nodes"
@@ -155,7 +156,7 @@ resource "aws_security_group" "kibana-elb-sg" {
 
 resource "aws_autoscaling_group" "kibana-asg" {
   count                = "${min(var.max_server_count, 1)}"
-  availability_zones   = ["${var.vpc_azs}"]
+  availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
   name                 = "${var.name_prefix}-kibana-asg"
   max_size             = "${var.max_server_count}"
   min_size             = "${var.min_server_count}"

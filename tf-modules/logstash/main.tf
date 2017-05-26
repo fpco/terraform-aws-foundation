@@ -77,21 +77,24 @@ data "template_file" "logstash-config" {
   }
 }
 
-data "aws_vpc" "current" {
-  id = "${var.vpc_id}"
+
+data "aws_subnet" "public" {
+  count  = "${length(var.public_subnet_ids)}"
+  id     = "${var.public_subnet_ids[count.index]}"
+  vpc_id = "${var.vpc_id}"
 }
 
-
-data "aws_subnet" "logstash-elb" {
-  count = "${length(var.public_subnet_ids)}"
-  id = "${var.public_subnet_ids[count.index]}"
+data "aws_subnet" "private" {
+  count  = "${length(var.public_subnet_ids)}"
+  id     = "${var.public_subnet_ids[count.index]}"
+  vpc_id = "${var.vpc_id}"
 }
 
 
 resource "aws_security_group" "logstash-sg" {
   name        = "${var.name_prefix}-logstash-instance"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow Logstash Beat port (5044), Logstash HTTP health check (8080) for ELB. Also everything outbound."
+  description = "Allow Logstash Beat port (5044), Logstash HTTP health check (8080) from ELB. Also everything outbound."
 
   tags {
     Name = "${var.name_prefix}-logstash-nodes"
@@ -133,7 +136,7 @@ resource "aws_security_group" "logstash-elb-sg" {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = ["${concat(data.aws_subnet.logstash-elb.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
+    cidr_blocks = ["${concat(data.aws_subnet.public.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
   }
 
   egress {
@@ -147,7 +150,7 @@ resource "aws_security_group" "logstash-elb-sg" {
 
 resource "aws_autoscaling_group" "logstash-asg" {
   count                = "${min(var.max_server_count, 1)}"
-  availability_zones   = ["${var.vpc_azs}"]
+  availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
   vpc_zone_identifier  = ["${var.private_subnet_ids}"]
   name                 = "${var.name_prefix}-logstash${var.name_suffix}-asg"
   max_size             = "${var.max_server_count}"

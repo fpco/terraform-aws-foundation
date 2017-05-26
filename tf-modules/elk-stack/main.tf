@@ -3,17 +3,12 @@
  *
  * This module takes care of deployment of the full ELK stack. Which entails:
  *
- * * Creation of VPC with private and private subnets across many
- *   Availability Zones (AZs). At most one NAT gateway per private subnet,
- *   actual number of gateways is calculated automatically.
  * * Deploying Elasticsearch cluster across a private subnets with specified number
  *   of master and data nodes across all AZs, thus promoting high availability.
  *   See `../elasticsearch` module for more information.
- * * Deploys multiple load balanced servers running Kibana+Logstash each. See
- *   `../logstash+kibana` module for more information, as well as individual modules
- *   `../logstash` and `../kibana`.
- * * It also deploys a control EC2 instance that can be used to manage all instances
- *    in the stack
+ * * Deploys multiple load balanced servers each running Logstash+Kibana. individual
+ *   modules `../logstash` and `../kibana` for more information.
+ *
  */
 
 provider "aws" {
@@ -38,7 +33,7 @@ data "aws_vpc" "current" {
   id = "${var.vpc_id}"
 }
 
-# Temporary SSH sg
+# Optional SSH Securtity Group.
 resource "aws_security_group" "ssh" {
   count = "${var.allow_ssh > 0 ? 1 : 0}"
   name = "${var.name_prefix}-ssh"
@@ -69,7 +64,6 @@ module "elasticsearch" {
   name_prefix               = "${var.name_prefix}"
   region                    = "${var.region}"
   vpc_id                    = "${var.vpc_id}"
-  vpc_azs                   = ["${var.vpc_azs}"]
   route53_zone_id           = "${var.route53_zone_id}"
   key_name                  = "${aws_key_pair.elk-key.key_name}"
   public_subnet_ids         = ["${var.private_subnet_ids}"]
@@ -92,7 +86,6 @@ module "kibana" {
 
   name_prefix          = "${var.name_prefix}"
   vpc_id               = "${var.vpc_id}"
-  vpc_azs              = ["${var.vpc_azs}"]
   route53_zone_id      = "${var.route53_zone_id}"
   kibana_dns_name      = "${var.kibana_dns_name}"
   public_subnet_ids    = ["${var.public_subnet_ids}"]
@@ -107,6 +100,7 @@ module "kibana" {
   elb_ingress_cidrs    = ["${var.public_cidrs}"]
 }
 
+
 module "logstash-kibana" {
   source = "../logstash"
 
@@ -115,7 +109,6 @@ module "logstash-kibana" {
   vpc_id                   = "${var.vpc_id}"
   public_subnet_ids        = ["${var.public_subnet_ids}"]
   private_subnet_ids       = ["${var.private_subnet_ids}"]
-  vpc_azs                  = ["${var.vpc_azs}"]
   route53_zone_id          = "${var.route53_zone_id}"
   logstash_dns_name        = "${var.logstash_dns_name}"
   ami                      = "${data.aws_ami.ubuntu.id}"

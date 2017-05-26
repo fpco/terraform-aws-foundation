@@ -10,7 +10,7 @@ module "master-node-ebs-volumes" {
   source       = "../persistent-ebs-volumes"
   name_prefix  = "${var.name_prefix}-master-node"
   volume_count = "${var.master_node_count}"
-  azs          = ["${var.vpc_azs}"]
+  azs          = ["${data.aws_subnet.private.*.availability_zone}"]
   size         = "${var.master_node_ebs_size}"
   snapshot_ids = ["${var.master_node_snapshot_ids}"]
   encrypted    = "false"
@@ -43,8 +43,8 @@ resource "aws_launch_configuration" "master-node-lc" {
 # A single master node autoscaling group.
 resource "aws_autoscaling_group" "master-node-asg" {
   count                = "${var.master_node_count}"
-  availability_zones   = ["${element(var.vpc_azs, count.index)}"]
-  name                 = "${var.name_prefix}-master-node-asg-${count.index}-${element(var.vpc_azs, count.index)}"
+  availability_zones   = ["${element(data.aws_subnet.private.*.availability_zone, count.index)}"]
+  name                 = "${var.name_prefix}-master-node-asg-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
   max_size             = 1
   min_size             = 1
   desired_capacity     = 1
@@ -57,7 +57,7 @@ resource "aws_autoscaling_group" "master-node-asg" {
 
   tag = [{
     key                 = "Name"
-    value               = "${var.name_prefix}-master-node-${count.index}-${element(var.vpc_azs, count.index)}"
+    value               = "${var.name_prefix}-master-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     propagate_at_launch = true
   },{
     key                 = "cluster"
@@ -89,11 +89,11 @@ data "template_file" "master-node-config" {
   template = "${file("${path.module}/data/master_node_conf.tpl.yml")}"
 
   vars {
-    node_name          = "${var.name_prefix}-master-node-${count.index}-${element(var.vpc_azs, count.index)}"
+    node_name          = "${var.name_prefix}-master-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     min_master_nodes   = "${(var.master_node_count / 2) + 1}"
     region             = "${var.region}"
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
-    availability_zones = "[${join(",", var.vpc_azs)}]"
+    availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
   }
 }

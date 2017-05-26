@@ -27,11 +27,6 @@ variable "vpc_id" {
   description = "VPC id where Kibana servers should be deployed in"
 }
 
-variable "vpc_azs" {
-  description = "A list of availability zones to deploy Kibana servers in"
-  type = "list"
-}
-
 variable "private_subnet_ids" {
   description = "A list of private subnet ids to deploy Kibana servers in"
   type = "list"

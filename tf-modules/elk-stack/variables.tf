@@ -11,15 +11,6 @@ variable "vpc_id" {
   description = "VPC ID for the ELK stack"
 }
 
-variable "vpc_route_table_id" {
-  description = "ID of the route table, with which created subnets will be associated with"
-}
-
-variable "vpc_azs" {
-  type = "list"
-  description = "A list of availability zones. This is also the order in which nodes will be deployed in"
-}
-
 variable "public_subnet_ids" {
   type = "list"
   description = "Public subnet ids, where Kibana and Logstash ELBs will be placed"
@@ -27,7 +18,7 @@ variable "public_subnet_ids" {
 
 variable "private_subnet_ids" {
   type = "list"
-  description = "Private subnet ids, where Kibana, Logstash and ELasticsearch instances will be placed"
+  description = "Private subnet ids, where Kibana, Logstash and ELasticsearch instances will be placed. This is also the order in which nodes will be deployed in."
 }
 
 variable "public_cidrs" {

@@ -50,11 +50,7 @@ variable "data_node_ebs_size" {
 }
 
 variable "vpc_id" {
-}
-
-variable "vpc_azs" {
-  type = "list"
-  description = "A list of availability zones to deploy subnets in"
+  description = "VPC id where Elasticsearch cluster is deployed"
 }
 
 variable "private_subnet_ids" {

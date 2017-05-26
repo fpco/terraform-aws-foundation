@@ -35,11 +35,6 @@ variable "vpc_id" {
   description = "VPC id where Logstash servers should be deployed in"
 }
 
-variable "vpc_azs" {
-  description = "A list of availability zones to deploy Logstash servers in"
-  type = "list"
-}
-
 variable "private_subnet_ids" {
   description = "A list of private subnet ids to deploy Logstash servers in"
   type = "list"
