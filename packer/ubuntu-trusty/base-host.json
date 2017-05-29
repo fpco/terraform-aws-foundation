@@ -11,22 +11,16 @@
     "build_id": "",
     "region": "us-west-1",
     "copy_to_a": "us-east-1",
-    "copy_to_b": "us-west-2",
-    "aws_session_token": "",
-    "aws_access_key": "",
-    "aws_secret_key": ""
+    "copy_to_b": "us-west-2"
   },
   "builders": [ {
       "type": "amazon-ebs",
       "source_ami": "{{user `source_ami`}}",
-      "instance_type": "t2.small",
+      "instance_type": "{{user `instance_type`}}",
       "vpc_id": "{{user `vpc_id`}}",
       "subnet_id": "{{user `subnet_id`}}",
       "region": "{{user `region`}}",
-      "access_key": "{{user `aws_access_key`}}",
-      "secret_key": "{{user `aws_secret_key`}}",
       "ami_name": "base-host-{{ isotime | clean_ami_name }}",
-      "ami_regions": ["{{user `copy_to_a` }}", "{{user `copy_to_b` }}"],
       "ssh_username": "ubuntu",
       "tags": {
 	  "Name": "base-host",

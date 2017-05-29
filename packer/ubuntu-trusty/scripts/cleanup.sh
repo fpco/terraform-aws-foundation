@@ -1,6 +1,7 @@
-# Clean up
-# we ought to employ some of the methods described in
-#
+#!/usr/bin/env bash
+
+set -eux
+
 apt-get -y autoremove
 apt-get -y clean
 
