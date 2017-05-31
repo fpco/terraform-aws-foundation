@@ -27,7 +27,7 @@ resource "aws_iam_role_policy_attachment" "data-node-attach-ebs-volume" {
 
 resource "aws_launch_configuration" "data-node-lc" {
   count                = "${var.data_node_count}"
-  name_prefix          = "${var.name_prefix}-data-node-lc-${count.index}-"
+  name_prefix          = "${var.name_prefix}-data-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}-"
   image_id             = "${var.node_ami}"
   instance_type        = "${var.data_node_instance_type}"
   iam_instance_profile = "${element(aws_iam_instance_profile.data-node-iam-profile.*.id, count.index)}"
@@ -44,7 +44,7 @@ resource "aws_launch_configuration" "data-node-lc" {
 resource "aws_autoscaling_group" "data-node-asg" {
   count                = "${var.data_node_count}"
   availability_zones   = ["${element(data.aws_subnet.private.*.availability_zone, count.index)}"]
-  name                 = "${var.name_prefix}-data-node-asg-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+  name                 = "${var.name_prefix}-data-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
   max_size             = 1
   min_size             = 1
   desired_capacity     = 1

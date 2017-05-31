@@ -89,7 +89,6 @@ variable "route53_zone_id" {
 
 variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
-  default = "elasticsearch-dev.e1c.net"
 }
 
 variable "key_name" {

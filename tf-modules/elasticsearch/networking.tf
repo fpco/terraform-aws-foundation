@@ -12,9 +12,13 @@ data "aws_subnet" "private" {
 }
 
 resource "aws_security_group" "transport-sg" {
-  name        = "${var.name_prefix}-transport"
+  name        = "${var.name_prefix}-elasticsearch-transport"
   vpc_id      = "${var.vpc_id}"
   description = "Allow Elasticsearch Transport TCP (9300) and everything outbound."
+
+  tags {
+    Name = "${var.name_prefix}-elasticsearch-transport"
+  }
 
   ingress {
     from_port   = 9300
@@ -36,6 +40,10 @@ resource "aws_security_group" "elasticsearch-api-sg" {
   vpc_id      = "${var.vpc_id}"
   description = "Allow HTTP API (9200) inbound from ELB security group."
 
+  tags {
+    Name = "${var.name_prefix}-elasticsearch-api"
+  }
+
   ingress {
     from_port       = 9200
     to_port         = 9200
@@ -48,6 +56,10 @@ resource "aws_security_group" "elasticsearch-elb-sg" {
   name        = "${var.name_prefix}-elasticsearch-elb"
   vpc_id      = "${var.vpc_id}"
   description = "Allow HTTP API (9200) from private subnet and everything outbound."
+
+  tags {
+    Name = "${var.elasticsearch_dns_name}"
+  }
 
   ingress {
     from_port   = 9200

@@ -38,6 +38,7 @@ resource "aws_security_group" "ssh" {
   count = "${var.allow_ssh > 0 ? 1 : 0}"
   name = "${var.name_prefix}-ssh"
   vpc_id = "${var.vpc_id}"
+  description = "Allow SSH (22) from public CIDRs to all EC2 instances."
   tags {
     Name = "${var.name_prefix}-ssh"
     Description = "Allow SSH to hosts in ${var.name_prefix}"
@@ -70,6 +71,7 @@ module "elasticsearch" {
   private_subnet_ids        = ["${var.private_subnet_ids}"]
   extra_sg_ids              = ["${aws_security_group.ssh.id}"]
   node_ami                  = "${data.aws_ami.ubuntu.id}"
+  elasticsearch_dns_name    = "${var.elasticsearch_dns_name}"
   data_node_count           = "${var.elasticsearch_data_node_count}"
   data_node_ebs_size        = "${var.elasticsearch_data_node_ebs_size}"
   data_node_snapshot_ids    = ["${var.elasticsearch_data_node_snapshot_ids}"]
@@ -125,6 +127,7 @@ module "logstash-kibana" {
   certstrap_depot_path     = "${var.certstrap_depot_path}"
   certstrap_ca_common_name = "${var.certstrap_ca_common_name}"
   certstrap_ca_passphrase  = "${var.certstrap_ca_passphrase}"
+  certstrap_ca_force_new   = "${var.certstrap_ca_force_new}"
   credstash_table_name     = "${var.credstash_table_name}"
   credstash_kms_key_arn    = "${var.credstash_kms_key_arn}"
   credstash_prefix         = "${var.name_prefix}-"

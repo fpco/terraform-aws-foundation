@@ -125,7 +125,7 @@ resource "aws_security_group" "kibana-sg" {
 resource "aws_security_group" "kibana-elb-sg" {
   name        = "${var.name_prefix}-kibana-elb"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow HTTP, HTTPS and everything outbound."
+  description = "Allow HTTP (80), HTTPS (443) and everything outbound."
 
   tags {
     Name = "${var.kibana_dns_name}"
@@ -157,7 +157,7 @@ resource "aws_security_group" "kibana-elb-sg" {
 resource "aws_autoscaling_group" "kibana-asg" {
   count                = "${min(var.max_server_count, 1)}"
   availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
-  name                 = "${var.name_prefix}-kibana-asg"
+  name                 = "${var.name_prefix}-kibana"
   max_size             = "${var.max_server_count}"
   min_size             = "${var.min_server_count}"
   desired_capacity     = "${var.desired_server_count}"
@@ -177,7 +177,7 @@ resource "aws_autoscaling_group" "kibana-asg" {
 
 resource "aws_launch_configuration" "kibana-lc" {
   count           = "${min(var.max_server_count, 1)}"
-  name_prefix     = "${var.name_prefix}-kibana-lc-"
+  name_prefix     = "${var.name_prefix}-kibana-"
   image_id        = "${var.ami}"
   instance_type   = "${var.instance_type}"
   key_name        = "${var.key_name}"

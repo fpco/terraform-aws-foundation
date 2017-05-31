@@ -66,6 +66,11 @@ variable "certstrap_depot_path" {
   description = "Local path, where generated SSL certifcates will be stored in. Certificates will be removed from local file system if left empty and will only be retained in credential store"
 }
 
+variable "certstrap_ca_force_new" {
+  default = false
+  description = "New CA certificate will be created even if there already one exitsts with the same CN"
+}
+
 variable "certstrap_ca_common_name" {
   default = "Logstash"
   description = "Common Name to be used during CA certificate generation"

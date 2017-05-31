@@ -152,7 +152,7 @@ resource "aws_autoscaling_group" "logstash-asg" {
   count                = "${min(var.max_server_count, 1)}"
   availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
   vpc_zone_identifier  = ["${var.private_subnet_ids}"]
-  name                 = "${var.name_prefix}-logstash${var.name_suffix}-asg"
+  name                 = "${var.name_prefix}-logstash${var.name_suffix}"
   max_size             = "${var.max_server_count}"
   min_size             = "${var.min_server_count}"
   desired_capacity     = "${var.desired_server_count}"
@@ -171,7 +171,7 @@ resource "aws_autoscaling_group" "logstash-asg" {
 
 resource "aws_launch_configuration" "logstash-lc" {
   count                = "${min(var.max_server_count, 1)}"
-  name_prefix          = "${var.name_prefix}-logstash-lc-"
+  name_prefix          = "${var.name_prefix}-logstash-"
   image_id             = "${var.ami}"
   instance_type        = "${var.instance_type}"
   key_name             = "${var.key_name}"

@@ -26,6 +26,10 @@ variable "public_cidrs" {
   description = "List of CIDRs that will have access to Kibana UI and SSH to EC2 instances"
 }
 
+variable "elasticsearch_dns_name" {
+  description = "DNS name for Elasticsearch"
+}
+
 variable "elasticsearch_master_node_count" {
   description = "Number of master nodes in the cluster. It should be either 1, 3 or more, in order to deal with split brain"
   default = 1
@@ -105,6 +109,11 @@ variable "logstash_dns_name" {
 variable "certstrap_depot_path" {
   default = ""
   description = "Local path, where generated SSL certifcates will be stored in. Certificates will be removed from local file system if left empty and will only be retained in credential store"
+}
+
+variable "certstrap_ca_force_new" {
+  default = false
+  description = "New CA certificate will be created even if there already one exitsts with the same CN"
 }
 
 variable "certstrap_ca_common_name" {

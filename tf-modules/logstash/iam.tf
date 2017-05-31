@@ -21,8 +21,10 @@ data "template_file" "certstrap" {
   vars {
     domain_name       = "${var.logstash_dns_name}"
     depot_path        = "${var.certstrap_depot_path}"
+    ca_force_new      = "${var.certstrap_ca_force_new}"
     ca_common_name    = "${var.certstrap_ca_common_name}"
     ca_passphrase     = "${var.certstrap_ca_passphrase}"
+    credstash_get_cmd = "${module.credstash-reader.get_cmd}"
     credstash_put_cmd = "${module.credstash-reader.put_cmd}"
     ca_cert_name      = "${var.credstash_prefix}${var.credstash_ca_cert_name}"
     ca_key_name       = "${var.credstash_prefix}${var.credstash_ca_key_name}"
