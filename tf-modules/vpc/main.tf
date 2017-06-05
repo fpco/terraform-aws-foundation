@@ -14,7 +14,7 @@ resource "aws_vpc" "main" {
 
 resource "aws_vpc_dhcp_options" "main" {
   domain_name         = "${var.region}.compute.internal"
-  domain_name_servers = ["AmazonProvidedDNS"]
+  domain_name_servers = ["${var.dns_server_list}"]
 
   tags = "${merge(map("Name", "${var.name_prefix}-dhcp-options"), "${var.extra_tags}")}"
 }

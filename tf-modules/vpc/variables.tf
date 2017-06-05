@@ -9,7 +9,10 @@ variable "region" {
 variable "cidr" {
   description = "CIDR range of VPC. eg: 172.16.0.0/16"
 }
-
+variable "dns_server_list" {
+  description = "list of IPs to use as DNS servers (in DHCP options for the VPC)"
+  default     = ["AmazonProvidedDNS"]
+}
 variable "public_subnet_cidrs" {
   type = "list"
   description = "A list of public subnet CIDRs to deploy inside the VPC."
