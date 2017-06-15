@@ -73,3 +73,12 @@ variable "elb_ingress_cidrs" {
   description = "CIDRs that are allowed to access Kibana web UI. By default only CIDR from `public_subnet_ids` are allowed"
 }
 
+variable "basic_auth_username" {
+  default = "kibanaadmin"
+  description = "Username for Kibana authentication"
+}
+
+variable "basic_auth_password" {
+  default = "kibanaadmin"
+  description = "Password for Kibana authentication"
+}

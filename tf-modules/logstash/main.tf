@@ -64,6 +64,7 @@ data "template_file" "logstash-setup" {
     credstash_server_key_name     = "${var.credstash_prefix}${var.credstash_server_key_name}"
     credstash_dynamic_config_name = "${var.credstash_prefix}${var.credstash_dynamic_config_name}"
     config                        = "${data.template_file.logstash-config.rendered}"
+    extra_config                  = "${var.extra_config}"
     extra_settings                = "${var.extra_settings}"
     extra_setup_snippet           = "${var.extra_setup_snippet}"
   }
@@ -171,17 +172,13 @@ resource "aws_autoscaling_group" "logstash-asg" {
 
 resource "aws_launch_configuration" "logstash-lc" {
   count                = "${min(var.max_server_count, 1)}"
-  name_prefix          = "${var.name_prefix}-logstash-"
+  name_prefix          = "${var.name_prefix}-logstash${var.name_suffix}-"
   image_id             = "${var.ami}"
   instance_type        = "${var.instance_type}"
   key_name             = "${var.key_name}"
   security_groups      = ["${concat(list(aws_security_group.logstash-sg.id), var.extra_sg_ids)}"]
   iam_instance_profile = "${aws_iam_instance_profile.logstash-profile.id}"
-  user_data            = <<USER_DATA
-#!/bin/bash
-${data.template_file.logstash-setup.rendered}
-${var.extra_setup_snippet}
-USER_DATA
+  user_data            = "${data.template_file.logstash-setup.rendered}"
 
   lifecycle = {
     create_before_destroy = true

@@ -16,8 +16,8 @@ systemctl start kibana.service
 apt-get install -y nginx
 
 # Basic auth
-echo -n 'kibanaadmin:' >> /etc/nginx/.htpasswd
-echo "kibanaadmin" | openssl passwd -apr1 -stdin >> /etc/nginx/.htpasswd
+echo -n "${basic_auth_username}:" >> /etc/nginx/.htpasswd
+echo -n "${basic_auth_password}" | openssl passwd -apr1 -stdin >> /etc/nginx/.htpasswd
 
 mkdir /var/www/html/kibana-status
 echo "Status: Initializing" > /var/www/html/kibana-status/index.html
@@ -58,7 +58,7 @@ service nginx configtest
 service nginx reload
 
 
-# Create a cron job for checking the status of Kibana and nginx for ELB
+# Create a cron job for checking the status of Kibana and nginx for ELB Health Checks
 cat <<EOF > /etc/kibana/status-cronjob.sh
 #!/bin/bash
 KIBANA_RESPONSE_CODE=\$(curl --write-out %{http_code} --silent --output /dev/null localhost:5601)

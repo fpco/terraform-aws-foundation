@@ -70,6 +70,11 @@ variable "elasticsearch_data_node_snapshot_ids" {
   description = "List of snapshots ids to use for data nodes."
 }
 
+variable "elasticsearch_index_retention_period" {
+  default = 60
+  description = "Age of Elasticsearch indices in days before they will be considered old and be pruned by the curator"
+}
+
 variable "logstash_kibana_instance_type" {
   default = "t2.micro"
   description = "Instance type to use for servers running Kibana+Logstash."
@@ -96,6 +101,16 @@ variable "logstash_extra_cidrs" {
 
 variable "route53_zone_id" {
   description = "Route53 Zone id where ELB should get added a record to"
+}
+
+variable "kibana_username" {
+  default = "kibanaadmin"
+  description = "Username for Kibana authentication"
+}
+
+variable "kibana_password" {
+  default = "kibanaadmin"
+  description = "Password for Kibana authentication"
 }
 
 variable "kibana_dns_name" {
@@ -135,18 +150,18 @@ variable "credstash_kms_key_arn" {
   description = "Master KMS key ARN for getting SSL server key using credstash"
 }
 
-variable "priv_key_file" {
-  default = "ssh_key"
-  description = "Path to the SSH private key file to use for connecting to all instances"
-}
-
-variable "pub_key_file" {
+variable "ssh_pubkey" {
   default = "ssh_key.pub"
-  description = "Path to the SSH public key file to use for connecting to all instances"
+  description = "Path to the SSH public key file to use for connecting to all instances. Ignored if ssh_keyname is non-empty"
 }
 
-variable "allow_ssh" {
-  default = 1
+variable "ssh_key_name" {
+  default = ""
+  description = "Use an existing ssh key pair, must already be created on AWS. If empty, ssh_pubkey is used to create a new pair with name 'var.name_prefix + key'"
+}
+
+variable "ssh_allow" {
+  default = true
   description = "Allow SSH access to EC2 instances."
 }
 

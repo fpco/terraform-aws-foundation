@@ -27,7 +27,7 @@ resource "aws_iam_role_policy_attachment" "master-node-attach-ebs-volume" {
 # changing settings on existing nodes, namely changing `minimum_master_nodes` setting.
 resource "aws_launch_configuration" "master-node-lc" {
   count                = "${var.master_node_count}"
-  name_prefix          = "${var.name_prefix}-master-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}-"
+  name_prefix          = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}-"
   image_id             = "${var.node_ami}"
   instance_type        = "${var.master_node_instance_type}"
   iam_instance_profile = "${element(aws_iam_instance_profile.master-node-iam-profile.*.id, count.index)}"
@@ -44,7 +44,7 @@ resource "aws_launch_configuration" "master-node-lc" {
 resource "aws_autoscaling_group" "master-node-asg" {
   count                = "${var.master_node_count}"
   availability_zones   = ["${element(data.aws_subnet.private.*.availability_zone, count.index)}"]
-  name                 = "${var.name_prefix}-master-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+  name                 = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
   max_size             = 1
   min_size             = 1
   desired_capacity     = 1
@@ -57,7 +57,7 @@ resource "aws_autoscaling_group" "master-node-asg" {
 
   tag = [{
     key                 = "Name"
-    value               = "${var.name_prefix}-master-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+    value               = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     propagate_at_launch = true
   },{
     key                 = "cluster"
@@ -73,12 +73,14 @@ data "template_file" "master-node-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    mount_snippet = "${element(module.master-node-ebs-volumes.volume_mount_snippets, count.index)}"
-    device_name   = "/dev/xvdf"
-    mount_point   = "/mnt/elasticsearch"
-    wait_interval = 1
-    region        = "${var.region}"
-    config_yaml   = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
+    mount_snippet          = "${element(module.master-node-ebs-volumes.volume_mount_snippets, count.index)}"
+    device_name            = "/dev/xvdf"
+    mount_point            = "/mnt/elasticsearch"
+    wait_interval          = 1
+    region                 = "${var.region}"
+    config_yaml            = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
+    index_retention_period = "${var.index_retention_period}"
+    is_master_node         = "true"
   }
 }
 
@@ -89,7 +91,7 @@ data "template_file" "master-node-config" {
   template = "${file("${path.module}/data/master_node_conf.tpl.yml")}"
 
   vars {
-    node_name          = "${var.name_prefix}-master-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+    node_name          = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     min_master_nodes   = "${(var.master_node_count / 2) + 1}"
     region             = "${var.region}"
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"

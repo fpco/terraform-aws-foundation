@@ -144,6 +144,11 @@ variable "extra_settings" {
   description = "Extra Logstash setting in YAML format"
 }
 
+variable "extra_config" {
+  default = ""
+  description = "Extra Logstash configuration. It will in the middle of the pipeline, between the main config, and the one that can be supplied through credstash with 'credstash_dynamic_config_name' keyname."
+}
+
 variable "extra_elbs" {
   default = []
   description = "Elastic Load Balancers, besides the default one, to be used for Logstash scaling group"
@@ -153,3 +158,4 @@ variable "internal" {
   default = true
   description = "Set it to false if you want Logstash to be accessible by the outside world"
 }
+

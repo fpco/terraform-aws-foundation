@@ -40,6 +40,11 @@ systemctl daemon-reload
 systemctl enable elasticsearch.service
 systemctl start elasticsearch.service
 
+
+if [ "${is_master_node}" != "true" ]; then
+  exit 0
+fi
+
 # Install curator (will only run on active master)
 
 pip install elasticsearch-curator
@@ -89,13 +94,13 @@ actions:
     filters:
     - filtertype: pattern
       kind: prefix
-      value: filebeat-
+      value: '^([a-z]+-)+'
       exclude:
     - filtertype: age
       source: name
       direction: older
       timestring: '%Y.%m.%d'
       unit: days
-      unit_count: 60
+      unit_count: ${index_retention_period}
       exclude:
 EOF

@@ -95,3 +95,7 @@ variable "key_name" {
   description = "SSH key name to use for connecting to all nodes"
 }
 
+variable "index_retention_period" {
+  default = 60
+  description = "Age of Elasticsearch indices in days before they will be considered old and be pruned by the curator"
+}

@@ -35,7 +35,7 @@ data "aws_vpc" "current" {
 
 # Optional SSH Securtity Group.
 resource "aws_security_group" "ssh" {
-  count = "${var.allow_ssh > 0 ? 1 : 0}"
+  count = "${var.ssh_allow ? 1 : 0}"
   name = "${var.name_prefix}-ssh"
   vpc_id = "${var.vpc_id}"
   description = "Allow SSH (22) from public CIDRs to all EC2 instances."
@@ -52,10 +52,11 @@ resource "aws_security_group" "ssh" {
   }
 }
 
-
+# Optionally create an SSH Key Pair.
 resource "aws_key_pair" "elk-key" {
+  count = "${length(var.ssh_key_name) > 0 ? 0 : 1}"
   key_name = "${var.name_prefix}-key"
-  public_key = "${file("${path.module}/${var.pub_key_file}")}"
+  public_key = "${file(var.ssh_pubkey)}"
 }
 
 
@@ -66,7 +67,9 @@ module "elasticsearch" {
   region                    = "${var.region}"
   vpc_id                    = "${var.vpc_id}"
   route53_zone_id           = "${var.route53_zone_id}"
-  key_name                  = "${aws_key_pair.elk-key.key_name}"
+  #key_name                  = "${coalesce(var.ssh_key_name, element(aws_key_pair.elk-key.*.key_name, 0))}"
+  key_name                 =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
+  #key_name                 = "${length(aws_key_pair.elk-key.*.key_name) == 0 ? var.ssh_key_name : element(aws_key_pair.elk-key.*.key_name, 0)}"
   public_subnet_ids         = ["${var.private_subnet_ids}"]
   private_subnet_ids        = ["${var.private_subnet_ids}"]
   extra_sg_ids              = ["${aws_security_group.ssh.id}"]
@@ -100,6 +103,8 @@ module "kibana" {
   max_server_count     = 0
   desired_server_count = 0
   elb_ingress_cidrs    = ["${var.public_cidrs}"]
+  basic_auth_username  = "${var.kibana_username}"
+  basic_auth_password  = "${var.kibana_password}"
 }
 
 
@@ -115,7 +120,8 @@ module "logstash-kibana" {
   logstash_dns_name        = "${var.logstash_dns_name}"
   ami                      = "${data.aws_ami.ubuntu.id}"
   instance_type            = "${var.logstash_kibana_instance_type}"
-  key_name                 = "${aws_key_pair.elk-key.key_name}"
+  #key_name                 = "${length(aws_key_pair.elk-key.*.key_name) == 0 ? var.ssh_key_name : element(aws_key_pair.elk-key.*.key_name, 0)}"
+  key_name                 =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
   elasticsearch_url        = "http://${module.elasticsearch.elb_dns}:9200"
   min_server_count         = "${var.logstash_kibana_min_server_count}"
   max_server_count         = "${var.logstash_kibana_max_server_count}"
@@ -131,5 +137,25 @@ module "logstash-kibana" {
   credstash_table_name     = "${var.credstash_table_name}"
   credstash_kms_key_arn    = "${var.credstash_kms_key_arn}"
   credstash_prefix         = "${var.name_prefix}-"
+  extra_config             = <<END_CONFIG
+input {
+    file {
+        path => "/var/log/nginx/access.log"
+        add_field => {
+            index_prefix => "elk"
+            info_str => '{"origin":"aws-ec2","source":"kibana","format":"nginx_access","transport":"file"}'
+        }
+        type => "log"
+    }
+    file {
+        path => "/var/log/nginx/error.log"
+        add_field => {
+            index_prefix => "elk"
+            info_str => '{"origin":"aws-ec2","source":"kibana","format":"nginx_error","transport":"file"}'
+        }
+        type => "log"
+    }
+}
+END_CONFIG
 }
 

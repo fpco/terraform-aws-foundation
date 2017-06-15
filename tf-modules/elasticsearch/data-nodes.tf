@@ -27,7 +27,7 @@ resource "aws_iam_role_policy_attachment" "data-node-attach-ebs-volume" {
 
 resource "aws_launch_configuration" "data-node-lc" {
   count                = "${var.data_node_count}"
-  name_prefix          = "${var.name_prefix}-data-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}-"
+  name_prefix          = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}-"
   image_id             = "${var.node_ami}"
   instance_type        = "${var.data_node_instance_type}"
   iam_instance_profile = "${element(aws_iam_instance_profile.data-node-iam-profile.*.id, count.index)}"
@@ -44,7 +44,7 @@ resource "aws_launch_configuration" "data-node-lc" {
 resource "aws_autoscaling_group" "data-node-asg" {
   count                = "${var.data_node_count}"
   availability_zones   = ["${element(data.aws_subnet.private.*.availability_zone, count.index)}"]
-  name                 = "${var.name_prefix}-data-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+  name                 = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
   max_size             = 1
   min_size             = 1
   desired_capacity     = 1
@@ -58,7 +58,7 @@ resource "aws_autoscaling_group" "data-node-asg" {
 
   tag = [{
     key                 = "Name"
-    value               = "${var.name_prefix}-data-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+    value               = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     propagate_at_launch = true
   },{
     key                 = "cluster"
@@ -72,12 +72,14 @@ data "template_file" "data-node-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    mount_snippet = "${element(module.data-node-ebs-volumes.volume_mount_snippets, count.index)}"
-    device_name   = "/dev/xvdf"
-    mount_point   = "/mnt/elasticsearch"
-    wait_interval = 1
-    region        = "${var.region}"
-    config_yaml   = "${element(data.template_file.data-node-config.*.rendered, count.index)}"
+    mount_snippet          = "${element(module.data-node-ebs-volumes.volume_mount_snippets, count.index)}"
+    device_name            = "/dev/xvdf"
+    mount_point            = "/mnt/elasticsearch"
+    wait_interval          = 1
+    region                 = "${var.region}"
+    config_yaml            = "${element(data.template_file.data-node-config.*.rendered, count.index)}"
+    index_retention_period = "0"
+    is_master_node         = "falase"
   }
 }
 
@@ -86,7 +88,7 @@ data "template_file" "data-node-config" {
   template = "${file("${path.module}/data/data_node_conf.tpl.yml")}"
 
   vars {
-    node_name          = "${var.name_prefix}-data-node-${count.index}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+    node_name          = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     region             = "${var.region}"
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"

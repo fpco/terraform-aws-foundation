@@ -75,7 +75,9 @@ data "template_file" "kibana-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    elasticsearch_url = "${var.elasticsearch_url}"
+    elasticsearch_url   = "${var.elasticsearch_url}"
+    basic_auth_username = "${var.basic_auth_username}"
+    basic_auth_password = "${var.basic_auth_password}"
   }
 }
 
