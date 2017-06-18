@@ -1,83 +1,30 @@
 /**
- *## Virtual Private Cloud (VPC)
+ * ## VPC w/ DHCP Options
  *
- * This module takes care of VPC deployment. Scenarios 1 and 2 are possible with
- * this module: http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenarios.html
+ * This module creates the basic VPC and DHCP options resources.
+ * Use this module in combination with the `subnet`, `nat-gateway`,
+ * and related network modules.
  *
  */
+
 resource "aws_vpc" "main" {
   cidr_block           = "${var.cidr}"
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  tags = "${merge(map("Name", "${var.name_prefix}-vpc"), "${var.extra_tags}")}"
+  enable_dns_hostnames = "${var.enable_dns_hostnames}"
+  enable_dns_support   = "${var.enable_dns_support}"
+
+  tags = "${merge(map("Name", "${var.name_prefix}"), "${var.extra_tags}")}"
 }
 
+// move these two into their own module? or combine with aws_vpc in a module?
 resource "aws_vpc_dhcp_options" "main" {
   domain_name         = "${var.region}.compute.internal"
-  domain_name_servers = ["${var.dns_server_list}"]
+  domain_name_servers = "${var.dns_servers}"
+  ntp_servers         = "${var.ntp_servers}"
 
-  tags = "${merge(map("Name", "${var.name_prefix}-dhcp-options"), "${var.extra_tags}")}"
+  tags = "${merge(map("Name", "${var.name_prefix}"), "${var.extra_tags}")}"
 }
 
 resource "aws_vpc_dhcp_options_association" "main" {
   vpc_id          = "${aws_vpc.main.id}"
   dhcp_options_id = "${aws_vpc_dhcp_options.main.id}"
-}
-
-module "public-subnets" {
-  source      = "../subnets"
-  azs         = "${var.azs}"
-  vpc_id      = "${aws_vpc.main.id}"
-  name_prefix = "${var.name_prefix}-public"
-  cidr_blocks = "${var.public_subnet_cidrs}"
-  extra_tags  = "${var.extra_tags}"
-}
-
-module "private-subnets" {
-  source      = "../subnets"
-  azs         = "${var.azs}"
-  vpc_id      = "${aws_vpc.main.id}"
-  name_prefix = "${var.name_prefix}-private"
-  cidr_blocks = "${var.private_subnet_cidrs}"
-  extra_tags  = "${var.extra_tags}"
-}
-
-
-
-## Internet Gateway - provide internet access to public subnets.
-
-resource "aws_internet_gateway" "main" {
-  vpc_id = "${aws_vpc.main.id}"
-
-  tags = "${merge(map("Name", "${var.name_prefix}-igw"), "${var.extra_tags}")}"
-}
-
-resource "aws_route_table" "public" {
-  vpc_id = "${aws_vpc.main.id}"
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.main.id}"
-  }
-
-  tags = "${merge(map("Name", "${var.name_prefix}-public"), "${var.extra_tags}")}"
-}
-
-resource "aws_route_table_association" "public-rta" {
-  count          = "${length(var.public_subnet_cidrs)}"
-  subnet_id      = "${element(module.public-subnets.ids, count.index)}"
-  route_table_id = "${aws_route_table.public.id}"
-}
-
-
-## NAT Gateways - provide internet access to private subnets.
-
-module "nat-gateways" {
-  source             = "../nat-gateways"
-  vpc_id             = "${aws_vpc.main.id}"
-  name_prefix        = "${var.name_prefix}"
-  nat_count          = "${var.nat_count}"
-  public_subnet_ids  = ["${module.subnets.public_ids}"]
-  private_subnet_ids = ["${module.subnets.private_ids}"]
-  extra_tags         = "${var.extra_tags}"
 }
