@@ -1,10 +1,19 @@
-//List of public subnet ids
-output "public_ids" {
-  value = ["${aws_subnet.public.*.id}"]
+//List of subnet ids
+output "ids" {
+  value = ["${aws_subnet.main.*.id}"]
 }
 
-//List of private subnet ids
-output "private_ids" {
-  value = ["${aws_subnet.private.*.id}"]
+// CIDR blocks
+output "cidr_blocks" {
+  value = ["${aws_subnet.main.*.cidr_block}"]
 }
 
+// list of Availability Zones
+output "azs" {
+  value = ["${aws_subnet.main.*.availability_zones}"]
+}
+
+// ID of the VPC the subnets are in
+output "vpc_id" {
+  value = ["${var.vpc_id}"]
+}
