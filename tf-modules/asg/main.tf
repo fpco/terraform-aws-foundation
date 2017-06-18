@@ -22,6 +22,9 @@ resource "aws_autoscaling_group" "cluster" {
     max_size = "${var.max_nodes}"
     min_size = "${var.min_nodes}"
     name = "${var.name}-${var.suffix}"
+    lifecycle {
+      create_before_destroy = true
+    }
     vpc_zone_identifier = ["${compact(split(",", replace(var.subnet_ids, " ", "")))}"]
 }
 # Launch Config for the ASG
@@ -37,5 +40,8 @@ resource "aws_launch_configuration" "cluster" {
     root_block_device {
         volume_type = "${var.root_volume_type}"
         volume_size = "${var.root_volume_size}"
+    }
+    lifecycle {
+      create_before_destroy = true
     }
 }
