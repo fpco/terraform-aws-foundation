@@ -1,0 +1,6 @@
+{
+  "out_dir": "box",
+  "box": "trusty64",
+  "repo": "ubuntu",
+  "version": "20170526.4.0"
+}

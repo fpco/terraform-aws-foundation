@@ -1,0 +1,38 @@
+{
+  "variables": {
+    "home":    "{{env `HOME`}}",
+    "out_dir": "box",
+    "type":    "base-host",
+    "box":     "trusty64",
+    "repo":    "ubuntu",
+    "version": "20170526.4.0"
+  },
+  "builders": [{
+    "type": "virtualbox-ovf",
+    "source_path": "{{user `home`}}/.vagrant.d/boxes/{{user `repo`}}-VAGRANTSLASH-{{user `box`}}/{{user `version`}}/virtualbox/box.ovf",
+    "ssh_username": "vagrant",
+    "ssh_password": "vagrant",
+    "ssh_wait_timeout": "90s",
+    "shutdown_command": "echo 'packer' | sudo -S shutdown -P now"
+  }],
+  "provisioners": [{
+    "type": "file",
+    "source": "uploads/",
+    "destination": "/tmp/"
+  },
+  {
+    "type": "shell",
+    "execute_command": "sudo -H -S sh '{{.Path}}'",
+    "scripts": [
+      "scripts/base.sh",
+      "scripts/bootstrap-salt.sh",
+      "scripts/run-highstate.sh",
+      "scripts/cleanup.sh"
+    ]
+  }],
+  "post-processors": [{
+    "type": "vagrant",
+    "keep_input_artifact": true,
+    "output": "{{user `out_dir`}}/{{user `type`}}-{{user `repo`}}-{{user `box`}}-{{user `version`}}.box"
+  }]
+}
