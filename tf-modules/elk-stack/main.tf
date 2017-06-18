@@ -64,7 +64,6 @@ module "elasticsearch" {
   source = "../elasticsearch"
 
   name_prefix               = "${var.name_prefix}"
-  region                    = "${var.region}"
   vpc_id                    = "${var.vpc_id}"
   route53_zone_id           = "${var.route53_zone_id}"
   #key_name                  = "${coalesce(var.ssh_key_name, element(aws_key_pair.elk-key.*.key_name, 0))}"
@@ -83,6 +82,7 @@ module "elasticsearch" {
   master_node_ebs_size      = "${var.elasticsearch_master_node_ebs_size}"
   master_node_snapshot_ids  = ["${var.elasticsearch_master_node_snapshot_ids}"]
   master_node_instance_type = "${var.elasticsearch_master_node_instance_type}"
+  extra_setup_snippet       = "${var.elasticsearch_extra_setup_snippet}"
 }
 
 
@@ -93,6 +93,7 @@ module "kibana" {
   vpc_id               = "${var.vpc_id}"
   route53_zone_id      = "${var.route53_zone_id}"
   kibana_dns_name      = "${var.kibana_dns_name}"
+  kibana_dns_ssl_name  = "${var.kibana_dns_ssl_name}"
   public_subnet_ids    = ["${var.public_subnet_ids}"]
   private_subnet_ids   = ["${var.private_subnet_ids}"]
   key_name             = ""
@@ -120,7 +121,6 @@ module "logstash-kibana" {
   logstash_dns_name        = "${var.logstash_dns_name}"
   ami                      = "${data.aws_ami.ubuntu.id}"
   instance_type            = "${var.logstash_kibana_instance_type}"
-  #key_name                 = "${length(aws_key_pair.elk-key.*.key_name) == 0 ? var.ssh_key_name : element(aws_key_pair.elk-key.*.key_name, 0)}"
   key_name                 =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
   elasticsearch_url        = "http://${module.elasticsearch.elb_dns}:9200"
   min_server_count         = "${var.logstash_kibana_min_server_count}"

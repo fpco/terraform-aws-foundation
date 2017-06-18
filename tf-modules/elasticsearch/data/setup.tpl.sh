@@ -34,18 +34,20 @@ sed -i -e "s/^-Xmx.*/-Xmx$JVM_HEAP_SIZE/g" /etc/elasticsearch/jvm.options
 echo "${config_yaml}" > /etc/elasticsearch/elasticsearch.yml
 mkdir ${mount_point}/data ${mount_point}/logs
 chown elasticsearch:elasticsearch ${mount_point}/data ${mount_point}/logs
+#chmod 640 ${mount_point}/data ${mount_point}/logs
 echo "path.data: ${mount_point}/data" >> /etc/elasticsearch/elasticsearch.yml
 echo "path.logs: ${mount_point}/logs" >> /etc/elasticsearch/elasticsearch.yml
 systemctl daemon-reload
 systemctl enable elasticsearch.service
 systemctl start elasticsearch.service
 
+${extra_setup_snippet}
 
 if [ "${is_master_node}" != "true" ]; then
   exit 0
 fi
 
-# Install curator (will only run on active master)
+# Install curator (will only run on the active master)
 
 pip install elasticsearch-curator
 useradd -r curator

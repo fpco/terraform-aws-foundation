@@ -1,19 +1,21 @@
 network.host: _ec2_
+network.bind_host: [_ec2_, localhost]
 node:
   name: "${node_name}"
   master: true
   data: false
   ingest: false
-http.enabled: false
+http.port: 9200
 transport.tcp.port: 9300
-discovery.zen.minimum_master_nodes: ${min_master_nodes}
 
 # discovery-ec2
 cloud.aws.region: ${region}
 cloud.node.auto_attributes: true
 cluster.routing.allocation.awareness.attributes: aws_availability_zone
 discovery:
-  zen.hosts_provider: ec2
+  zen:
+    minimum_master_nodes: ${min_master_nodes}
+    hosts_provider: ec2
   ec2:
     groups: ${security_groups}
     host_type: private_ip

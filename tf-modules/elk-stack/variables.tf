@@ -75,6 +75,11 @@ variable "elasticsearch_index_retention_period" {
   description = "Age of Elasticsearch indices in days before they will be considered old and be pruned by the curator"
 }
 
+variable "elasticsearch_extra_setup_snippet" {
+  default = ""
+  description = "Extra snippet to run after Elasticsearch has been installed and configured"
+}
+
 variable "logstash_kibana_instance_type" {
   default = "t2.micro"
   description = "Instance type to use for servers running Kibana+Logstash."
@@ -115,6 +120,11 @@ variable "kibana_password" {
 
 variable "kibana_dns_name" {
   description = "DNS name for Kibana"
+}
+
+variable "kibana_dns_ssl_name" {
+  default = ""
+  description = "DNS name for Kibana endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'kibana_dns_name' will be checked instead."
 }
 
 variable "logstash_dns_name" {

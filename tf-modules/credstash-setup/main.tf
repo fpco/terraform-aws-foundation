@@ -14,18 +14,12 @@ resource "aws_kms_key" "credstash-key" {
   description         = "Master key used by credstash"
   policy              = "${var.kms_key_policy}"
   enable_key_rotation = "${var.enable_key_rotation}"
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_kms_alias" "credstash-key" {
   count         = "${var.create_kms_key ? 1 : 0}"
   name          = "alias/${var.kms_key_name}"
   target_key_id = "${aws_kms_key.credstash-key.key_id}"
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 
@@ -44,26 +38,36 @@ resource "aws_dynamodb_table" "credstash-db" {
     name = "version"
     type = "S"
   }
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 
-//KMS Key Alias. It can later be used to store secrets:
-// credstash put -k kms_key_alias secret_key secret_value
-output "kms_key_alias" {
-  value = "alias/${var.kms_key_name}"
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {
+  current = true
 }
 
-//KMS Master key ARN.
+
+//KMS Key ARN. It can later be used to store and retrieve secrets:
+// credstash put -k kms_key_arn secret_key secret_value
+// credstash get -k kms_key_arn secret_key
 output "kms_key_arn" {
-  value = "${aws_kms_alias.credstash-key.arn}"
+  value = "${aws_kms_key.credstash-key.arn}"
 }
 
 //KMS Master key id which can be used by credstash to store/retrieve secrets.
-output "kms_key_arn" {
-  value = "${aws_kms_alias.credstash-key.key_id}"
+output "kms_key_id" {
+  value = "${aws_kms_key.credstash-key.key_id}"
+}
+
+//KMS Master key ARN.
+output "kms_key_alias" {
+  value = "${aws_kms_alias.credstash-key.name}"
+}
+
+//KMS Master key ARN.
+output "kms_key_alias_arn" {
+  value = "${aws_kms_alias.credstash-key.arn}"
 }
 
 //DynamoDB table ARN that can be used by credstash to store/retrieve secrets.

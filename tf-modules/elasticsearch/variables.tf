@@ -1,6 +1,3 @@
-variable "region" {
-}
-
 variable "name_prefix" {
   default = "dev"
 }
@@ -76,6 +73,11 @@ variable "extra_elb_sg_ids" {
 variable "extra_elb_ingress_cidrs" {
   default = []
   description = "Extra CIDRs that are allowed to access Elasticsearch API. By default only CIDR from `public_subnet_ids` are allowed"
+}
+
+variable "extra_setup_snippet" {
+  default = ""
+  description = "Extra snippet to run after Elasticsearch has been installed and configured"
 }
 
 variable "internal" {

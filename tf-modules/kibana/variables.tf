@@ -38,7 +38,12 @@ variable "public_subnet_ids" {
 }
 
 variable "kibana_dns_name" {
-  description = "DNS name for Kibana endpoint (An SSL certificate is expected in ACM for this domain)"
+  description = "DNS name for Kibana endpoint. For SSL Certificate in ACM, if different, set 'kibana_dns_ssl_name'"
+}
+
+variable "kibana_dns_ssl_name" {
+  default = ""
+  description = "DNS name for Kibana endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'kibana_dns_name' will be checked instead."
 }
 
 variable "route53_zone_id" {

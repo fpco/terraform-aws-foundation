@@ -76,10 +76,10 @@ data "template_file" "data-node-setup" {
     device_name            = "/dev/xvdf"
     mount_point            = "/mnt/elasticsearch"
     wait_interval          = 1
-    region                 = "${var.region}"
     config_yaml            = "${element(data.template_file.data-node-config.*.rendered, count.index)}"
     index_retention_period = "0"
-    is_master_node         = "falase"
+    is_master_node         = "false"
+    extra_setup_snippet    = "${var.extra_setup_snippet}"
   }
 }
 
@@ -89,10 +89,11 @@ data "template_file" "data-node-config" {
 
   vars {
     node_name          = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
-    region             = "${var.region}"
+    min_master_nodes   = "${(var.master_node_count / 2) + 1}"
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
+    region             = "${data.aws_region.current.name}"
   }
 }
 

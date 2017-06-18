@@ -17,6 +17,10 @@ module "master-node-ebs-volumes" {
   device_name  = "/dev/xvdf"
 }
 
+data "aws_region" "current" {
+  current = true
+}
+
 resource "aws_iam_role_policy_attachment" "master-node-attach-ebs-volume" {
   count = "${var.master_node_count}"
   role = "${element(aws_iam_role.master-node-role.*.name, count.index)}"
@@ -77,10 +81,10 @@ data "template_file" "master-node-setup" {
     device_name            = "/dev/xvdf"
     mount_point            = "/mnt/elasticsearch"
     wait_interval          = 1
-    region                 = "${var.region}"
     config_yaml            = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
     index_retention_period = "${var.index_retention_period}"
     is_master_node         = "true"
+    extra_setup_snippet    = "${var.extra_setup_snippet}"
   }
 }
 
@@ -93,10 +97,10 @@ data "template_file" "master-node-config" {
   vars {
     node_name          = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     min_master_nodes   = "${(var.master_node_count / 2) + 1}"
-    region             = "${var.region}"
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
+    region             = "${data.aws_region.current.name}"
   }
 }
 

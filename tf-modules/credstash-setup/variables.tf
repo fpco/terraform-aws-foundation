@@ -27,4 +27,3 @@ variable "db_table_name" {
   default = "credential-store"
   description = "Name of the DynamoDB table where credentials will be stored"
 }
-

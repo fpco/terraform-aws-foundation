@@ -8,7 +8,7 @@
  *
  */
 data "aws_acm_certificate" "kibana-cert" {
-  domain = "${var.kibana_dns_name}"
+  domain = "${coalesce(var.kibana_dns_ssl_name, var.kibana_dns_name)}"
   statuses = ["ISSUED"]
 }
 
