@@ -26,6 +26,7 @@ resource "aws_autoscaling_group" "cluster" {
     create_before_destroy = true
   }
   vpc_zone_identifier = ["${var.subnet_ids}"]
+  tags = ["${map("key", "Name", "value", "${var.name}-${var.suffix}", "propagate_at_launch", true)}"]
 }
 # Launch Config for the ASG
 resource "aws_launch_configuration" "cluster" {
