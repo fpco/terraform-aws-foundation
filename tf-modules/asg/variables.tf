@@ -42,20 +42,20 @@ variable "public_ip" {
     description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"
 }
 variable "az_list" {
-    default = ""
-    description = "string-list of availability zones to associate with the ASG"
+    default = []
+    description = "list of availability zones to associate with the ASG"
 }
 variable "subnet_ids" {
-    default = ""
-    description = "string-list of subnets to associate with the ASG (by id)"
+    default = []
+    description = "list of subnets to associate with the ASG (by id)"
 }
 variable "security_group_ids" {
-    default = ""
-    description = "string-list of security groups to associate with the ASG (by id)"
+    default = []
+    description = "list of security groups to associate with the ASG (by id)"
 }
 variable "elb_names" {
-    default = ""
-    description = "string-list of load balancers to associate with the ASG (by name)"
+    default = []
+    description = "list of load balancers to associate with the ASG (by name)"
 }
 variable "root_volume_type" {
     default = "gp2"

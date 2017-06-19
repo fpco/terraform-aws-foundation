@@ -12,20 +12,20 @@
  */
 # Auto-Scaling Group
 resource "aws_autoscaling_group" "cluster" {
-    availability_zones = ["${compact(split(",", replace(var.az_list, " ", "")))}"]
+    availability_zones = ["${var.az_list}"]
     desired_capacity = "${var.desired_capacity}"
     force_delete = true
     health_check_grace_period = 300
     health_check_type = "EC2"
     launch_configuration = "${aws_launch_configuration.cluster.name}"
-    load_balancers =  ["${compact(split(",", replace(var.elb_names, " ", "")))}"]
+    load_balancers =  ["${var.elb_names}"]
     max_size = "${var.max_nodes}"
     min_size = "${var.min_nodes}"
     name = "${var.name}-${var.suffix}"
     lifecycle {
       create_before_destroy = true
     }
-    vpc_zone_identifier = ["${compact(split(",", replace(var.subnet_ids, " ", "")))}"]
+    vpc_zone_identifier = ["${var.subnet_ids}"]
 }
 # Launch Config for the ASG
 resource "aws_launch_configuration" "cluster" {
@@ -35,7 +35,7 @@ resource "aws_launch_configuration" "cluster" {
     image_id = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
-    security_groups = ["${compact(split(",", replace(var.security_group_ids, " ", "")))}"]
+    security_groups = ["${var.security_group_ids}"]
     user_data = "${var.user_data}"
     root_block_device {
         volume_type = "${var.root_volume_type}"
