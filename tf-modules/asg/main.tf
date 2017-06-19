@@ -12,7 +12,6 @@
  */
 # Auto-Scaling Group
 resource "aws_autoscaling_group" "cluster" {
-    availability_zones = ["${var.az_list}"]
     desired_capacity = "${var.desired_capacity}"
     force_delete = true
     health_check_grace_period = 300
@@ -26,6 +25,7 @@ resource "aws_autoscaling_group" "cluster" {
       create_before_destroy = true
     }
     vpc_zone_identifier = ["${var.subnet_ids}"]
+  availability_zones        = ["${var.azs}"]
 }
 # Launch Config for the ASG
 resource "aws_launch_configuration" "cluster" {

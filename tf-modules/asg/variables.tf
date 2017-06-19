@@ -41,7 +41,7 @@ variable "public_ip" {
   default     = "true"
   description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"
 }
-variable "az_list" {
+variable "azs" {
   default     = []
   description = "list of availability zones to associate with the ASG"
 }
