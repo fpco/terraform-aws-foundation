@@ -18,8 +18,8 @@ variable "user_data" {
     description = "The user_data string to pass to cloud-init"
 }
 variable "leader_security_group_ids" {
-    default = ""
-    description = "String-list of ids, the security groups to assign to the leaders"
+    default = []
+    description = "List of ids, the security groups to assign to the leaders"
 }
 variable "max_nodes" {
     default = 9
@@ -78,6 +78,6 @@ variable "root_volume_size" {
     description = "The size of the EBS volume (in GB) for the root block device"
 }
 variable "load_balancers" {
-    default = ""
-    description = "The string list of names of load balancers to pass to the ASG module"
+    default = []
+    description = "The list of names of load balancers to pass to the ASG module"
 }

@@ -22,8 +22,8 @@
 module "leader-asg" {
     source = "../asg"
     ami = "${var.ami}"
-    az_list = "${var.region}a, ${var.region}c"
-    elb_names = "${var.load_balancers}"
+    azs = ["${var.region}a", "${var.region}c"]
+    elb_names = ["${var.load_balancers}"]
     instance_type = "${var.instance_type}"
     desired_capacity = "${var.desired_capacity}"
     max_nodes = "${var.max_nodes}"
@@ -31,8 +31,8 @@ module "leader-asg" {
     key_name = "${var.key_name}"
     name = "${var.name}"
     suffix = "consul-leaders"
-    subnet_ids = "${module.cluster-net.id_a}, ${module.cluster-net.id_c}"
-    security_group_ids = "${var.leader_security_group_ids}"
+    subnet_ids = ["${module.cluster-net.id_a}", "${module.cluster-net.id_c}"]
+    security_group_ids = ["${var.leader_security_group_ids}"]
     user_data = "${var.user_data}"
     root_volume_type = "${var.root_volume_type}"
     root_volume_size = "${var.root_volume_size}"

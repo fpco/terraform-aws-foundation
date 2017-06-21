@@ -25,11 +25,11 @@ module "server" {
   suffix = "${var.name_suffix}-${var.az}"
   instance_type = "${var.instance_type}"
   ami = "${var.ami}"
-  subnet_ids = "${var.subnet_id}"
-  az_list = "${var.az}"
+  subnet_ids = ["${var.subnet_id}"]
+  azs = ["${var.az}"]
   public_ip = "${var.public_ip}"
   key_name = "${var.key_name}"
-  elb_names = "${var.load_balancers}"
+  elb_names = ["${var.load_balancers}"]
   desired_capacity = 1
   max_nodes = 1
   min_nodes = 1
