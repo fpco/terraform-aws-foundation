@@ -17,17 +17,17 @@ module "prometheus-data" {
 }
 module "prometheus-server" {
     source = "../asg"
-    security_group_ids = "${var.security_group_ids}"
+    security_group_ids = ["${var.security_group_ids}"]
     name = "${var.name}"
     # append this to the ASG name
     suffix = "prometheus-${var.az}"
     instance_type = "${var.instance_type}"
     ami = "${var.ami}"
-    subnet_ids = "${var.subnet_id}"
-    az_list = "${var.region}${var.az}"
+    subnet_ids = ["${var.subnet_id}"]
+    azs = ["${var.region}${var.az}"]
     public_ip = "${var.public_ip}"
     key_name = "${var.key_name}"
-    elb_names = "${var.load_balancers}"
+    elb_names = ["${var.load_balancers}"]
     desired_capacity = 1
     max_nodes = 1
     min_nodes = 1

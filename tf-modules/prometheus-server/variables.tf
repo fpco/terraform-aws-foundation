@@ -65,7 +65,8 @@ variable "subnet_id" {
     description = "The ID of the subnet to use, depends on the availability zone"
 }
 variable "security_group_ids" {
-    description = "string list of security groups (by ID) to associate with the ASG"
+    type        = "list"
+    description = "list of security groups (by ID) to associate with the ASG"
 }
 variable "region" {
     description = "The AWS region to deploy to"
@@ -74,8 +75,8 @@ variable "az" {
     description = "The AWS Availability Zone (AZ) to create the instance in"
 }
 variable "load_balancers" {
-    default = ""
-    description = "The string list of load balancers names to pass to the ASG module"
+    default = []
+    description = "The list of load balancers names to pass to the ASG module"
 }
 variable "account_arn" {
     description = "The AWS account number, for IAM role assigned to the ASG"

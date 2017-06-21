@@ -43,17 +43,17 @@
 module "agent-asg" {
     source = "../asg"
     ami = "${var.ami}"
-    az_list = "${var.region}a, ${var.region}c"
+    azs = ["${var.region}a", "${var.region}c"]
     desired_capacity = "${var.desired_capacity}"
-    elb_names = "${var.load_balancers}"
+    elb_names = ["${var.load_balancers}"]
     instance_type = "${var.instance_type}"
     max_nodes = "${var.max_nodes}"
     min_nodes = "${var.min_nodes}"
     key_name = "${var.key_name}"
     name = "${var.name}"
     suffix = "cluster"
-    subnet_ids = "${module.cluster-net.id_a}, ${module.cluster-net.id_c}"
-    security_group_ids = "${var.cluster_security_group_ids}"
+    subnet_ids = ["${module.cluster-net.id_a}", "${module.cluster-net.id_c}"]
+    security_group_ids = ["${var.cluster_security_group_ids}"]
     user_data = "${var.user_data}"
     root_volume_type = "${var.root_volume_type}"
     root_volume_size = "${var.root_volume_size}"

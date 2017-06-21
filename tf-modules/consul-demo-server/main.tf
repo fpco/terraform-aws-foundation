@@ -25,8 +25,8 @@ module "consul-server" {
   load_balancers          = "${var.load_balancers}"
   public_ip               = "${var.public_ip}"
   subnet_id               = "${var.subnet_id}"
-  load_balancers          = "${var.load_balancers}"
-  security_group_ids      = "${var.security_group_ids}"
+  load_balancers          = ["${var.load_balancers}"]
+  security_group_ids      = ["${var.security_group_ids}"]
   init_suffix = <<END_INIT
 ${var.init_suffix}
 END_INIT
