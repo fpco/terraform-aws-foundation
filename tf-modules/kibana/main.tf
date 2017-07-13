@@ -41,8 +41,8 @@ resource "aws_elb" "kibana-elb" {
 
   health_check {
     healthy_threshold = 2
-    unhealthy_threshold = 10 # TODO lower it down
-    timeout = 3
+    unhealthy_threshold = 5
+    timeout = 10
     target = "HTTP:5603/"
     interval = 60
   }

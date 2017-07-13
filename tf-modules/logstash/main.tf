@@ -23,7 +23,7 @@ resource "aws_elb" "logstash-elb" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 5
-    timeout             = 3
+    timeout             = 10
     target              = "HTTP:8080/"
     interval            = 60
   }

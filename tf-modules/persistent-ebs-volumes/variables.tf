@@ -40,3 +40,7 @@ variable "max_wait" {
   default = 60
   description = "Setting for volume mount snipppet. Maximum number of seconds to wait for volume to be mounted before exiting with an error"
 }
+variable "extra_tags" {
+  default = {}
+  description = "Map with extra tags to be applied to all ebs volumes"
+}

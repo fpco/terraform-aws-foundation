@@ -17,9 +17,7 @@ resource "aws_ebs_volume" "volumes" {
   encrypted   = "${var.encrypted}"
   kms_key_id  = "${var.encrypted ? var.kms_key_id : ""}"
   snapshot_id = "${element(var.snapshot_ids, count.index)}"
-  tags {
-    Name = "${var.name_prefix}-${count.index}-${element(var.azs, count.index)}"
-  }
+  tags        = "${merge(map("Name", "${var.name_prefix}-${format("%02d", count.index)}-${element(var.azs, count.index)}"), "${var.extra_tags}")}"
 }
 
 data "template_file" "volume_mount_snippets" {

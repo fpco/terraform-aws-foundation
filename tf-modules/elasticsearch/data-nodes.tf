@@ -17,6 +17,9 @@ module "data-node-ebs-volumes" {
   snapshot_ids = ["${var.data_node_snapshot_ids}"]
   encrypted    = "false"
   device_name  = "/dev/xvdf"
+  extra_tags   = {
+    cluster = "${var.name_prefix}-elasticsearch-cluster"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "data-node-attach-ebs-volume" {

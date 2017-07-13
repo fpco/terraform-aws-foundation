@@ -35,3 +35,7 @@ variable "iops" {
 variable "account_arn" {
     description = "The AWS account number, for IAM role assigned to the instance created"
 }
+variable "extra_tags" {
+  default = {}
+  description = "Map with extra tags to be applied to all ebs volumes"
+}

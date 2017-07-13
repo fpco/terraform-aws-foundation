@@ -14,9 +14,7 @@ resource "aws_ebs_volume" "main" {
     encrypted   = "${var.encrypted}"
     kms_key_id  = "${var.kms_key_id}"
     snapshot_id = "${var.snapshot_id}"
-    tags {
-        Name = "${var.name}"
-    }
+    tags        = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }
 //`id` exported from the `aws_iam_instance_profile`
 output "iam_profile" {

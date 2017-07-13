@@ -15,6 +15,9 @@ module "master-node-ebs-volumes" {
   snapshot_ids = ["${var.master_node_snapshot_ids}"]
   encrypted    = "false"
   device_name  = "/dev/xvdf"
+  extra_tags   = {
+    cluster = "${var.name_prefix}-elasticsearch-cluster"
+  }
 }
 
 data "aws_region" "current" {
