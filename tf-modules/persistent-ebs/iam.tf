@@ -45,29 +45,3 @@ resource "aws_iam_role_policy" "attach_ebs" {
 }
 END_POLICY
 }
-#{
-#  "Version": "2012-10-17",
-#  "Statement": [
-#    {
-#      "Sid": "TheseActionsDontSupportResourceLevelPermissions",
-#      "Action": [
-#        "ec2:DescribeVolumeAttribute",
-#        "ec2:DescribeVolumeStatus",
-#        "ec2:DescribeVolumes"
-#      ],
-#      "Effect": "Allow",
-#      "Resource": "*"
-#    },
-#    {
-#      "Sid": "TheseActionsSupportResourceLevelPermissions",
-#      "Effect": "Allow",
-#      "Action": [
-#        "ec2:AttachVolume",
-#        "ec2:DetachVolume"
-#      ],
-#      "Resource": "arn:aws:ec2:${var.region}:${var.account_arn}:volume/${aws_ebs_volume.main.id}"
-#    }
-#  ]
-#}
-#EOF
-#}
