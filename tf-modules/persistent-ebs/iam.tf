@@ -1,10 +1,10 @@
 resource "aws_iam_instance_profile" "attach_ebs" {
-    name = "${var.name}-attach-ebs-to-instance"
-    roles = ["${aws_iam_role.attach_ebs.name}"]
+    name = "${var.name}-attach-ebs"
+    role = "${aws_iam_role.attach_ebs.name}"
 }
 #
 resource "aws_iam_role" "attach_ebs" {
-    name = "${var.name}-attach-ebs-to-instance"
+    name = "${var.name}-attach-ebs"
     path = "/"
     assume_role_policy = <<END_POLICY
 {
@@ -24,7 +24,7 @@ END_POLICY
 }
 #
 resource "aws_iam_role_policy" "attach_ebs" {
-    name = "attach_ebs"
+    name = "attach-ebs-${aws_ebs_volume.main.id}"
     role = "${aws_iam_role.attach_ebs.id}"
     policy = <<END_POLICY
 {
