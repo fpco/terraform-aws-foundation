@@ -59,7 +59,6 @@ module "ec2-with-persistent-ebs" {
     secret_key = "${var.secret_key}"
     key_name = "${aws_key_pair.main.key_name}"
     key_file = "${var.key_file}"
-    account_arn = "${var.account_arn}"
 }
 resource "aws_key_pair" "main" {
     key_name = "${var.key_name}"
@@ -96,9 +95,6 @@ variable "az" {
 variable "instance_type" {
     default = "t2.micro"
     description = "The type of AWS instance (size)"
-}
-variable "account_arn" {
-    description = "The AWS account number, for IAM role assigned to the instance created"
 }
 variable "access_key" {
     default = ""

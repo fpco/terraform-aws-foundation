@@ -37,8 +37,8 @@ resource "aws_iam_role_policy" "attach_ebs" {
         "ec2:DetachVolume"
       ],
       "Resource": [
-        "arn:aws:ec2:${var.region}:${var.account_arn}:volume/${aws_ebs_volume.main.id}",
-        "arn:aws:ec2:${var.region}:${var.account_arn}:instance/*"
+        "arn:aws:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:volume/${aws_ebs_volume.main.id}",
+        "arn:aws:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:instance/*"
       ]
     }
   ]
