@@ -32,6 +32,9 @@ variable "iops" {
     default = ""
     description = "The amount of IOPS to provision for the EBS block device"
 }
+variable "extra_tags" {
+  default = {}
+  description = "Map with extra tags to be applied to all ebs volumes"
 }
 variable "extra_tags" {
   default = {}
