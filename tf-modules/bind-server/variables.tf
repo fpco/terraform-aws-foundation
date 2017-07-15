@@ -52,3 +52,7 @@ variable "distro" {
   description = "Linux distribution that AMI runs: 'ubuntu' or 'amazon'"
   default     = "ubuntu"
 }
+variable "alarm_actions" {
+  description = "list of alarm actions to append to the default (optional)"
+  default     = []
+}

@@ -167,5 +167,5 @@ resource "aws_cloudwatch_metric_alarm" "auto-recover" {
   statistic = "Minimum"
   threshold = "0"
   alarm_description = "Auto-recover the instance if the system status check fails for two minutes"
-  alarm_actions     = ["arn:aws:automate:${data.aws_region.current.name}:ec2:recover"]
+  alarm_actions     = ["${compact(concat(list("arn:aws:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
 }
