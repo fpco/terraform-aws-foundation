@@ -186,4 +186,3 @@ resource "aws_launch_configuration" "logstash-lc" {
 
 }
 
-
