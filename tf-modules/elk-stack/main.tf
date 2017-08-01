@@ -66,8 +66,9 @@ module "elasticsearch" {
   name_prefix               = "${var.name_prefix}"
   vpc_id                    = "${var.vpc_id}"
   route53_zone_id           = "${var.route53_zone_id}"
-  #key_name                  = "${coalesce(var.ssh_key_name, element(aws_key_pair.elk-key.*.key_name, 0))}"
   key_name                 =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
+  # Other attempts to make it work, terraform no longer allows indexing empty lists
+  #key_name                  = "${coalesce(var.ssh_key_name, element(aws_key_pair.elk-key.*.key_name, 0))}"
   #key_name                 = "${length(aws_key_pair.elk-key.*.key_name) == 0 ? var.ssh_key_name : element(aws_key_pair.elk-key.*.key_name, 0)}"
   public_subnet_ids         = ["${var.private_subnet_ids}"]
   private_subnet_ids        = ["${var.private_subnet_ids}"]
@@ -139,7 +140,6 @@ module "logstash-kibana" {
   certstrap_ca_force_new   = "${var.certstrap_ca_force_new}"
   credstash_table_name     = "${var.credstash_table_name}"
   credstash_kms_key_arn    = "${var.credstash_kms_key_arn}"
-  #credstash_prefix         = "${var.name_prefix}-"
   extra_config             = <<END_CONFIG
 input {
     file {
