@@ -59,4 +59,42 @@ systemctl daemon-reload
 systemctl enable logstash.service
 systemctl start logstash.service
 
+
+
+## Setup Metricbeat
+## ----------------
+
+apt-get install -y metricbeat
+
+cat <<EOF > /etc/metricbeat/metricbeat.yml
+metricbeat.modules:
+- module: system
+  metricsets:
+    - cpu
+    - load
+    - filesystem
+    - diskio
+    - fsstat
+    - memory
+    - network
+    - process
+  enabled: true
+  period: 30s
+  processes: ['.*']
+  cpu_ticks: false
+  fields_under_root: true
+  fields:
+    index_prefix: metric-elk
+    metric_info:
+      origin: aws
+      source: logstash-node
+output.logstash:
+  hosts: ["localhost:5045"]
+EOF
+
+systemctl daemon-reload
+systemctl enable metricbeat.service
+systemctl start metricbeat.service
+
+
 ${extra_setup_snippet}

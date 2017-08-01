@@ -97,7 +97,29 @@ variable "key_name" {
   description = "SSH key name to use for connecting to all nodes"
 }
 
+variable "deploy_curator" {
+  default = false
+  description = "Should a curator be installed and enabled on all master eligible nodes. If enabled it will only run on currently elected master."
+}
+
 variable "index_retention_period" {
   default = 60
-  description = "Age of Elasticsearch indices in days before they will be considered old and be pruned by the curator"
+  description = "Age of Elasticsearch indices in days before they will be considered old and be pruned by the curator. Set to 0 in order to disable."
+}
+
+variable "extra_curator_actions" {
+  default = ""
+  description = "YAML formatted dictionary of actions, as described in documentation, but started at index '2', since action number '1' is the one that purges old indices."
+}
+
+variable "logstash_beats_address" {
+  description = "DNS name and port of where logstash is listenting with beats protocol."
+}
+variable "credstash_table_name" {
+  default = "credential-store"
+  description = "DynamoDB table used by credstash to store credentials"
+}
+
+variable "credstash_kms_key_arn" {
+  description = "Master KMS key ARN for getting SSL server key using credstash"
 }

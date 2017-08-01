@@ -21,7 +21,7 @@ variable "private_subnet_ids" {
   description = "Private subnet ids, where Kibana, Logstash and ELasticsearch instances will be placed. This is also the order in which nodes will be deployed in."
 }
 
-variable "public_cidrs" {
+variable "user_ingress_cidrs" {
   default = []
   description = "List of CIDRs that will have access to Kibana UI and SSH to EC2 instances"
 }
@@ -99,8 +99,8 @@ variable "logstash_kibana_desired_server_count" {
   description = "Desired number of EC2 instances running Logstash+Kibana"
   default = 1
 }
-variable "logstash_extra_cidrs" {
-  description = "Extar CIDRs that will be allowed to connect to Logstash over Beat protocol"
+variable "logstash_extra_ingress_cidrs" {
+  description = "Extra CIDRs that will be allowed to connect to Logstash over Beat protocol"
   default = []
 }
 

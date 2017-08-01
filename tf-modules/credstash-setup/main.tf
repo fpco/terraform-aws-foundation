@@ -74,3 +74,8 @@ output "kms_key_alias_arn" {
 output "db_table_arn" {
   value = "${aws_dynamodb_table.credstash-db.arn}"
 }
+
+//DynamoDB table ARN that can be used by credstash to store/retrieve secrets.
+output "db_table_name" {
+  value = "${aws_dynamodb_table.credstash-db.id}"
+}

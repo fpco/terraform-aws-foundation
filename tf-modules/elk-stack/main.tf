@@ -48,7 +48,7 @@ resource "aws_security_group" "ssh" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.public_cidrs}"]
+    cidr_blocks = ["${var.user_ingress_cidrs}"]
   }
 }
 
@@ -83,6 +83,9 @@ module "elasticsearch" {
   master_node_snapshot_ids  = ["${var.elasticsearch_master_node_snapshot_ids}"]
   master_node_instance_type = "${var.elasticsearch_master_node_instance_type}"
   extra_setup_snippet       = "${var.elasticsearch_extra_setup_snippet}"
+  credstash_table_name      = "${var.credstash_table_name}"
+  credstash_kms_key_arn     = "${var.credstash_kms_key_arn}"
+  logstash_beats_address    = "${var.logstash_dns_name}:5044"
 }
 
 
@@ -99,11 +102,11 @@ module "kibana" {
   key_name             = ""
   ami                  = ""
   instance_type        = ""
-  elasticsearch_url    = "http://${module.elasticsearch.elb_dns}:9200"
+  elasticsearch_url    = "http://${var.elasticsearch_dns_name}:9200"
   min_server_count     = 0
   max_server_count     = 0
   desired_server_count = 0
-  elb_ingress_cidrs    = ["${var.public_cidrs}"]
+  elb_ingress_cidrs    = ["${var.user_ingress_cidrs}"]
   basic_auth_username  = "${var.kibana_username}"
   basic_auth_password  = "${var.kibana_password}"
 }
@@ -122,13 +125,13 @@ module "logstash-kibana" {
   ami                      = "${data.aws_ami.ubuntu.id}"
   instance_type            = "${var.logstash_kibana_instance_type}"
   key_name                 =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
-  elasticsearch_url        = "http://${module.elasticsearch.elb_dns}:9200"
+  elasticsearch_url        = "http://${var.elasticsearch_dns_name}:9200"
   min_server_count         = "${var.logstash_kibana_min_server_count}"
   max_server_count         = "${var.logstash_kibana_max_server_count}"
   desired_server_count     = "${var.logstash_kibana_desired_server_count}"
   extra_sg_ids             = ["${module.kibana.security_group_id}", "${aws_security_group.ssh.id}"]
   extra_setup_snippet      = "${module.kibana.setup_snippet}"
-  extra_elb_ingress_cidrs  = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_cidrs)}"]
+  extra_elb_ingress_cidrs  = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_ingress_cidrs)}"]
   extra_elbs               = ["${module.kibana.elb_name}"]
   certstrap_depot_path     = "${var.certstrap_depot_path}"
   certstrap_ca_common_name = "${var.certstrap_ca_common_name}"
@@ -136,14 +139,14 @@ module "logstash-kibana" {
   certstrap_ca_force_new   = "${var.certstrap_ca_force_new}"
   credstash_table_name     = "${var.credstash_table_name}"
   credstash_kms_key_arn    = "${var.credstash_kms_key_arn}"
-  credstash_prefix         = "${var.name_prefix}-"
+  #credstash_prefix         = "${var.name_prefix}-"
   extra_config             = <<END_CONFIG
 input {
     file {
         path => "/var/log/nginx/access.log"
         add_field => {
             index_prefix => "elk"
-            info_str => '{"origin":"aws-ec2","source":"kibana","format":"nginx_access","transport":"file"}'
+            info_str => '{"origin":"aws-ec2","source":"kibana","formats":["nginx_access"],"transport":"file"}'
         }
         type => "log"
     }
@@ -151,7 +154,7 @@ input {
         path => "/var/log/nginx/error.log"
         add_field => {
             index_prefix => "elk"
-            info_str => '{"origin":"aws-ec2","source":"kibana","format":"nginx_error","transport":"file"}'
+            info_str => '{"origin":"aws-ec2","source":"kibana","formats":["nginx_error"],"transport":"file"}'
         }
         type => "log"
     }

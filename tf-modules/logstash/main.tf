@@ -59,10 +59,10 @@ data "template_file" "logstash-setup" {
   vars {
     credstash_install_snippet     = "${module.credstash-reader.install_snippet}"
     credstash_get_cmd             = "${module.credstash-reader.get_cmd}"
-    credstash_ca_cert_name        = "${var.credstash_prefix}${var.credstash_ca_cert_name}"
-    credstash_server_cert_name    = "${var.credstash_prefix}${var.credstash_server_cert_name}"
-    credstash_server_key_name     = "${var.credstash_prefix}${var.credstash_server_key_name}"
-    credstash_dynamic_config_name = "${var.credstash_prefix}${var.credstash_dynamic_config_name}"
+    credstash_dynamic_config_name = "${var.name_prefix}-${var.credstash_dynamic_config_name}"
+    credstash_ca_cert_name        = "${var.name_prefix}-logstash-ca-cert"
+    credstash_server_cert_name    = "${var.name_prefix}-logstash-server-cert"
+    credstash_server_key_name     = "${var.name_prefix}-logstash-server-key"
     config                        = "${data.template_file.logstash-config.rendered}"
     extra_config                  = "${var.extra_config}"
     extra_settings                = "${var.extra_settings}"
@@ -86,8 +86,8 @@ data "aws_subnet" "public" {
 }
 
 data "aws_subnet" "private" {
-  count  = "${length(var.public_subnet_ids)}"
-  id     = "${var.public_subnet_ids[count.index]}"
+  count  = "${length(var.private_subnet_ids)}"
+  id     = "${var.private_subnet_ids[count.index]}"
   vpc_id = "${var.vpc_id}"
 }
 
@@ -127,7 +127,7 @@ resource "aws_security_group" "logstash-sg" {
 resource "aws_security_group" "logstash-elb-sg" {
   name        = "${var.name_prefix}-logstash-elb"
   vpc_id      = "${var.vpc_id}"
-  description = "Allow ICMP, Logstash Beat port (5044) and everything outbound."
+  description = "Allow Logstash Beat port (5044) and everything outbound."
 
   tags {
     Name = "${var.logstash_dns_name}"
@@ -137,7 +137,7 @@ resource "aws_security_group" "logstash-elb-sg" {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = ["${concat(data.aws_subnet.public.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
+    cidr_blocks = ["${concat(data.aws_subnet.public.*.cidr_block, data.aws_subnet.private.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
   }
 
   egress {

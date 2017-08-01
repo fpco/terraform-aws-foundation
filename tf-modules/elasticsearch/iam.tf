@@ -22,9 +22,37 @@ resource "aws_iam_role_policy_attachment" "data-node-attach-ec2-discovery" {
   policy_arn = "${aws_iam_policy.ec2-discovery-policy.arn}"
 }
 
+module "credstash-reader" {
+  source = "../credstash"
+  name_prefix = "${var.name_prefix}-elasticsearch"
+  create_reader_policy = true
+  kms_key_arn = "${var.credstash_kms_key_arn}"
+  table_name = "${var.credstash_table_name}"
+}
+
+resource "aws_iam_role_policy_attachment" "master-node-credstash-reader-policy-attachment" {
+  count = "${var.master_node_count}"
+  role = "${element(aws_iam_role.master-node-role.*.name, count.index)}"
+  policy_arn = "${module.credstash-reader.reader_policy_arn}"
+}
+
+resource "aws_iam_role_policy_attachment" "data-node-credstash-reader-policy-attachment" {
+  count = "${var.data_node_count}"
+  role = "${element(aws_iam_role.data-node-role.*.name, count.index)}"
+  policy_arn = "${module.credstash-reader.reader_policy_arn}"
+}
+
 resource "aws_iam_role" "master-node-role" {
   count = "${var.master_node_count}"
-  name = "${var.name_prefix}-master-node-role-${count.index}"
+  name = "${var.name_prefix}-master-node-role-${format("%02d", count.index)}"
+  provisioner "local-exec" {
+    command = "${path.module}/../credstash/grant.sh create reader ${var.credstash_kms_key_arn} ${self.arn}"
+  }
+  provisioner "local-exec" {
+    when       = "destroy"
+    on_failure = "continue"
+    command    = "${path.module}/../credstash/grant.sh revoke ${var.credstash_kms_key_arn} ${self.arn}"
+  }
   assume_role_policy = <<END_POLICY
 {
   "Version": "2012-10-17",
@@ -45,7 +73,15 @@ END_POLICY
 
 resource "aws_iam_role" "data-node-role" {
   count = "${var.data_node_count}"
-  name = "${var.name_prefix}-data-node-role-${count.index}"
+  name = "${var.name_prefix}-data-node-role-${format("%02d", count.index)}"
+  provisioner "local-exec" {
+    command = "${path.module}/../credstash/grant.sh create reader ${var.credstash_kms_key_arn} ${self.arn}"
+  }
+  provisioner "local-exec" {
+    when       = "destroy"
+    on_failure = "continue"
+    command    = "${path.module}/../credstash/grant.sh revoke ${var.credstash_kms_key_arn} ${self.arn}"
+  }
   assume_role_policy = <<END_POLICY
 {
   "Version": "2012-10-17",

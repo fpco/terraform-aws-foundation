@@ -80,14 +80,22 @@ data "template_file" "master-node-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    mount_snippet          = "${element(module.master-node-ebs-volumes.volume_mount_snippets, count.index)}"
-    device_name            = "/dev/xvdf"
-    mount_point            = "/mnt/elasticsearch"
-    wait_interval          = 1
-    config_yaml            = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
-    index_retention_period = "${var.index_retention_period}"
-    is_master_node         = "true"
-    extra_setup_snippet    = "${var.extra_setup_snippet}"
+    mount_snippet              = "${element(module.master-node-ebs-volumes.volume_mount_snippets, count.index)}"
+    device_name                = "/dev/xvdf"
+    mount_point                = "/mnt/elasticsearch"
+    wait_interval              = 1
+    config_yaml                = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
+    index_retention_period     = "${var.index_retention_period}"
+    extra_setup_snippet        = "${var.extra_setup_snippet}"
+    credstash_install_snippet  = "${module.credstash-reader.install_snippet}"
+    credstash_get_cmd          = "${module.credstash-reader.get_cmd}"
+    credstash_ca_cert_name     = "${var.name_prefix}-logstash-ca-cert"
+    credstash_client_cert_name = "${var.name_prefix}-logstash-client-cert"
+    credstash_client_key_name  = "${var.name_prefix}-logstash-client-key"
+    logstash_beats_address     = "${var.logstash_beats_address}"
+    is_master_node             = "true"
+    deploy_curator             = "${var.deploy_curator}"
+    extra_curator_actions      = "${var.extra_curator_actions}"
   }
 }
 

@@ -26,10 +26,12 @@ data "template_file" "certstrap" {
     ca_passphrase     = "${var.certstrap_ca_passphrase}"
     credstash_get_cmd = "${module.credstash-reader.get_cmd}"
     credstash_put_cmd = "${module.credstash-reader.put_cmd}"
-    ca_cert_name      = "${var.credstash_prefix}${var.credstash_ca_cert_name}"
-    ca_key_name       = "${var.credstash_prefix}${var.credstash_ca_key_name}"
-    server_cert_name  = "${var.credstash_prefix}${var.credstash_server_cert_name}"
-    server_key_name   = "${var.credstash_prefix}${var.credstash_server_key_name}"
+    ca_cert_name      = "${var.name_prefix}-logstash-ca-cert"
+    ca_key_name       = "${var.name_prefix}-logstash-ca-key"
+    server_cert_name  = "${var.name_prefix}-logstash-server-cert"
+    server_key_name   = "${var.name_prefix}-logstash-server-key"
+    client_cert_name  = "${var.name_prefix}-logstash-client-cert"
+    client_key_name   = "${var.name_prefix}-logstash-client-key"
   }
 }
 
@@ -38,7 +40,7 @@ resource "aws_iam_role" "logstash-role" {
     command = "${data.template_file.certstrap.rendered}"
   }
   provisioner "local-exec" {
-    command = "${path.module}/../credstash/grant.sh create reader ${var.credstash_kms_key_arn} ${aws_iam_role.logstash-role.arn}"
+    command = "${path.module}/../credstash/grant.sh create reader ${var.credstash_kms_key_arn} ${self.arn}"
   }
   ## This cleanup action requires at least terraform 0.9.0.
   ## See RFC: https://docs.google.com/document/d/15nEcV7fxskDgYrXoNMl6RYIo10PCiZGle7TP8xitrFE/edit#
@@ -46,7 +48,7 @@ resource "aws_iam_role" "logstash-role" {
   provisioner "local-exec" {
     when       = "destroy"
     on_failure = "continue"
-    command    = "${path.module}/../credstash/grant.sh revoke ${var.credstash_kms_key_arn} ${aws_iam_role.logstash-role.arn}"
+    command    = "${path.module}/../credstash/grant.sh revoke ${var.credstash_kms_key_arn} ${self.arn}"
   }
   name_prefix  = "${var.name_prefix}-logstash-role-"
   assume_role_policy = <<END_POLICY

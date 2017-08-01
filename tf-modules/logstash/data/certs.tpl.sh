@@ -2,6 +2,8 @@
 
 set -x
 
+LOGSTASH_CLIENT_NAME="logstash-client"
+
 if [ -z "${depot_path}" ]; then
   DEPOT_PATH=$$(mktemp -d)
 else
@@ -37,6 +39,8 @@ if [ "$CA_CREATE" = "true" ]; then
   certstrap --depot-path "$DEPOT_PATH" init --common-name "${ca_common_name}" --passphrase "${ca_passphrase}"
 fi
 
+## Create Server SSL Key
+
 # Remove any old certificate
 rm -f "$DEPOT_PATH/${domain_name}.crt" \
    "$DEPOT_PATH/${domain_name}.csr" \
@@ -49,10 +53,27 @@ certstrap --depot-path "$DEPOT_PATH" sign "${domain_name}" --CA "${ca_common_nam
 
 openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in "$DEPOT_PATH/${domain_name}.key" -out "$DEPOT_PATH/${domain_name}.pkcs8.key"
 
+
+## Create Client SSL Key
+
+# Remove any old certificate
+rm -f "$DEPOT_PATH/$LOGSTASH_CLIENT_NAME.crt" \
+   "$DEPOT_PATH/$LOGSTASH_CLIENT_NAME.csr" \
+   "$DEPOT_PATH/$LOGSTASH_CLIENT_NAME.key"
+
+certstrap --depot-path "$DEPOT_PATH" request-cert --domain "$LOGSTASH_CLIENT_NAME" --passphrase ""
+certstrap --depot-path "$DEPOT_PATH" sign "$LOGSTASH_CLIENT_NAME" --CA "${ca_common_name}" --passphrase "${ca_passphrase}"
+
+# Convert into PKCS8 format.
+
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in "$DEPOT_PATH/$LOGSTASH_CLIENT_NAME.key" -out "$DEPOT_PATH/$LOGSTASH_CLIENT_NAME.pkcs8.key"
+
 ${credstash_put_cmd} -a "${ca_cert_name}" "@$DEPOT_PATH/${ca_common_name}.crt"
 ${credstash_put_cmd} -a "${ca_key_name}" "@$DEPOT_PATH/${ca_common_name}.key"
 ${credstash_put_cmd} -a "${server_cert_name}" "@$DEPOT_PATH/${domain_name}.crt"
 ${credstash_put_cmd} -a "${server_key_name}" "@$DEPOT_PATH/${domain_name}.pkcs8.key"
+${credstash_put_cmd} -a "${client_cert_name}" "@$DEPOT_PATH/$LOGSTASH_CLIENT_NAME.crt"
+${credstash_put_cmd} -a "${client_key_name}" "@$DEPOT_PATH/$LOGSTASH_CLIENT_NAME.pkcs8.key"
 
 # Remove a folder with generated certificates if it was in fact a temporary folder
 if [ -z "${depot_path}" ]; then
