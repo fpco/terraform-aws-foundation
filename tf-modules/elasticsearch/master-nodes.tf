@@ -85,17 +85,17 @@ data "template_file" "master-node-setup" {
     mount_point                = "/mnt/elasticsearch"
     wait_interval              = 1
     config_yaml                = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
-    index_retention_period     = "${var.index_retention_period}"
-    extra_setup_snippet        = "${var.extra_setup_snippet}"
-    credstash_install_snippet  = "${module.credstash-reader.install_snippet}"
-    credstash_get_cmd          = "${module.credstash-reader.get_cmd}"
+    credstash_install_snippet  = "${var.credstash_install_snippet}"
+    credstash_get_cmd          = "${var.credstash_get_cmd}"
     credstash_ca_cert_name     = "${var.name_prefix}-logstash-ca-cert"
     credstash_client_cert_name = "${var.name_prefix}-logstash-client-cert"
     credstash_client_key_name  = "${var.name_prefix}-logstash-client-key"
     logstash_beats_address     = "${var.logstash_beats_address}"
     is_master_node             = "true"
     deploy_curator             = "${var.deploy_curator}"
+    index_retention_period     = "${var.index_retention_period}"
     extra_curator_actions      = "${var.extra_curator_actions}"
+    extra_setup_snippet        = "${var.extra_setup_snippet}"
   }
 }
 

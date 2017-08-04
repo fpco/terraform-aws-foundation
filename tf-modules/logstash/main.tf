@@ -57,8 +57,8 @@ data "template_file" "logstash-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    credstash_install_snippet     = "${module.credstash-reader.install_snippet}"
-    credstash_get_cmd             = "${module.credstash-reader.get_cmd}"
+    credstash_install_snippet     = "${var.credstash_install_snippet}"
+    credstash_get_cmd             = "${var.credstash_get_cmd}"
     credstash_dynamic_config_name = "${var.name_prefix}-${var.credstash_dynamic_config_name}"
     credstash_ca_cert_name        = "${var.name_prefix}-logstash-ca-cert"
     credstash_server_cert_name    = "${var.name_prefix}-logstash-server-cert"

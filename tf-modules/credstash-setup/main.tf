@@ -14,6 +14,9 @@ resource "aws_kms_key" "credstash-key" {
   description         = "Master key used by credstash"
   policy              = "${var.kms_key_policy}"
   enable_key_rotation = "${var.enable_key_rotation}"
+  tags                = {
+    Name = "${var.name_prefix}-credstash-key"
+  }
 }
 
 resource "aws_kms_alias" "credstash-key" {
@@ -41,41 +44,61 @@ resource "aws_dynamodb_table" "credstash-db" {
 }
 
 
-data "aws_caller_identity" "current" {}
+## Writer Policy
 
-data "aws_region" "current" {
-  current = true
+resource "aws_iam_policy" "writer-policy" {
+  count = "${var.create_writer_policy ? 1 : 0}"
+  name = "${var.name_prefix}-credstash-writer"
+  policy = <<END_POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "kms:GenerateDataKey"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_kms_key.credstash-key.arn}"
+    },
+    {
+      "Action": [
+        "dynamodb:PutItem"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+    }
+  ]
+}
+END_POLICY
 }
 
 
-//KMS Key ARN. It can later be used to store and retrieve secrets:
-// credstash put -k kms_key_arn secret_key secret_value
-// credstash get -k kms_key_arn secret_key
-output "kms_key_arn" {
-  value = "${aws_kms_key.credstash-key.arn}"
-}
+## Reader Policy
 
-//KMS Master key id which can be used by credstash to store/retrieve secrets.
-output "kms_key_id" {
-  value = "${aws_kms_key.credstash-key.key_id}"
+resource "aws_iam_policy" "reader-policy" {
+  count = "${var.create_reader_policy ? 1 : 0}"
+  name = "${var.name_prefix}-credstash-reader"
+  policy = <<END_POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "kms:Decrypt"
+      ],
+      "Effect": "Allow",
+      "Resource": "${aws_kms_key.credstash-key.arn}"
+    },
+    {
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+    }
+  ]
 }
-
-//KMS Master key ARN.
-output "kms_key_alias" {
-  value = "${aws_kms_alias.credstash-key.name}"
-}
-
-//KMS Master key ARN.
-output "kms_key_alias_arn" {
-  value = "${aws_kms_alias.credstash-key.arn}"
-}
-
-//DynamoDB table ARN that can be used by credstash to store/retrieve secrets.
-output "db_table_arn" {
-  value = "${aws_dynamodb_table.credstash-db.arn}"
-}
-
-//DynamoDB table ARN that can be used by credstash to store/retrieve secrets.
-output "db_table_name" {
-  value = "${aws_dynamodb_table.credstash-db.id}"
+END_POLICY
 }
