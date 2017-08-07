@@ -7,13 +7,12 @@ data in encrypted form.
 ## Setup
 
 In order to start using `credstash`, KMS Master Key and DynamoDB table need to
-be created. Also, in order to control access to secret store with credstash, we
-need to use IAM roles and policies. All resources are deployed in current
-region.
+be created. Also, to get access to secrets in the store with credstash, IAM
+roles and policies ought to be used.
 
 [credstash-setup](https://github.com/fpco/fpco-terraform-aws/tree/master/tf-modules/credstash-setup) is
 the module that can take care of the whole setup and need to be applied only
-once. This module creates:
+once. This module creates resources in the current region:
 
 * DynamoDB table with default value: `credstash-store`
 * KMS Master Key and an alias for it with default value: `alias/credstash`
@@ -23,13 +22,14 @@ once. This module creates:
   extra IAM users and roles can be attached to above policy through
   `kms_key_admins` variable.
 * Reader and/or Writer IAM Policies that give access to created DynamoDB table.
-  Therefore those policies can later be assigned to a role assumed by an EC2
-  instance that will be reading/writing secrets with `credstash`.
+  Those policies can later be assigned to a role assumed by an EC2 instance that
+  will be reading/writing secrets with `credstash`. More on that in the next
+  section.
 
 
-Unless multiple tables and KMS keys are used by credstash within one AWS
+Unless multiple tables and KMS keys are used by credstash within the same AWS
 account, most of the variables in the module can be kept with their default
-values. Here is an example `credstash-setup` module usage:
+values. Here is an example of `credstash-setup` module usage:
 
 ```hcl
 module "credstash" {
@@ -150,7 +150,7 @@ Reading a password from within EC2 User Data is simplified with a few helper sni
 ```
 # Install credstash and dependencies:
 ${data.terraform_remote_state.credstash.install_snippet}
-# Retrieve the `high-entropy-password`:
+# Retrieve the `high-entropy-password` that was stored before:
 ${data.terraform_remote_state.credstash.get_cmd} my-secret
 ```
 
@@ -174,9 +174,7 @@ module "credstash-grant" {
 }
 ```
 
-Store a secret
-
-Using helper snippets to read a password from within EC2 User Data:
+Using helper snippets to read a secret from within EC2 User Data:
 
 ```
 ${data.terraform_remote_state.credstash.get_cmd} my-super-secret env=example service=webserver
@@ -184,6 +182,10 @@ ${data.terraform_remote_state.credstash.get_cmd} my-super-secret env=example ser
 
 **Note**: KMS Encryption Context should not contain sensitive information as it
 can be observed in CloudTrail logs.
+
+It is also important that `my-super-secret` was stored using exactly the same
+context, otherwise decryption will fail, since encrypted value is encryptionally
+bound to the context.
 
 This whole example will ensure that EC2 instance assuming `credstash-role` will
 only be able to read from the `credstash-store` and decrypt only values that
@@ -203,3 +205,6 @@ store as well, since writer policy was not assigned to the role:
 ```
 ${data.terraform_remote_state.credstash.put_cmd} some-secret some-value
 ```
+
+Despite that above examples do not cover putting secrets in the store with
+credstash in much detail, it is almost the same as doing the reading of secrets.
