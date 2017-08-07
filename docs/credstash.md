@@ -185,7 +185,12 @@ can be observed in CloudTrail logs.
 
 It is also important that `my-super-secret` was stored using exactly the same
 context, otherwise decryption will fail, since encrypted value is encryptionally
-bound to the context.
+bound to the context:
+
+```bash
+$ credstash put my-super-secret actual-value env=example service=webserver
+my-super-secret has been stored
+```
 
 This whole example will ensure that EC2 instance assuming `credstash-role` will
 only be able to read from the `credstash-store` and decrypt only values that
