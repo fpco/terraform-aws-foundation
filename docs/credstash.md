@@ -200,7 +200,7 @@ For example, an attempt to retrieve credentials with some other or no context at
 would result in a permission error:
 
 ```
-${data.terraform_remote_state.credstash.get_cmd} my-super-secret env=production service=webserver
+${data.terraform_remote_state.credstash.get_cmd} my-other-secret env=production service=webserver
 ${data.terraform_remote_state.credstash.get_cmd} my-secret
 ```
 
