@@ -13,8 +13,9 @@ variable "kms_key_arn" {
   description = "ARN for the KMS Master key created by 'credstash-setup' module"
 }
 
+// Roles count is only necessary to circumvent [terraform #4149](https://github.com/hashicorp/terraform/issues/4149) issue.
 variable "roles_count" {
-  description = "Number of roles that will be used during a grant process, i.e. how many roles_names there is"
+  description = "Number of roles that will be used during a grant process, i.e. how many roles_names there is."
 }
 
 variable "roles_names" {
@@ -39,12 +40,12 @@ variable "writer_policy_arn" {
 
 variable "reader_context" {
   default = ""
-  description = "Optional comma separated contex key/value pairs that are required to read encrypted values. Eg. env=dev,svc=db"
+  description = "Optional space separated contex key/value pairs that are required to read encrypted values. Eg. env=dev svc=db"
 }
 
 variable "writer_context" {
   default = ""
-  description = "Optional comma separated contex key/value pairs that will be used to encrypt values with credstash. Eg. env=dev,svc=db"
+  description = "Optional space separated contex key/value pairs that will be used to encrypt values with credstash. Eg. env=dev svc=db"
 }
 
 resource "aws_iam_role_policy_attachment" "credstash-reader-policy-attachment" {
@@ -53,7 +54,7 @@ resource "aws_iam_role_policy_attachment" "credstash-reader-policy-attachment" {
   policy_arn = "${var.reader_policy_arn}"
 
   provisioner "local-exec" {
-    command = "${path.module}/grant.sh create reader ${var.reader_context == "" ? "" : "--context ${var.reader_context}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
+    command = "${path.module}/grant.sh create reader ${var.reader_context == "" ? "" : "--context ${join(",", split(" ", var.reader_context))}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
   }
 
   provisioner "local-exec" {
@@ -70,7 +71,7 @@ resource "aws_iam_role_policy_attachment" "credstash-writer-policy-attachment" {
   policy_arn = "${var.writer_policy_arn}"
 
   provisioner "local-exec" {
-    command = "${path.module}/grant.sh create writer ${var.writer_context == "" ? "" : "--context ${var.writer_context}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
+    command = "${path.module}/grant.sh create writer ${var.writer_context == "" ? "" : "--context ${join(",", split(" ", var.writer_context))}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
   }
 
   provisioner "local-exec" {

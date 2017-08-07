@@ -98,7 +98,7 @@ if [ "$MODE" = "create" ]; then
     TOTAL_SLEEP=$((TOTAL_SLEEP + SLEEP_INTERVAL))
     RESULT=$($GRANT_CMD 2>&1)
   done
-  printf "\Role ${GRANTEE_NAME} is now available and grant was created for KMS Key.\n"
+  echo "Role ${GRANTEE_NAME} is now available and grant was created for KMS Key."
   echo "${RESULT}"
 elif [ "$MODE" = "revoke" ]; then
   GRANT_ID=$(aws kms list-grants --key-id $KMS_KEY_ID | \

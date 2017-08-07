@@ -12,9 +12,9 @@ variable "kms_key_name" {
   description = "KMS Master Key Name."
 }
 
-variable "kms_key_policy" {
-  default = ""
-  description = "A valid policy JSON document"
+variable "kms_key_admins" {
+  default = []
+  description = "A list of ARNs for roles and users that will have administrative access to created Credstash KMS Master Key"
 }
 
 variable "enable_key_rotation" {

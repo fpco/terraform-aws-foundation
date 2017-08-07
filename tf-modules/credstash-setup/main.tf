@@ -12,11 +12,43 @@
 resource "aws_kms_key" "credstash-key" {
   count               = "${var.create_kms_key ? 1 : 0}"
   description         = "Master key used by credstash"
-  policy              = "${var.kms_key_policy}"
+  policy              = "${data.aws_iam_policy_document.credstash-key-policy.json}"
   enable_key_rotation = "${var.enable_key_rotation}"
   tags                = {
     Name = "${var.name_prefix}-credstash-key"
   }
+}
+
+data "aws_iam_policy_document" "credstash-key-policy" {
+  statement {
+    sid = "Credstash KMS Master Key Admins Policy"
+    effect = "Allow"
+    principals = {
+      type = "AWS"
+      identifiers = [ "${concat(list(aws_iam_role.credstash-key-admin.arn), var.kms_key_admins)}" ]
+    }
+    actions = [ "kms:*" ]
+    resources = [ "*" ]
+  }
+}
+
+resource "aws_iam_role" "credstash-key-admin" {
+  name_prefix        = "${var.name_prefix}-credstash-key-admin-"
+  assume_role_policy = <<END_POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+END_POLICY
 }
 
 resource "aws_kms_alias" "credstash-key" {

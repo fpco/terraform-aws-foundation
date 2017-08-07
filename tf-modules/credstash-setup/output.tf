@@ -52,3 +52,8 @@ output "reader_policy_arn" {
 output "writer_policy_arn" {
   value = "${aws_iam_policy.writer-policy.arn}"
 }
+
+// Role which can be assumed to administer the KMS Key.
+output "kms_key_admin_role_arn" {
+  value = "${aws_iam_role.credstash-key-admin.arn}"
+}
