@@ -8,7 +8,7 @@ output "kms_key_id" {
   value = "${aws_kms_key.credstash-key.key_id}"
 }
 
-//KMS Master key alias.
+//KMS Master key alias. It can later be used to store and retrieve secrets.
 output "kms_key_alias" {
   value = "${aws_kms_alias.credstash-key.name}"
 }
@@ -23,7 +23,7 @@ output "db_table_arn" {
   value = "${aws_dynamodb_table.credstash-db.arn}"
 }
 
-//DynamoDB table ARN that can be used by credstash to store/retrieve secrets.
+//DynamoDB table name that can be used by credstash to store/retrieve secrets.
 output "db_table_name" {
   value = "${aws_dynamodb_table.credstash-db.id}"
 }
@@ -51,9 +51,4 @@ output "reader_policy_arn" {
 // Secret Writer policy
 output "writer_policy_arn" {
   value = "${aws_iam_policy.writer-policy.arn}"
-}
-
-// Role which can be assumed to administer the KMS Key.
-output "kms_key_admin_role_arn" {
-  value = "${aws_iam_role.credstash-key-admin.arn}"
 }

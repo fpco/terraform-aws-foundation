@@ -16,11 +16,6 @@ once. This module creates resources in the current region:
 
 * DynamoDB table with default value: `credstash-store`
 * KMS Master Key and an alias for it with default value: `alias/credstash`
-* IAM Policy with full access to above KMS Key
-* Default IAM Role attached to above policy that can be used for managing that
-  key: modify/delete the key, encrypt/decrypt with the key, etc. Optionally
-  extra IAM users and roles can be attached to above policy through
-  `kms_key_admins` variable.
 * Reader and/or Writer IAM Policies that give access to created DynamoDB table.
   Those policies can later be assigned to a role assumed by an EC2 instance that
   will be reading/writing secrets with `credstash`. More on that in the next
@@ -37,7 +32,6 @@ module "credstash" {
   name_prefix          = "dev"
   create_reader_policy = true # can be ommitted if secrets are writeonly from within EC2
   create_writer_policy = true # can be ommitted if secrets are readonly from within EC2
-  kms_key_admins       = ["arn:aws:iam::111111111111:user/developer"]
 }
 # Below outputs will be used for automatic credstash usage by EC2 instances
 output "kms_key_arn" {
@@ -62,10 +56,9 @@ output "writer_policy_arn" {
 
 ## Manual usage
 
-After `credstash` related resources have been setup any user from the list of
-`kms_key_admins` can start using the tool.
+After all resources have been deployed with `terraform apply` we can start using `credstash`.
 
-Here is a simple example on how to use it on the terminal:
+Here is a simple example on how to use it in the terminal:
 
 ```bash
 $ credstash put my-secret poor-entropy-password

@@ -12,11 +12,6 @@ variable "kms_key_name" {
   description = "KMS Master Key Name."
 }
 
-variable "kms_key_admins" {
-  default = []
-  description = "A list of ARNs for roles and users that will have administrative access to created Credstash KMS Master Key"
-}
-
 variable "enable_key_rotation" {
   default = false
   description = "Specifies whether key rotation is enabled"
