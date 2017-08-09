@@ -14,7 +14,7 @@ resource "aws_kms_key" "credstash-key" {
   description         = "Master key used by credstash"
   enable_key_rotation = "${var.enable_key_rotation}"
   tags                = {
-    Name = "${var.name_prefix}-credstash-key"
+    Name = "${var.kms_key_name}"
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_dynamodb_table" "credstash-db" {
 
 resource "aws_iam_policy" "writer-policy" {
   count = "${var.create_writer_policy ? 1 : 0}"
-  name = "${var.name_prefix}-credstash-writer"
+  name = "${var.db_table_name}-writer"
   policy = <<END_POLICY
 {
   "Version": "2012-10-17",
@@ -69,7 +69,7 @@ END_POLICY
 
 resource "aws_iam_policy" "reader-policy" {
   count = "${var.create_reader_policy ? 1 : 0}"
-  name = "${var.name_prefix}-credstash-reader"
+  name = "${var.db_table_name}-reader"
   policy = <<END_POLICY
 {
   "Version": "2012-10-17",

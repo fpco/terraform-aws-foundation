@@ -1,7 +1,3 @@
-variable "name_prefix" {
-  description = "The name prefix Reader/Writer Policies"
-}
-
 variable "create_kms_key" {
   default = true
   description = "Should the Master key be created"
