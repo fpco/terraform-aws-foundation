@@ -29,7 +29,6 @@ values. Here is an example of `credstash-setup` module usage:
 ```hcl
 module "credstash" {
   source               = "github.com/fpco/fpco-terraform-aws/tf-modules/credstash-setup"
-  name_prefix          = "dev"
   create_reader_policy = true # can be ommitted if secrets are writeonly from within EC2
   create_writer_policy = true # can be ommitted if secrets are readonly from within EC2
 }
