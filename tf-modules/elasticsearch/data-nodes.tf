@@ -85,14 +85,28 @@ data "template_file" "data-node-setup" {
     credstash_ca_cert_name     = "${var.name_prefix}-logstash-ca-cert"
     credstash_client_cert_name = "${var.name_prefix}-logstash-client-cert"
     credstash_client_key_name  = "${var.name_prefix}-logstash-client-key"
+    credstash_context          = "env=${var.name_prefix} service=elk"
     logstash_beats_address     = "${var.logstash_beats_address}"
-    is_master_node             = "false"
-    deploy_curator             = "false"
-    index_retention_period     = "0"
-    extra_curator_actions      = ""
-    extra_setup_snippet        = "${var.extra_setup_snippet}"
+    extra_setup_snippet        = <<EXTRA_SETUP
+${var.deploy_proxy ? data.template_file.proxy-setup.rendered : ""}
+
+${var.extra_setup_snippet}
+EXTRA_SETUP
   }
 }
+
+data "template_file" "proxy-setup" {
+  template = "${file("${path.module}/data/nginx-setup.tpl.sh")}"
+
+  vars {
+    credstash_install_snippet = "${var.credstash_install_snippet}"
+    credstash_get_cmd         = "${var.credstash_get_cmd}"
+    credstash_context         = "env=${var.name_prefix} service=elk"
+    nginx_username_key        = "${var.name_prefix}-elasticsearch-basic-auth-username"
+    nginx_password_key        = "${var.name_prefix}-elasticsearch-basic-auth-password"
+  }
+}
+
 
 data "template_file" "data-node-config" {
   count    = "${var.data_node_count}"
@@ -108,6 +122,13 @@ data "template_file" "data-node-config" {
   }
 }
 
+
+
+data "aws_acm_certificate" "elasticsearch-cert" {
+  domain = "${coalesce(var.elasticsearch_dns_ssl_name, var.elasticsearch_dns_name)}"
+  statuses = ["ISSUED"]
+}
+
 resource "aws_elb" "elasticsearch-elb" {
   name            = "${var.name_prefix}-elasticsearch"
   subnets         = ["${var.public_subnet_ids}"]
@@ -119,6 +140,14 @@ resource "aws_elb" "elasticsearch-elb" {
     instance_protocol = "http"
     lb_port = 9200
     lb_protocol = "http"
+  }
+
+  listener {
+    instance_port = 9201
+    instance_protocol = "http"
+    lb_port = 9201
+    lb_protocol = "https"
+    ssl_certificate_id = "${data.aws_acm_certificate.elasticsearch-cert.arn}"
   }
 
   health_check {
@@ -134,6 +163,7 @@ resource "aws_elb" "elasticsearch-elb" {
   connection_draining       = false
 
 }
+
 
 resource "aws_route53_record" "elasticsearch-elb" {
   zone_id = "${var.route53_zone_id}"

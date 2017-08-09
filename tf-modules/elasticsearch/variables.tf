@@ -70,9 +70,9 @@ variable "extra_elb_sg_ids" {
   description = "Extra Security Group IDs that will be added to Elasticsearch API Load Balancer"
 }
 
-variable "extra_elb_ingress_cidrs" {
+variable "auth_elb_ingress_cidrs" {
   default = []
-  description = "Extra CIDRs that are allowed to access Elasticsearch API. By default only CIDR from `public_subnet_ids` are allowed"
+  description = "CIDRs that are allowed to access Elasticsearch API over HTTPS on port 9201 with BasicAuth."
 }
 
 variable "extra_setup_snippet" {
@@ -130,4 +130,9 @@ variable "credstash_install_snippet" {
 
 variable "credstash_get_cmd" {
   description = "Credstash get command with region and table values set."
+}
+
+variable "elasticsearch_dns_ssl_name" {
+  default = ""
+  description = "DNS name for Elasticsearch endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'elasticsearch_dns_name' will be checked instead."
 }
