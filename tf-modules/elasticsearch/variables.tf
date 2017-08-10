@@ -102,6 +102,11 @@ variable "deploy_curator" {
   description = "Should a curator be installed and enabled on all master eligible nodes. If enabled it will only run on currently elected master."
 }
 
+variable "deploy_proxy" {
+  default = false
+  description = "Should a reverse proxy with Basic Authentication be setup for ES API on port 9201."
+}
+
 variable "index_retention_period" {
   default = 60
   description = "Age of Elasticsearch indices in days before they will be considered old and be pruned by the curator. Set to 0 in order to disable."

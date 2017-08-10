@@ -26,7 +26,7 @@ module "credstash-grant" {
   source            = "../credstash-grant"
   kms_key_arn       = "${var.credstash_kms_key_arn}"
   reader_policy_arn = "${var.credstash_reader_policy_arn}"
-  reader_context    = "env=${var.name_prefix} service=elk"
+  reader_context    = "env=${var.name_prefix}"
   roles_count       = "${var.master_node_count + var.data_node_count}"
   roles_arns        = ["${concat(aws_iam_role.master-node-role.*.arn, aws_iam_role.data-node-role.*.arn)}"]
   roles_names       = ["${concat(aws_iam_role.master-node-role.*.name, aws_iam_role.data-node-role.*.name)}"]

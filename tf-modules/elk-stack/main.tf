@@ -73,8 +73,10 @@ module "elasticsearch" {
   public_subnet_ids           = ["${var.private_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   extra_sg_ids                = ["${aws_security_group.ssh.id}"]
+  auth_elb_ingress_cidrs      = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
   node_ami                    = "${data.aws_ami.ubuntu.id}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
+  elasticsearch_dns_ssl_name  = "${var.elasticsearch_dns_ssl_name}"
   data_node_count             = "${var.elasticsearch_data_node_count}"
   data_node_ebs_size          = "${var.elasticsearch_data_node_ebs_size}"
   data_node_snapshot_ids      = ["${var.elasticsearch_data_node_snapshot_ids}"]
@@ -88,6 +90,7 @@ module "elasticsearch" {
   credstash_reader_policy_arn = "${var.credstash_reader_policy_arn}"
   credstash_install_snippet   = "${var.credstash_install_snippet}"
   credstash_get_cmd           = "${var.credstash_get_cmd}"
+  deploy_proxy                = "${var.elasticsearch_deploy_proxy}"
   logstash_beats_address      = "${var.logstash_dns_name}:5044"
 }
 
@@ -95,23 +98,23 @@ module "elasticsearch" {
 module "kibana" {
   source = "../kibana"
 
-  name_prefix          = "${var.name_prefix}"
-  vpc_id               = "${var.vpc_id}"
-  route53_zone_id      = "${var.route53_zone_id}"
-  kibana_dns_name      = "${var.kibana_dns_name}"
-  kibana_dns_ssl_name  = "${var.kibana_dns_ssl_name}"
-  public_subnet_ids    = ["${var.public_subnet_ids}"]
-  private_subnet_ids   = ["${var.private_subnet_ids}"]
-  key_name             = ""
-  ami                  = ""
-  instance_type        = ""
-  elasticsearch_url    = "http://${var.elasticsearch_dns_name}:9200"
-  min_server_count     = 0
-  max_server_count     = 0
-  desired_server_count = 0
-  elb_ingress_cidrs    = ["${var.user_ingress_cidrs}"]
-  basic_auth_username  = "${var.kibana_username}"
-  basic_auth_password  = "${var.kibana_password}"
+  name_prefix               = "${var.name_prefix}"
+  vpc_id                    = "${var.vpc_id}"
+  route53_zone_id           = "${var.route53_zone_id}"
+  kibana_dns_name           = "${var.kibana_dns_name}"
+  kibana_dns_ssl_name       = "${var.kibana_dns_ssl_name}"
+  public_subnet_ids         = ["${var.public_subnet_ids}"]
+  private_subnet_ids        = ["${var.private_subnet_ids}"]
+  key_name                  = ""
+  ami                       = ""
+  instance_type             = ""
+  elasticsearch_url         = "http://${var.elasticsearch_dns_name}:9200"
+  min_server_count          = 0
+  max_server_count          = 0
+  desired_server_count      = 0
+  elb_ingress_cidrs         = ["${var.user_ingress_cidrs}"]
+  credstash_install_snippet = "${var.credstash_install_snippet}"
+  credstash_get_cmd         = "${var.credstash_get_cmd}"
 }
 
 

@@ -46,9 +46,9 @@ systemctl start elasticsearch.service
 
 mkdir -p /etc/beats/ssl/
 
-${credstash_get_cmd} -n ${credstash_ca_cert_name} > /etc/beats/ssl/ca.crt
-${credstash_get_cmd} -n ${credstash_client_cert_name} > /etc/beats/ssl/client.crt
-${credstash_get_cmd} -n ${credstash_client_key_name} > /etc/beats/ssl/client.key
+${credstash_get_cmd} -n ${credstash_ca_cert_name} ${credstash_context} > /etc/beats/ssl/ca.crt
+${credstash_get_cmd} -n ${credstash_client_cert_name} ${credstash_context} > /etc/beats/ssl/client.crt
+${credstash_get_cmd} -n ${credstash_client_key_name} ${credstash_context} > /etc/beats/ssl/client.key
 
 
 ## Setup Filebeat

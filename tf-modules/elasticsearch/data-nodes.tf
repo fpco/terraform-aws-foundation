@@ -85,7 +85,8 @@ data "template_file" "data-node-setup" {
     credstash_ca_cert_name     = "${var.name_prefix}-logstash-ca-cert"
     credstash_client_cert_name = "${var.name_prefix}-logstash-client-cert"
     credstash_client_key_name  = "${var.name_prefix}-logstash-client-key"
-    credstash_context          = "env=${var.name_prefix} service=elk"
+    credstash_context          = "env=${var.name_prefix}"
+    is_master_node             = false
     logstash_beats_address     = "${var.logstash_beats_address}"
     extra_setup_snippet        = <<EXTRA_SETUP
 ${var.deploy_proxy ? data.template_file.proxy-setup.rendered : ""}
@@ -101,7 +102,7 @@ data "template_file" "proxy-setup" {
   vars {
     credstash_install_snippet = "${var.credstash_install_snippet}"
     credstash_get_cmd         = "${var.credstash_get_cmd}"
-    credstash_context         = "env=${var.name_prefix} service=elk"
+    credstash_context         = "env=${var.name_prefix}"
     nginx_username_key        = "${var.name_prefix}-elasticsearch-basic-auth-username"
     nginx_password_key        = "${var.name_prefix}-elasticsearch-basic-auth-password"
   }

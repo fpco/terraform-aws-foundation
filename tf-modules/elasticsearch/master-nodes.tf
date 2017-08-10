@@ -90,6 +90,8 @@ data "template_file" "master-node-setup" {
     credstash_ca_cert_name     = "${var.name_prefix}-logstash-ca-cert"
     credstash_client_cert_name = "${var.name_prefix}-logstash-client-cert"
     credstash_client_key_name  = "${var.name_prefix}-logstash-client-key"
+    credstash_context          = "env=${var.name_prefix}"
+    is_master_node             = true
     logstash_beats_address     = "${var.logstash_beats_address}"
     extra_setup_snippet        = <<EXTRA_SETUP
 ${var.deploy_curator ? data.template_file.curator-setup.rendered : ""}
