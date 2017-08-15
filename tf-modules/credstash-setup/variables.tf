@@ -8,13 +8,8 @@ variable "kms_key_name" {
   description = "KMS Master Key Name."
 }
 
-variable "kms_key_policy" {
-  default = ""
-  description = "A valid policy JSON document"
-}
-
 variable "enable_key_rotation" {
-  default = true
+  default = false
   description = "Specifies whether key rotation is enabled"
 }
 
@@ -27,3 +22,14 @@ variable "db_table_name" {
   default = "credential-store"
   description = "Name of the DynamoDB table where credentials will be stored"
 }
+
+variable "create_reader_policy" {
+  default = false
+  description = "Should credstash Secret Reader IAM Policy be created."
+}
+
+variable "create_writer_policy" {
+  default = false
+  description = "Should credstash Secret Writer IAM Policy be created."
+}
+

@@ -151,13 +151,24 @@ variable "certstrap_ca_passphrase" {
   description = "Passphrase for SSL Key encryption to be used during CA certificate generation"
 }
 
-variable "credstash_table_name" {
-  default = "credential-store"
-  description = "DynamoDB table used by credstash to store credentials"
-}
-
 variable "credstash_kms_key_arn" {
   description = "Master KMS key ARN for getting SSL server key using credstash"
+}
+
+variable "credstash_reader_policy_arn" {
+  description = "Secrets Reader Policy ARN that was created by 'credstash-setup' module. Reading will be disabled if not supplied."
+}
+
+variable "credstash_install_snippet" {
+  description = "Ubuntu bash script snippet for installing credstash and its dependencies"
+}
+
+variable "credstash_get_cmd" {
+  description = "Credstash get command with region and table values set."
+}
+
+variable "credstash_put_cmd" {
+  description = "Credstash put command with region, table and kms key values set."
 }
 
 variable "ssh_pubkey" {
