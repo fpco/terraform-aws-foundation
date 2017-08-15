@@ -81,11 +81,6 @@ variable "certstrap_ca_passphrase" {
   description = "Passphrase for SSL Key encryption to be used during CA certificate generation"
 }
 
-variable "credstash_dynamic_config_name" {
-  default = "logstash-dynamic-conf"
-  description = "This a key for credstash to be used to poll dynamic configuration for logstash, thus creating an ability to remotely update logstash fiters during runtime."
-}
-
 variable "credstash_kms_key_arn" {
   description = "Master KMS key ARN for getting SSL server key using credstash"
 }

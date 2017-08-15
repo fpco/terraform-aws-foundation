@@ -16,8 +16,10 @@ systemctl start kibana.service
 apt-get install -y nginx
 
 # Basic auth
-echo -n "${basic_auth_username}:" >> /etc/nginx/.htpasswd
-echo -n "${basic_auth_password}" | openssl passwd -apr1 -stdin >> /etc/nginx/.htpasswd
+BASIC_AUTH_USERNAME="$(${credstash_get_cmd} ${nginx_username_key} ${credstash_context})"
+BASIC_AUTH_PASSWORD="$(${credstash_get_cmd} ${nginx_password_key} ${credstash_context})"
+echo -n "$BASIC_AUTH_USERNAME:" > /etc/nginx/.htpasswd
+openssl passwd -apr1 "$BASIC_AUTH_PASSWORD" >> /etc/nginx/.htpasswd
 
 mkdir /var/www/html/kibana-status
 echo "Status: Initializing" > /var/www/html/kibana-status/index.html

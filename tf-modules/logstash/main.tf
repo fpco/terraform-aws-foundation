@@ -59,10 +59,11 @@ data "template_file" "logstash-setup" {
   vars {
     credstash_install_snippet     = "${var.credstash_install_snippet}"
     credstash_get_cmd             = "${var.credstash_get_cmd}"
-    credstash_dynamic_config_name = "${var.name_prefix}-${var.credstash_dynamic_config_name}"
     credstash_ca_cert_name        = "${var.name_prefix}-logstash-ca-cert"
     credstash_server_cert_name    = "${var.name_prefix}-logstash-server-cert"
     credstash_server_key_name     = "${var.name_prefix}-logstash-server-key"
+    credstash_dynamic_config_name = "${var.name_prefix}-logstash-dynamic-conf"
+    credstash_context             = "env=${var.name_prefix}"
     config                        = "${data.template_file.logstash-config.rendered}"
     extra_config                  = "${var.extra_config}"
     extra_settings                = "${var.extra_settings}"

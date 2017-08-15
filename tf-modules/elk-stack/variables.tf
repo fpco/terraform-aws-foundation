@@ -18,7 +18,7 @@ variable "public_subnet_ids" {
 
 variable "private_subnet_ids" {
   type = "list"
-  description = "Private subnet ids, where Kibana, Logstash and ELasticsearch instances will be placed. This is also the order in which nodes will be deployed in."
+  description = "Private subnet ids, where Kibana, Logstash and Elasticsearch instances will be placed. This is also the order in which nodes will be deployed in."
 }
 
 variable "user_ingress_cidrs" {
@@ -28,6 +28,11 @@ variable "user_ingress_cidrs" {
 
 variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
+}
+
+variable "elasticsearch_dns_ssl_name" {
+  default = ""
+  description = "DNS name for Elasticsearch endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'elasticsearch_dns_name' will be checked instead."
 }
 
 variable "elasticsearch_master_node_count" {
@@ -80,6 +85,16 @@ variable "elasticsearch_extra_setup_snippet" {
   description = "Extra snippet to run after Elasticsearch has been installed and configured"
 }
 
+variable "elasticsearch_deploy_proxy" {
+  default = false
+  description = "Should a reverse proxy with Basic Authentication be setup for ES API on port 9201."
+}
+
+variable "elasticsearch_auth_elb_ingress_cidrs" {
+  default = []
+  description = "CIDRs that are allowed to access Elasticsearch API over HTTPS on port 9201 with BasicAuth."
+}
+
 variable "logstash_kibana_instance_type" {
   default = "t2.micro"
   description = "Instance type to use for servers running Kibana+Logstash."
@@ -106,16 +121,6 @@ variable "logstash_extra_ingress_cidrs" {
 
 variable "route53_zone_id" {
   description = "Route53 Zone id where ELB should get added a record to"
-}
-
-variable "kibana_username" {
-  default = "kibanaadmin"
-  description = "Username for Kibana authentication"
-}
-
-variable "kibana_password" {
-  default = "kibanaadmin"
-  description = "Password for Kibana authentication"
 }
 
 variable "kibana_dns_name" {

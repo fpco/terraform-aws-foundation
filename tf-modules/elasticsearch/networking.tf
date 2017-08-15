@@ -50,6 +50,13 @@ resource "aws_security_group" "elasticsearch-api-sg" {
     protocol        = "tcp"
     security_groups = ["${aws_security_group.elasticsearch-elb-sg.id}"]
   }
+
+  ingress {
+    from_port       = 9201
+    to_port         = 9201
+    protocol        = "tcp"
+    security_groups = ["${aws_security_group.elasticsearch-elb-sg.id}"]
+  }
 }
 
 resource "aws_security_group" "elasticsearch-elb-sg" {
@@ -65,7 +72,14 @@ resource "aws_security_group" "elasticsearch-elb-sg" {
     from_port   = 9200
     to_port     = 9200
     protocol    = "tcp"
-    cidr_blocks = ["${concat(data.aws_subnet.public.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
+    cidr_blocks = ["${data.aws_subnet.public.*.cidr_block}"]
+  }
+
+  ingress {
+    from_port   = 9201
+    to_port     = 9201
+    protocol    = "tcp"
+    cidr_blocks = ["${var.auth_elb_ingress_cidrs}"]
   }
 
   egress {

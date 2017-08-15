@@ -75,9 +75,12 @@ data "template_file" "kibana-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
   vars {
-    elasticsearch_url   = "${var.elasticsearch_url}"
-    basic_auth_username = "${var.basic_auth_username}"
-    basic_auth_password = "${var.basic_auth_password}"
+    elasticsearch_url         = "${var.elasticsearch_url}"
+    credstash_install_snippet = "${var.credstash_install_snippet}"
+    credstash_get_cmd         = "${var.credstash_get_cmd}"
+    credstash_context         = "env=${var.name_prefix}"
+    nginx_username_key        = "${var.name_prefix}-kibana-basic-auth-username"
+    nginx_password_key        = "${var.name_prefix}-kibana-basic-auth-password"
   }
 }
 
