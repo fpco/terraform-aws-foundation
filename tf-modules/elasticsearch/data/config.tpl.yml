@@ -2,9 +2,9 @@ network.host: _ec2_
 network.bind_host: [_ec2_, localhost]
 node:
   name: "${node_name}"
-  master: false
-  data: true
-  ingest: true
+  master: ${is_master}
+  data: ${is_master ? false : true}
+  ingest: ${is_master ? false : true}
 http.port: 9200
 transport.tcp.port: 9300
 
@@ -22,3 +22,4 @@ discovery:
     availability_zones: ${availability_zones}
     tag.cluster: ${cluster_tag}
 
+${extra_config}
