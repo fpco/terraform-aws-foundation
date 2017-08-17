@@ -80,6 +80,11 @@ variable "extra_setup_snippet" {
   description = "Extra snippet to run after Elasticsearch has been installed and configured"
 }
 
+variable "extra_config" {
+  default = ""
+  description = "Extra elasticsearch configuration in yaml format that will be applied to all nodes"
+}
+
 variable "internal" {
   default = true
   description = "Set it to false if you want Elasticsearch to be accessible by the outside world"

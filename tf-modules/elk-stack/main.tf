@@ -86,6 +86,7 @@ module "elasticsearch" {
   master_node_snapshot_ids    = ["${var.elasticsearch_master_node_snapshot_ids}"]
   master_node_instance_type   = "${var.elasticsearch_master_node_instance_type}"
   extra_setup_snippet         = "${var.elasticsearch_extra_setup_snippet}"
+  extra_config                = "${var.elasticsearch_extra_config}"
   credstash_kms_key_arn       = "${var.credstash_kms_key_arn}"
   credstash_reader_policy_arn = "${var.credstash_reader_policy_arn}"
   credstash_install_snippet   = "${var.credstash_install_snippet}"

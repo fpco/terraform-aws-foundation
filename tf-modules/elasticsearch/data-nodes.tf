@@ -111,15 +111,17 @@ data "template_file" "proxy-setup" {
 
 data "template_file" "data-node-config" {
   count    = "${var.data_node_count}"
-  template = "${file("${path.module}/data/data_node_conf.tpl.yml")}"
+  template = "${file("${path.module}/data/config.tpl.yml")}"
 
   vars {
+    is_master          = false
     node_name          = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     min_master_nodes   = "${(var.master_node_count / 2) + 1}"
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
     region             = "${data.aws_region.current.name}"
+    extra_config       = "${var.extra_config}"
   }
 }
 

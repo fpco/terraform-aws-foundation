@@ -95,6 +95,11 @@ variable "elasticsearch_auth_elb_ingress_cidrs" {
   description = "CIDRs that are allowed to access Elasticsearch API over HTTPS on port 9201 with BasicAuth."
 }
 
+variable "elasticsearch_extra_config" {
+  default = ""
+  description = "Extra Elasticsearch configuration in yaml format that will be applied to all nodes"
+}
+
 variable "logstash_kibana_instance_type" {
   default = "t2.micro"
   description = "Instance type to use for servers running Kibana+Logstash."
