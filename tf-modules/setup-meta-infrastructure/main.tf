@@ -11,6 +11,11 @@
 # Variables
 #----------------------------------------------------------------------
 
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
+}
+
 variable "create_groups" {
   description = "Set to 0 to disable creating the 'admin', 'power-user', and 'setup-mfa' groups.  This should be done for accounts that users do not sign into directly (only delegated access)."
   default = 1
@@ -155,6 +160,7 @@ resource "aws_iam_group" "setup-mfa" {
 module "admin-role" {
   source = "../cross-account-role"
   name = "admin"
+  aws_cloud         = "${var.aws_cloud}"
   trust_account_ids = [
     "${data.aws_caller_identity.current.account_id}",
     "${var.trust_account_ids}"
@@ -164,6 +170,7 @@ module "admin-role" {
 module "power-user-role" {
   source = "../cross-account-role"
   name = "power-user"
+  aws_cloud         = "${var.aws_cloud}"
   trust_account_ids = [
     "${data.aws_caller_identity.current.account_id}",
     "${var.trust_account_ids}"
@@ -215,6 +222,7 @@ resource "aws_iam_policy" "admin-no-mfa" {
 
 module "assume-admin-role-policy" {
   source = "../cross-account-assume-role-policy"
+  aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-control-accounts-admin-role"
   role_name = "${module.admin-role.name}"
   account_ids = [
@@ -291,6 +299,7 @@ resource "aws_iam_policy" "power-user-no-mfa" {
 
 module "assume-power-user-role-policy" {
   source = "../cross-account-assume-role-policy"
+  aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-control-accounts-power-user-role"
   role_name = "${module.power-user-role.name}"
   account_ids = [
@@ -308,7 +317,7 @@ data "aws_iam_policy_document" "setup-mfa" {
     sid = "AllowUsersToCreateDeleteTheirOwnVirtualMFADevices"
     effect = "Allow"
     actions = ["iam:*VirtualMFADevice"]
-    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:mfa/&{aws:username}"]
+    resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:mfa/&{aws:username}"]
   }
   statement {
     sid = "AllowUsersToEnableSyncDisableTheirOwnMFADevices"
@@ -319,19 +328,19 @@ data "aws_iam_policy_document" "setup-mfa" {
       "iam:ListMFADevices",
       "iam:ResyncMFADevice"
     ]
-    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
+    resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
   }
   statement {
     sid = "AllowUsersToListVirtualMFADevices"
     effect = "Allow"
     actions = ["iam:ListVirtualMFADevices"]
-    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:mfa/*"]
+    resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:mfa/*"]
   }
   statement {
     sid = "AllowUsersToListUsersInConsole"
     effect = "Allow"
     actions = ["iam:ListUsers"]
-    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/*"]
+    resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/*"]
   }
 }
 
@@ -349,7 +358,7 @@ data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
       "iam:*AccessKey*",
       "iam:ResyncMFADevice"
     ]
-    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
+    resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
     condition {
       test = "Bool"
       variable = "aws:MultiFactorAuthPresent"

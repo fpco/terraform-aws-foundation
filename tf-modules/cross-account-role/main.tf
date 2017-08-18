@@ -5,6 +5,11 @@
  * Fill-in the README.
  */
 
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
+}
+
 variable "trust_account_ids" {
   description = "List of other accounts to trust to assume the role"
   default = []
@@ -35,7 +40,7 @@ data "aws_iam_policy_document" "assume-role" {
     }
     principals {
       type = "AWS"
-      identifiers = ["${formatlist("arn:aws:iam::%s:root",var.trust_account_ids)}"]
+      identifiers = ["${formatlist("arn:${var.aws_cloud}:iam::%s:root",var.trust_account_ids)}"]
     }
   }
 }
