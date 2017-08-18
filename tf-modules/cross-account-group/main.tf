@@ -37,20 +37,20 @@ resource "aws_iam_group" "main" {
 
 # check with manny on the name of this resource
 resource "aws_iam_group_policy_attachment" "manage-own-credentials-with-mfa" {
-  group  = "${aws_iam_group.main.name}"
+  group      = "${aws_iam_group.main.name}"
   policy_arn = "${var.mfa_policy_arn}"
 }
 
 module "assume-group-role-policy" {
-  source = "../cross-account-assume-role-policy"
+  source      = "../cross-account-assume-role-policy"
   aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-${var.name}-${var.role_name}-role"
-  role_name = "${var.role_name}"
+  role_name   = "${var.role_name}"
   account_ids = ["${var.account_ids}"]
 }
 
 resource "aws_iam_group_policy_attachment" "group-assume-role" {
-  group  = "${aws_iam_group.main.name}"
+  group      = "${aws_iam_group.main.name}"
   policy_arn = "${module.assume-group-role-policy.arn}"
 }
 
