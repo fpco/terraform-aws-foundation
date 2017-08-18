@@ -18,57 +18,57 @@ variable "aws_cloud" {
 
 variable "create_groups" {
   description = "Set to 0 to disable creating the 'admin', 'power-user', and 'setup-mfa' groups.  This should be done for accounts that users do not sign into directly (only delegated access)."
-  default = 1
+  default     = 1
 }
 
 variable "groups_require_assume_role" {
   description = "Set to 1 to give the 'admin' and 'power-user' groups no privileges aside from being able to assume roles.  This is a best practice and recommended for all new accounts.  Only relevant if create_groups = 1."
-  default = 0
+  default     = 0
 }
 
 variable "trust_account_ids" {
   description = "A list of accounts that are trusted.  Trusted accounts can assume the 'admin' and 'power-user' roles in the current account."
-  default = []
+  default     = []
 }
 
 variable "admin_control_account_ids" {
   description = "List of accounts that users in the 'admin' group can assume the 'admin' and 'power-user' roles in.  These accounts must trust the current account.  Only relevant if create_groups = 1."
-  default = []
+  default     = []
 }
 
 variable "power_user_control_account_ids" {
   description = "List of accounts that users in the 'power-user' group can assume the 'power-user' role in.  These accounts must trust the current account.  Only relevant if create_groups = 1."
-  default = []
+  default     = []
 }
 
 variable "admin_group_name" {
   description = "The name of the administrators group.  A common value for new accounts is 'super-admin', since these admins have control over other accounts.  Only relevant if create_groups = 1."
-  default = "admin"
+  default     = "admin"
 }
 
 variable "power_user_group_name" {
   description = "The name of the power users group.  A common value for new accounts with delegation is 'super-power-user', since these admins have control over other accounts.  Only relevant if create_groups = 1."
-  default = "power-user"
+  default     = "power-user"
 }
 
 variable "admin_group_members" {
   description = "Users in the 'admin' group.  Only relevant if create_groups = 1."
-  default = []
+  default     = []
 }
 
 variable "power_user_group_members" {
   description = "Users in the 'power-user' group.  Only relevant if create_groups = 1."
-  default = []
+  default     = []
 }
 
 variable "setup_mfa_group_members" {
   description = "Users in the 'setup-mfa' group.  Only relevant if create_groups = 1."
-  default = []
+  default     = []
 }
 
 variable "set_password_policy" {
   description = "Set to 0 to disable setting the account password policy"
-  default = 1
+  default     = 1
 }
 
 #----------------------------------------------------------------------
@@ -140,17 +140,17 @@ data "aws_caller_identity" "current" { }
 
 resource "aws_iam_group" "admin" {
   count = "${var.create_groups}"
-  name = "${var.admin_group_name}"
+  name  = "${var.admin_group_name}"
 }
 
 resource "aws_iam_group" "power-user" {
   count = "${var.create_groups}"
-  name = "${var.power_user_group_name}"
+  name  = "${var.power_user_group_name}"
 }
 
 resource "aws_iam_group" "setup-mfa" {
   count = "${var.create_groups}"
-  name = "setup-mfa"
+  name  = "setup-mfa"
 }
 
 #----------------------------------------------------------------------
@@ -158,9 +158,9 @@ resource "aws_iam_group" "setup-mfa" {
 #----------------------------------------------------------------------
 
 module "admin-role" {
-  source = "../cross-account-role"
-  name = "admin"
+  source            = "../cross-account-role"
   aws_cloud         = "${var.aws_cloud}"
+  name              = "admin"
   trust_account_ids = [
     "${data.aws_caller_identity.current.account_id}",
     "${var.trust_account_ids}"
@@ -168,9 +168,9 @@ module "admin-role" {
 }
 
 module "power-user-role" {
-  source = "../cross-account-role"
-  name = "power-user"
+  source            = "../cross-account-role"
   aws_cloud         = "${var.aws_cloud}"
+  name              = "power-user"
   trust_account_ids = [
     "${data.aws_caller_identity.current.account_id}",
     "${var.trust_account_ids}"
@@ -184,29 +184,29 @@ module "power-user-role" {
 # Has full access to everything, including IAM management.  Requires MFA.
 data "aws_iam_policy_document" "admin-with-mfa" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = [
       "*",
       "aws-portal:*",
       "support:*"]
     resources = ["*"]
     condition {
-      test = "Bool"
+      test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values = ["true"]
+      values   = ["true"]
     }
   }
 }
 
 resource "aws_iam_policy" "admin-with-mfa" {
-  name = "full-administrator-access-with-mfa"
+  name   = "full-administrator-access-with-mfa"
   policy = "${data.aws_iam_policy_document.admin-with-mfa.json}"
 }
 
 # Has full access to everything, including IAM management.  Does NOT require MFA.
 data "aws_iam_policy_document" "admin-no-mfa" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = [
       "*",
       "aws-portal:*",
@@ -216,15 +216,15 @@ data "aws_iam_policy_document" "admin-no-mfa" {
 }
 
 resource "aws_iam_policy" "admin-no-mfa" {
-  name = "full-administrator-access-no-mfa"
+  name   = "full-administrator-access-no-mfa"
   policy = "${data.aws_iam_policy_document.admin-no-mfa.json}"
 }
 
 module "assume-admin-role-policy" {
-  source = "../cross-account-assume-role-policy"
+  source      = "../cross-account-assume-role-policy"
   aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-control-accounts-admin-role"
-  role_name = "${module.admin-role.name}"
+  role_name   = "${module.admin-role.name}"
   account_ids = [
     "${data.aws_caller_identity.current.account_id}",
     "${var.admin_control_account_ids}"
@@ -234,7 +234,7 @@ module "assume-admin-role-policy" {
 # Has full access to AWS, _except_ for IAM management. Requires MFA.
 data "aws_iam_policy_document" "power-user-with-mfa" {
   statement {
-    effect = "Allow"
+    effect      = "Allow"
     not_actions = [
       "iam:*",
       "organizations:*"
@@ -247,7 +247,7 @@ data "aws_iam_policy_document" "power-user-with-mfa" {
     }
   }
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = [
       "iam:ListAccount*",
       "iam:GetAccount*",
@@ -265,14 +265,14 @@ data "aws_iam_policy_document" "power-user-with-mfa" {
 }
 
 resource "aws_iam_policy" "power-user-with-mfa" {
-  name = "power-user-access-with-mfa"
+  name   = "power-user-access-with-mfa"
   policy = "${data.aws_iam_policy_document.power-user-with-mfa.json}"
 }
 
 # Has full access to AWS, _except_ for IAM management. Does NOT require MFA.
 data "aws_iam_policy_document" "power-user-no-mfa" {
   statement {
-    effect = "Allow"
+    effect      = "Allow"
     not_actions = [
       "iam:*",
       "organizations:*"
@@ -293,15 +293,15 @@ data "aws_iam_policy_document" "power-user-no-mfa" {
 }
 
 resource "aws_iam_policy" "power-user-no-mfa" {
-  name = "power-user-access-no-mfa"
+  name   = "power-user-access-no-mfa"
   policy = "${data.aws_iam_policy_document.power-user-no-mfa.json}"
 }
 
 module "assume-power-user-role-policy" {
-  source = "../cross-account-assume-role-policy"
+  source      = "../cross-account-assume-role-policy"
   aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-control-accounts-power-user-role"
-  role_name = "${module.power-user-role.name}"
+  role_name   = "${module.power-user-role.name}"
   account_ids = [
     "${data.aws_caller_identity.current.account_id}",
     "${var.power_user_control_account_ids}"
@@ -314,14 +314,14 @@ module "assume-power-user-role-policy" {
 # could remove their MFA device).
 data "aws_iam_policy_document" "setup-mfa" {
   statement {
-    sid = "AllowUsersToCreateDeleteTheirOwnVirtualMFADevices"
-    effect = "Allow"
-    actions = ["iam:*VirtualMFADevice"]
+    sid       = "AllowUsersToCreateDeleteTheirOwnVirtualMFADevices"
+    effect    = "Allow"
+    actions   = ["iam:*VirtualMFADevice"]
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:mfa/&{aws:username}"]
   }
   statement {
-    sid = "AllowUsersToEnableSyncDisableTheirOwnMFADevices"
-    effect = "Allow"
+    sid     = "AllowUsersToEnableSyncDisableTheirOwnMFADevices"
+    effect  = "Allow"
     actions = [
       "iam:DeactivateMFADevice",
       "iam:EnableMFADevice",
@@ -331,28 +331,28 @@ data "aws_iam_policy_document" "setup-mfa" {
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
   }
   statement {
-    sid = "AllowUsersToListVirtualMFADevices"
-    effect = "Allow"
-    actions = ["iam:ListVirtualMFADevices"]
+    sid       = "AllowUsersToListVirtualMFADevices"
+    effect    = "Allow"
+    actions   = ["iam:ListVirtualMFADevices"]
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:mfa/*"]
   }
   statement {
-    sid = "AllowUsersToListUsersInConsole"
-    effect = "Allow"
-    actions = ["iam:ListUsers"]
+    sid       = "AllowUsersToListUsersInConsole"
+    effect    = "Allow"
+    actions   = ["iam:ListUsers"]
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/*"]
   }
 }
 
 resource "aws_iam_policy" "setup-mfa" {
-  name = "setup-mfa-device"
+  name   = "setup-mfa-device"
   policy = "${data.aws_iam_policy_document.setup-mfa.json}"
 }
 
 # Allow a user to change their password, manage their access keys, and resync their MFA device (but not change it).
 data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = [
       "iam:*LoginProfile",
       "iam:*AccessKey*",
@@ -366,7 +366,7 @@ data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
     }
   }
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = [
       "iam:ListAccount*",
       "iam:GetAccount*",
@@ -376,21 +376,21 @@ data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
     ]
     resources = ["*"]
     condition {
-      test = "Bool"
+      test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values = ["true"]
+      values   = ["true"]
     }
   }
   statement {
     # This helps tools like https://github.com/lonelyplanet/aws-mfa find out a user's MFA device ARN so that they can prompt for an MFA code.
-    effect = "Allow"
-    actions = ["iam:ListMFADevices"]
+    effect    = "Allow"
+    actions   = ["iam:ListMFADevices"]
     resources = ["*"]
   }
 }
 
 resource "aws_iam_policy" "manage-own-credentials-with-mfa" {
-  name = "manage-own-credentials-with-mfa"
+  name   = "manage-own-credentials-with-mfa"
   policy = "${data.aws_iam_policy_document.manage-own-credentials-with-mfa.json}"
 }
 
@@ -399,50 +399,50 @@ resource "aws_iam_policy" "manage-own-credentials-with-mfa" {
 #----------------------------------------------------------------------
 
 resource "aws_iam_group_policy_attachment" "admin_admin" {
-  count  = "${(1 - var.groups_require_assume_role) * var.create_groups}"
-  group  = "${aws_iam_group.admin.name}"
+  count      = "${(1 - var.groups_require_assume_role) * var.create_groups}"
+  group      = "${aws_iam_group.admin.name}"
   policy_arn = "${aws_iam_policy.admin-with-mfa.arn}"
 }
 
 resource "aws_iam_group_policy_attachment" "admin_assume-admin-role" {
-  count  = "${var.create_groups}"
-  group  = "${aws_iam_group.admin.name}"
+  count      = "${var.create_groups}"
+  group      = "${aws_iam_group.admin.name}"
   policy_arn = "${module.assume-admin-role-policy.arn}"
 }
 
 resource "aws_iam_group_policy_attachment" "admin_assume-power-user-role" {
-  count  = "${var.create_groups}"
-  group  = "${aws_iam_group.admin.name}"
+  count      = "${var.create_groups}"
+  group      = "${aws_iam_group.admin.name}"
   policy_arn = "${module.assume-power-user-role-policy.arn}"
 }
 
 resource "aws_iam_group_policy_attachment" "admin_manage-own-credentials-with-mfa" {
-  count  = "${var.create_groups}"
-  group  = "${aws_iam_group.admin.name}"
+  count      = "${var.create_groups}"
+  group      = "${aws_iam_group.admin.name}"
   policy_arn = "${aws_iam_policy.manage-own-credentials-with-mfa.arn}"
 }
 
 resource "aws_iam_group_policy_attachment" "power-user_power-user" {
-  count  = "${(1 - var.groups_require_assume_role) * var.create_groups}"
-  group  = "${aws_iam_group.power-user.name}"
+  count      = "${(1 - var.groups_require_assume_role) * var.create_groups}"
+  group      = "${aws_iam_group.power-user.name}"
   policy_arn = "${aws_iam_policy.power-user-with-mfa.arn}"
 }
 
 resource "aws_iam_group_policy_attachment" "power-user_manage-own-credentials-with-mfa" {
-  count  = "${var.create_groups}"
-  group  = "${aws_iam_group.power-user.name}"
+  count      = "${var.create_groups}"
+  group      = "${aws_iam_group.power-user.name}"
   policy_arn = "${aws_iam_policy.manage-own-credentials-with-mfa.arn}"
 }
 
 resource "aws_iam_group_policy_attachment" "power-user_assume-power-user-role" {
-  count  = "${var.create_groups}"
-  group  = "${aws_iam_group.power-user.name}"
+  count      = "${var.create_groups}"
+  group      = "${aws_iam_group.power-user.name}"
   policy_arn = "${module.assume-power-user-role-policy.arn}"
 }
 
 resource "aws_iam_group_policy_attachment" "setup-mfa_setup-mfa" {
-  count  = "${var.create_groups}"
-  group  = "${aws_iam_group.setup-mfa.name}"
+  count      = "${var.create_groups}"
+  group      = "${aws_iam_group.setup-mfa.name}"
   policy_arn = "${aws_iam_policy.setup-mfa.arn}"
 }
 
@@ -455,12 +455,12 @@ resource "aws_iam_group_policy_attachment" "setup-mfa_setup-mfa" {
 # secure.
 
 resource "aws_iam_role_policy_attachment" "admin_admin" {
-  role   = "${module.admin-role.name}"
+  role       = "${module.admin-role.name}"
   policy_arn = "${aws_iam_policy.admin-no-mfa.arn}"
 }
 
 resource "aws_iam_role_policy_attachment" "power-user_power-user" {
-  role   = "${module.power-user-role.name}"
+  role       = "${module.power-user-role.name}"
   policy_arn = "${aws_iam_policy.power-user-no-mfa.arn}"
 }
 
