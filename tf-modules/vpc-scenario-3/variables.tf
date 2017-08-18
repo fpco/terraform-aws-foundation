@@ -46,6 +46,7 @@ variable "dns_servers" {
 }
 
 variable "vpn_static_routes" {
+  type        = "list"
   description = "list of static routes to use with AWS customer gateway (VPN)"
 }
 

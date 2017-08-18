@@ -69,12 +69,13 @@ resource "aws_route_table" "private-vpn" {
 }
 resource "aws_route_table_association" "private-vpn" {
   count          = "${length(module.private-subnets.ids)}"
-  subnet_id      = "${element(module.private-subnet.ids, count.index)}"
+  subnet_id      = "${element(module.private-subnets.ids, count.index)}"
   route_table_id = "${aws_route_table.private-vpn.id}"
 }
 
 module "vpn" {
   source           = "../aws-ipsec-vpn"
+  name             = "${var.name_prefix}"
   vpc_id           = "${module.vpc.id}"
   extra_tags       = "${var.extra_tags}"
   remote_device_ip = "${var.vpn_remote_ip}"
