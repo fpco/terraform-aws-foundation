@@ -108,6 +108,7 @@ data "template_file" "curator-setup" {
   vars {
     index_retention_period = "${var.index_retention_period}"
     extra_curator_actions  = "${var.extra_curator_actions}"
+    elasticsearch_host     = "localhost"
   }
 }
 

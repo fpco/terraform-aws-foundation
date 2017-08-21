@@ -12,7 +12,7 @@ crontab -u curator $TMP_CRON
 cat <<EOF > /etc/curator/config.yaml
 client:
   hosts:
-    - localhost
+    - ${elasticsearch_host}
   port: 9200
   url_prefix:
   use_ssl: False

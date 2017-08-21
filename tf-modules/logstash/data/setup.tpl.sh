@@ -72,15 +72,15 @@ metricbeat.modules:
   metricsets:
     - cpu
     - load
-    - filesystem
     - diskio
     - fsstat
     - memory
-    - network
-    - process
+    - processes
   enabled: true
   period: 30s
-  processes: ['.*']
+  processes:
+    - 'java'
+    - 'filebeat'
   cpu_ticks: false
   fields_under_root: true
   fields:

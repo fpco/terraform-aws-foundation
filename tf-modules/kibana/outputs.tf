@@ -13,3 +13,7 @@ output "security_group_id" {
 output "setup_snippet" {
   value = "${data.template_file.kibana-setup.rendered}"
 }
+
+output "asg_name" {
+  value = "${aws_autoscaling_group.kibana-asg.name}"
+}
