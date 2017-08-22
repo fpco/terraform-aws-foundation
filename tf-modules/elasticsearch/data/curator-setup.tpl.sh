@@ -22,7 +22,7 @@ client:
   ssl_no_validate: False
   http_auth:
   timeout: 30
-  master_only: True
+  master_only: ${master_only}
 
 logging:
   loglevel: INFO
@@ -59,6 +59,7 @@ actions:
 ${extra_curator_actions}
 EOF
 
+sudo mkdir -p /etc/filebeat/prospectors/
 
 cat <<EOF > /etc/filebeat/prospectors/curator.yaml
 filebeat.prospectors:

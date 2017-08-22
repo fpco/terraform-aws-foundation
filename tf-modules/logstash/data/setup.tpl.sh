@@ -75,7 +75,7 @@ metricbeat.modules:
     - diskio
     - fsstat
     - memory
-    - processes
+    - process
   enabled: true
   period: 30s
   processes:

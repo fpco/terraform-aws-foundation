@@ -24,6 +24,6 @@ output "elasticsearch_data_node_ebs_volume_ids" {
   value = ["${module.elasticsearch.data_node_ebs_volume_ids}"]
 }
 
-output "logstash_asg_name" {
+output "logstash_kibana_asg_name" {
   value = "${module.logstash-kibana.asg_name}"
 }
