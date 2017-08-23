@@ -11,7 +11,7 @@ variable "ami" {
   description = "The base AMI for each AWS instance created"
 }
 variable "instance_type" {
-  default = "t2.small"
+  default = "t2.micro"
   description = "The type of AWS instance (size)"
 }
 variable "data_volume_size" {
