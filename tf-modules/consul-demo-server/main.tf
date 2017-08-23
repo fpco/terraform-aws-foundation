@@ -22,7 +22,6 @@ module "consul-server" {
   key_file                = "${var.key_file}"
   ami                     = "${var.ami}"
   instance_type           = "${var.instance_type}"
-  load_balancers          = "${var.load_balancers}"
   public_ip               = "${var.public_ip}"
   subnet_id               = "${var.subnet_id}"
   load_balancers          = ["${var.load_balancers}"]
