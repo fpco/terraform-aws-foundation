@@ -9,6 +9,7 @@ module "consul-server" {
   source                  = "../single-node-asg"
   name                    = "${var.name}"
   name_suffix             = "consul-server"
+  aws_cloud               = "${var.aws_cloud}"
   region                  = "${var.region}"
   az                      = "${var.az}"
   root_volume_type        = "gp2"

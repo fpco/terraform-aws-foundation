@@ -8,6 +8,7 @@
 module "service-data" {
   source      = "../persistent-ebs"
   name        = "${var.name}-${var.name_suffix}-data-${var.az}"
+  aws_cloud   = "${var.aws_cloud}"
   region      = "${var.region}"
   az          = "${var.az}"
   size        = "${var.data_volume_size}"

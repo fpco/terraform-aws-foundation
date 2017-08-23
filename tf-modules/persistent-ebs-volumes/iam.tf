@@ -17,8 +17,8 @@ resource "aws_iam_policy" "ebs-volume-policy" {
         "ec2:DetachVolume"
       ],
       "Resource": [
-        "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:volume/${element(aws_ebs_volume.volumes.*.id, count.index)}",
-        "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*"
+        "arn:${var.aws_cloud}:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:volume/${element(aws_ebs_volume.volumes.*.id, count.index)}",
+        "arn:${var.aws_cloud}:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*"
       ]
     }
   ]

@@ -77,3 +77,7 @@ variable "load_balancers" {
   default = []
   description = "The list of load balancers names to pass to the ASG module"
 }
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
+}
