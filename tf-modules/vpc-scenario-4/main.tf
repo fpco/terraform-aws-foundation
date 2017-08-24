@@ -25,6 +25,7 @@ module "private-subnets" {
   source      = "../subnets"
   azs         = "${var.azs}"
   vpc_id      = "${module.vpc.id}"
+  public      = false
   name_prefix = "${var.name_prefix}-private"
   cidr_blocks = "${var.private_subnet_cidrs}"
   extra_tags  = "${var.extra_tags}"
