@@ -26,7 +26,7 @@ module "public-subnets" {
   azs         = "${var.azs}"
   vpc_id      = "${module.vpc.id}"
   name_prefix = "${var.name_prefix}-public"
-  cidr_blocks = "${var.public_subnet_cidrs}"
+  cidr_blocks = ["${var.public_subnet_cidrs}"]
   extra_tags  = "${var.extra_tags}"
 }
 
