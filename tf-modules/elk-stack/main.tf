@@ -52,24 +52,14 @@ resource "aws_security_group" "ssh" {
   }
 }
 
-# Optionally create an SSH Key Pair.
-resource "aws_key_pair" "elk-key" {
-  count = "${length(var.ssh_key_name) > 0 ? 0 : 1}"
-  key_name = "${var.name_prefix}-key"
-  public_key = "${file(var.ssh_pubkey)}"
-}
-
 
 module "elasticsearch" {
   source = "../elasticsearch"
 
-  name_prefix               = "${var.name_prefix}"
-  vpc_id                    = "${var.vpc_id}"
-  route53_zone_id           = "${var.route53_zone_id}"
-  key_name                 =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
-  # Other attempts to make it work, terraform no longer allows indexing empty lists
-  #key_name                  = "${coalesce(var.ssh_key_name, element(aws_key_pair.elk-key.*.key_name, 0))}"
-  #key_name                 = "${length(aws_key_pair.elk-key.*.key_name) == 0 ? var.ssh_key_name : element(aws_key_pair.elk-key.*.key_name, 0)}"
+  name_prefix                 = "${var.name_prefix}"
+  vpc_id                      = "${var.vpc_id}"
+  route53_zone_id             = "${var.route53_zone_id}"
+  key_name                    = "${var.ssh_key_name}"
   public_subnet_ids           = ["${var.private_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   extra_sg_ids                = ["${aws_security_group.ssh.id}"]
@@ -131,7 +121,7 @@ module "logstash-kibana" {
   logstash_dns_name           = "${var.logstash_dns_name}"
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "${var.logstash_kibana_instance_type}"
-  key_name                    =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
+  key_name                    = "${var.ssh_key_name}"
   elasticsearch_url           = "http://${var.elasticsearch_dns_name}:9200"
   min_server_count            = "${var.logstash_kibana_min_server_count}"
   max_server_count            = "${var.logstash_kibana_max_server_count}"
@@ -155,7 +145,7 @@ input {
         path => "/var/log/nginx/access.log"
         add_field => {
             index_prefix => "elk"
-            info_str => '{"origin":"aws-ec2","source":"kibana","formats":["nginx_access"],"transport":"file"}'
+            info_str => '{"origin":"elk-logstash-kibana","source":"kibana","formats":["nginx_access"],"transport":"file"}'
         }
         type => "log"
     }
@@ -163,7 +153,7 @@ input {
         path => "/var/log/nginx/error.log"
         add_field => {
             index_prefix => "elk"
-            info_str => '{"origin":"aws-ec2","source":"kibana","formats":["nginx_error"],"transport":"file"}'
+            info_str => '{"origin":"elk-logstash-kibana","source":"kibana","formats":["nginx_error"],"transport":"file"}'
         }
         type => "log"
     }

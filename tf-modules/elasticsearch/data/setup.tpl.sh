@@ -1,5 +1,9 @@
 #!/bin/bash
 
+hostname ${node_name}
+echo ${node_name} > /etc/hostname
+echo 127.0.1.1 ${node_name} >> /etc/hosts
+
 # Install dependencies
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 apt-get install -y apt-transport-https
@@ -71,7 +75,7 @@ filebeat.prospectors:
   fields:
     index_prefix: elk
     log_info:
-      origin: aws
+      origin: elk-elasticsearch-${is_master_node ? "master" : "data" }-node
       source: elasticsearch
       formats:
         - log4j2
@@ -83,7 +87,7 @@ filebeat.prospectors:
   fields:
     index_prefix: elk
     log_info:
-      origin: aws
+      origin: elk-elasticsearch-${is_master_node ? "master" : "data" }-node
       source: filebeat
       formats:
         - filebeat
@@ -95,7 +99,7 @@ filebeat.prospectors:
   fields:
     index_prefix: elk
     log_info:
-      origin: aws
+      origin: elk-elasticsearch-${is_master_node ? "master" : "data" }-node
       source: metricbeat
       formats:
         - metricbeat
@@ -133,18 +137,18 @@ metricbeat.modules:
     - fsstat
     - memory
     - process
+    - network
   enabled: true
   period: 30s
   processes:
     - 'java'
-    - 'filebeat'
   cpu_ticks: false
   fields_under_root: true
   fields:
     index_prefix: metric-elk
     metric_info:
-      origin: aws
-      source: elasticsearch-${is_master_node ? "master" : "data" }-node
+      origin: elk-elasticsearch-${is_master_node ? "master" : "data" }-node
+      source: metricbeat
 output.logstash:
   hosts: ["${logstash_beats_address}"]
   ssl.certificate_authorities: ['/etc/beats/ssl/ca.crt']

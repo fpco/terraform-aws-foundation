@@ -76,18 +76,19 @@ metricbeat.modules:
     - fsstat
     - memory
     - process
+    - network
   enabled: true
   period: 30s
   processes:
     - 'java'
-    - 'filebeat'
+    - 'kibana'
   cpu_ticks: false
   fields_under_root: true
   fields:
     index_prefix: metric-elk
     metric_info:
-      origin: aws
-      source: logstash-node
+      origin: elk-logstash${name_suffix}
+      source: metricbeat
 output.logstash:
   hosts: ["localhost:5045"]
 EOF

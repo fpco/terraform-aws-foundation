@@ -84,6 +84,7 @@ data "template_file" "master-node-setup" {
     device_name                = "/dev/xvdf"
     mount_point                = "/mnt/elasticsearch"
     wait_interval              = 1
+    node_name                  = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     config_yaml                = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
     credstash_install_snippet  = "${var.credstash_install_snippet}"
     credstash_get_cmd          = "${var.credstash_get_cmd}"
