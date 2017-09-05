@@ -65,3 +65,15 @@ variable "root_volume_size" {
   default     = "15"
   description = "The size of the EBS volume (in GB) for the root block device"
 }
+// List of maps, as extra tags to append to the Auto-Scaling Group
+variable "extra_tags" {
+  description = "Extra tags that will be added to ASG, as a list of maps"
+  default = []
+  # see the example in this TF doc for more info:
+  # https://www.terraform.io/docs/providers/aws/r/autoscaling_group.html
+  # should be provided in the following form:
+  #   list(
+  #     map("key", "k1", "value", "value1", "propagate_at_launch", true),
+  #     map("key", "k2", "value", "value2", "propagate_at_launch", true)
+  #   ),
+}
