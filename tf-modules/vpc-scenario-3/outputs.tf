@@ -1,6 +1,6 @@
 //VPC id
 output "vpc_id" {
-  value = "${module.vpc.id}"
+  value = "${module.vpc.vpc_id}"
 }
 
 //List of private subnet ids. None created if list is empty.

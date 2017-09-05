@@ -24,7 +24,7 @@ module "vpc" {
 module "private-subnets" {
   source      = "../subnets"
   azs         = "${var.azs}"
-  vpc_id      = "${module.vpc.id}"
+  vpc_id      = "${module.vpc.vpc_id}"
   public      = false
   name_prefix = "${var.name_prefix}-private"
   cidr_blocks = "${var.private_subnet_cidrs}"
@@ -34,7 +34,7 @@ module "private-subnets" {
 ## TODO: Move these next two resources into the IPSEC/VPN module..?
 # Route private subnets through the VPN gateway
 resource "aws_route_table" "private-vpn" {
-  vpc_id           = "${module.vpc.id}"
+  vpc_id           = "${module.vpc.vpc_id}"
   propagating_vgws = ["${module.vpn.vpn_gw_id}"]
 
   tags = {
@@ -49,7 +49,7 @@ resource "aws_route_table_association" "private-vpn" {
 
 module "vpn" {
   source           = "../aws-ipsec-vpn"
-  vpc_id           = "${module.vpc.id}"
+  vpc_id           = "${module.vpc.vpc_id}"
   extra_tags       = "${var.extra_tags}"
   remote_device_ip = "${var.vpn_remote_ip}"
   static_routes    = ["${var.vpn_static_routes}"]

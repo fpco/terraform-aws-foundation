@@ -24,7 +24,7 @@ module "vpc" {
 module "public-subnets" {
   source      = "../subnets"
   azs         = "${var.azs}"
-  vpc_id      = "${module.vpc.id}"
+  vpc_id      = "${module.vpc.vpc_id}"
   name_prefix = "${var.name_prefix}-public"
   cidr_blocks = "${var.public_subnet_cidrs}"
   extra_tags  = "${var.extra_tags}"
@@ -32,7 +32,7 @@ module "public-subnets" {
 
 module "public-gateway" {
   source      = "../route-public"
-  vpc_id      = "${module.vpc.id}"
+  vpc_id      = "${module.vpc.vpc_id}"
   name_prefix = "${var.name_prefix}-public"
   extra_tags  = "${var.extra_tags}"
   public_subnet_ids = ["${module.public-subnets.ids}"]
@@ -41,7 +41,7 @@ module "public-gateway" {
 module "private-subnets" {
   source      = "../subnets"
   azs         = "${var.azs}"
-  vpc_id      = "${module.vpc.id}"
+  vpc_id      = "${module.vpc.vpc_id}"
   name_prefix = "${var.name_prefix}-private"
   cidr_blocks = "${var.private_subnet_cidrs}"
   public      = false
@@ -50,7 +50,7 @@ module "private-subnets" {
 
 module "nat-gateway" {
   source             = "../nat-gateways"
-  vpc_id             = "${module.vpc.id}"
+  vpc_id             = "${module.vpc.vpc_id}"
   name_prefix        = "${var.name_prefix}"
   nat_count          = "${length(module.private-subnets.ids)}"
   public_subnet_ids  = ["${module.public-subnets.ids}"]
