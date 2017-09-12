@@ -167,16 +167,3 @@ resource "aws_elb" "elasticsearch-elb" {
   connection_draining       = false
 
 }
-
-
-resource "aws_route53_record" "elasticsearch-elb" {
-  zone_id = "${var.route53_zone_id}"
-  name = "${var.elasticsearch_dns_name}"
-  type = "A"
-
-  alias {
-    name = "${aws_elb.elasticsearch-elb.dns_name}"
-    zone_id = "${aws_elb.elasticsearch-elb.zone_id}"
-    evaluate_target_health = true
-  }
-}

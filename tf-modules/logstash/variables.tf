@@ -49,10 +49,6 @@ variable "logstash_dns_name" {
   description = "DNS name for Logstash endpoint"
 }
 
-variable "route53_zone_id" {
-  description = "Route53 Zone id where ELB should get added a record to"
-}
-
 variable "elasticsearch_url" {
   description = "Elasticsearch endpoint url"
 }

@@ -58,19 +58,6 @@ resource "aws_elb" "kibana-elb" {
 }
 
 
-resource "aws_route53_record" "kibana-elb" {
-  zone_id = "${var.route53_zone_id}"
-  name = "${var.kibana_dns_name}"
-  type = "A"
-
-  alias {
-    name = "${aws_elb.kibana-elb.dns_name}"
-    zone_id = "${aws_elb.kibana-elb.zone_id}"
-    evaluate_target_health = true
-  }
-}
-
-
 data "template_file" "kibana-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 

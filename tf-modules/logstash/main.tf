@@ -40,18 +40,6 @@ resource "aws_elb" "logstash-elb" {
 }
 
 
-resource "aws_route53_record" "logstash-elb" {
-  zone_id = "${var.route53_zone_id}"
-  name    = "${var.logstash_dns_name}"
-  type    = "A"
-
-  alias {
-    name                   = "${aws_elb.logstash-elb.dns_name}"
-    zone_id                = "${aws_elb.logstash-elb.zone_id}"
-    evaluate_target_health = true
-  }
-}
-
 
 data "template_file" "logstash-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"

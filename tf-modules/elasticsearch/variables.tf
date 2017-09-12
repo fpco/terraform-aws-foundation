@@ -90,10 +90,6 @@ variable "internal" {
   description = "Set it to false if you want Elasticsearch to be accessible by the outside world"
 }
 
-variable "route53_zone_id" {
-  description = "Route53 Zone id where ELB should get added a record to"
-}
-
 variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
 }
