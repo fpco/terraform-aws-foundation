@@ -28,6 +28,11 @@ config.reload.interval: 60
 ${extra_settings}
 EOF
 
+mkdir /etc/logstash/patterns
+cat <<EOF > /etc/logstash/patterns/extra-grok-patterns
+${extra_grok_patterns}
+EOF
+
 mkdir /etc/logstash/ssl
 
 ${credstash_get_cmd} -n ${credstash_ca_cert_name} ${credstash_context} > /etc/logstash/ssl/ca.crt
@@ -77,6 +82,7 @@ metricbeat.modules:
     - memory
     - process
     - network
+  interfaces: [eth0]
   enabled: true
   period: 30s
   processes:
@@ -85,7 +91,7 @@ metricbeat.modules:
   cpu_ticks: false
   fields_under_root: true
   fields:
-    index_prefix: metric-elk
+    index_prefix: metricbeat-elk
     metric_info:
       origin: elk-logstash${name_suffix}
       source: metricbeat

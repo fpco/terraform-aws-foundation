@@ -138,14 +138,16 @@ metricbeat.modules:
     - memory
     - process
     - network
+  interfaces: [eth0]
   enabled: true
   period: 30s
   processes:
     - 'java'
+    - 'curator'
   cpu_ticks: false
   fields_under_root: true
   fields:
-    index_prefix: metric-elk
+    index_prefix: metricbeat-elk
     metric_info:
       origin: elk-elasticsearch-${is_master_node ? "master" : "data" }-node
       source: metricbeat
@@ -162,7 +164,7 @@ logging:
     name: metricbeat.log
 EOF
 
-curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/metric' -d@/etc/metricbeat/metricbeat.template.json
+curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_template/metricbeat' -d@/etc/metricbeat/metricbeat.template.json
 
 systemctl daemon-reload
 systemctl enable metricbeat.service

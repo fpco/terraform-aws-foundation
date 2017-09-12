@@ -35,7 +35,7 @@ data "aws_vpc" "current" {
 
 # Optional SSH Securtity Group.
 resource "aws_security_group" "ssh" {
-  count = "${var.ssh_allow ? 1 : 0}"
+  count = "${length(var.ssh_key_name) > 0 ? 1 : 0}"
   name = "${var.name_prefix}-ssh"
   vpc_id = "${var.vpc_id}"
   description = "Allow SSH (22) from public CIDRs to all EC2 instances."
@@ -139,6 +139,7 @@ module "logstash-kibana" {
   credstash_install_snippet   = "${var.credstash_install_snippet}"
   credstash_get_cmd           = "${var.credstash_get_cmd}"
   credstash_put_cmd           = "${var.credstash_put_cmd}"
+  extra_grok_patterns         = "${var.logstash_extra_grok_patterns}"
   extra_config                = <<END_CONFIG
 input {
     file {

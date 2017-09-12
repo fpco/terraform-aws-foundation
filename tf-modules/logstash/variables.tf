@@ -131,6 +131,11 @@ variable "extra_config" {
   description = "Extra Logstash configuration. It will in the middle of the pipeline, between the main config, and the one that can be supplied through credstash with 'credstash_dynamic_config_name' keyname."
 }
 
+variable "extra_grok_patterns" {
+  default = ""
+  description = "Extra grok Patterns for Logstash, which can be used during log parsing by setting: patterns_dir => ['/etc/logstash/patterns']"
+}
+
 variable "extra_elbs" {
   default = []
   description = "Elastic Load Balancers, besides the default one, to be used for Logstash scaling group"

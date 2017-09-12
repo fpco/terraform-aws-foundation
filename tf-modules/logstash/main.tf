@@ -68,6 +68,7 @@ data "template_file" "logstash-setup" {
     config                        = "${data.template_file.logstash-config.rendered}"
     extra_config                  = "${var.extra_config}"
     extra_settings                = "${var.extra_settings}"
+    extra_grok_patterns           = "${var.extra_grok_patterns}"
     extra_setup_snippet           = "${var.extra_setup_snippet}"
   }
 }

@@ -124,6 +124,15 @@ variable "logstash_extra_ingress_cidrs" {
   default = []
 }
 
+variable "logstash_extra_grok_patterns" {
+  description = "Extra grok Patterns for Logstash, which can be used during log parsing by setting: patterns_dir => ['/etc/logstash/patterns']"
+  default = ""
+}
+
+variable "logstash_dns_name" {
+  description = "DNS name for Logstash"
+}
+
 variable "route53_zone_id" {
   description = "Route53 Zone id where ELB should get added a record to"
 }
@@ -135,10 +144,6 @@ variable "kibana_dns_name" {
 variable "kibana_dns_ssl_name" {
   default = ""
   description = "DNS name for Kibana endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'kibana_dns_name' will be checked instead."
-}
-
-variable "logstash_dns_name" {
-  description = "DNS name for Logstash"
 }
 
 variable "certstrap_depot_path" {
@@ -181,18 +186,8 @@ variable "credstash_put_cmd" {
   description = "Credstash put command with region, table and kms key values set."
 }
 
-variable "ssh_pubkey" {
-  default = "ssh_key.pub"
-  description = "Path to the SSH public key file to use for connecting to all instances. Ignored if ssh_keyname is non-empty"
-}
-
 variable "ssh_key_name" {
   default = ""
-  description = "Use an existing ssh key pair, must already be created on AWS. If empty, ssh_pubkey is used to create a new pair with name 'var.name_prefix + key'"
-}
-
-variable "ssh_allow" {
-  default = true
-  description = "Allow SSH access to EC2 instances."
+  description = "Use an existing ssh key pair, must already be created on AWS. If empty, SSH access will be disabled."
 }
 
