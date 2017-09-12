@@ -58,7 +58,6 @@ module "elasticsearch" {
 
   name_prefix                 = "${var.name_prefix}"
   vpc_id                      = "${var.vpc_id}"
-  route53_zone_id             = "${var.route53_zone_id}"
   key_name                    = "${var.ssh_key_name}"
   public_subnet_ids           = ["${var.private_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
@@ -91,7 +90,6 @@ module "kibana" {
 
   name_prefix               = "${var.name_prefix}"
   vpc_id                    = "${var.vpc_id}"
-  route53_zone_id           = "${var.route53_zone_id}"
   kibana_dns_name           = "${var.kibana_dns_name}"
   kibana_dns_ssl_name       = "${var.kibana_dns_ssl_name}"
   public_subnet_ids         = ["${var.public_subnet_ids}"]
@@ -117,7 +115,6 @@ module "logstash-kibana" {
   vpc_id                      = "${var.vpc_id}"
   public_subnet_ids           = ["${var.public_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
-  route53_zone_id             = "${var.route53_zone_id}"
   logstash_dns_name           = "${var.logstash_dns_name}"
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "${var.logstash_kibana_instance_type}"

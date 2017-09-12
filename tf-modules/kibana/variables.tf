@@ -46,10 +46,6 @@ variable "kibana_dns_ssl_name" {
   description = "DNS name for Kibana endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'kibana_dns_name' will be checked instead."
 }
 
-variable "route53_zone_id" {
-  description = "Route53 Zone id where ELB should get added a record to"
-}
-
 variable "elasticsearch_url" {
   description = "Elasticsearch endpoint URL"
 }
