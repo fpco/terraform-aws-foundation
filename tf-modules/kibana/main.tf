@@ -58,6 +58,41 @@ resource "aws_elb" "kibana-elb" {
 }
 
 
+resource "aws_alb_target_group" "kibana-https" {
+  name     = "${var.name_prefix}-kibana-https"
+  port     = 5602
+  protocol = "HTTPS"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    interval = 300
+    protocol = "http"
+    matcher  = "401"
+  }
+
+  health_check {
+    interval = 300
+    protocol = "http"
+    port     = 5601
+    path     = "/status"
+    matcher  = "200"
+  }
+}
+
+// Target group for redirect to https
+resource "aws_alb_target_group" "kibana-http" {
+  name     = "${var.name_prefix}-kibana-http"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+
+  health_check {
+    interval = 300
+    matcher  = "301"
+  }
+}
+
+
 data "template_file" "kibana-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
@@ -86,15 +121,7 @@ resource "aws_security_group" "kibana-sg" {
     from_port       = 5602
     to_port         = 5602
     protocol        = "tcp"
-    security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
-  }
-
-  # Kibana status
-  ingress {
-    from_port       = 5603
-    to_port         = 5603
-    protocol        = "tcp"
-    security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
+    security_groups = ["${var.alb_security_group_id}"]
   }
 
   # Used for proper redirect to https
@@ -102,7 +129,7 @@ resource "aws_security_group" "kibana-sg" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = ["${aws_security_group.kibana-elb-sg.id}"]
+    security_groups = ["${var.alb_security_group_id}"]
   }
 
   egress {
@@ -112,7 +139,6 @@ resource "aws_security_group" "kibana-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
 
 resource "aws_security_group" "kibana-elb-sg" {
   name        = "${var.name_prefix}-kibana-elb"
@@ -156,7 +182,7 @@ resource "aws_autoscaling_group" "kibana-asg" {
   launch_configuration = "${aws_launch_configuration.kibana-lc.name}"
   health_check_type    = "ELB"
   vpc_zone_identifier  = ["${var.private_subnet_ids}"]
-  load_balancers       = ["${aws_elb.kibana-elb.name}"]
+  load_balancers       = ["${var.alb_name}"]
 
   tag = [{
     key                 = "Name"

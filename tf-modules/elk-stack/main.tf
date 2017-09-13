@@ -52,6 +52,121 @@ resource "aws_security_group" "ssh" {
   }
 }
 
+resource "aws_security_group" "internal-alb-sg" {
+  name        = "${var.name_prefix}-internal-alb"
+  vpc_id      = "${var.vpc_id}"
+  description = "Security group for the internal ALB used by Kibana and Elasticsearch."
+
+  tags {
+    Name = "${var.name_prefix}-internal-alb"
+  }
+}
+
+// Allow egress traffic
+resource "aws_security_group_rule" "alb-http-rule" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.internal-alb-sg.id}"
+}
+
+// Rule that allows ingress to ALB on port 80 for HTTP redirect to HTTPS
+// from custom CIDRs
+resource "aws_security_group_rule" "alb-http-rule" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.user_ingress_cidrs}"]
+  security_group_id = "${aws_security_group.internal-alb-sg.id}"
+}
+
+// Rule that allows ingress to ALB on port 443 from custom CIDRs
+resource "aws_security_group_rule" "alb-http-rule" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.user_ingress_cidrs}"]
+  security_group_id = "${aws_security_group.internal-alb-sg.id}"
+}
+
+resource "aws_alb" "internal" {
+  name            = "${var.name_prefix}-internal-alb"
+  internal        = true
+  idle_timeout    = "300"
+  security_groups = ["${aws_security_group.internal-alb-sg.id}"]
+  subnets         = ["${var.private_subnet_ids}"]
+
+  enable_deletion_protection = true
+
+  tags {
+    Name = "${var.name_prefix}-internal-alb"
+    Apps = "Elasticsearch+Kibana"
+  }
+}
+
+resource "aws_alb_listener" "internal-http" {
+  load_balancer_arn = "${aws_alb.internal.arn}"
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${module.kibana.alb_target_group_arn}"
+  }
+}
+
+resource "aws_alb_listener_rule" "kibana" {
+  listener_arn = "${aws_alb_listener.internal-http.arn}"
+  priority     = 99
+
+  action {
+    type = "forward"
+    target_group_arn = "${module.kibana.alb_target_group_arn}"
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.kibana_dns_name}"]
+  }
+}
+
+data "aws_acm_certificate" "kibana-cert" {
+  domain = "${coalesce(var.kibana_dns_ssl_name, var.kibana_dns_name)}"
+  statuses = ["ISSUED"]
+}
+
+
+resource "aws_alb_listener" "internal-https" {
+  load_balancer_arn = "${aws_alb.internal.arn}"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "${var.kibana_dns_ssl_name}"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${module.kibana.alb_target_group_arn}"
+  }
+}
+
+resource "aws_alb_listener_rule" "kibana" {
+  listener_arn = "${aws_alb_listener.internal-https.arn}"
+  priority     = 99
+
+  action {
+    type = "forward"
+    target_group_arn = "${module.kibana.alb_target_group_arn}"
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.kibana_dns_name}"]
+  }
+}
 
 module "elasticsearch" {
   source = "../elasticsearch"
@@ -62,7 +177,6 @@ module "elasticsearch" {
   public_subnet_ids           = ["${var.private_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   extra_sg_ids                = ["${aws_security_group.ssh.id}"]
-  auth_elb_ingress_cidrs      = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
   node_ami                    = "${data.aws_ami.ubuntu.id}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
   elasticsearch_dns_ssl_name  = "${var.elasticsearch_dns_ssl_name}"
@@ -82,6 +196,14 @@ module "elasticsearch" {
   credstash_get_cmd           = "${var.credstash_get_cmd}"
   deploy_proxy                = "${var.elasticsearch_deploy_proxy}"
   logstash_beats_address      = "${var.logstash_dns_name}:5044"
+
+  internal_alb_arn               = "${aws_alb.internal.arn}"
+  internal_alb_name              = "${aws_alb.internal.name}"
+  internal_alb_security_group_id = "${aws_security_group.internal-alb-sg.id}"
+  external_alb_arn               = "${aws_alb.internal.arn}"
+  external_alb_name              = "${aws_alb.internal.name}"
+  external_alb_security_group_id = "${aws_security_group.internal-alb-sg.id}"
+  external_alb_ingress_cidrs     = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
 }
 
 
@@ -101,7 +223,8 @@ module "kibana" {
   min_server_count          = 0
   max_server_count          = 0
   desired_server_count      = 0
-  elb_ingress_cidrs         = ["${var.user_ingress_cidrs}"]
+  alb_security_group_id     = "${aws_security_group.internal-alb-sg.id}"
+  alb_ingress_cidrs         = ["${var.user_ingress_cidrs}"]
   credstash_install_snippet = "${var.credstash_install_snippet}"
   credstash_get_cmd         = "${var.credstash_get_cmd}"
 }

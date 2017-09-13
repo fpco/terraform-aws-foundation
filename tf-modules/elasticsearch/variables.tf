@@ -85,11 +85,6 @@ variable "extra_config" {
   description = "Extra elasticsearch configuration in yaml format that will be applied to all nodes"
 }
 
-variable "internal" {
-  default = true
-  description = "Set it to false if you want Elasticsearch to be accessible by the outside world"
-}
-
 variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
 }
@@ -101,11 +96,6 @@ variable "key_name" {
 variable "deploy_curator" {
   default = false
   description = "Should a curator be installed and enabled on all master eligible nodes. If enabled it will only run on currently elected master."
-}
-
-variable "deploy_proxy" {
-  default = false
-  description = "Should a reverse proxy with Basic Authentication be setup for ES API on port 9201."
 }
 
 variable "index_retention_period" {

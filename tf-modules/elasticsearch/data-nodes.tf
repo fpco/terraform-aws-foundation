@@ -54,7 +54,7 @@ resource "aws_autoscaling_group" "data-node-asg" {
   launch_configuration = "${element(aws_launch_configuration.data-node-lc.*.name, count.index)}"
   health_check_type    = "ELB"
   vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]
-  load_balancers       = ["${aws_elb.elasticsearch-elb.name}"]
+  load_balancers       = ["${compcat(list(var.internal_alb_name, var.external_alb_name))}"]
   lifecycle            = {
     create_before_destroy = true
   }
@@ -90,7 +90,7 @@ data "template_file" "data-node-setup" {
     is_master_node             = false
     logstash_beats_address     = "${var.logstash_beats_address}"
     extra_setup_snippet        = <<EXTRA_SETUP
-${var.deploy_proxy ? data.template_file.proxy-setup.rendered : ""}
+${length(var.external_alb_name) == 0 ? data.template_file.proxy-setup.rendered : ""}
 
 ${var.extra_setup_snippet}
 EXTRA_SETUP
@@ -133,37 +133,119 @@ data "aws_acm_certificate" "elasticsearch-cert" {
   statuses = ["ISSUED"]
 }
 
-resource "aws_elb" "elasticsearch-elb" {
-  name            = "${var.name_prefix}-elasticsearch"
-  subnets         = ["${var.public_subnet_ids}"]
-  security_groups = ["${concat(list(aws_security_group.elasticsearch-elb-sg.id), var.extra_elb_sg_ids)}"]
-  internal        = "${var.internal}"
+# resource "aws_elb" "elasticsearch-elb" {
+#   name            = "${var.name_prefix}-elasticsearch"
+#   subnets         = ["${var.public_subnet_ids}"]
+#   security_groups = ["${concat(list(aws_security_group.elasticsearch-elb-sg.id), var.extra_elb_sg_ids)}"]
+#   internal        = "${var.internal}"
 
-  listener {
-    instance_port = 9200
-    instance_protocol = "http"
-    lb_port = 9200
-    lb_protocol = "http"
-  }
+#   listener {
+#     instance_port = 9200
+#     instance_protocol = "http"
+#     lb_port = 9200
+#     lb_protocol = "http"
+#   }
 
-  listener {
-    instance_port = 9201
-    instance_protocol = "http"
-    lb_port = 9201
-    lb_protocol = "https"
-    ssl_certificate_id = "${data.aws_acm_certificate.elasticsearch-cert.arn}"
-  }
+#   listener {
+#     instance_port = 9201
+#     instance_protocol = "http"
+#     lb_port = 9201
+#     lb_protocol = "https"
+#     ssl_certificate_id = "${data.aws_acm_certificate.elasticsearch-cert.arn}"
+#   }
 
-  health_check {
-    healthy_threshold = 2
-    unhealthy_threshold = 3
-    timeout = 3
-    target = "HTTP:9200/"
+#   health_check {
+#     healthy_threshold = 2
+#     unhealthy_threshold = 3
+#     timeout = 3
+#     target = "HTTP:9200/"
+#     interval = 60
+#   }
+
+#   cross_zone_load_balancing = true
+#   idle_timeout              = 30
+#   connection_draining       = false
+
+# }
+
+
+
+resource "aws_alb_target_group" "elasticsearch-api" {
+  name     = "${var.name_prefix}-elasticsearch-api"
+  port     = 9200
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+  health_check = {
     interval = 60
   }
+}
 
-  cross_zone_load_balancing = true
-  idle_timeout              = 30
-  connection_draining       = false
+resource "aws_alb_listener" "elasticsearch-api" {
+  load_balancer_arn = "${var.internal_alb_arn}"
+  port              = 9200
+  protocol          = "HTTP"
 
+  default_action {
+    target_group_arn = "${aws_alb_target_group.elasticsearch-api}"
+    type             = "forward"
+  }
+}
+
+resource "aws_alb_listener_rule" "elasticsearch-api" {
+  listener_arn = "${aws_alb_listener.elasticsearch-api.arn}"
+  priority     = 99
+
+  action {
+    type = "forward"
+    target_group_arn = "${aws_alb_target_group.elasticsearch-api.arn}"
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.elasticsearch_dns_name}"]
+  }
+}
+
+
+// Optional ES API endpoint with BasicAuth
+resource "aws_alb_target_group" "elasticsearch-api-secured" {
+  count    = "${length(var.external_alb_name) == 0 ? 0 : 1}"
+  name     = "${var.name_prefix}-elasticsearch-api-secured"
+  port     = 9201
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+  health_check {
+    interval = 300
+    matcher  = "401"
+  }
+}
+
+resource "aws_alb_listener" "elasticsearch-api-secured" {
+  count             = "${length(var.external_alb_name) == 0 ? 0 : 1}"
+  load_balancer_arn = "${var.external_alb_arn}"
+  port              = 9201
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "${data.aws_acm_certificate.elasticsearch-cert.arn}"
+
+  default_action {
+    target_group_arn = "${element(aws_alb_target_group.elasticsearch-api-secured.*.arn, 0)}"
+    type             = "forward"
+  }
+}
+
+resource "aws_alb_listener_rule" "elasticsearch-api-secured" {
+  count        = "${length(var.external_alb_name) == 0 ? 0 : 1}"
+  listener_arn = "${element(aws_alb_listener.elasticsearch-api-secured.*.arn, 0)}"
+  priority     = 99
+
+  action {
+    type = "forward"
+    target_group_arn = "${element(aws_alb_target_group.elasticsearch-api-secured.*.arn, 0)}"
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.elasticsearch_dns_name}"]
+  }
 }
