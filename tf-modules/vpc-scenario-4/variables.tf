@@ -11,23 +11,23 @@ variable "cidr" {
 }
 
 variable "public_subnet_cidrs" {
-  type = "list"
+  type        = "list"
   description = "A list of public subnet CIDRs to deploy inside the VPC."
 }
 
 variable "private_subnet_cidrs" {
   description = "A list of private subnet CIDRs to deploy inside the VPC. Should not be higher than public subnets count"
-  default = []
+  default     = []
 }
 
 variable "azs" {
-  type = "list"
+  type        = "list"
   description = "A list of Availaiblity Zones in the region"
 }
 
 variable "extra_tags" {
   description = "Extra tags that will be added to VPC, DHCP Options, Internet Gateway, Subnets and Routing Table."
-  default = {}
+  default     = {}
 }
 
 variable "enable_dns_hostnames" {
@@ -46,6 +46,7 @@ variable "dns_servers" {
 }
 
 variable "vpn_static_routes" {
+  type        = "list"
   description = "list of static routes to use with AWS customer gateway (VPN)"
 }
 

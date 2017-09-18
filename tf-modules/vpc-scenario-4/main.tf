@@ -8,6 +8,14 @@
  * Scenario 4 from AWS docs:
  * http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenarios.html
  *
+ * Note that, when using this module and deploying the VPC for the first time,
+ * Terraform needs the user to add the VPC, Subnets, and then Route Tables. For
+ * example, use targets to apply these updates sequentially:
+ *
+ *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.vpc
+ *     ᐅ terraform apply tf.out
+ *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.private-subnets
+ *     ᐅ terraform apply tf.out
  */
 
 module "vpc" {
@@ -41,9 +49,10 @@ resource "aws_route_table" "private-vpn" {
     Name = "${var.name_prefix}-private-vpn"
   }
 }
+
 resource "aws_route_table_association" "private-vpn" {
   count          = "${length(module.private-subnets.ids)}"
-  subnet_id      = "${element(module.private-subnet.ids, count.index)}"
+  subnet_id      = "${element(module.private-subnets.ids, count.index)}"
   route_table_id = "${aws_route_table.private-vpn.id}"
 }
 
@@ -53,4 +62,5 @@ module "vpn" {
   extra_tags       = "${var.extra_tags}"
   remote_device_ip = "${var.vpn_remote_ip}"
   static_routes    = ["${var.vpn_static_routes}"]
+  name             = "${var.name_prefix}-vpn"
 }

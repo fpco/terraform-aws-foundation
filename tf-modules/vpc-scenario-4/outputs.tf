@@ -20,5 +20,5 @@ output "public_route_table_id" {
 
 //Internet gateway id
 output "igw_id" {
-  value = "${aws_internet_gateway.main.id}"
+  value = ["${module.private-subnets.ids}"]
 }
