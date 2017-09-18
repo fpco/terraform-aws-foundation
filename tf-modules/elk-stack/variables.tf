@@ -4,7 +4,7 @@ variable "name_prefix" {
 }
 
 variable "region" {
-  description = "Region to deploy ELK stack in"
+  description = "Region to configure ELK stack for"
 }
 
 variable "vpc_id" {

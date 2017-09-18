@@ -47,14 +47,14 @@ resource "aws_launch_configuration" "data-node-lc" {
 resource "aws_autoscaling_group" "data-node-asg" {
   count                = "${var.data_node_count}"
   availability_zones   = ["${element(data.aws_subnet.private.*.availability_zone, count.index)}"]
-  name                 = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
+  name_prefix          = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}-"
   max_size             = 1
   min_size             = 1
   desired_capacity     = 1
   launch_configuration = "${element(aws_launch_configuration.data-node-lc.*.name, count.index)}"
   health_check_type    = "ELB"
   vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]
-  load_balancers       = ["${compcat(list(var.internal_alb_name, var.external_alb_name))}"]
+  target_group_arns    = ["${concat(list(aws_alb_target_group.elasticsearch-api.arn), aws_alb_target_group.elasticsearch-api-secured.*.arn)}"]
   lifecycle            = {
     create_before_destroy = true
   }
@@ -90,7 +90,7 @@ data "template_file" "data-node-setup" {
     is_master_node             = false
     logstash_beats_address     = "${var.logstash_beats_address}"
     extra_setup_snippet        = <<EXTRA_SETUP
-${length(var.external_alb_name) == 0 ? data.template_file.proxy-setup.rendered : ""}
+${var.external_alb_setup ? data.template_file.proxy-setup.rendered : ""}
 
 ${var.extra_setup_snippet}
 EXTRA_SETUP
@@ -127,51 +127,14 @@ data "template_file" "data-node-config" {
 }
 
 
-
+# TODO: move out from here or require only when external_alb_setup = true
 data "aws_acm_certificate" "elasticsearch-cert" {
   domain = "${coalesce(var.elasticsearch_dns_ssl_name, var.elasticsearch_dns_name)}"
   statuses = ["ISSUED"]
 }
 
-# resource "aws_elb" "elasticsearch-elb" {
-#   name            = "${var.name_prefix}-elasticsearch"
-#   subnets         = ["${var.public_subnet_ids}"]
-#   security_groups = ["${concat(list(aws_security_group.elasticsearch-elb-sg.id), var.extra_elb_sg_ids)}"]
-#   internal        = "${var.internal}"
-
-#   listener {
-#     instance_port = 9200
-#     instance_protocol = "http"
-#     lb_port = 9200
-#     lb_protocol = "http"
-#   }
-
-#   listener {
-#     instance_port = 9201
-#     instance_protocol = "http"
-#     lb_port = 9201
-#     lb_protocol = "https"
-#     ssl_certificate_id = "${data.aws_acm_certificate.elasticsearch-cert.arn}"
-#   }
-
-#   health_check {
-#     healthy_threshold = 2
-#     unhealthy_threshold = 3
-#     timeout = 3
-#     target = "HTTP:9200/"
-#     interval = 60
-#   }
-
-#   cross_zone_load_balancing = true
-#   idle_timeout              = 30
-#   connection_draining       = false
-
-# }
-
-
-
 resource "aws_alb_target_group" "elasticsearch-api" {
-  name     = "${var.name_prefix}-elasticsearch-api"
+  name     = "${var.name_prefix}-ES-api"
   port     = 9200
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
@@ -181,12 +144,12 @@ resource "aws_alb_target_group" "elasticsearch-api" {
 }
 
 resource "aws_alb_listener" "elasticsearch-api" {
-  load_balancer_arn = "${var.internal_alb_arn}"
+  load_balancer_arn = "${var.internal_alb["arn"]}"
   port              = 9200
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = "${aws_alb_target_group.elasticsearch-api}"
+    target_group_arn = "${aws_alb_target_group.elasticsearch-api.arn}"
     type             = "forward"
   }
 }
@@ -209,8 +172,8 @@ resource "aws_alb_listener_rule" "elasticsearch-api" {
 
 // Optional ES API endpoint with BasicAuth
 resource "aws_alb_target_group" "elasticsearch-api-secured" {
-  count    = "${length(var.external_alb_name) == 0 ? 0 : 1}"
-  name     = "${var.name_prefix}-elasticsearch-api-secured"
+  count    = "${var.external_alb_setup ? 1 : 0}"
+  name     = "${var.name_prefix}-ES-api-secured"
   port     = 9201
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
@@ -221,8 +184,8 @@ resource "aws_alb_target_group" "elasticsearch-api-secured" {
 }
 
 resource "aws_alb_listener" "elasticsearch-api-secured" {
-  count             = "${length(var.external_alb_name) == 0 ? 0 : 1}"
-  load_balancer_arn = "${var.external_alb_arn}"
+  count             = "${var.external_alb_setup ? 1 : 0}"
+  load_balancer_arn = "${lookup(var.external_alb, "arn", "")}"
   port              = 9201
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -235,7 +198,7 @@ resource "aws_alb_listener" "elasticsearch-api-secured" {
 }
 
 resource "aws_alb_listener_rule" "elasticsearch-api-secured" {
-  count        = "${length(var.external_alb_name) == 0 ? 0 : 1}"
+  count        = "${var.external_alb_setup ? 1 : 0}"
   listener_arn = "${element(aws_alb_listener.elasticsearch-api-secured.*.arn, 0)}"
   priority     = 99
 

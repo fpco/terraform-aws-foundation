@@ -30,57 +30,60 @@ resource "aws_security_group" "transport-sg" {
 }
 
 resource "aws_security_group" "elasticsearch-api-sg" {
-  name        = "${var.name_prefix}-elasticsearch-api"
+  name        = "${var.name_prefix}-elasticsearch-api-endpoints"
   vpc_id      = "${var.vpc_id}"
   description = "Allow HTTP API (9200) and Optionally HTTPS API (9201) inbound from ALB security group."
 
   tags {
-    Name = "${var.name_prefix}-elasticsearch-api"
+    Name = "${var.name_prefix}-elasticsearch-api-endpoints"
   }
 }
 
 
 // Rule that allows ingress to API on EC2 instances from ALB
 resource "aws_security_group_rule" "elasticsearch-api-rule" {
+  security_group_id        = "${aws_security_group.elasticsearch-api-sg.id}"
+  type                     = "ingress"
   from_port                = 9200
   to_port                  = 9200
   protocol                 = "tcp"
-  security_group_id        = "${aws_security_group.elasticsearch-api-sg.id}"
-  source_security_group_id = "${var.internal_alb_security_group_id}"
+  source_security_group_id = "${var.internal_alb["security_group_id"]}"
 }
 
 
 // Rule that allows ingress to ALB from the private subnet only
 resource "aws_security_group_rule" "internal-alb-rule" {
+  security_group_id = "${var.internal_alb["security_group_id"]}"
   type              = "ingress"
   from_port         = 9200
   to_port           = 9200
   protocol          = "tcp"
   cidr_blocks       = ["${data.aws_subnet.private.*.cidr_block}"]
-  security_group_id = "${var.internal_alb_security_group_id}"
 }
 
 
 // Optional rule that allows ingress to API with BasicAuth on EC2 instances from ALB
 resource "aws_security_group_rule" "elasticsearch-api-secured-rule" {
-  count                    = "${length(var.external_alb_security_group_id) == 0 ? 0 : 1}"
+  count                    = "${var.external_alb_setup ? 1 : 0}"
+  security_group_id        = "${aws_security_group.elasticsearch-api-sg.id}"
+  type                     = "ingress"
   from_port                = 9201
   to_port                  = 9201
   protocol                 = "tcp"
-  security_group_id        = "${aws_security_group.elasticsearch-api-sg.id}"
-  source_security_group_id = "${var.external_alb_security_group_id}"
+  source_security_group_id = "${lookup(var.external_alb, "security_group_id", "")}"
 }
 
 
 // Optional rule that allows ingress to external ALB from the outside
 resource "aws_security_group_rule" "external-alb-rule" {
-  count             = "${length(var.external_alb_security_group_id) == 0 ? 0 : 1}"
+  count             = "${var.external_alb_setup ? 1 : 0}"
+  # TODO: check if fails without default "" and with empty `external_alb`.
+  security_group_id = "${lookup(var.external_alb, "security_group_id", "")}"
   type              = "ingress"
   from_port         = 9201
   to_port           = 9201
   protocol          = "tcp"
   cidr_blocks       = ["${var.external_alb_ingress_cidrs}"]
-  security_group_id = "${var.external_alb_security_group_id}"
 }
 
 

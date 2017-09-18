@@ -10,7 +10,7 @@
 resource "aws_elb" "logstash-elb" {
   name            = "${var.name_prefix}-logstash"
   subnets         = ["${var.public_subnet_ids}"]
-  security_groups = ["${concat(list(aws_security_group.logstash-elb-sg.id), var.extra_elb_sg_ids)}"]
+  security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
   internal        = "${var.internal}"
 
   listener {
@@ -151,7 +151,8 @@ resource "aws_autoscaling_group" "logstash-asg" {
   desired_capacity     = "${var.desired_server_count}"
   launch_configuration = "${aws_launch_configuration.logstash-lc.name}"
   health_check_type    = "ELB"
-  load_balancers       = ["${concat(list(aws_elb.logstash-elb.name), var.extra_elbs)}"]
+  load_balancers       = ["${aws_elb.logstash-elb.name}"]
+  target_group_arns    = ["${var.target_group_arns}"]
 
   tag = [{
     key                 = "Name"
