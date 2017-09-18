@@ -8,6 +8,18 @@
  * Scenario 2 from AWS docs:
  * http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenarios.html
  *
+ * Note that, when using this module and deploying the VPC for the first time,
+ * Terraform needs the user to add the VPC, Subnets, and then Route Tables. For
+ * example, use targets to apply these updates sequentially:
+ *
+ *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.vpc
+ *     ᐅ terraform apply tf.out
+ *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.public-subnets
+ *     ᐅ terraform apply tf.out
+ *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.public-gateway
+ *     ᐅ terraform apply tf.out
+ *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.private-subnets
+ *     ᐅ terraform apply tf.out
  */
 
 module "vpc" {
@@ -31,10 +43,10 @@ module "public-subnets" {
 }
 
 module "public-gateway" {
-  source      = "../route-public"
-  vpc_id      = "${module.vpc.vpc_id}"
-  name_prefix = "${var.name_prefix}-public"
-  extra_tags  = "${var.extra_tags}"
+  source            = "../route-public"
+  vpc_id            = "${module.vpc.vpc_id}"
+  name_prefix       = "${var.name_prefix}-public"
+  extra_tags        = "${var.extra_tags}"
   public_subnet_ids = ["${module.public-subnets.ids}"]
 }
 
