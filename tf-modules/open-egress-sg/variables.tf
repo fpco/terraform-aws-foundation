@@ -1,6 +1,7 @@
 variable "name" {
-    description = "The name prefix for this security group"
+  description = "The name prefix for this security group"
 }
+
 variable "vpc_id" {
-    description = "The ID of the VPC to deploy to"
+  description = "The ID of the VPC to deploy to"
 }
