@@ -31,6 +31,13 @@ module "private-ssh-sg" {
   vpc_id              = "${module.vpc.vpc_id}"
   allowed_cidr_blocks = "${var.vpc_cidr}"
 }
+# shared security group, open ingress (inbound to nodes), for kube workers
+module "open-ingress-sg" {
+  source              = "../../tf-modules/open-ingress-sg"
+  name_prefix         = "${var.name}"
+  vpc_id              = "${module.vpc.vpc_id}"
+  allowed_cidr_blocks = "${var.vpc_cidr}"
+}
 # shared security group, open egress (outbound from nodes), use in public subnet
 module "open-egress-sg" {
   source = "../../tf-modules/open-egress-sg"
