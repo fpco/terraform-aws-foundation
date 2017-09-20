@@ -7,6 +7,11 @@ variable "region" {
   description = "Region to deploy ELK stack in"
 }
 
+variable "is_govcloud" {
+  description = "Boolean, if this is running on GovCloud or not"
+  default     = "false"
+}
+
 variable "vpc_id" {
   description = "VPC ID for the ELK stack"
 }
