@@ -15,19 +15,10 @@ provider "aws" {
   region = "${var.region}"
 }
 
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
+module "ubuntu-ami" {
+  source      = "../ami-ubuntu"
+  release     = "16.04"
+  is_govcloud = "${var.is_govcloud}"
 }
 
 data "aws_vpc" "current" {
@@ -65,7 +56,7 @@ module "elasticsearch" {
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   extra_sg_ids                = ["${aws_security_group.ssh.id}"]
   auth_elb_ingress_cidrs      = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
-  node_ami                    = "${data.aws_ami.ubuntu.id}"
+  node_ami                    = "${module.ubuntu-ami.id}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
   elasticsearch_dns_ssl_name  = "${var.elasticsearch_dns_ssl_name}"
   data_node_count             = "${var.elasticsearch_data_node_count}"
@@ -116,7 +107,7 @@ module "logstash-kibana" {
   public_subnet_ids           = ["${var.public_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   logstash_dns_name           = "${var.logstash_dns_name}"
-  ami                         = "${data.aws_ami.ubuntu.id}"
+  ami                         = "${module.ubuntu-ami.id}"
   instance_type               = "${var.logstash_kibana_instance_type}"
   key_name                    = "${var.ssh_key_name}"
   elasticsearch_url           = "http://${var.elasticsearch_dns_name}:9200"

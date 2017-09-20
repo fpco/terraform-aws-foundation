@@ -1,6 +1,6 @@
 // AMI that was used for all EC2 instances in the stack
 output "ami" {
-  value = "${data.aws_ami.ubuntu.id}"
+  value = "${module.ubuntu-ami.id}"
 }
 
 // Security group that allows SSH access
