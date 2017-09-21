@@ -9,6 +9,7 @@
  */
 
 module "data-node-ebs-volumes" {
+  aws_cloud    = "${var.is_govcloud ? "aws-us-gov" : "aws"}"
   source       = "../persistent-ebs-volumes"
   name_prefix  = "${var.name_prefix}-data-node"
   volume_count = "${var.data_node_count}"
