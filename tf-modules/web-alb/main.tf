@@ -1,12 +1,12 @@
-data "aws_acm_certificate" "kibana-cert" {
-  domain = "${coalesce(var.kibana_dns_ssl_name, var.kibana_dns_name)}"
+data "aws_acm_certificate" "web-server-cert" {
+  domain = "${coalesce(var.dns_ssl_name, var.dns_name)}"
   statuses = ["ISSUED"]
 }
 
 resource "aws_security_group" "alb-sg" {
   name        = "${var.name_prefix}-alb"
   vpc_id      = "${var.vpc_id}"
-  description = "Security group for Kibana ALB."
+  description = "Security group for ${var.app_names} ALB."
 
   tags {
     Name = "${var.name_prefix}-alb"
@@ -23,9 +23,10 @@ resource "aws_security_group_rule" "alb-egress-rule" {
   security_group_id = "${aws_security_group.alb-sg.id}"
 }
 
-// Rule that allows ingress to ALB on port 80 for HTTP in order to
-// redirect to HTTPS from custom CIDRs
+// Rule that allows ingress to ALB on port 80 from custom CIDRs,
+// usually for redirect of HTTP to HTTPS
 resource "aws_security_group_rule" "alb-http-rule" {
+  count             = "${length(var.user_ingress_cidrs) > 0 ? 1 : 0}"
   type              = "ingress"
   from_port         = 80
   to_port           = 80
@@ -36,6 +37,7 @@ resource "aws_security_group_rule" "alb-http-rule" {
 
 // Rule that allows ingress to ALB on port 443 from custom CIDRs
 resource "aws_security_group_rule" "alb-https-rule" {
+  count             = "${length(var.user_ingress_cidrs) > 0 ? 1 : 0}"
   type              = "ingress"
   from_port         = 443
   to_port           = 443
@@ -44,8 +46,8 @@ resource "aws_security_group_rule" "alb-https-rule" {
   security_group_id = "${aws_security_group.alb-sg.id}"
 }
 
-// Application Load Balancer for Kibana.
-resource "aws_alb" "kibana" {
+// Application Load Balancer for Web Server.
+resource "aws_alb" "web-server" {
   name            = "${var.name_prefix}-alb"
   internal        = "${var.internal}"
   idle_timeout    = "300"
@@ -53,13 +55,13 @@ resource "aws_alb" "kibana" {
   subnets         = ["${var.subnet_ids}"]
 
   tags {
-    Name = "${var.name_prefix}-alb"
-    Apps = "Kibana${var.extra_app_names}"
+    Name = "${var.name_prefix}-${var.app_names}-alb"
+    Apps = "${var.app_names}"
   }
 }
 
 resource "aws_alb_listener" "http" {
-  load_balancer_arn = "${aws_alb.kibana.arn}"
+  load_balancer_arn = "${aws_alb.web-server.arn}"
   port              = "80"
   protocol          = "HTTP"
 
@@ -80,17 +82,17 @@ resource "aws_alb_listener_rule" "http" {
 
   condition {
     field  = "host-header"
-    values = ["${var.kibana_dns_name}"]
+    values = ["${var.dns_name}"]
   }
 }
 
 
 resource "aws_alb_listener" "https" {
-  load_balancer_arn = "${aws_alb.kibana.arn}"
+  load_balancer_arn = "${aws_alb.web-server.arn}"
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${data.aws_acm_certificate.kibana-cert.arn}"
+  certificate_arn   = "${data.aws_acm_certificate.web-server-cert.arn}"
 
   default_action {
     type             = "forward"
@@ -109,6 +111,6 @@ resource "aws_alb_listener_rule" "https" {
 
   condition {
     field  = "host-header"
-    values = ["${var.kibana_dns_name}"]
+    values = ["${var.dns_name}"]
   }
 }

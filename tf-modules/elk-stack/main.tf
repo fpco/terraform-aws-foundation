@@ -11,11 +11,6 @@
  *
  */
 
-provider "aws" {
-  region = "${var.region}"
-}
-
-
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
@@ -68,23 +63,7 @@ module "kibana" {
   desired_server_count      = 0
   credstash_install_snippet = "${var.credstash_install_snippet}"
   credstash_get_cmd         = "${var.credstash_get_cmd}"
-  alb                       = "${module.kibana-alb.alb}"
-  # alb_security_group_id     = "${module.kibana-alb.security_group_id}"
-}
-
-module "kibana-alb" {
-  source = "../kibana-alb"
-  #source = "../web-alb"
-  name_prefix                 = "${var.name_prefix}"
-  vpc_id                      = "${var.vpc_id}"
-  subnet_ids                  = ["${var.private_subnet_ids}"]
-  user_ingress_cidrs          = ["${var.user_ingress_cidrs}"]
-  http_target_group_arn       = "${module.kibana.http_target_group_arn}"
-  https_target_group_arn      = "${module.kibana.https_target_group_arn}"
-  internal                    = true
-  extra_app_names             = "+Elasticsearch"
-  kibana_dns_name             = "${var.kibana_dns_name}"
-  kibana_dns_ssl_name         = "${var.kibana_dns_ssl_name}"
+  alb                       = "${var.kibana_alb}"
 }
 
 
@@ -172,8 +151,8 @@ module "elasticsearch" {
   credstash_get_cmd           = "${var.credstash_get_cmd}"
   logstash_beats_address      = "${var.logstash_dns_name}:5044"
 
-  internal_alb                = "${module.kibana-alb.alb}"
-  external_alb_setup          = true
-  external_alb                = "${module.kibana-alb.alb}"
+  internal_alb                = "${var.elasticsearch_internal_alb}"
+  external_alb_setup          = "${var.elasticsearch_external_alb_setup}"
+  external_alb                = "${var.elasticsearch_external_alb}"
   external_alb_ingress_cidrs  = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
 }

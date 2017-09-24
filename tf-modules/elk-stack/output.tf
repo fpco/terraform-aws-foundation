@@ -28,14 +28,14 @@ output "logstash_kibana_asg_name" {
   value = "${module.logstash-kibana.asg_name}"
 }
 
-output "elasticsearch_lb" {
-  value = "${module.kibana-alb.alb}"
-}
-
 output "logstash_lb" {
   value = "${module.logstash-kibana.elb}"
 }
 
-output "kibana_lb" {
-  value = "${module.kibana-alb.alb}"
+output "kibana_http_target_group_arn" {
+  value = "${module.kibana.http_target_group_arn}"
+}
+
+output "kibana_https_target_group_arn" {
+  value = "${module.kibana.https_target_group_arn}"
 }

@@ -57,7 +57,3 @@ variable "alb" {
   type = "map"
   description = "Information about ALB"
 }
-
-# variable "alb_security_group_id" {
-#   description = "Id of Security Group attached to internal ALB"
-# }
