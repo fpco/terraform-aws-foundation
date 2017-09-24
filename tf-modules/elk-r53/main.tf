@@ -14,17 +14,17 @@ resource "aws_route53_record" "elasticsearch-lb" {
   }
 }
 
-# resource "aws_route53_record" "logstash-lb" {
-#   zone_id = "${var.route53_zone_id}"
-#   name    = "${var.logstash_dns_name}"
-#   type    = "A"
+resource "aws_route53_record" "logstash-lb" {
+  zone_id = "${var.route53_zone_id}"
+  name    = "${var.logstash_dns_name}"
+  type    = "A"
 
-#   alias {
-#     name                   = "${var.logstash_lb["dns_name"]}"
-#     zone_id                = "${var.logstash_lb["zone_id"]}"
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = "${var.logstash_lb["dns_name"]}"
+    zone_id                = "${var.logstash_lb["zone_id"]}"
+    evaluate_target_health = true
+  }
+}
 
 resource "aws_route53_record" "kibana-lb" {
   zone_id = "${var.route53_zone_id}"
