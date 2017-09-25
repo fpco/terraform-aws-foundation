@@ -6,7 +6,7 @@ Generate new keypair for the Packer user
 
 Import into AWS using this command:
 
-    aws-env -p admin aws import-key-pair --key-name Packer-Kubespray-Builder --region us-east-1 --public-key-material $(cat id_rsa.pub)
+    aws-env -p admin aws import-key-pair --key-name Packer-Kubespray-Builder --region us-east-1 --public-key-material "$(cat id_rsa.pub)"
 
 `NOTE`: Make sure to change the aws profile as well as `--region` and `--key-name` accordingly.
 
