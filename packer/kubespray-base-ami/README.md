@@ -4,7 +4,11 @@ Generate new keypair for the Packer user
 
     ssh-keygen -q -t rsa -N '' -f id_rsa
 
-`NOTE`: You have to upload this public key manually through the aws console
+Import into AWS using this command:
+
+    aws-env -p admin aws import-key-pair --key-name Packer-Kubespray-Builder --region us-east-1 --public-key-material $(cat id_rsa.pub)
+
+`NOTE`: Make sure to change the aws profile as well as `--region` and `--key-name` accordingly.
 
 Create the neccessary `packer.vars` file:
 
