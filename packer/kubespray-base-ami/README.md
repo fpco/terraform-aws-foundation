@@ -10,8 +10,8 @@ Create the neccessary `packer.vars` file:
 
     cat << EOF > packer.vars
     {
-        "aws_vpc_id": "vpc-xxxxx",
-        "aws_subnet_id":
+        "aws_vpc_id": "vpc-xxxx",
+        "aws_subnet_id": "subnet-xxx"
     }
     EOF
 
