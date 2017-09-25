@@ -89,6 +89,12 @@ resource "aws_instance" "bind" {
       host        = "${self.private_ip}"
       user        = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
       private_key = "${file(var.ssh_key)}"
+      host                = "${self.private_ip}"
+      user                = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
+      private_key         = "${file(var.ssh_key)}"
+      bastion_host        = "${var.bastion_host}"
+      bastion_user        = "${var.bastion_user}"
+      bastion_private_key = "${var.bastion_private_key}"
     }
     inline = [
       "${var.distro == "ubuntu" ? "sudo apt-get update && sudo apt-get install -y bind9 dnsutils && sudo service bind9 start" : "sudo yum install -y bind && sudo service named start && sudo chkconfig named on"}",
@@ -118,6 +124,12 @@ resource "null_resource" "bind" {
     host        = "${aws_instance.bind.*.private_ip[count.index]}"
     user        = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
     private_key = "${file(var.ssh_key)}"
+    host                = "${aws_instance.bind.*.private_ip[count.index]}"
+    user                = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
+    private_key         = "${file(var.ssh_key)}"
+    bastion_host        = "${var.bastion_host}"
+    bastion_user        = "${var.bastion_user}"
+    bastion_private_key = "${var.bastion_private_key}"
   }
   provisioner "file" {
     content     = "${var.named_conf}"

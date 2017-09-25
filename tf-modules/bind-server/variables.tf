@@ -56,3 +56,17 @@ variable "alarm_actions" {
   description = "list of alarm actions to append to the default (optional)"
   default     = []
 }
+variable "bastion_host" {
+  default     = ""
+  description = "maps to `bastion_host` attribute for the `ssh` `connection` to the `aws_instance` provisioners"
+}
+
+variable "bastion_user" {
+  default     = ""
+  description = "maps to `bastion_user` attribute for the `ssh` `connection` to the `aws_instance` provisioners"
+}
+
+variable "bastion_private_key" {
+  default     = ""
+  description = "maps to `bastion_private_key` attribute for the `ssh` `connection` to the `aws_instance` provisioners"
+}
