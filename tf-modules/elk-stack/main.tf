@@ -74,7 +74,7 @@ module "elasticsearch" {
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   extra_sg_ids                = ["${aws_security_group.ssh.id}"]
   auth_elb_ingress_cidrs      = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
-  node_ami                    = "${data.aws_ami.ubuntu.id}"
+  node_ami                    = "${coalesce(var.ami, data.aws_ami.ubuntu.id)}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
   elasticsearch_dns_ssl_name  = "${var.elasticsearch_dns_ssl_name}"
   data_node_count             = "${var.elasticsearch_data_node_count}"
@@ -129,7 +129,7 @@ module "logstash-kibana" {
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   route53_zone_id             = "${var.route53_zone_id}"
   logstash_dns_name           = "${var.logstash_dns_name}"
-  ami                         = "${data.aws_ami.ubuntu.id}"
+  ami                         = "${coalesce(var.ami, data.aws_ami.ubuntu.id)}"
   instance_type               = "${var.logstash_kibana_instance_type}"
   key_name                    =  "${length(var.ssh_key_name) > 0 ? var.ssh_key_name : "${var.name_prefix}-key"}"
   elasticsearch_url           = "http://${var.elasticsearch_dns_name}:9200"

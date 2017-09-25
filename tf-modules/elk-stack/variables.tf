@@ -196,3 +196,8 @@ variable "ssh_allow" {
   description = "Allow SSH access to EC2 instances."
 }
 
+variable "ami" {
+  default = ""
+  description = "Ubuntu AMI to use for all nodes. If left empty newest 16.04 will be used"
+}
+
