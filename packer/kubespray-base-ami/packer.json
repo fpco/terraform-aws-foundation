@@ -5,7 +5,9 @@
     "ami_image_name_regex": "CoreOS-stable-*-hvm-*",
     "ami_owner": "679593333241",
     "aws_instance_type": "m3.medium",
-    "ssh_private_key_file_path": "id_rsa"
+    "ssh_private_key_file_path": "id_rsa",
+    "aws_vpc_id": "changeme",
+    "aws_subnet_id": "changeme"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -24,7 +26,9 @@
     "ssh_username": "core",
     "ami_name": "packer-kube-base-{{timestamp}}",
     "ssh_keypair_name": "{{ user `ssh_keypair_name` }}",
-    "ssh_private_key_file": "{{ user `ssh_private_key_file_path` }}"
+    "ssh_private_key_file": "{{ user `ssh_private_key_file_path` }}",
+    "vpc_id": "{{ user `aws_vpc_id` }}",
+    "subnet_id": "{{ user `aws_subnet_id` }}"
   }],
   "provisioners": [
     {

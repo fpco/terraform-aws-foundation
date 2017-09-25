@@ -6,12 +6,25 @@ Generate new keypair for the Packer user
 
 `NOTE`: You have to upload this public key manually through the aws console
 
+Create the neccessary `packer.vars` file:
 
-Change the desired packer variables and run:
+    cat << EOF > packer.vars
+    {
+        "aws_vpc_id": "vpc-xxxxx",
+        "aws_subnet_id":
+    }
+    EOF
 
-    aws-env -p admin packer build packer.json
+You have to override atleast `aws_vpc_id` and `aws_subnet_id`. See
+`packer.json` for list of all variables.
 
-`NOTE`: Use -var 'key=value' to override packer variables
+`NOTE`: You'll probably want to override `aws_region`, `ami_owner` and `ami_image_name_regex`.
+
+To run issue the following command:
+
+    aws-env -p admin packer build -var-file=packer.vars packer.json
+
+`NOTE`: Make sure to use the correct aws-env profile
 
 Every instance has to invoke this as part of their cloudinit as the docker provisioner
 need to mount the sshkey to be able to ssh into localhost.
