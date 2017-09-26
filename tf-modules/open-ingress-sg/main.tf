@@ -8,7 +8,7 @@
 
 resource "aws_security_group" "main" {
   name   = "${var.name_prefix}-${var.name_suffix}"
-  vpc_id = "${module.vpc.vpc_id}"
+  vpc_id = "${var.vpc_id}"
 
   tags {
     Name = "${var.name_prefix}-${var.name_suffix}"
