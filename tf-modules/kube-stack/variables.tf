@@ -69,6 +69,10 @@ variable "controller_min_nodes" {
   default     = "0"
 }
 
+variable "controller_iam_profile" {
+  description = "name of the IAM profile to assign to the controllers"
+}
+
 variable "controller_name_suffix" {
   description = ""
   default     = "kube-controller"
@@ -120,6 +124,10 @@ variable "worker_max_nodes" {
 variable "worker_min_nodes" {
   description = "minimum number of nodes in worker ASG"
   default     = "0"
+}
+
+variable "worker_iam_profile" {
+  description = "name of the IAM profile to assign to the workers"
 }
 
 variable "worker_name_suffix" {

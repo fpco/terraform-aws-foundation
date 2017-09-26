@@ -46,6 +46,7 @@ module "controller-asg" {
   ami                = "${var.controller_ami}"
   name               = "${var.name_prefix}"
   elb_names          = ["${aws_elb.kube-controllers.name}"]
+  iam_profile        = "${var.controller_iam_profile}"
   instance_type      = "${var.controller_instance_type}"
   root_volume_type   = "${var.controller_root_volume_type}"
   root_volume_size   = "${var.controller_root_volume_size}"
@@ -81,6 +82,7 @@ module "worker-asg" {
   azs                = ["${var.availability_zones}"]
   ami                = "${var.worker_ami}"
   name               = "${var.name_prefix}"
+  iam_profile        = "${var.worker_iam_profile}"
   instance_type      = "${var.worker_instance_type}"
   root_volume_type   = "${var.worker_root_volume_type}"
   root_volume_size   = "${var.worker_root_volume_size}"
