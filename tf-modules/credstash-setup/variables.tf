@@ -1,3 +1,8 @@
+variable "is_govcloud" {
+  default     = false
+  description = "Boolean, is this running on GovCloud"
+}
+
 variable "create_kms_key" {
   default = true
   description = "Should the Master key be created"
