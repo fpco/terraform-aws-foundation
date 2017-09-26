@@ -15,18 +15,6 @@ provider "aws" {
   region = "${var.region}"
 }
 
-
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
-  }
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
 module "ubuntu-ami" {
   source      = "../ami-ubuntu"
   release     = "16.04"
