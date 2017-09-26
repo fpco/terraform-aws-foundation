@@ -59,7 +59,7 @@ resource "aws_iam_policy" "writer-policy" {
         "dynamodb:PutItem"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws${var.is_govcloud ? "-us-gov" : "" }:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+      "Resource": "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
     }
   ]
 }
@@ -83,7 +83,7 @@ resource "aws_iam_policy" "reader-policy" {
         "dynamodb:Scan"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws${var.is_govcloud ? "-us-gov" : ""}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+      "Resource": "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
     }
   ]
 }

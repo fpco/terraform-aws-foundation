@@ -1,6 +1,6 @@
-variable "is_govcloud" {
-  default     = false
-  description = "Boolean, is this running on GovCloud"
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
 }
 
 variable "create_kms_key" {
