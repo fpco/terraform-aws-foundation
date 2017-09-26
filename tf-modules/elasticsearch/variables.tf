@@ -1,3 +1,8 @@
+variable "is_govcloud" {
+  description = "Boolean, is it running on GovCloud"
+  default     = false
+}
+
 variable "name_prefix" {
   default = "dev"
 }
