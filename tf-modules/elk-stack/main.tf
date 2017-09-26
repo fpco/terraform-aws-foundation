@@ -27,14 +27,16 @@ data "aws_vpc" "current" {
 
 # Optional SSH Securtity Group.
 resource "aws_security_group" "ssh" {
-  count = "${length(var.ssh_key_name) > 0 ? 1 : 0}"
-  name = "${var.name_prefix}-ssh"
-  vpc_id = "${var.vpc_id}"
+  count       = "${length(var.ssh_key_name) > 0 ? 1 : 0}"
+  name        = "${var.name_prefix}-ssh"
+  vpc_id      = "${var.vpc_id}"
   description = "Allow SSH (22) from public CIDRs to all EC2 instances."
+
   tags {
-    Name = "${var.name_prefix}-ssh"
+    Name        = "${var.name_prefix}-ssh"
     Description = "Allow SSH to hosts in ${var.name_prefix}"
   }
+
   # SSH
   ingress {
     from_port   = 22
@@ -43,7 +45,6 @@ resource "aws_security_group" "ssh" {
     cidr_blocks = ["${var.user_ingress_cidrs}"]
   }
 }
-
 
 module "elasticsearch" {
   source = "../elasticsearch"
@@ -77,7 +78,6 @@ module "elasticsearch" {
   logstash_beats_address      = "${var.logstash_dns_name}:5044"
 }
 
-
 module "kibana" {
   source = "../kibana"
 
@@ -98,7 +98,6 @@ module "kibana" {
   credstash_install_snippet = "${var.credstash_install_snippet}"
   credstash_get_cmd         = "${var.credstash_get_cmd}"
 }
-
 
 module "logstash-kibana" {
   source = "../logstash"
@@ -130,7 +129,8 @@ module "logstash-kibana" {
   credstash_get_cmd           = "${var.credstash_get_cmd}"
   credstash_put_cmd           = "${var.credstash_put_cmd}"
   extra_grok_patterns         = "${var.logstash_extra_grok_patterns}"
-  extra_config                = <<END_CONFIG
+
+  extra_config = <<END_CONFIG
 input {
     file {
         path => "/var/log/nginx/access.log"
@@ -151,4 +151,3 @@ input {
 }
 END_CONFIG
 }
-

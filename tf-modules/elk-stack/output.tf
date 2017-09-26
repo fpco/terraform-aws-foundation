@@ -31,7 +31,7 @@ output "logstash_kibana_asg_name" {
 output "dns" {
   value = {
     "elasticsearch" = "${module.elasticsearch.elasticsearch_dns}"
-    "logstash" = "${module.logstash-kibana.logstash_dns}"
-    "kibana" = "${module.kibana.kibana_dns}"
+    "logstash"      = "${module.logstash-kibana.logstash_dns}"
+    "kibana"        = "${module.kibana.kibana_dns}"
   }
 }
