@@ -79,6 +79,7 @@ data "template_file" "kibana-setup" {
     credstash_install_snippet = "${var.credstash_install_snippet}"
     credstash_get_cmd         = "${var.credstash_get_cmd}"
     credstash_context         = "env=${var.name_prefix}"
+    kibana_version            = "${var.kibana_version}"
     nginx_username_key        = "${var.name_prefix}-kibana-basic-auth-username"
     nginx_password_key        = "${var.name_prefix}-kibana-basic-auth-password"
   }
@@ -185,7 +186,6 @@ resource "aws_launch_configuration" "kibana-lc" {
   name_prefix     = "${var.name_prefix}-kibana-"
   image_id        = "${var.ami}"
   instance_type   = "${var.instance_type}"
-  kibana_version  = "${var.kibana_version}"
   key_name        = "${var.key_name}"
   security_groups = "${concat(list(aws_security_group.kibana-sg.id), var.extra_sg_ids)}"
   user_data       = <<USER_DATA
