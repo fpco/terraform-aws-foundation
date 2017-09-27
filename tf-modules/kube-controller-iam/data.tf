@@ -2,6 +2,7 @@ data "aws_iam_policy_document" "kube_master" {
   statement {
     effect  = "Allow"
     actions = [
+      "ec2:*",
       "elasticloadbalancing:*"
     ]
     resources = ["*"]
