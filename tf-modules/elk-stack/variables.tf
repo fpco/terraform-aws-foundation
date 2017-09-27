@@ -26,6 +26,11 @@ variable "user_ingress_cidrs" {
   description = "List of CIDRs that will have access to Kibana UI and SSH to EC2 instances"
 }
 
+variable "elk_version" {
+  default = "5.6.2"
+  description = "Which versions of Elasticsearch/Logstash/Kibana to install"
+}
+
 variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
 }

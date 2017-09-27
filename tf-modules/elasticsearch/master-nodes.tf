@@ -15,6 +15,7 @@ module "master-node-ebs-volumes" {
   snapshot_ids = ["${var.master_node_snapshot_ids}"]
   encrypted    = "false"
   device_name  = "/dev/xvdf"
+  max_wait     = 3600
   extra_tags   = {
     cluster = "${var.name_prefix}-elasticsearch-cluster"
   }
@@ -84,6 +85,7 @@ data "template_file" "master-node-setup" {
     device_name                = "/dev/xvdf"
     mount_point                = "/mnt/elasticsearch"
     wait_interval              = 1
+    elasticsearch_version      = "${var.elasticsearch_version}"
     config_yaml                = "${element(data.template_file.master-node-config.*.rendered, count.index)}"
     credstash_install_snippet  = "${var.credstash_install_snippet}"
     credstash_get_cmd          = "${var.credstash_get_cmd}"

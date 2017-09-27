@@ -185,6 +185,7 @@ resource "aws_launch_configuration" "kibana-lc" {
   name_prefix     = "${var.name_prefix}-kibana-"
   image_id        = "${var.ami}"
   instance_type   = "${var.instance_type}"
+  kibana_version  = "${var.kibana_version}"
   key_name        = "${var.key_name}"
   security_groups = "${concat(list(aws_security_group.kibana-sg.id), var.extra_sg_ids)}"
   user_data       = <<USER_DATA

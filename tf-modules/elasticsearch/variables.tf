@@ -146,3 +146,8 @@ variable "elasticsearch_dns_ssl_name" {
   default = ""
   description = "DNS name for Elasticsearch endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'elasticsearch_dns_name' will be checked instead."
 }
+
+variable "elasticsearch_version" {
+  default = "5.6.2"
+  description = "Which version of elasticsearch to install"
+}

@@ -75,6 +75,7 @@ module "elasticsearch" {
   extra_sg_ids                = ["${aws_security_group.ssh.id}"]
   auth_elb_ingress_cidrs      = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
   node_ami                    = "${coalesce(var.ami, data.aws_ami.ubuntu.id)}"
+  elasticsearch_version       = "${var.elk_version}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
   elasticsearch_dns_ssl_name  = "${var.elasticsearch_dns_ssl_name}"
   data_node_count             = "${var.elasticsearch_data_node_count}"
@@ -102,6 +103,7 @@ module "kibana" {
   name_prefix               = "${var.name_prefix}"
   vpc_id                    = "${var.vpc_id}"
   route53_zone_id           = "${var.route53_zone_id}"
+  kibana_version            = "${var.elk_version}"
   kibana_dns_name           = "${var.kibana_dns_name}"
   kibana_dns_ssl_name       = "${var.kibana_dns_ssl_name}"
   public_subnet_ids         = ["${var.public_subnet_ids}"]
@@ -128,6 +130,7 @@ module "logstash-kibana" {
   public_subnet_ids           = ["${var.public_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   route53_zone_id             = "${var.route53_zone_id}"
+  logstash_version            = "${var.elk_version}"
   logstash_dns_name           = "${var.logstash_dns_name}"
   ami                         = "${coalesce(var.ami, data.aws_ami.ubuntu.id)}"
   instance_type               = "${var.logstash_kibana_instance_type}"

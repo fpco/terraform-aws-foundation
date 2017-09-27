@@ -86,3 +86,7 @@ variable "credstash_get_cmd" {
   description = "Credstash get command with region and table values set."
 }
 
+variable "kibana_version" {
+  default = "5.6.2"
+  description = "Which version of Kibana to install"
+}
