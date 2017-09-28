@@ -7,7 +7,7 @@
     "aws_instance_type": "m3.medium",
     "ssh_private_key_file_path": "id_rsa",
     "aws_vpc_id": "changeme",
-    "aws_subnet_id": "changeme"
+    "aws_subnet_id": "changeme",
     "ops_tool_version": "0.3.2"
   },
   "builders": [{
