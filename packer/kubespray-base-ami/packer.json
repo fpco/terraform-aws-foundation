@@ -8,6 +8,7 @@
     "ssh_private_key_file_path": "id_rsa",
     "aws_vpc_id": "changeme",
     "aws_subnet_id": "changeme"
+    "ops_tool_version": "0.3.2"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -51,6 +52,14 @@
       "inline": [
         "rm -rf /tmp/kube-packer-base-image-temp",
         "cd /home/core/.ssh && rm authorized_keys"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir -p /opt/bin",
+        "sudo wget https://download.fpcomplete.com/ops/ops-v{{ user `ops_tool_version` }}-linux-amd64 -O /opt/bin/ops",
+        "sudo chmod +x /opt/bin/ops"
       ]
     }
   ]
