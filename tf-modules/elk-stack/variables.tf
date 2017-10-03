@@ -3,10 +3,6 @@ variable "name_prefix" {
   description = "Prefix that will be added to names of all resources"
 }
 
-variable "region" {
-  description = "Region to deploy ELK stack in"
-}
-
 variable "is_govcloud" {
   description = "Boolean, if this is running on GovCloud or not"
   default     = "false"
@@ -90,11 +86,6 @@ variable "elasticsearch_extra_setup_snippet" {
   description = "Extra snippet to run after Elasticsearch has been installed and configured"
 }
 
-variable "elasticsearch_deploy_proxy" {
-  default     = false
-  description = "Should a reverse proxy with Basic Authentication be setup for ES API on port 9201."
-}
-
 variable "elasticsearch_auth_elb_ingress_cidrs" {
   default     = []
   description = "CIDRs that are allowed to access Elasticsearch API over HTTPS on port 9201 with BasicAuth."
@@ -103,6 +94,22 @@ variable "elasticsearch_auth_elb_ingress_cidrs" {
 variable "elasticsearch_extra_config" {
   default     = ""
   description = "Extra Elasticsearch configuration in yaml format that will be applied to all nodes"
+}
+
+variable "elasticsearch_internal_alb" {
+  type = "map"
+  description = "Internal ALB information for Elasticsearch API"
+}
+
+variable "elasticsearch_external_alb" {
+  type = "map"
+  default = {}
+  description = "External ALB information for Elasticsearch API secured with BasicAuth"
+}
+
+variable "elasticsearch_external_alb_setup" {
+  default = false
+  description = "Should external ALB be configured for Elasticsearch API. Reverse proxy with Basic Authentication will also be setup for ES API on port 9201"
 }
 
 variable "logstash_kibana_instance_type" {
@@ -139,13 +146,9 @@ variable "logstash_dns_name" {
   description = "DNS name for Logstash"
 }
 
-variable "kibana_dns_name" {
-  description = "DNS name for Kibana"
-}
-
-variable "kibana_dns_ssl_name" {
-  default     = ""
-  description = "DNS name for Kibana endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'kibana_dns_name' will be checked instead."
+variable "kibana_alb" {
+  type = "map"
+  description = "ALB information for Kibana"
 }
 
 variable "certstrap_depot_path" {

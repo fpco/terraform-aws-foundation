@@ -107,11 +107,6 @@ variable "extra_sg_ids" {
   description = "Extra Security Group IDs that will be added to all instances running Logstash. This is a way to add extra services, SSH access for instance."
 }
 
-variable "extra_elb_sg_ids" {
-  default = []
-  description = "Extra Security Group IDs that will be added to Logstash Load Balancer"
-}
-
 variable "extra_elb_ingress_cidrs" {
   default = []
   description = "Extra CIDRs that are allowed to access Logstash. By default only CIDR from `public_subnet_ids` are allowed"
@@ -132,9 +127,9 @@ variable "extra_grok_patterns" {
   description = "Extra grok Patterns for Logstash, which can be used during log parsing by setting: patterns_dir => ['/etc/logstash/patterns']"
 }
 
-variable "extra_elbs" {
+variable "target_group_arns" {
   default = []
-  description = "Elastic Load Balancers, besides the default one, to be used for Logstash scaling group"
+  description = "Application Load Balancer target groups to be used for Logstash auto scaling group"
 }
 
 variable "internal" {

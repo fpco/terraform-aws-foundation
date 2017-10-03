@@ -1,38 +1,47 @@
 variable "route53_zone_id" {
-  description = "Route53 Zone id where records for ELBs will be added to"
+  description = "Route53 Zone id where records for LBs will be added to"
 }
 
 # Example:
-# elasticsearch = {
-#    "dns_name"     = "elasticsearch.example.com"
-#    "elb_dns_name" = "${aws_elb.elasticsearch-elb.dns_name}"
-#    "elb_zone_id"  = "${aws_elb.elasticsearch-elb.zone_id}"
+# elasticsearch_dns_name = "elasticsearch.example.com"
+# elasticsearch_lb       = {
+#    "dns_name" = "${aws_alb.elasticsearch-lb.dns_name}"
+#    "zone_id"  = "${aws_alb.elasticsearch-lb.zone_id}"
 #  }
-variable "elasticsearch" {
-  description = "Elasticsearch DNS and ELB info"
+variable "elasticsearch_dns_name" {
+  description = "DNS name for Elasticsearch"
+}
+variable "elasticsearch_lb" {
+  description = "Elasticsearch DNS and LB info"
   type = "map"
 }
 
 
 # Example:
+# dns_name = "logstash.example.com"
 # logstash = {
-#    "dns_name"     = "logstash.example.com"
-#    "elb_dns_name" = "${aws_elb.logstash-elb.dns_name}"
-#    "elb_zone_id"  = "${aws_elb.logstash-elb.zone_id}"
+#    "dns_name" = "${aws_elb.logstash-lb.dns_name}"
+#    "zone_id"  = "${aws_elb.logstash-lb.zone_id}"
 #  }
-variable "logstash" {
-  description = "Logstash DNS and ELB info"
+variable "logstash_dns_name" {
+  description = "DNS name for Logstash"
+}
+variable "logstash_lb" {
+  description = "Logstash DNS and LB info"
   type = "map"
 }
 
 
 # Example:
-# kibana = {
-#    "dns_name"     = "kibana.example.com"
-#    "elb_dns_name" = "${aws_elb.kibana-elb.dns_name}"
-#    "elb_zone_id"  = "${aws_elb.kibana-elb.zone_id}"
+# kibana_dns_name = "kibana.example.com"
+# kibana_lb = {
+#    "dns_name" = "${aws_alb.kibana-lb.dns_name}"
+#    "zone_id"  = "${aws_alb.kibana-lb.zone_id}"
 #  }
-variable "kibana" {
-  description = "Kibana DNS and ELB info"
+variable "kibana_dns_name" {
+  description = "DNS name for Kibana"
+}
+variable "kibana_lb" {
+  description = "Kibana DNS and LB info"
   type = "map"
 }

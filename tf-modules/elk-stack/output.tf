@@ -28,10 +28,14 @@ output "logstash_kibana_asg_name" {
   value = "${module.logstash-kibana.asg_name}"
 }
 
-output "dns" {
-  value = {
-    "elasticsearch" = "${module.elasticsearch.elasticsearch_dns}"
-    "logstash"      = "${module.logstash-kibana.logstash_dns}"
-    "kibana"        = "${module.kibana.kibana_dns}"
-  }
+output "logstash_lb" {
+  value = "${module.logstash-kibana.elb}"
+}
+
+output "kibana_http_target_group_arn" {
+  value = "${module.kibana.http_target_group_arn}"
+}
+
+output "kibana_https_target_group_arn" {
+  value = "${module.kibana.https_target_group_arn}"
 }

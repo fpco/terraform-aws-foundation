@@ -11,10 +11,6 @@
  *
  */
 
-provider "aws" {
-  region = "${var.region}"
-}
-
 module "ubuntu-ami" {
   source      = "../ami-ubuntu"
   release     = "16.04"
@@ -46,6 +42,7 @@ resource "aws_security_group" "ssh" {
   }
 }
 
+
 module "elasticsearch" {
   source = "../elasticsearch"
 
@@ -56,7 +53,6 @@ module "elasticsearch" {
   public_subnet_ids           = ["${var.private_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
   extra_sg_ids                = ["${aws_security_group.ssh.id}"]
-  auth_elb_ingress_cidrs      = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
   node_ami                    = "${module.ubuntu-ami.id}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
   elasticsearch_dns_ssl_name  = "${var.elasticsearch_dns_ssl_name}"
@@ -74,8 +70,12 @@ module "elasticsearch" {
   credstash_reader_policy_arn = "${var.credstash_reader_policy_arn}"
   credstash_install_snippet   = "${var.credstash_install_snippet}"
   credstash_get_cmd           = "${var.credstash_get_cmd}"
-  deploy_proxy                = "${var.elasticsearch_deploy_proxy}"
   logstash_beats_address      = "${var.logstash_dns_name}:5044"
+
+  internal_alb                = "${var.elasticsearch_internal_alb}"
+  external_alb_setup          = "${var.elasticsearch_external_alb_setup}"
+  external_alb                = "${var.elasticsearch_external_alb}"
+  external_alb_ingress_cidrs  = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
 }
 
 module "kibana" {
@@ -83,9 +83,6 @@ module "kibana" {
 
   name_prefix               = "${var.name_prefix}"
   vpc_id                    = "${var.vpc_id}"
-  kibana_dns_name           = "${var.kibana_dns_name}"
-  kibana_dns_ssl_name       = "${var.kibana_dns_ssl_name}"
-  public_subnet_ids         = ["${var.public_subnet_ids}"]
   private_subnet_ids        = ["${var.private_subnet_ids}"]
   key_name                  = ""
   ami                       = ""
@@ -94,9 +91,9 @@ module "kibana" {
   min_server_count          = 0
   max_server_count          = 0
   desired_server_count      = 0
-  elb_ingress_cidrs         = ["${var.user_ingress_cidrs}"]
   credstash_install_snippet = "${var.credstash_install_snippet}"
   credstash_get_cmd         = "${var.credstash_get_cmd}"
+  alb                       = "${var.kibana_alb}"
 }
 
 module "logstash-kibana" {
@@ -118,7 +115,10 @@ module "logstash-kibana" {
   extra_sg_ids                = ["${module.kibana.security_group_id}", "${aws_security_group.ssh.id}"]
   extra_setup_snippet         = "${module.kibana.setup_snippet}"
   extra_elb_ingress_cidrs     = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_ingress_cidrs)}"]
-  extra_elbs                  = ["${module.kibana.elb_name}"]
+  target_group_arns           = [
+    "${module.kibana.http_target_group_arn}",
+    "${module.kibana.https_target_group_arn}"
+  ]
   certstrap_depot_path        = "${var.certstrap_depot_path}"
   certstrap_ca_common_name    = "${var.certstrap_ca_common_name}"
   certstrap_ca_passphrase     = "${var.certstrap_ca_passphrase}"
