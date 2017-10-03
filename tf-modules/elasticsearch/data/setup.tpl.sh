@@ -11,7 +11,7 @@ echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | tee -a /e
 ${credstash_install_snippet}
 apt-get install -y awscli
 apt-get install -y openjdk-8-jre
-apt-get install -y openjdk-8-jre elasticsearch
+apt-get install -y elasticsearch=${elasticsearch_version}
 
 # Mount EBS volume
 ${mount_snippet}
@@ -65,6 +65,18 @@ mkdir /etc/filebeat/prospectors/
 cat <<EOF > /etc/filebeat/filebeat.yml
 filebeat.config_dir: '/etc/filebeat/prospectors/'
 filebeat.prospectors:
+- input_type: log
+  paths:
+    - '/var/log/syslog'
+  fields_under_root: true
+  fields:
+    index_prefix: elk
+    log_info:
+      origin: aws
+      source: elasticsearch
+      formats:
+        - syslog
+      transport: filebeat
 - input_type: log
   paths:
     - '${mount_point}/logs/elasticsearch*.log'

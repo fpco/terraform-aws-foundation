@@ -8,7 +8,7 @@ echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | tee -a /e
 # Install dependencies
 ${credstash_install_snippet}
 apt-get install -y openjdk-8-jre
-apt-get install -y logstash
+apt-get install -y logstash=1:${logstash_version}-1
 
 # Make sure Logstash can read local logs.
 usermod -a -G adm logstash

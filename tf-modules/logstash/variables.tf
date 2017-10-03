@@ -137,3 +137,7 @@ variable "internal" {
   description = "Set it to false if you want Logstash to be accessible by the outside world"
 }
 
+variable "logstash_version" {
+  default = "5.6.2"
+  description = "Which version of Logstash to install"
+}

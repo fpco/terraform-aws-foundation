@@ -100,6 +100,7 @@ data "template_file" "kibana-setup" {
     credstash_install_snippet = "${var.credstash_install_snippet}"
     credstash_get_cmd         = "${var.credstash_get_cmd}"
     credstash_context         = "env=${var.name_prefix}"
+    kibana_version            = "${var.kibana_version}"
     nginx_username_key        = "${var.name_prefix}-kibana-basic-auth-username"
     nginx_password_key        = "${var.name_prefix}-kibana-basic-auth-password"
   }

@@ -154,3 +154,8 @@ variable "external_alb_ingress_cidrs" {
   default = []
   description = "CIDRs that are allowed to access Elasticsearch API over HTTPS on port 9201 with BasicAuth."
 }
+
+variable "elasticsearch_version" {
+  default = "5.6.2"
+  description = "Which version of elasticsearch to install"
+}

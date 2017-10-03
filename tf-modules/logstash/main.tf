@@ -40,7 +40,6 @@ resource "aws_elb" "logstash-elb" {
 }
 
 
-
 data "template_file" "logstash-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
@@ -53,6 +52,7 @@ data "template_file" "logstash-setup" {
     credstash_dynamic_config_name = "${var.name_prefix}-logstash-dynamic-conf"
     credstash_context             = "env=${var.name_prefix}"
     name_suffix                   = "${var.name_suffix}"
+    logstash_version              = "${var.logstash_version}"
     config                        = "${data.template_file.logstash-config.rendered}"
     extra_config                  = "${var.extra_config}"
     extra_settings                = "${var.extra_settings}"
