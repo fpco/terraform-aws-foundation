@@ -14,6 +14,10 @@ variable "versioning" {
     default     = "true"
     description = "enables versioning for objects in the S3 bucket"
 }
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
+}
 resource "aws_s3_bucket" "remote-state" {
     bucket = "${var.bucket_name}"
     acl    = "private"
@@ -36,7 +40,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       identifiers = ["${compact(var.principals)}"]
     }
 
-    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}"]
+    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}"]
   }
 
   statement {
@@ -58,7 +62,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       identifiers = ["${compact(var.principals)}"]
     }
 
-    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}/*"]
+    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}/*"]
   }
 }
 resource "aws_s3_bucket_policy" "s3-full-access" {
@@ -73,7 +77,7 @@ data "aws_iam_policy_document" "bucket-full-access" {
       "s3:GetBucketLocation",
       "s3:ListBucketMultipartUploads"
     ]
-    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}"]
+    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}"]
   }
   statement {
     effect = "Allow"
@@ -84,7 +88,7 @@ data "aws_iam_policy_document" "bucket-full-access" {
       "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload"
     ]
-    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}/*"]
+    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}/*"]
   }
 }
 resource "aws_iam_policy" "bucket-full-access" {
@@ -99,7 +103,7 @@ data "aws_iam_policy_document" "bucket-full-access-with-mfa" {
       "s3:GetBucketLocation",
       "s3:ListBucketMultipartUploads"
     ]
-    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}"]
+    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}"]
   }
   statement {
     effect = "Allow"
@@ -110,7 +114,7 @@ data "aws_iam_policy_document" "bucket-full-access-with-mfa" {
       "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload"
     ]
-    resources = ["arn:aws:s3:::${aws_s3_bucket.remote-state.id}/*"]
+    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}/*"]
     condition {
       test = "Bool"
       variable = "aws:MultiFactorAuthPresent"

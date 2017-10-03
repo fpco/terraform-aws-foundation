@@ -9,6 +9,7 @@ module "consul-server" {
   source                  = "../single-node-asg"
   name                    = "${var.name}"
   name_suffix             = "consul-server"
+  aws_cloud               = "${var.aws_cloud}"
   region                  = "${var.region}"
   az                      = "${var.az}"
   root_volume_type        = "gp2"
@@ -22,7 +23,6 @@ module "consul-server" {
   key_file                = "${var.key_file}"
   ami                     = "${var.ami}"
   instance_type           = "${var.instance_type}"
-  load_balancers          = "${var.load_balancers}"
   public_ip               = "${var.public_ip}"
   subnet_id               = "${var.subnet_id}"
   load_balancers          = ["${var.load_balancers}"]

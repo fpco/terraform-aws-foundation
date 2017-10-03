@@ -21,16 +21,22 @@ variable "most_recent" {
 }
 
 variable "name_map" {
-  default     = {
-    "16.04"   = "xenial"
-    "14.04"   = "trusty"
+  default = {
+    "16.04" = "xenial"
+    "14.04" = "trusty"
   }
+
   description = "map of release numbers to names"
 }
 
 variable "release" {
   default     = "16.04"
   description = "default ubuntu release to target"
+}
+
+variable "is_govcloud" {
+  default     = false
+  description = "boolean, defines `owners` below, as govcloud carries different ids"
 }
 
 data "aws_ami" "ubuntu" {
@@ -46,8 +52,9 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = ["${var.is_govcloud == "true" ? "513442679011" : "099720109477"}"] # Canonical
 }
+
 // ID of the AMI
 output "id" {
   value = "${data.aws_ami.ubuntu.id}"

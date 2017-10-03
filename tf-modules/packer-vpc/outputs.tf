@@ -8,9 +8,9 @@ output "subnet_id" {
 }
 // ID of latest trusty AMI
 output "trusty_ami_id" {
-  value = "${data.aws_ami.trusty.id}"
+  value = "${data.aws_ami.ubuntu-trusty.id}"
 }
 // ID of latest xenial AMI
 output "xenial_ami_id" {
-  value = "${data.aws_ami.xenial.id}"
+  value = "${data.aws_ami.ubuntu-xenial.id}"
 }

@@ -43,6 +43,7 @@ and can be done manually at any time. Revoke all grants that don't have a valid
 ARN as it's grantee.
 
 ```bash
+# KMS_KEY_ARN on GovCloud has 'arn:aws-us-gov:…' instead of 'arn:aws:…'
 $ KMS_KEY_ARN="arn:aws:kms:us-east-1:1234567890:key/b2fcd07b-..."
 $ GRANT_IDS=$(aws kms list-grants --key-id $KMS_KEY_ARN | \
     jq -r '.Grants[]|select(.GranteePrincipal|startswith("arn:")|not).GrantId')

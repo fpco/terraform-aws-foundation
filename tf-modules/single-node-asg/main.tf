@@ -8,6 +8,7 @@
 module "service-data" {
   source      = "../persistent-ebs"
   name        = "${var.name}-${var.name_suffix}-data-${var.az}"
+  aws_cloud   = "${var.aws_cloud}"
   region      = "${var.region}"
   az          = "${var.az}"
   size        = "${var.data_volume_size}"
@@ -18,26 +19,26 @@ module "service-data" {
   snapshot_id = "${var.data_volume_snapshot_id}"
 }
 module "server" {
-  source = "../asg"
+  source             = "../asg"
   security_group_ids = "${var.security_group_ids}"
-  name = "${var.name}"
+  name               = "${var.name}"
   # append this to the ASG name
-  suffix = "${var.name_suffix}-${var.az}"
-  instance_type = "${var.instance_type}"
-  ami = "${var.ami}"
-  subnet_ids = ["${var.subnet_id}"]
-  azs = ["${var.az}"]
-  public_ip = "${var.public_ip}"
-  key_name = "${var.key_name}"
-  elb_names = ["${var.load_balancers}"]
-  desired_capacity = 1
-  max_nodes = 1
-  min_nodes = 1
-  root_volume_type = "${var.root_volume_type}"
-  root_volume_size = "${var.root_volume_size}"
+  suffix             = "${var.name_suffix}-${var.az}"
+  instance_type      = "${var.instance_type}"
+  ami                = "${var.ami}"
+  subnet_ids         = ["${var.subnet_id}"]
+  azs                = ["${var.az}"]
+  public_ip          = "${var.public_ip}"
+  key_name           = "${var.key_name}"
+  elb_names          = ["${var.load_balancers}"]
+  desired_capacity   = 1
+  max_nodes          = 1
+  min_nodes          = 1
+  root_volume_type   = "${var.root_volume_type}"
+  root_volume_size   = "${var.root_volume_size}"
   #
-  iam_profile = "${module.service-data.iam_profile}"
-  user_data = <<END_INIT
+  iam_profile        = "${module.service-data.iam_profile}"
+  user_data          = <<END_INIT
 #!/bin/bash
 ${var.init_prefix}
 apt-get update

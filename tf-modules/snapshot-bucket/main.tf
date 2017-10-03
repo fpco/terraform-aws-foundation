@@ -23,7 +23,7 @@ resource "aws_iam_policy" "s3" {
                 "s3:ListBucket"
             ],
             "Resource": [
-                "arn:aws:s3:::${var.name}"
+                "arn:${var.aws_cloud}:s3:::${var.name}"
             ]
         },
         {
@@ -35,7 +35,7 @@ resource "aws_iam_policy" "s3" {
                 "s3:CreateMultipartUpload"
             ],
             "Resource": [
-                "arn:aws:s3:::${var.name}/*"
+                "arn:${var.aws_cloud}:s3:::${var.name}/*"
             ]
         }
     ]

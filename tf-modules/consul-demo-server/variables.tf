@@ -11,7 +11,7 @@ variable "ami" {
   description = "The base AMI for each AWS instance created"
 }
 variable "instance_type" {
-  default = "t2.small"
+  default = "t2.micro"
   description = "The type of AWS instance (size)"
 }
 variable "data_volume_size" {
@@ -54,4 +54,8 @@ variable "az" {
 variable "load_balancers" {
   default = []
   description = "The list of load balancers names to pass to the ASG module"
+}
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
 }

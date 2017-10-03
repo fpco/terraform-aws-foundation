@@ -7,6 +7,11 @@
  * in Terraform.
  */
 
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
+}
+
 variable "policy_name" {
   description = "Name of the policy."
 }
@@ -40,8 +45,8 @@ data "aws_iam_policy_document" "assume-role" {
     effect = "Allow"
     actions = ["sts:AssumeRole"]
     resources = [
-      "${formatlist("arn:aws:iam::%s:role/%s",var.account_ids,var.role_name)}",
-      "${formatlist("arn:aws:iam::%s:role/%s",var.account_id,var.role_names)}"
+      "${formatlist("arn:${var.aws_cloud}:iam::%s:role/%s",var.account_ids,var.role_name)}",
+      "${formatlist("arn:${var.aws_cloud}:iam::%s:role/%s",var.account_id,var.role_names)}"
     ]
   }
 }

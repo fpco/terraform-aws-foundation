@@ -12,8 +12,8 @@ data "aws_ami" "ubuntu-trusty" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-
-  owners = ["099720109477"] # Canonical
+            # GovCloud      # Standard AWS
+  owners = ["513442679011", "099720109477"] # Canonical
 }
 
 data "aws_ami" "ubuntu-xenial" {
@@ -29,5 +29,6 @@ data "aws_ami" "ubuntu-xenial" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+            # GovCloud      # Standard AWS
+  owners = ["513442679011", "099720109477"] # Canonical
 }

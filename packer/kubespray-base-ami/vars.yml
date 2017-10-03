@@ -1,0 +1,9 @@
+bootstrap_os: coreos
+bin_dir: "/opt/bin"
+ansible_python_interpreter: "/opt/bin/python"
+docker_dns: host_resolvconf
+populate_inventory_to_hosts_file: false
+download_run_once: true
+cloud_provider: aws
+kube_version: v1.7.5
+
