@@ -4,6 +4,11 @@
  * This module uses an EBS volume and an auto-scaling group with a single-node
  * to establish a reliable and robust pattern for HA in various forms.
  *
+ * NOTE: This module assumes that all the dependencies for the
+ * "../init-snippet-attach-ebs-volume" module are satisfied
+ * by the `init_prefix`.
+ * In particular, this means that the aws cli tool and ec2metadata are installed.
+ *
  */
 module "service-data" {
   source      = "../persistent-ebs"
@@ -41,11 +46,7 @@ module "server" {
   user_data          = <<END_INIT
 #!/bin/bash
 ${var.init_prefix}
-apt-get update
-${module.init-install-awscli.init_snippet}
 ${module.init-attach-ebs.init_snippet}
-${module.init-install-ops.init_snippet}
-ops disk automount /dev/xvdf /opt/consul
 ${var.init_suffix}
 END_INIT
 }
@@ -54,12 +55,4 @@ module "init-attach-ebs" {
   source    = "../init-snippet-attach-ebs-volume"
   region    = "${var.region}"
   volume_id = "${module.service-data.volume_id}"
-}
-# boxed module to install the ops tool
-module "init-install-ops" {
-  source = "../init-snippet-install-ops"
-}
-# boxed module to install the awscli tool
-module "init-install-awscli" {
-  source = "../init-snippet-install-awscli"
 }
