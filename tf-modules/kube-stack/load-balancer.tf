@@ -1,6 +1,6 @@
 
 resource "aws_elb" "kube-controllers" {
-  name            = "${var.name_prefix}-kube-controller"
+  name            = "${var.name_prefix}-kube-api"
   subnets         = ["${var.lb_subnet_ids}"]
   security_groups = ["${var.lb_security_group_ids}"]
   internal        = "${var.private_load_balancer}"
@@ -34,7 +34,7 @@ resource "aws_elb" "kube-controllers" {
   connection_draining_timeout = 60
 
   tags {
-    Name = "${var.name_prefix}-kube-controller"
+    Name = "${var.name_prefix}-kube-api"
   }
 }
 
