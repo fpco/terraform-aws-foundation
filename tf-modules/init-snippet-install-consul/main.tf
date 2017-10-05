@@ -1,6 +1,6 @@
 # variables used by this snippet of init shellcode
 variable "version" {
-    default = "0.8.5"
+    default = "0.9.3"
     description = "version of consul, to install"
 }
 variable "base_url" {
