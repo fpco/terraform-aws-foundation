@@ -56,17 +56,17 @@ variable "controller_subnet_ids" {
 
 variable "controller_desired_capacity" {
   description = ""
-  default     = "2"
+  default     = "3"
 }
 
 variable "controller_max_nodes" {
   description = ""
-  default     = "4"
+  default     = "5"
 }
 
 variable "controller_min_nodes" {
   description = "minimum number of nodes in controller ASG"
-  default     = "0"
+  default     = "2"
 }
 
 variable "controller_iam_profile" {
