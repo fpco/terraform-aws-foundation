@@ -61,6 +61,11 @@ variable "named_conf_local" {
   default     = "//"
 }
 
+variable "db_records_folder" {
+  description = "Path to locally rendered directory of zone files."
+  default     = ""
+}
+
 variable "log_files" {
   description = "A list of configured log files.  These will be created with correct ownership before reloading configuration."
   default     = []

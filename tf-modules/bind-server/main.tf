@@ -152,12 +152,25 @@ resource "null_resource" "bind" {
 
   provisioner "remote-exec" {
     inline = [
+      "mkdir --parents /tmp/db_records",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "${var.db_records_folder}/"
+    destination = "/tmp/db_records"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
       "sudo chown ${data.template_file.config_owner.rendered} /tmp/named.conf",
       "${var.named_conf == "//" ? "sudo rm /tmp/named.conf" : join("", list("sudo mv /tmp/named.conf ", data.template_file.config_root.rendered, "/named.conf"))}",
       "sudo chown ${data.template_file.config_owner.rendered} /tmp/named.conf.options",
       "${var.named_conf_options == "//" ? "sudo rm /tmp/named.conf.options" : join("", list("sudo mv /tmp/named.conf.options ", data.template_file.config_root.rendered, "/named.conf.options"))}",
       "sudo chown ${data.template_file.config_owner.rendered} /tmp/named.conf.local",
       "${var.named_conf_local == "//" ? "sudo rm /tmp/named.conf.local" : join("", list("sudo mv /tmp/named.conf.local ", data.template_file.config_root.rendered, "/named.conf.local"))}",
+      "sudo chown -R ${data.template_file.config_owner.rendered} /tmp/db_records/*",
+      "${var.db_records_folder == "" ? "sudo rm /tmp/db_records/*; sudo rmdir /tmp/db_records" : join("", list("sudo mv /tmp/db_records/* ", data.template_file.config_root.rendered))}",
       "${formatlist("sudo mkdir -p \"$(dirname '%s')\"", var.log_files)}",
       "${formatlist("sudo touch \"$(dirname '%s')\"", var.log_files)}",
       "${formatlist("sudo chown bind \"$(dirname '%s')\"", var.log_files)}",
