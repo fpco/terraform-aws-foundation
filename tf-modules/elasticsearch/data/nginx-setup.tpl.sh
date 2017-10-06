@@ -1,3 +1,4 @@
+apt-get update
 apt-get install -y nginx
 BASIC_AUTH_USERNAME="$(${credstash_get_cmd} ${nginx_username_key} ${credstash_context})"
 BASIC_AUTH_PASSWORD="$(${credstash_get_cmd} ${nginx_password_key} ${credstash_context})"

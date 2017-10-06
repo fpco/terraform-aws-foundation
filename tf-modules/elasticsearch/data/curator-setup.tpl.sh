@@ -1,5 +1,7 @@
 # Install curator (will only run on the active master)
 
+apt-get update
+apt-get install python-pip
 pip install elasticsearch-curator
 useradd -r curator
 mkdir /var/log/curator/
