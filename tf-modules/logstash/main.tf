@@ -142,17 +142,18 @@ resource "aws_security_group" "logstash-elb-sg" {
 
 
 resource "aws_autoscaling_group" "logstash-asg" {
-  count                = "${min(var.max_server_count, 1)}"
-  availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
-  vpc_zone_identifier  = ["${var.private_subnet_ids}"]
-  name                 = "${var.name_prefix}-logstash${var.name_suffix}"
-  max_size             = "${var.max_server_count}"
-  min_size             = "${var.min_server_count}"
-  desired_capacity     = "${var.desired_server_count}"
-  launch_configuration = "${aws_launch_configuration.logstash-lc.name}"
-  health_check_type    = "ELB"
-  load_balancers       = ["${aws_elb.logstash-elb.name}"]
-  target_group_arns    = ["${var.target_group_arns}"]
+  count                     = "${min(var.max_server_count, 1)}"
+  availability_zones        = ["${data.aws_subnet.private.*.availability_zone}"]
+  vpc_zone_identifier       = ["${var.private_subnet_ids}"]
+  name                      = "${var.name_prefix}-logstash${var.name_suffix}"
+  max_size                  = "${var.max_server_count}"
+  min_size                  = "${var.min_server_count}"
+  desired_capacity          = "${var.desired_server_count}"
+  launch_configuration      = "${aws_launch_configuration.logstash-lc.name}"
+  health_check_type         = "ELB"
+  health_check_grace_period = "600"
+  load_balancers            = ["${aws_elb.logstash-elb.name}"]
+  target_group_arns         = ["${var.target_group_arns}"]
 
   tag = [{
     key                 = "Name"
