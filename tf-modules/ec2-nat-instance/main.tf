@@ -41,15 +41,26 @@ resource "aws_security_group" "ec2-nat" {
   }
 
   ingress {
+<<<<<<< HEAD
     from_port   = 433
     to_port     = 433
+=======
+    from_port   = 443
+    to_port     = 443
+>>>>>>> PT-324-log-aggregation
     protocol    = "tcp"
     cidr_blocks = "${var.private_subnet_cidrs}"
   }
 
+<<<<<<< HEAD
   ingress {
     from_port   = 433
     to_port     = 433
+=======
+  egress {
+    from_port   = 443
+    to_port     = 443
+>>>>>>> PT-324-log-aggregation
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
