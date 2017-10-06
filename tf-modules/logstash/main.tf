@@ -36,9 +36,7 @@ resource "aws_elb" "logstash-elb" {
   tags {
     Name = "${var.name_prefix}-logstash-elb"
   }
-
 }
-
 
 data "template_file" "logstash-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
@@ -70,7 +68,6 @@ data "template_file" "logstash-config" {
   }
 }
 
-
 data "aws_subnet" "public" {
   count  = "${length(var.public_subnet_ids)}"
   id     = "${var.public_subnet_ids[count.index]}"
@@ -83,7 +80,6 @@ data "aws_subnet" "private" {
   vpc_id = "${var.vpc_id}"
 }
 
-
 resource "aws_security_group" "logstash-sg" {
   name        = "${var.name_prefix}-logstash-instance"
   vpc_id      = "${var.vpc_id}"
@@ -94,16 +90,16 @@ resource "aws_security_group" "logstash-sg" {
   }
 
   ingress {
-    from_port   = 5044
-    to_port     = 5044
-    protocol    = "tcp"
+    from_port       = 5044
+    to_port         = 5044
+    protocol        = "tcp"
     security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
   }
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
     security_groups = ["${aws_security_group.logstash-elb-sg.id}"]
   }
 
@@ -114,7 +110,6 @@ resource "aws_security_group" "logstash-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
 
 resource "aws_security_group" "logstash-elb-sg" {
   name        = "${var.name_prefix}-logstash-elb"
@@ -140,7 +135,6 @@ resource "aws_security_group" "logstash-elb-sg" {
   }
 }
 
-
 resource "aws_autoscaling_group" "logstash-asg" {
   count                     = "${min(var.max_server_count, 1)}"
   availability_zones        = ["${data.aws_subnet.private.*.availability_zone}"]
@@ -160,9 +154,7 @@ resource "aws_autoscaling_group" "logstash-asg" {
     value               = "${var.name_prefix}-logstash${var.name_suffix}"
     propagate_at_launch = true
   }]
-
 }
-
 
 resource "aws_launch_configuration" "logstash-lc" {
   count                = "${min(var.max_server_count, 1)}"
@@ -177,6 +169,4 @@ resource "aws_launch_configuration" "logstash-lc" {
   lifecycle = {
     create_before_destroy = true
   }
-
 }
-
