@@ -7,10 +7,14 @@
  * requires some manual setup the very first time to make it available
  * for use (unless a snapshot id is supplied):
  *
+ * parted --script /dev/xvdf -- mklabel msdos
  * parted --script /dev/xvdf -- mkpart primary 0 -1
  * mkfs -t ext4 -F /dev/xvdf1
  * e2label /dev/xvdf1 gitlab
  *
+ * After running the above code to initialise the EBS, terminate the instance
+ * and the autoscaling group will bring up a new instance that will be running
+ * gitlab once it is done initialising.
  */
 
 module "snasg" {
