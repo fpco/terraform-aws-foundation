@@ -129,7 +129,7 @@ resource "aws_security_group" "logstash-elb-sg" {
     from_port   = 5044
     to_port     = 5044
     protocol    = "tcp"
-    cidr_blocks = ["${concat(data.aws_subnet.public.*.cidr_block, data.aws_subnet.private.*.cidr_block, var.extra_elb_ingress_cidrs)}"]
+    cidr_blocks = ["${distinct(concat(data.aws_subnet.public.*.cidr_block, data.aws_subnet.private.*.cidr_block, var.extra_elb_ingress_cidrs))}"]
   }
 
   egress {
