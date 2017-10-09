@@ -17,17 +17,17 @@
  * gitlab once it is done initialising.
  */
 
-module "snasg" {
+module "gitlab-asg" {
   source                  = "../../tf-modules/single-node-asg"
-  name                    = "test"
+  name                    = "${var.name}"
   az                      = "${var.az}"
   key_name                = "${var.key_name}"
   key_file                = "${var.key_file}"
   ami                     = "${var.instance_ami}"
   instance_type           = "${var.instance_type}"
-  name_suffix             = "gitlab-snasg"
+  name_suffix             = "gitlab-asg"
   subnet_id               = "${var.subnet_id}"
-  security_group_ids      = ["${aws_security_group.snasg-security-group.id}"]
+  security_group_ids      = "${var.security_group_ids}"
   region                  = "${var.region}"
   root_volume_type        = "${var.root_volume_type}"
   root_volume_size        = "${var.root_volume_size}"
@@ -53,9 +53,9 @@ echo "LABEL=gitlab            /gitlab  ext4   defaults,nofail     0 2" >> /etc/f
 
 apt-get install -y docker docker.io
 cmd="docker run --detach \
-    --publish 443:443 \
-    --publish 80:80 \
-    --publish 8022:22 \
+    --publish ${var.gitlab_https_port}:443 \
+    --publish ${var.gitlab_http_port}:80 \
+    --publish ${var.gitlab_ssh_port}:22 \
     --restart always \
     --volume /gitlab/config:/etc/gitlab \
     --volume /gitlab/logs:/var/log/gitlab \
@@ -64,47 +64,6 @@ cmd="docker run --detach \
 echo "$cmd" > /etc/rc.local
 $cmd
 END_INIT
-}
-
-resource "aws_security_group" "snasg-security-group" {
-  name        = "snasg-security-group"
-  vpc_id      = "${var.vpc_id}"
-  description = "Security group for the single-node autoscaling group"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 8022
-    to_port     = 8022
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 module "init-install-awscli" {

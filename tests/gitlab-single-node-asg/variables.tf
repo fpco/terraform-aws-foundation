@@ -1,13 +1,22 @@
+variable "name" {
+  description = "The name of the autoscaling group"
+}
+
 variable "key_name" {
   description = "The name of the keypair to use"
 }
 
 variable "instance_type" {
-  description = "The type of the EC2 instance to use"
+  description = "The type of the EC2 instance to use (needs to be at least t2.medium)"
 }
 
 variable "instance_ami" {
   description = "The EC2 image to use"
+}
+
+variable "security_group_ids" {
+  type        = "list"
+  description = "The security groups to use for instances"
 }
 
 variable "region" {
@@ -68,4 +77,19 @@ variable "data_volume_snapshot_id" {
 variable "data_volume_iops" {
   default     = ""
   description = "The amount of IOPS to provision for the EBS block device"
+}
+
+variable "gitlab_ssh_port" {
+  default     = "8022"
+  description = "The port to use for ssh access to the gitlab instance"
+}
+
+variable "gitlab_http_port" {
+  default     = "80"
+  description = "The port to use for http access to the gitlab instance"
+}
+
+variable "gitlab_https_port" {
+  default     = "443"
+  description = "The port to use for https access to the gitlab instance"
 }
