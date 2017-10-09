@@ -19,5 +19,4 @@ cat <<EOT >> ${config_file}
   "encrypt": "${encrypt}"
 }
 EOT
-consul agent -config-file ${config_file} -config-dir /etc/consul.d
 ${init_suffix}
