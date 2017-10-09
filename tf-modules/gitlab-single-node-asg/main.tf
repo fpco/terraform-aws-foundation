@@ -18,7 +18,7 @@
  */
 
 module "gitlab-asg" {
-  source                  = "../../tf-modules/single-node-asg"
+  source                  = "../single-node-asg"
   name                    = "${var.name}"
   az                      = "${var.az}"
   key_name                = "${var.key_name}"

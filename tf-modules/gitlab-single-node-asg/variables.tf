@@ -7,10 +7,12 @@ variable "key_name" {
 }
 
 variable "instance_type" {
+  default     = "t2.medium"
   description = "The type of the EC2 instance to use (needs to be at least t2.medium)"
 }
 
 variable "instance_ami" {
+  default     = "ami-cd0f5cb6"
   description = "The EC2 image to use"
 }
 
