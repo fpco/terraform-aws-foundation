@@ -3,29 +3,29 @@ variable "is_govcloud" {
   default     = false
 }
 
-variable "vpc_id" {
-  description = "VPC where this NAT instance should be created in"
+variable "az" {
+  description = "Availability zone for the NAT instance"
+  type        = "string"
 }
 
-variable "availability_zone" {
-  description = "Availability zone for the NAT instance"
+variable "instance_type" {
+  description = "AWS instance type, use larger instances for high-volume traffic"
+  default     = "t2.nano"
 }
 
 variable "name_prefix" {
-  description = "Prefix for resources, usually project-related"
+  description = "Prefix for naming resources, usually project-related"
+  type        = "string"
 }
 
 variable "extra_tags" {
-  type = "map"
+  description = "map of tags to append to the Name tag, added to the instance"
+  default     = {}
 }
 
-variable "public_subnet_ids" {
-  type = "list"
-}
-
-variable "private_subnet_ids" {
-  description = "Subnets that should have their traffic provided by the NAT instance"
-  type        = "list"
+variable "public_subnet_id" {
+  description = "the ID of the subnet to deploy the NAT instance to"
+  type        = "string"
 }
 
 variable "private_subnet_cidrs" {
@@ -33,6 +33,12 @@ variable "private_subnet_cidrs" {
   type        = "list"
 }
 
-variable "aws_key_pair" {
-  description = "Key to access NAT instance through SSH"
+variable "key_name" {
+  description = "name of SSH key, maps to NAT instance `key_name`"
+  type        = "string"
+}
+
+variable "security_group_ids" {
+  description = "list of security groups to associate with the NAT instance"
+  type        = "list"
 }
