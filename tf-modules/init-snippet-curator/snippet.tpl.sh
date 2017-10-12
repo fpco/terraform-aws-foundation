@@ -15,7 +15,7 @@ cat <<EOF > /etc/curator/config.yaml
 client:
   hosts:
     - ${elasticsearch_host}
-  port: 9200
+  port: ${elasticsearch_port}
   url_prefix:
   use_ssl: False
   certificate:

@@ -98,23 +98,18 @@ data "template_file" "master-node-setup" {
     is_master_node             = true
     logstash_beats_address     = "${var.logstash_beats_address}"
     extra_setup_snippet        = <<EXTRA_SETUP
-${var.deploy_curator ? data.template_file.curator-setup.rendered : ""}
+${var.deploy_curator ? module.curator-setup.init_snippet : ""}
 
 ${var.extra_setup_snippet}
 EXTRA_SETUP
   }
 }
 
-
-data "template_file" "curator-setup" {
-  template = "${file("${path.module}/data/curator-setup.tpl.sh")}"
-
-  vars {
-    index_retention_period = "${var.index_retention_period}"
-    extra_curator_actions  = "${var.extra_curator_actions}"
-    elasticsearch_host     = "localhost"
-    master_only            = true
-  }
+module "curator-setup" {
+  source                 = "../init-snippet-curator"
+  index_retention_period = "${var.index_retention_period}"
+  extra_curator_actions  = "${var.extra_curator_actions}"
+  master_only            = true
 }
 
 
