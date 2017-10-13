@@ -63,6 +63,16 @@
         "sudo wget https://download.fpcomplete.com/ops/ops-v{{ user `ops_tool_version` }}-linux-amd64 -O /opt/bin/ops",
         "sudo chmod +x /opt/bin/ops"
       ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir -p /opt/bin",
+        "sudo wget https://releases.hashicorp.com/consul/0.9.3/consul_0.9.3_linux_amd64.zip -O /tmp/consul.zip",
+        "sudo unzip -d /opt/bin /tmp/consul.zip",
+        "sudo chmod +x /opt/bin/consul",
+        "sudo rm /tmp/consul.zip"
+      ]
     }
   ]
 }
