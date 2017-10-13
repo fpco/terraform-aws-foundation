@@ -41,10 +41,10 @@
 
 # an auto-scaling group for kube controllers
 module "controller-asg" {
-  source = "../asg"
+  source             = "../asg"
   azs                = ["${var.availability_zones}"]
   ami                = "${var.controller_ami}"
-  name               = "${var.name_prefix}"
+  name               = "${var.name_prefix == "" ? "" : "${var.name_prefix}"}"
   elb_names          = ["${aws_elb.kube-controllers.name}"]
   iam_profile        = "${var.controller_iam_profile}"
   instance_type      = "${var.controller_instance_type}"
@@ -58,6 +58,7 @@ module "controller-asg" {
   public_ip          = "${var.controller_public_ip}"
   subnet_ids         = ["${var.controller_subnet_ids}"]
   security_group_ids = ["${var.controller_security_group_ids}"]
+
   extra_tags = ["${list(
     map("key", "kubespray-role",
         "value", "kube-master,etcd,kube-node",
@@ -66,6 +67,7 @@ module "controller-asg" {
         "value", "${var.name_prefix}",
 	"propagate_at_launch", true),
     )}"]
+
   user_data = <<END_INIT
 #!/bin/bash
 # update the node's hostname
@@ -78,10 +80,10 @@ END_INIT
 
 # an auto-scaling group for kube workers
 module "worker-asg" {
-  source = "../asg"
+  source             = "../asg"
   azs                = ["${var.availability_zones}"]
   ami                = "${var.worker_ami}"
-  name               = "${var.name_prefix}"
+  name               = "${var.name_prefix == "" ? "" : "${var.name_prefix}"}"
   iam_profile        = "${var.worker_iam_profile}"
   instance_type      = "${var.worker_instance_type}"
   root_volume_type   = "${var.worker_root_volume_type}"
@@ -94,6 +96,7 @@ module "worker-asg" {
   public_ip          = "${var.worker_public_ip}"
   subnet_ids         = ["${var.worker_subnet_ids}"]
   security_group_ids = ["${var.worker_security_group_ids}"]
+
   extra_tags = ["${list(
     map("key", "kubespray-role",
         "value", "kube-node",
@@ -102,6 +105,7 @@ module "worker-asg" {
         "value", "${var.name_prefix}",
 	"propagate_at_launch", true),
     )}"]
+
   user_data = <<END_INIT
 #!/bin/bash
 # update the node's hostname

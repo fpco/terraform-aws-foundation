@@ -1,5 +1,6 @@
 variable "name_prefix" {
   description = "prefix to use when naming resources in this kube stack (cluster)"
+  default     = ""
 }
 
 variable "availability_zones" {
