@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set -xe
 
 LOGSTASH_CLIENT_NAME="logstash-client"
 
