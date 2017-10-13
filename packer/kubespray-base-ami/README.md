@@ -10,7 +10,7 @@ Import into AWS using this command:
 
 `NOTE`: Make sure to change the aws profile as well as `--region` and `--key-name` accordingly.
 
-Create the neccessary `packer.vars` file:
+Create the necessary `packer.vars` file:
 
     cat << EOF > packer.vars
     {
@@ -19,7 +19,7 @@ Create the neccessary `packer.vars` file:
     }
     EOF
 
-You have to override atleast `aws_vpc_id` and `aws_subnet_id`. See
+You have to override at least `aws_vpc_id` and `aws_subnet_id`. See
 `packer.json` for list of all variables.
 
 `NOTE`: You'll probably want to override `aws_region`, `ami_owner` and `ami_image_name_regex`.
