@@ -30,6 +30,8 @@ To run issue the following command:
 
 `NOTE`: Make sure to use the correct aws-env profile
 
+`NOTE`: To add a description to the AMI use `-var 'aws_ami_description=Description goes here'`.
+
 Every instance has to invoke this as part of their cloudinit as the docker provisioner
 need to mount the sshkey to be able to ssh into localhost.
 

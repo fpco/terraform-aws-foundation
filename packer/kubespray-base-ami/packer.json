@@ -8,10 +8,12 @@
     "ssh_private_key_file_path": "id_rsa",
     "aws_vpc_id": "changeme",
     "aws_subnet_id": "changeme",
-    "ops_tool_version": "0.3.2"
+    "ops_tool_version": "0.3.2",
+    "aws_ami_description": ""
   },
   "builders": [{
     "type": "amazon-ebs",
+    "ami_description": "{{ user `aws_ami_description` }}",
     "region": "{{ user `aws_region` }}",
     "ami_virtualization_type": "{{ user `aws_virtualization_type` }}",
     "source_ami_filter": {
