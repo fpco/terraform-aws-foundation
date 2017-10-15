@@ -21,7 +21,7 @@
  *       vpc_id      = "${module.vpc.vpc_id}"
  *       cidr_blocks = ["${var.vpc_cidr}"]
  *     }
- *     
+ *
  *     module "kube-controller-sg" {
  *       source      = "../single-port-tcp-sg"
  *       port        = "6443"
@@ -61,7 +61,7 @@ module "controller-asg" {
 
   extra_tags = ["${list(
     map("key", "kubespray-role",
-        "value", "kube-master,etcd,kube-node",
+        "value", "kube-master,etcd",
 	"propagate_at_launch", true),
     map("key", "cluster-name",
         "value", "${var.name_prefix}",
