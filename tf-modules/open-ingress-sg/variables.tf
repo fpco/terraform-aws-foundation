@@ -17,3 +17,10 @@ variable "cidr_blocks" {
   description = "CIDR blocks to use with `ingress`"
   type        = "list"
 }
+
+
+variable "extra_tags" {
+  default     = {}
+  description = "map of extra_tags to use"
+}
+

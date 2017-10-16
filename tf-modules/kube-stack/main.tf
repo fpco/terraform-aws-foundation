@@ -66,8 +66,10 @@ module "controller-asg" {
     map("key", "cluster-name",
         "value", "${var.name_prefix}",
 	"propagate_at_launch", true),
+    map("key", "KubernetesCluster",
+        "value", "${var.kube_cluster_name}",
+	"propagate_at_launch", true),
     )}"]
-
   user_data = <<END_INIT
 #!/bin/bash
 # update the node's hostname
@@ -104,8 +106,10 @@ module "worker-asg" {
     map("key", "cluster-name",
         "value", "${var.name_prefix}",
 	"propagate_at_launch", true),
+    map("key", "KubernetesCluster",
+        "value", "${var.kube_cluster_name}",
+	"propagate_at_launch", true),
     )}"]
-
   user_data = <<END_INIT
 #!/bin/bash
 # update the node's hostname

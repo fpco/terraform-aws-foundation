@@ -10,9 +10,7 @@ resource "aws_security_group" "main" {
   name   = "${var.name_prefix}-${var.name_suffix}"
   vpc_id = "${var.vpc_id}"
 
-  tags {
-    Name = "${var.name_prefix}-${var.name_suffix}"
-  }
+  tags = "${merge(var.extra_tags, map("Name", "${var.name_prefix}-${var.name_suffix}"))}"
 
   ingress {
     from_port   = 0

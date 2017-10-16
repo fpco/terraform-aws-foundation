@@ -3,6 +3,11 @@ variable "name_prefix" {
   default     = ""
 }
 
+variable "kube_cluster_name" {
+  description = "FQDN name of the kube cluster"
+  default = "cluster.local"
+}
+
 variable "availability_zones" {
   description = "list of availability zones to deploy to"
   type        = "list"
