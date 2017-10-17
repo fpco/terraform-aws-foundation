@@ -10,12 +10,17 @@ variable "key_name" {
   description = "Keypair name to log into the ec2 instance"
 }
 
+variable "key_file" {
+  description = "The secret key file to use"
+  default     = "~/.ssh/id_rsa"
+}
+
 module "setup" {
   name               = "test"
   source             = "../../tf-modules/gitlab-single-node-asg"
   region             = "${var.region}"
   az                 = "${var.az}"
-  key_file           = "~/.ssh/id_rsa"
+  key_file           = "${var.key_file}"
   key_name           = "${var.key_name}"
   subnet_id          = "${module.vpc.public_subnet_ids[0]}"
   vpc_id             = "${module.vpc.vpc_id}"
