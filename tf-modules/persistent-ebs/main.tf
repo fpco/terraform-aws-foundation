@@ -20,6 +20,12 @@ resource "aws_ebs_volume" "main" {
 output "iam_profile" {
     value = "${aws_iam_instance_profile.attach_ebs.id}"
 }
+
+//`arn` exported from the `aws_iam_instance_profile`
+output "iam_profile_policy_document" {
+  value = "${aws_iam_instance_profile.attach_ebs.policy}"
+}
+
 //`id` exported from the `aws_ebs_volume`
 output "volume_id" {
     value = "${aws_ebs_volume.main.id}"
