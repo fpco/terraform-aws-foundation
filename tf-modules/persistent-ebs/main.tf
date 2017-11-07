@@ -7,18 +7,20 @@
  * init-snippet that attaches the named EBS volume on boot.
  */
 resource "aws_ebs_volume" "main" {
-    availability_zone = "${var.az}"
-    size = "${var.size}"
-    type = "${var.volume_type}"
-#   iops = "${var.iops}"
-    encrypted   = "${var.encrypted}"
-    kms_key_id  = "${var.kms_key_id}"
-    snapshot_id = "${var.snapshot_id}"
-    tags        = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
+  availability_zone = "${var.az}"
+  size              = "${var.size}"
+  type              = "${var.volume_type}"
+
+  #   iops = "${var.iops}"
+  encrypted   = "${var.encrypted}"
+  kms_key_id  = "${var.kms_key_id}"
+  snapshot_id = "${var.snapshot_id}"
+  tags        = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }
+
 //`id` exported from the `aws_iam_instance_profile`
 output "iam_profile" {
-    value = "${aws_iam_instance_profile.attach_ebs.id}"
+  value = "${aws_iam_instance_profile.attach_ebs.id}"
 }
 
 //`arn` exported from the `aws_iam_instance_profile`
@@ -28,5 +30,5 @@ output "iam_profile_policy_document" {
 
 //`id` exported from the `aws_ebs_volume`
 output "volume_id" {
-    value = "${aws_ebs_volume.main.id}"
+  value = "${aws_ebs_volume.main.id}"
 }
