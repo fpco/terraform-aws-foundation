@@ -1,6 +1,6 @@
 variable "region" {
-    default = "us-west-1"
-    description = "The AWS region to deploy to"
+  default = "us-west-1"
+  description = "The AWS region to deploy to"
 }
 provider "aws" {
   region = "${var.region}"
