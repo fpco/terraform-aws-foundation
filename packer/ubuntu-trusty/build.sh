@@ -20,7 +20,7 @@ export COPY_TO_A="us-west-2"
 export COPY_TO_B="us-east-1"
 # hard-code the rest
 export INSTANCE_TYPE="t2.small"
-export DESC="Stock Ubuntu 14.04 + FPC common base for HMST"
+export DESC="Stock Ubuntu 14.04 + FP Deploy base"
 export OS_VERSION="Ubuntu Trusty"
 export RELEASE="14.04 LTS"
 # fill these in
