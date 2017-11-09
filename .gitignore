@@ -1,6 +1,7 @@
 *.tfstate*
 .terraform
 *.sw[o,p]
+tf.out
 auth.tfvars
 docs/modules/*.md
 docs/saltstack/*.md
