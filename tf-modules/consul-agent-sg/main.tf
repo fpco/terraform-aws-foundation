@@ -37,12 +37,12 @@ resource "aws_security_group" "main" {
         from_port = 8301
         to_port = 8301
         protocol = "tcp"
-        cidr_blocks = ["${split(",", replace(var.cidr_blocks, " ", ""))}"]
+        cidr_blocks = ["${var.cidr_blocks}"]
     }
     ingress {
         from_port = 8301
         to_port = 8301
         protocol = "udp"
-        cidr_blocks = ["${split(",", replace(var.cidr_blocks, " ", ""))}"]
+        cidr_blocks = ["${var.cidr_blocks}"]
     }
 }
