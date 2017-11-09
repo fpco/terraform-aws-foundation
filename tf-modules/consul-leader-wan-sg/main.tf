@@ -21,13 +21,13 @@ resource "aws_security_group" "main" {
     from_port   = "${var.wan_port}"
     to_port     = "${var.wan_port}"
     protocol    = "tcp"
-    cidr_blocks = ["${split(",", replace(var.cidr_blocks, " ", ""))}"]
+    cidr_blocks = ["${var.cidr_blocks}"]
   }
 
   ingress {
     from_port   = "${var.wan_port}"
     to_port     = "${var.wan_port}"
     protocol    = "udp"
-    cidr_blocks = ["${split(",", replace(var.cidr_blocks, " ", ""))}"]
+    cidr_blocks = ["${var.cidr_blocks}"]
   }
 }
