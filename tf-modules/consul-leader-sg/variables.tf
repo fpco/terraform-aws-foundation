@@ -7,5 +7,6 @@ variable "vpc_id" {
 }
 
 variable "cidr_blocks" {
-  description = "The list of CIDR IP blocks allowed to access the consul ports (as a string)"
+  description = "The list of CIDR IP blocks allowed to access the consul ports"
+  type        = "list"
 }
