@@ -12,7 +12,7 @@ variable "cidr" {
 
 variable "extra_tags" {
   description = "Extra tags that will be added to VPC and DHCP resources"
-  default = {}
+  default     = {}
 }
 
 variable "enable_dns_hostnames" {
