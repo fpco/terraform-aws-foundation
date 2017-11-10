@@ -27,14 +27,14 @@ module "init-nat-config-iptables" {
   source = "../init-snippet-exec"
   init   = <<END_INIT
 # write out script to setup nat
-cat <<EOT > /etc/network/if-pre-up.d/nat-setup
+echo '#!/bin/sh
 echo 1 > /proc/sys/net/ipv4/ip_forward
 for s in ${join(" ", var.private_subnet_cidrs)};
 do
   logger -i -t "user_data" "Setting NAT for $$s subnet"
   iptables -t nat -A POSTROUTING -s $$s -j MASQUERADE
 done
-EOT
+' > /etc/network/if-pre-up.d/nat-setup
 # make the script executable
 chmod +x /etc/network/if-pre-up.d/nat-setup
 # run the script
