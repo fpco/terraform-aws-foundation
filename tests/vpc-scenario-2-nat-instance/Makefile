@@ -1,0 +1,49 @@
+.PHONY: generate-ssh-key network plan apply test destroy
+
+.DEFAULT_GOAL = help
+
+## Use ssh-keygen to generate a keypair for SSH
+generate-ssh-key:
+	@ssh-keygen -q -N "" -b 4096 -C "test" -f ./id_rsa
+
+## Use Terraform to create the VPC and core network resources in a specific order
+network:
+	@terraform init
+	@terraform plan -out=tf.out -target=module.public-subnets
+	@terraform apply tf.out
+	@terraform plan -out=tf.out -target=module.private-subnets
+	@terraform apply tf.out
+	@terraform plan -out=tf.out -target=module.public-gateway
+	@terraform apply tf.out
+	@terraform plan -out=tf.out -target=module.nat-instance
+	@terraform apply tf.out
+	@rm -rf tf.out
+
+## Use Terraform to generate a planfile tf.out
+plan:
+	@terraform plan -out=tf.out
+
+## Use Terraform to apply the tf.out planfile
+apply:
+	@terraform apply tf.out
+
+## Use curl to ping the ELB as a test
+test:
+	@curl -v http://$(terraform output elb_dns)
+
+## Use Terraform to destory all resources in the test env
+destroy:
+	@terraform destroy -force
+
+## Show help screen.
+help:
+	@echo "Please use \`make <target>' where <target> is one of\n\n"
+	@awk '/^[a-zA-Z\-\_0-9]+:/ { \
+		helpMessage = match(lastLine, /^## (.*)/); \
+		if (helpMessage) { \
+			helpCommand = substr($$1, 0, index($$1, ":")-1); \
+			helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
+			printf "%-30s %s\n", helpCommand, helpMessage; \
+		} \
+	} \
+	{ lastLine = $$0 }' $(MAKEFILE_LIST)
