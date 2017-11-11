@@ -42,8 +42,8 @@ variable "name_format" {
 }
 
 variable "user_data" {
-  description = "shell script code passed to `aws_instance.user_data`"
-  default     = ""
+  description = "list of shell script code to pass to each `aws_instance.user_data`"
+  default     = []
 }
 
 variable "alarm_actions" {

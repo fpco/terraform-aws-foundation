@@ -78,7 +78,7 @@ resource "aws_instance" "auto-recover" {
   lifecycle {
     ignore_changes = ["ami"]
   }
-  user_data = "${var.user_data}"
+  user_data = "${element(var.user_data, count.index)}"
 }
 
 # Current AWS region
