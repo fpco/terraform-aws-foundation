@@ -12,6 +12,11 @@ variable "instance_type" {
   default     = "t2.nano"
 }
 
+variable "iam_profiles" {
+  description = "maps to `aws_instance.iam_instance_profile`, for each instance"
+  default     = []
+}
+
 variable "subnet_ids" {
   description = "Subnets to run servers in"
   type        = "list"
