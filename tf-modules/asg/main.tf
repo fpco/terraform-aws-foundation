@@ -22,10 +22,13 @@ resource "aws_autoscaling_group" "cluster" {
   max_size                  = "${var.max_nodes}"
   min_size                  = "${var.min_nodes}"
   name                      = "${var.name}-${var.suffix}"
+
   lifecycle {
     create_before_destroy = true
   }
+
   vpc_zone_identifier = ["${var.subnet_ids}"]
+
   tags = ["${concat(
     list(
       map("key", "Name",
@@ -35,6 +38,7 @@ resource "aws_autoscaling_group" "cluster" {
     var.extra_tags,
   )}"]
 }
+
 # Launch Config for the ASG
 resource "aws_launch_configuration" "cluster" {
   # omit name so it's generated as a unique value
@@ -45,10 +49,12 @@ resource "aws_launch_configuration" "cluster" {
   key_name                    = "${var.key_name}"
   security_groups             = ["${var.security_group_ids}"]
   user_data                   = "${var.user_data}"
+
   root_block_device {
     volume_type = "${var.root_volume_type}"
     volume_size = "${var.root_volume_size}"
   }
+
   lifecycle {
     create_before_destroy = true
   }
