@@ -17,7 +17,7 @@ resource "aws_security_group" "main" {
     to_port   = 4647
     protocol  = "tcp"
 
-    cidr_blocks = ["${concat(var.server_cidr_blocks, var.worker_cidr_blocks)}"]
+    cidr_blocks = ["${distinct(concat(var.server_cidr_blocks, var.worker_cidr_blocks))}"]
   }
 
   # open port 4648 (nomad) tcp/udp for the leaders
