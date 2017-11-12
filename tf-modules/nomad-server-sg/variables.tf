@@ -8,9 +8,11 @@ variable "vpc_id" {
 }
 
 variable "server_cidr_blocks" {
-  description = "The list of CIDR IP blocks where nomad servers run (as a string-list)"
+  description = "The list of CIDR IP blocks where nomad servers run"
+  type        = "list"
 }
 
 variable "worker_cidr_blocks" {
-  description = "The list of CIDR IP blocks where nomad agents run (as a string-list)"
+  description = "The list of CIDR IP blocks where nomad workers run"
+  type        = "list"
 }

@@ -17,9 +17,7 @@ resource "aws_security_group" "main" {
     to_port   = 4647
     protocol  = "tcp"
 
-    cidr_blocks = ["${compact(split(",", replace(var.worker_cidr_blocks, " ", "")))}",
-      "${compact(split(",", replace(var.server_cidr_blocks, " ", "")))}",
-    ]
+    cidr_blocks = ["${concat(var.server_cidr_blocks, var.worker_cidr_blocks)}"]
   }
 
   # open port 4648 (nomad) tcp/udp for the leaders
@@ -27,13 +25,13 @@ resource "aws_security_group" "main" {
     from_port   = 4648
     to_port     = 4648
     protocol    = "tcp"
-    cidr_blocks = ["${split(",", replace(var.server_cidr_blocks, " ", ""))}"]
+    cidr_blocks = ["${var.server_cidr_blocks}"]
   }
 
   ingress {
     from_port   = 4648
     to_port     = 4648
     protocol    = "udp"
-    cidr_blocks = ["${split(",", replace(var.server_cidr_blocks, " ", ""))}"]
+    cidr_blocks = ["${var.server_cidr_blocks}"]
   }
 }
