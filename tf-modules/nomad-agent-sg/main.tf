@@ -18,13 +18,13 @@ resource "aws_security_group" "main" {
     from_port   = 4646
     to_port     = 4646
     protocol    = "tcp"
-    cidr_blocks = ["${split(",", replace(var.cidr_blocks, " ", ""))}"]
+    cidr_blocks = ["${var.cidr_blocks}"]
   }
 
   ingress {
     from_port   = 20000
     to_port     = 60000
     protocol    = "tcp"
-    cidr_blocks = ["${split(",", replace(var.cidr_blocks, " ", ""))}"]
+    cidr_blocks = ["${var.cidr_blocks}"]
   }
 }
