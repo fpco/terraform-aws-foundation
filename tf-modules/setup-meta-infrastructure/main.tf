@@ -326,9 +326,16 @@ data "aws_iam_policy_document" "setup-mfa" {
       "iam:DeactivateMFADevice",
       "iam:EnableMFADevice",
       "iam:ListMFADevices",
-      "iam:ResyncMFADevice"
+      "iam:ResyncMFADevice",
+      "iam:ChangePassword"
     ]
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
+  }
+  statement {
+    sid = "AllowUsersToGetAccountPasswordPolicy"
+    effect = "Allow"
+    actions = ["iam:GetAccountPasswordPolicy"]
+    resources = ["*"]
   }
   statement {
     sid       = "AllowUsersToListVirtualMFADevices"
@@ -356,7 +363,8 @@ data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
     actions = [
       "iam:*LoginProfile",
       "iam:*AccessKey*",
-      "iam:ResyncMFADevice"
+      "iam:ResyncMFADevice",
+      "iam:ChangePassword"
     ]
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
     condition {
