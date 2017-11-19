@@ -15,13 +15,7 @@ resource "aws_internet_gateway" "public" {
 
 resource "aws_route_table" "public" {
   vpc_id = "${var.vpc_id}"
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.public.id}"
-  }
-
-  tags = "${merge(map("Name", "${var.name_prefix}-public"), "${var.extra_tags}")}"
+  tags   = "${merge(map("Name", "${var.name_prefix}-public"), "${var.extra_tags}")}"
 }
 
 resource "aws_route_table_association" "public" {
@@ -30,3 +24,9 @@ resource "aws_route_table_association" "public" {
   route_table_id = "${aws_route_table.public.id}"
 }
 
+resource "aws_route" "public" {
+  route_table_id         = "${aws_route_table.public.id}"
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = "${aws_internet_gateway.public.id}"
+  depends_on             = ["aws_route_table.public"]
+}
