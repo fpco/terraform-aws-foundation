@@ -6,6 +6,12 @@ tools and paradigms, supports the ops developer who needs to move fast while
 maintaining stability, and does not forget how to support your legacy apps.
 
 
+## Sections
+
+* [Tutorials](tutorials)
+* [Module API docs](modules)
+
+
 ## Project Goals
 
 This project aims to be..
@@ -56,8 +62,3 @@ by leveraging the following tools:
 
 As the collection of modules is composable into an endless array of possibilities,
 there is no explicit requirement to use all of these tools.
-
-
-## Sections
-
-* [Terraform Module API docs](modules)
