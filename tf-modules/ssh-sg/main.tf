@@ -10,7 +10,7 @@ variable "security_group_id" {
 
 variable "cidr_blocks" {
   description = "The list of CIDR IP blocks allowed to access the SSH port"
-  type        = "list"
+  default     = ["0.0.0.0/0"]
 }
 
 variable "ssh_port" {
