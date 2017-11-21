@@ -1,33 +1,26 @@
 /**
- *## Open Ingress Security Group
+ *## Open Ingress Security Group Rule
  *
- * Create a simple and reusable security group that opens all ports for
- * both TCP and UDP (unrestricted).
+ * Create a simple and reusable security group rule that opens all ports for
+ * both TCP and UDP traffic (unrestricted).
  *
  */
 
-resource "aws_security_group" "main" {
-  name   = "${var.name_prefix}-${var.name_suffix}"
-  vpc_id = "${var.vpc_id}"
-
-  tags {
-    Name = "${var.name_prefix}-${var.name_suffix}"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["${var.cidr_blocks}"]
-  }
+variable "security_group_id" {
+  description = "security group to attach the ingress rules to"
 }
 
-//`id` exported from `aws_security_group`
-output "id" {
-  value = "${aws_security_group.main.id}"
+variable "cidr_blocks" {
+  description = "The list of CIDR IP blocks allowed to access the etcd ports"
+  type        = "list"
 }
 
-//`name` exported from `aws_security_group`
-output "name" {
-  value = "${aws_security_group.main.name}"
+# open ingress!
+resource "aws_security_group_rule" "open_ingress" {
+  type              = "ingress"
+  from_port         = "0"
+  to_port           = "0"
+  protocol          = "-1"
+  cidr_blocks       = ["${var.cidr_blocks}"]
+  security_group_id = "${var.security_group_id}"
 }
