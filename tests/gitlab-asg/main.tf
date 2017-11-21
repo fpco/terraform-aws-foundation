@@ -32,7 +32,7 @@ module "setup" {
   instance_ami       = "${module.ubuntu-xenial-ami.id}"
   subnet_id          = "${module.vpc.public_subnet_ids[0]}"
   vpc_id             = "${module.vpc.vpc_id}"
-  security_group_ids = ["${aws_security_group.gitlab-asg.id}"]
+  security_group_ids = ["${aws_security_group.gitlab.id}"]
 }
 
 module "vpc" {
@@ -44,43 +44,42 @@ module "vpc" {
   region              = "${var.region}"
 }
 
-resource "aws_security_group" "gitlab-asg" {
+resource "aws_security_group" "gitlab" {
   name        = "gitlab-asg"
   vpc_id      = "${module.vpc.vpc_id}"
   description = "Security group for the single-node autoscaling group"
+}
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+module "ssh-rule" {
+  source            = "../../tf-modules/ssh-sg"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.gitlab.id}"
+}
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+module "http-rule" {
+  source            = "../../tf-modules/single-port-sg"
+  port              = 80
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.gitlab.id}"
+}
 
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+module "https-rule" {
+  source            = "../../tf-modules/single-port-sg"
+  port              = 443
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.gitlab.id}"
+}
 
-  ingress {
-    from_port   = 8022
-    to_port     = 8022
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+module "gitlab-ssh-rule" {
+  source            = "../../tf-modules/single-port-sg"
+  port              = 8022
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.gitlab.id}"
+}
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+module "open-egress-rule" {
+  source            = "../../tf-modules/open-egress-sg"
+  security_group_id = "${aws_security_group.gitlab.id}"
+}
+
 }
