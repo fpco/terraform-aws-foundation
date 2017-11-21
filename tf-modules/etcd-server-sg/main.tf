@@ -1,35 +1,22 @@
-variable "name_prefix" {
-  description = "Prefix to use when naming the SG"
+/*
+ * ADD DOCS
+ */
+
+variable "security_group_id" {
+  description = "security group to attach the ingress rules to"
 }
-variable "name_suffix" {
-  description = "Suffix to use when naming the SG"
-  default     = "etcd-server"
-}
-variable "vpc_id" {
-  description = "ID of VPC to associate SG with"
-}
+
 variable "cidr_blocks" {
-  description = "List of CIDR block ranges that the SG allows ingress from"
+  description = "The list of CIDR IP blocks allowed to access the etcd ports"
   type        = "list"
 }
-# Security group for DNS servers
-resource "aws_security_group" "main" {
-  name        = "${var.name_prefix}-${var.name_suffix}"
-  vpc_id      = "${var.vpc_id}"
 
-  tags {
-    Name = "${var.name_prefix}-${var.name_suffix}"
-  }
-
-  ingress {
-    from_port   = "2379"
-    to_port     = "2380"
-    protocol    = "tcp"
-    cidr_blocks = ["${var.cidr_blocks}"]
-  }
+# Security group for etcd servers
+resource "aws_security_group_rule" "etcd_server_tcp" {
+  type              = "ingress"
+  from_port         = "2379"
+  to_port           = "2380"
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.cidr_blocks}"]
+  security_group_id = "${var.security_group_id}"
 }
-// ID of the Security Group created
-output "id" {
-  value = "${aws_security_group.main.id}"
-}
-
