@@ -12,7 +12,6 @@ variable "instance_type" {
 }
 
 variable "instance_ami" {
-  default     = "ami-cd0f5cb6"
   description = "The EC2 image to use"
 }
 
