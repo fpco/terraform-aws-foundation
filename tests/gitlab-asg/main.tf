@@ -82,4 +82,12 @@ module "open-egress-rule" {
   security_group_id = "${aws_security_group.gitlab.id}"
 }
 
+// region deployed to
+output "region" {
+  value = "${var.region}"
+}
+
+// name of the Gitlab autoscaling group
+output "gitlab_asg_name" {
+  value = "${var.name}-gitlab-asg-${element(data.aws_availability_zones.available.names, 0)}"
 }
