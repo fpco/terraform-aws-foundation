@@ -10,7 +10,7 @@ output "cidr_blocks" {
 
 // list of Availability Zones
 output "azs" {
-  value = ["${aws_subnet.main.*.availability_zones}"]
+  value = ["${aws_subnet.main.*.availability_zone}"]
 }
 
 // ID of the VPC the subnets are in

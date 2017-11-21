@@ -39,7 +39,7 @@ output "vpn_config" {
 }
 // List of destination CIDR blocks, one for each (static) VPN Connection Route
 output "vpn_connection_static_routes" {
-  value = ["${aws_vpn_connection_route.main.*.destination_cide_block}"]
+  value = ["${aws_vpn_connection_route.main.*.destination_cidr_block}"]
 }
 
 
