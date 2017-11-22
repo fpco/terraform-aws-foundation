@@ -22,6 +22,7 @@ variable "vpc_id" {
 
 variable "extra_tags" {
   description = "map of name,value pairs to tag the security group (append to Name tag)"
+  default     = {}
   type        = "map"
 }
 
