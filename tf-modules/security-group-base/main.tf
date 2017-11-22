@@ -6,7 +6,12 @@
  */
 
 variable "name" {
-  description = "Name for security group"
+  description = "security group `name`"
+  type        = "string"
+}
+
+variable "description" {
+  description = "security group `description`"
   type        = "string"
 }
 
@@ -21,10 +26,11 @@ variable "extra_tags" {
 }
 
 resource "aws_security_group" "main" {
-  name   = "${var.name}"
-  vpc_id = "${var.vpc_id}"
+  name        = "${var.name}"
+  description = "${var.description}"
+  vpc_id      = "${var.vpc_id}"
 
-  tags   = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
+  tags = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }
 
 // ID of the Security Group created
