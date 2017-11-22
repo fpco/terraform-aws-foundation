@@ -24,6 +24,11 @@ variable "ssh_key" {
   default     = "./id_rsa"
 }
 
+variable "vpc_cidr_block" {
+  default     = "10.23.0.0/16"
+  description = "CIDR block to use with the VPC"
+}
+
 variable "public_subnet_cidrs" {
   default     = ["10.23.11.0/24", "10.23.12.0/24", "10.23.13.0/24"]
   description = "A list of public subnet CIDRs to deploy inside the VPC"
@@ -43,7 +48,7 @@ data "aws_availability_zones" "available" {}
 module "vpc" {
   source               = "../../tf-modules/vpc"
   region               = "${var.region}"
-  cidr                 = "10.23.0.0/16"
+  cidr                 = "${var.vpc_cidr_block}"
   name_prefix          = "${var.name}"
 }
 
