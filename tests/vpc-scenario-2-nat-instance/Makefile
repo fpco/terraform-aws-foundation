@@ -6,6 +6,11 @@
 generate-ssh-key:
 	@ssh-keygen -q -N "" -b 4096 -C "test" -f ./id_rsa
 
+## write out a tfvars file for a test deploy
+generate-tfvars:
+	@echo "key_file = \"./id_rsa.pub\"" > terraform.tfvars
+	@echo "region = \"us-east-2\"" >> terraform.tfvars
+
 ## Use Terraform to create the VPC and core network resources in a specific order
 network:
 	@terraform init
@@ -29,11 +34,21 @@ apply:
 
 ## Use curl to ping the ELB as a test
 test:
-	@curl -v http://$(terraform output elb_dns)
+	@curl -v http://$$(terraform output elb_dns)
+
+## use ops cli tool to lookup the public IP of the gitlab instance
+get-ip:
+	@ops aws ec2 asg ips -r $$(terraform output region) --private $$(terraform output web_asg_name)
 
 ## Use Terraform to destory all resources in the test env
 destroy:
 	@terraform destroy -force
+
+## rm -rf everything
+clean: destroy
+	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
+	@rm -rf id_rsa id_rsa.pub
+	@rm -rf tf.out terraform.tfvars
 
 ## Show help screen.
 help:
