@@ -85,11 +85,7 @@ module "nat-instance" {
 
   # the one instance can route for any private subnet
   private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
-  security_group_ids   = [
-    "${module.open-egress-sg.id}",
-    "${module.public-ssh-sg.id}",
-    "${aws_security_group.nat_instance.id}",
-  ]
+  security_group_ids   = ["${aws_security_group.nat_instance.id}"]
 }
 
 # route table for the private subnets, hooks up the VPN gateway
@@ -118,18 +114,30 @@ resource "aws_security_group" "nat_instance" {
     name = "${var.name}-nat-instance"
     description = "Allow HTTP/HTTPS thru the NAT"
     vpc_id = "${module.vpc.vpc_id}"
-    ingress {
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["${module.private-subnets.cidr_blocks}"]
-    }
-    ingress {
-        from_port = 443
-        to_port = 443
-        protocol = "tcp"
-        cidr_blocks = ["${module.private-subnets.cidr_blocks}"]
-    }
+}
+
+module "nat-http-rule" {
+  source            = "../../tf-modules/single-port-sg"
+  port              = 80
+  cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
+  security_group_id = "${aws_security_group.nat_instance.id}"
+}
+
+module "nat-https-rule" {
+  source            = "../../tf-modules/single-port-sg"
+  port              = 443
+  cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
+  security_group_id = "${aws_security_group.nat_instance.id}"
+}
+
+module "nat-public-ssh-rule" {
+  source            = "../../tf-modules/ssh-sg"
+  security_group_id = "${aws_security_group.nat_instance.id}"
+}
+
+module "nat-instance-open-egress-rule" {
+  source            = "../../tf-modules/open-egress-sg"
+  security_group_id = "${aws_security_group.nat_instance.id}"
 }
 
 module "ubuntu-xenial-ami" {
@@ -142,44 +150,50 @@ resource "aws_key_pair" "main" {
   public_key = "${file(var.ssh_pubkey)}"
 }
 
-# shared security group for SSH
-module "public-ssh-sg" {
-  source              = "../../tf-modules/ssh-sg"
-  name                = "${var.name}"
-  vpc_id              = "${module.vpc.vpc_id}"
-  allowed_cidr_blocks = ["0.0.0.0/0"]
-}
-# shared security group, open egress (outbound from nodes)
-module "open-egress-sg" {
-  source = "../../tf-modules/open-egress-sg"
-  name   = "${var.name}"
-  vpc_id = "${module.vpc.vpc_id}"
-}
-
 # Security Group for ELB, gets public access
-resource "aws_security_group" "public-elb" {
+resource "aws_security_group" "public_elb" {
     name = "${var.name}-public-elb"
     description = "Allow public access to ELB"
     vpc_id = "${module.vpc.vpc_id}"
-    ingress {
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
 }
+
+module "elb-http-rule" {
+  source            = "../../tf-modules/single-port-sg"
+  port              = 80
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.public_elb.id}"
+}
+
+module "elb-open-egress-rule" {
+  source            = "../../tf-modules/open-egress-sg"
+  security_group_id = "${aws_security_group.public_elb.id}"
+}
+
 # Security Group for webapp ASG, only accessible from ELB
-resource "aws_security_group" "web-service" {
+resource "aws_security_group" "web_service" {
     name = "${var.name}-web-service"
-    description = "Allow ELB to access the web-service in private subnet"
+    description = "security group for web-service instances in the private subnet"
     vpc_id = "${module.vpc.vpc_id}"
-    ingress {
-        from_port = 3000
-        to_port = 3000
-        protocol = "tcp"
-        cidr_blocks = ["${module.public-subnets.cidr_blocks}"]
-    }
 }
+
+module "web-service-http-rule" {
+  source            = "../../tf-modules/single-port-sg"
+  port              = 3000
+  cidr_blocks       = ["${module.public-subnets.cidr_blocks}"]
+  security_group_id = "${aws_security_group.web_service.id}"
+}
+
+module "web-service-vpc-ssh-rule" {
+  source            = "../../tf-modules/ssh-sg"
+  cidr_blocks       = ["${var.vpc_cidr_block}"]
+  security_group_id = "${aws_security_group.web_service.id}"
+}
+
+module "web-service-open-egress-rule" {
+  source            = "../../tf-modules/open-egress-sg"
+  security_group_id = "${aws_security_group.web_service.id}"
+}
+
 resource "aws_elb" "web" {
     name = "${var.name}-public-elb"
     health_check {
@@ -199,9 +213,7 @@ resource "aws_elb" "web" {
         lb_protocol = "http"
     }
     # Ensure we allow incoming traffic to the ELB, HTTP/S
-    security_groups = ["${aws_security_group.public-elb.id}",
-                       "${module.open-egress-sg.id}"
-    ]
+    security_groups = ["${aws_security_group.public_elb.id}"]
     # ELBs in the public subnets, separate from the web ASG in private subnets
     subnets = ["${module.public-subnets.ids}"]
 }
@@ -219,13 +231,9 @@ module "web" {
   public_ip          = false
   key_name           = "${aws_key_pair.main.key_name}"
   subnet_ids         = ["${module.private-subnets.ids}"]
-  security_group_ids = ["${module.public-ssh-sg.id}",
-                        "${module.open-egress-sg.id}",
-                        "${aws_security_group.web-service.id}"
-  ]
-
-  root_volume_type = "gp2"
-  root_volume_size = "8"
+  security_group_ids = ["${aws_security_group.web_service.id}"]
+  root_volume_type   = "gp2"
+  root_volume_size   = "8"
 
   user_data = <<END_INIT
 #!/bin/bash
@@ -254,6 +262,23 @@ docker run                   \
 END_INIT
 }
 
+# Security Group for bastion instance
+#resource "aws_security_group" "bastion" {
+#    name = "${var.name}-bastion-instance"
+#    description = "Allow SSH to bastion"
+#    vpc_id = "${module.vpc.vpc_id}"
+#}
+#
+#module "bastion-public-ssh-rule" {
+#  source            = "../../tf-modules/ssh-sg"
+#  security_group_id = "${aws_security_group.nat_instance.id}"
+#}
+#
+#module "bastion-open-egress-rule" {
+#  source            = "../../tf-modules/open-egress-sg"
+#  security_group_id = "${aws_security_group.nat_instance.id}"
+#}
+#
 #resource "aws_instance" "bastion" {
 #  ami               = "${module.ubuntu-xenial-ami.id}"
 #  key_name          = "${aws_key_pair.main.key_name}"
