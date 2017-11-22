@@ -278,3 +278,13 @@ output "elb_dns" {
 output "nat_ip" {
   value = "${module.nat-instance.public_ip}"
 }
+
+// region deployed to
+output "region" {
+  value = "${var.region}"
+}
+
+// name of the web service autoscaling group
+output "web_asg_name" {
+  value = "${var.name}-web-cluster"
+}
