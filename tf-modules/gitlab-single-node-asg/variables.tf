@@ -1,5 +1,5 @@
-variable "name" {
-  description = "The name of the autoscaling group"
+variable "name_prefix" {
+  description = "The name prefix of the autoscaling group"
 }
 
 variable "key_name" {
@@ -27,10 +27,6 @@ variable "region" {
 
 variable "az" {
   description = "The availability zone to create the instance in"
-}
-
-variable "key_file" {
-  description = "Path to the SSH private key to provide connection info as output"
 }
 
 variable "vpc_id" {
@@ -94,4 +90,9 @@ variable "gitlab_http_port" {
 variable "gitlab_https_port" {
   default     = "443"
   description = "The port to use for https access to the gitlab instance"
+}
+
+variable "aws_cloud" {
+  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
+  default     = "aws"
 }
