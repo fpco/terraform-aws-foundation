@@ -4,9 +4,6 @@ variable "name" {
 variable "key_name" {
   description = "The name of the (AWS) SSH key to associate with the instance"
 }
-variable "key_file" {
-  description = "Path to the SSH private key to provide connection info as output"
-}
 variable "ami" {
   description = "The base AMI for each AWS instance created"
 }
@@ -81,3 +78,4 @@ variable "aws_cloud" {
   description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
   default     = "aws"
 }
+

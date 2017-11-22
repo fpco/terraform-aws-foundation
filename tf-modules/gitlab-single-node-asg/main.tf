@@ -1,8 +1,8 @@
-/** 
+/**
  * Run a Gitlab on a single EC2 instance.
  * This instance will be part of a single-node autoscaling group
  * that shares an EBS volume to store data.
- * 
+ *
  * Note that there is a peculiarity with the EBS volume in that it
  * requires some manual setup the very first time to make it available
  * for use (unless a snapshot id is supplied):
@@ -19,10 +19,9 @@
 
 module "gitlab-asg" {
   source                  = "../single-node-asg"
-  name                    = "${var.name}"
+  name                    = "${var.name_prefix}"
   az                      = "${var.az}"
   key_name                = "${var.key_name}"
-  key_file                = "${var.key_file}"
   ami                     = "${var.instance_ami}"
   instance_type           = "${var.instance_type}"
   name_suffix             = "gitlab-asg"
@@ -37,6 +36,7 @@ module "gitlab-asg" {
   data_volume_kms_key_id  = "${var.data_volume_kms_key_id}"
   data_volume_snapshot_id = "${var.data_volume_snapshot_id}"
   data_volume_iops        = "${var.data_volume_iops}"
+  aws_cloud               = "${var.aws_cloud}"
 
   init_prefix = <<END_INIT
 apt-get update

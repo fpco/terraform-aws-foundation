@@ -16,7 +16,7 @@ variable "key_file" {
 }
 
 module "setup" {
-  name               = "test"
+  name_prefix        = "test"
   source             = "../../tf-modules/gitlab-single-node-asg"
   region             = "${var.region}"
   az                 = "${var.az}"
