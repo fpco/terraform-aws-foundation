@@ -6,6 +6,12 @@ variable "key_name" {
   description = "The name of the keypair to use"
 }
 
+variable "load_balancers" {
+  type        = "list"
+  default     = []
+  description = "The list of load balancers names to pass to the ASG module"
+}
+
 variable "instance_type" {
   default     = "t2.medium"
   description = "The type of the EC2 instance to use (needs to be at least t2.medium)"
@@ -14,6 +20,11 @@ variable "instance_type" {
 variable "instance_ami" {
   default     = "ami-cd0f5cb6"
   description = "The EC2 image to use"
+}
+
+variable "public_ip" {
+  default     = "true"
+  description = "Boolean flag to enable/disable `map_public_ip_on_launch` in the launch configuration"
 }
 
 variable "security_group_ids" {
