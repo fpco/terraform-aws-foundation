@@ -5,7 +5,7 @@ data "aws_region" "current" {
 
 resource "aws_iam_policy" "ebs-volume-policy" {
   count = "${var.volume_count}"
-  name = "${var.name_prefix}-ebs-volume-${count.index}"
+  name = "${var.name_prefix}-ebs-volume-${count.index + 1}"
   policy = <<END_POLICY
 {
   "Version": "2012-10-17",

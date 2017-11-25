@@ -12,6 +12,11 @@ variable "instance_type" {
   default     = "t2.nano"
 }
 
+variable "iam_profiles" {
+  description = "maps to `aws_instance.iam_instance_profile`, for each instance"
+  default     = []
+}
+
 variable "subnet_ids" {
   description = "Subnets to run servers in"
   type        = "list"
@@ -42,8 +47,8 @@ variable "name_format" {
 }
 
 variable "user_data" {
-  description = "shell script code passed to `aws_instance.user_data`"
-  default     = ""
+  description = "list of shell script code to pass to each `aws_instance.user_data`"
+  default     = []
 }
 
 variable "alarm_actions" {

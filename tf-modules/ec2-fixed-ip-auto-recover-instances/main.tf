@@ -53,6 +53,7 @@ resource "aws_instance" "auto-recover" {
   count                  = "${length(var.private_ips)}"
   ami                    = "${var.ami}"
   instance_type          = "${var.instance_type}"
+  iam_instance_profile   = "${element(var.iam_profiles, count.index)}"
   subnet_id              = "${element(var.subnet_ids, count.index)}"
   vpc_security_group_ids = ["${var.security_group_ids}"]
   private_ip             = "${var.private_ips[count.index]}"
@@ -78,7 +79,7 @@ resource "aws_instance" "auto-recover" {
   lifecycle {
     ignore_changes = ["ami"]
   }
-  user_data = "${var.user_data}"
+  user_data = "${element(var.user_data, count.index)}"
 }
 
 # Current AWS region
