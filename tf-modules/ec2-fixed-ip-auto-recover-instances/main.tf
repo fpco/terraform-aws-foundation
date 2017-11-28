@@ -58,10 +58,12 @@ resource "aws_instance" "auto-recover" {
   vpc_security_group_ids = ["${var.security_group_ids}"]
   private_ip             = "${var.private_ips[count.index]}"
   key_name               = "${var.key_name}"
+
   root_block_device {
     volume_type = "${var.root_volume_type}"
     volume_size = "${var.root_volume_size}"
   }
+
   # Instance auto-recovery (see cloudwatch metric alarm below) doesn't support
   # instances with ephemeral storage, so this disables it.
   # See https://github.com/hashicorp/terraform/issues/5388#issuecomment-282480864
@@ -69,16 +71,20 @@ resource "aws_instance" "auto-recover" {
     device_name = "/dev/sdb"
     no_device   = true
   }
+
   ephemeral_block_device {
     device_name = "/dev/sdc"
     no_device   = true
   }
+
   tags {
     Name = "${format(var.name_format, var.name_prefix, count.index + 1)}"
   }
+
   lifecycle {
     ignore_changes = ["ami"]
   }
+
   user_data = "${element(var.user_data, count.index)}"
 }
 
