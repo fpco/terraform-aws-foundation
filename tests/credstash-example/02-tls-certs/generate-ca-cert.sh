@@ -1,19 +1,6 @@
 #!/bin/bash
 set -x
 
-CLIENT_NAME="${client_name}"
-DEPOT_PATH="${depot_path}"
-CA_CONFIG="./ca_config.json"
-CA_COUNTRY="${ca_country}"
-CA_STATE="${ca_state}"
-CA_LOCALITY="${ca_locality}"
-CA_COMMON_NAME="${ca_common_name}"
-CA_PASSPHRASE="${ca_passphrase}"
-CA_DOMAIN_NAME="${domain_name}"
-SERVER_CONTEXT="${server_context}"
-CLIENT_CONTEXT="${client_context}"
-CREDSTASH_PUT_COMMAND="${credstash_put_cmd}"
-
 # Remove any old certificate
 rm -f "$DEPOT_PATH"
 

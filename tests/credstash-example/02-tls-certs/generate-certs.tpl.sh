@@ -10,3 +10,7 @@ export CA_DOMAIN_NAME="${domain_name}"
 export SERVER_CONTEXT="${server_context}"
 export CLIENT_CONTEXT="${client_context}"
 export CREDSTASH_PUT_COMMAND="${credstash_put_cmd}"
+
+./generate-ca-cert.sh
+./generate-nomad-certs.sh
+./generate-consul-certs.sh

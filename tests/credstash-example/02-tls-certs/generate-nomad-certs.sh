@@ -17,31 +17,6 @@ CREDSTASH_PUT_COMMAND="${credstash_put_cmd}"
 # Remove any old certificate
 rm -f "$DEPOT_PATH"
 
-## Write out config for CA cert generation
-cat <<EOT > $CA_CONFIG
-{
-    "CN": "$CA_COMMON_NAME",
-    "hosts": [
-        "$CA_DOMAIN_NAME"
-    ],
-    "key": {
-        "algo": "ecdsa",
-        "size": 256
-    },
-    "names": [
-        {
-            "C": "$CA_COUNTRY",
-            "ST": "$CA_STATE",
-            "L": "$CA_LOCALITY"
-        }
-    ]
-}
-EOT
-
-## Create CA SSL Key and Certificate
-#certstrap --depot-path "$DEPOT_PATH" init --common-name "$CA_COMMON_NAME" --passphrase "$CA_PASSPHRASE"
-cfssl gencert -initca $CA_CONFIG | cfssljson -bare $CA_COMMON_NAME-ca
-
 ## Create Server SSL Key and Certificate
 #certstrap --depot-path "$DEPOT_PATH" request-cert --domain "$DOMAIN_NAME" --passphrase "$CA_PASSPHRASE"
 #certstrap --depot-path "$DEPOT_PATH" sign "$DOMAIN_NAME" --CA "$CA_COMMON_NAME" --passphrase "$CA_PASSPHRASE"
