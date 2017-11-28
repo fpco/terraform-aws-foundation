@@ -87,21 +87,10 @@ data "aws_region" "current" {
   current = true
 }
 
-# Cloudwatch alarm that recovers the instance after two minutes of system status
-# check failure
-resource "aws_cloudwatch_metric_alarm" "auto-recover" {
-  count = "${length(compact(var.private_ips))}"
-  alarm_name = "${format(var.name_format, var.name_prefix, count.index + 1)}"
-  metric_name = "StatusCheckFailed_System"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods = "2"
-  dimensions {
-    InstanceId = "${aws_instance.auto-recover.*.id[count.index]}"
-  }
-  namespace = "AWS/EC2"
-  period    = "60"
-  statistic = "Minimum"
-  threshold = "0"
-  alarm_description = "Auto-recover the instance if the system status check fails for two minutes"
-  alarm_actions     = ["${compact(concat(list("arn:${var.aws_cloud}:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
+module "auto-recovery" {
+  source           = "../cloudwatch-auto-recover-existing-ec2"
+  aws_cloud        = "${var.aws_cloud}"
+  name_prefix      = "${var.name_prefix}"
+  ec2_instance_ids = "${aws_instance.auto-recover.id}"
+  alarm_actions    = "${var.alarm_actions}"
 }
