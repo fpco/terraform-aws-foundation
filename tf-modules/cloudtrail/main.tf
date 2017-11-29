@@ -12,10 +12,15 @@ resource "aws_cloudtrail" "cloudtrail" {
 
 resource "aws_s3_bucket" "cloudtrail" {
   bucket = "${var.name_prefix}-cloudtrail"
+  region = "${data.aws_region.current.name}"
   acl    = "private"
   policy = "${data.aws_iam_policy_document.cloudtrail-bucket.json}"
 
   tags = "${merge(map("Name", "${var.name_prefix}-cloudtrail"), "${var.extra_tags}")}"
+}
+
+data "aws_region" "current" {
+  current = true
 }
 
 data "aws_iam_policy_document" "cloudtrail-bucket" {
