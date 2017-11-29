@@ -18,7 +18,7 @@ variable "include_global_service_events" {
 }
 
 variable "enable_logging" {
-  description = "boolean, defines if logging should be started or stopped"
+  description = "boolean, maps to `aws_cloudtrail`'s enable_logging parameter"
   default     = true
 }
 
