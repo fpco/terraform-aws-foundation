@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "cloudtrail-bucket" {
     }
 
     actions   = ["s3:GetBucketAcl"]
-    resources = ["arn:${var.aws_cloud}:::${var.name_prefix}-cloudtrail"]
+    resources = ["arn:${var.aws_cloud}:s3:::${var.name_prefix}-cloudtrail"]
   }
 
   statement {
@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "cloudtrail-bucket" {
     }
 
     actions   = ["s3:PutObject"]
-    resources = ["arn:${var.aws_cloud}:::${var.name_prefix}-cloudtrail/*"]
+    resources = ["arn:${var.aws_cloud}:s3:::${var.name_prefix}-cloudtrail/*"]
 
     condition {
       test     = "StringEquals"
