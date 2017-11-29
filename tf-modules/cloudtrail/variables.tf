@@ -7,6 +7,11 @@ variable "aws_cloud" {
   default     = "aws"
 }
 
+variable "kms_key_id" {
+  description = "KMS key ARN for encryption of logs"
+  default     = ""
+}
+
 variable "include_global_service_events" {
   description = "boolean, if true logs IAM events as well as region-specific ones"
   default     = true

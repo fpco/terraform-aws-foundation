@@ -1,6 +1,7 @@
 resource "aws_cloudtrail" "cloudtrail" {
   name           = "${var.name_prefix}-cloudtrail"
   s3_bucket_name = "${aws_s3_bucket.cloudtrail.id}"
+  kms_key_id     = "${var.kms_key_id}"
 
   include_global_service_events = "${var.include_global_service_events}"
   enable_logging                = "${var.enable_logging}"
