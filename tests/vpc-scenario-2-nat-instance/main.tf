@@ -73,7 +73,6 @@ module "private-subnets" {
 
 module "nat-instance" {
   source           = "../../tf-modules/ec2-nat-instance"
-  az               = "${data.aws_availability_zones.available.names[0]}"
   name_prefix      = "${var.name}"
   key_name         = "${aws_key_pair.main.key_name}"
   public_subnet_id = "${module.public-subnets.ids[0]}"
@@ -130,7 +129,7 @@ resource "aws_security_group" "nat_instance" {
 module "ubuntu-xenial-ami" {
   source  = "../../tf-modules/ami-ubuntu"
   release = "16.04"
-} 
+}
 
 resource "aws_key_pair" "main" {
   key_name   = "${var.name}"
