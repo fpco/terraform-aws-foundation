@@ -33,9 +33,9 @@ resource "aws_autoscaling_group" "cluster" {
     list(
       map("key", "Name",
           "value", "${var.name}-${var.suffix}",
-          "propagate_at_launch", true),
+          "propagate_at_launch", true)
       ),
-    var.extra_tags,
+    var.extra_tags
   )}"]
 }
 

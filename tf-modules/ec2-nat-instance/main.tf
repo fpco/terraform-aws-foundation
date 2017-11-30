@@ -18,14 +18,15 @@ module "ubuntu-ami" {
 
 # boxed module to update the EC2 node's hostname
 module "init-nat-hostname" {
-  source = "../init-snippet-hostname-simple"
+  source          = "../init-snippet-hostname-simple"
   hostname_prefix = "ec2-nat"
 }
 
 # init snippet to configure NAT
 module "init-nat-config-iptables" {
   source = "../init-snippet-exec"
-  init   = <<END_INIT
+
+  init = <<END_INIT
 # write out script to setup nat
 echo '#!/bin/sh
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -43,13 +44,13 @@ END_INIT
 }
 
 resource "aws_instance" "ec2-nat" {
-  source_dest_check           = false # NAT requires this
-  associate_public_ip_address = true  # NAT requires this
+  source_dest_check           = false                         # NAT requires this
+  associate_public_ip_address = true                          # NAT requires this
   ami                         = "${module.ubuntu-ami.id}"
   key_name                    = "${var.key_name}"
   instance_type               = "${var.instance_type}"
-  availability_zone           = "${var.az}"
-  vpc_security_group_ids      = ["${var.security_group_ids}" ]
+  availability_zone           = "${data.aws_subnet.public-subnet.availability_zone}"
+  vpc_security_group_ids      = ["${var.security_group_ids}"]
   subnet_id                   = "${var.public_subnet_id}"
 
   root_block_device {
@@ -68,4 +69,8 @@ resource "aws_instance" "ec2-nat" {
 ${module.init-nat-hostname.init_snippet}
 ${module.init-nat-config-iptables.init_snippet}
 END_INIT
+}
+
+data "aws_subnet" "public-subnet" {
+  id = "${var.public_subnet_id}"
 }
