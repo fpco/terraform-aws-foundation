@@ -23,9 +23,14 @@ output "iam_profile" {
   value = "${aws_iam_instance_profile.attach_ebs.id}"
 }
 
-//`arn` exported from the `aws_iam_instance_profile`
+//`policy` exported from the `aws_iam_role_policy`
 output "iam_profile_policy_document" {
   value = "${aws_iam_role_policy.attach_ebs.policy}"
+}
+
+//`arn` exported from the `aws_iam_role`
+output "iam_role_arn" {
+  value = "${aws_iam_role.attach_ebs.arn}"
 }
 
 //`id` exported from the `aws_ebs_volume`

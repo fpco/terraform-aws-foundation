@@ -75,3 +75,8 @@ module "init-install-awscli" {
 module "init-install-ops" {
   source = "../../tf-modules/init-snippet-install-ops"
 }
+
+# The ARN of the IAM Role attached the single-node ASG instance
+output "asg_iam_role_arn" {
+  value = "${module.gitlab-asg.asg_iam_role_arn}"
+}
