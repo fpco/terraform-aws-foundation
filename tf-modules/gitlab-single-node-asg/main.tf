@@ -76,7 +76,12 @@ module "init-install-ops" {
   source = "../../tf-modules/init-snippet-install-ops"
 }
 
-# The ARN of the IAM Role attached the single-node ASG instance
+# `arn` exported from the `persistent-ebs` module's `aws_iam_instance_profile`
+output "asg_iam_profile_arn" {
+  value = "${module.gitlab-asg.asg_iam_profile_arn}"
+}
+
+// `arn` exported from the `persistent-ebs` module's `aws_iam_role`
 output "asg_iam_role_arn" {
   value = "${module.gitlab-asg.asg_iam_role_arn}"
 }

@@ -42,7 +42,7 @@ module "server" {
   root_volume_type   = "${var.root_volume_type}"
   root_volume_size   = "${var.root_volume_size}"
   #
-  iam_profile        = "${module.service-data.iam_profile}"
+  iam_profile        = "${module.service-data.iam_profile_id}"
   user_data          = <<END_INIT
 #!/bin/bash
 ${var.init_prefix}
