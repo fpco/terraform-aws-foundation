@@ -18,10 +18,16 @@ variable "worker_cidr_blocks" {
   type        = "list"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, nomad server"
+}
+
 # nomad ports 4646 (http)/4647 (rpc), open to both workers and servers/leaders
 # including 4646 here might lead it issues with it also being in the agent module
 resource "aws_security_group_rule" "nomad_http_rpc_tcp" {
   type              = "ingress"
+  description       = "${var.description} RPC and HTTP ports (TCP)"
   from_port         = "4646"
   to_port           = "4647"
   protocol          = "tcp"
@@ -33,6 +39,7 @@ resource "aws_security_group_rule" "nomad_http_rpc_tcp" {
 # open port 4648 (nomad) tcp/udp for the leaders
 resource "aws_security_group_rule" "nomad_serf_tcp" {
   type              = "ingress"
+  description       = "${var.description} serf port (TCP)"
   from_port         = "4648"
   to_port           = "4648"
   protocol          = "tcp"
@@ -42,6 +49,7 @@ resource "aws_security_group_rule" "nomad_serf_tcp" {
 
 resource "aws_security_group_rule" "nomad_serf_udp" {
   type              = "ingress"
+  description       = "${var.description} serf port (UDP)"
   from_port         = "4648"
   to_port           = "4648"
   protocol          = "udp"
