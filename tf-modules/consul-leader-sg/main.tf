@@ -20,7 +20,7 @@ variable "cidr_blocks" {
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
-  default     = "Allow ingress, consul leader's"
+  default     = "Allow ingress, consul leaders"
 }
 
 # Server RPC, used by servers to handle incoming requests from other agents.
