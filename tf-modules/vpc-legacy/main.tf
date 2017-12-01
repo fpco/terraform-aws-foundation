@@ -9,7 +9,7 @@ resource "aws_vpc" "main" {
   cidr_block           = "${var.cidr}"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = "${merge(map("Name", "${var.name_prefix}-vpc"), "${var.extra_tags}")}"
+  tags                 = "${merge(map("Name", "${var.name_prefix}-vpc"), "${var.extra_tags}")}"
 }
 
 resource "aws_vpc_dhcp_options" "main" {
@@ -33,7 +33,6 @@ module "subnets" {
   private_subnet_cidrs = "${var.private_subnet_cidrs}"
   extra_tags           = "${var.extra_tags}"
 }
-
 
 ## Internet Gateway - provide internet access to public subnets.
 
@@ -59,7 +58,6 @@ resource "aws_route_table_association" "public-rta" {
   subnet_id      = "${element(module.subnets.public_ids, count.index)}"
   route_table_id = "${aws_route_table.public.id}"
 }
-
 
 ## NAT Gateways - provide internet access to private subnets.
 
