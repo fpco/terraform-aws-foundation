@@ -15,9 +15,15 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, nomad's HTTP port 4646"
+}
+
 # open port 4646 (nomad http) tcp
 resource "aws_security_group_rule" "nomad_agent_tcp" {
   type              = "ingress"
+  description       = "${var.description} (TCP)"
   from_port         = "4646"
   to_port           = "4646"
   protocol          = "tcp"
