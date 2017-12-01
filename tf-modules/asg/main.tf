@@ -22,6 +22,7 @@ resource "aws_autoscaling_group" "cluster" {
   max_size                  = "${var.max_nodes}"
   min_size                  = "${var.min_nodes}"
   name                      = "${var.name}-${var.suffix}"
+  placement_group           = "${var.placement_group}"
 
   lifecycle {
     create_before_destroy = true

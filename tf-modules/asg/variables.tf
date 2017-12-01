@@ -27,6 +27,11 @@ variable "instance_type" {
   description = "The type of AWS instance (size)"
 }
 
+variable "placement_group" {
+  default     = ""
+  description = "The `id` of the `aws_placement_group` to associate with the ASG"
+}
+
 variable "user_data" {
   default     = ""
   description = "The user_data string to pass to cloud-init"
