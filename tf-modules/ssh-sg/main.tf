@@ -18,9 +18,15 @@ variable "ssh_port" {
   default     = "22"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rule"
+  default     = "Allow ingress, SSH server port "
+}
+
 # Security group for etcd servers
 resource "aws_security_group_rule" "ssh_tcp" {
   type              = "ingress"
+  description       = "${var.description} ${var.ssh_port} (TCP)"
   from_port         = "${var.ssh_port}"
   to_port           = "${var.ssh_port}"
   protocol          = "tcp"
