@@ -16,9 +16,15 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, to ports 20000 to 32000, for nomad dynamic assignment"
+}
+
 # open worker port range, tcp and udp
 resource "aws_security_group_rule" "nomad_worker_tcp" {
   type              = "ingress"
+  description       = "${var.description} (TCP)"
   from_port         = "20000"
   to_port           = "32000"
   protocol          = "tcp"
@@ -28,6 +34,7 @@ resource "aws_security_group_rule" "nomad_worker_tcp" {
 
 resource "aws_security_group_rule" "nomad_worker_udp" {
   type              = "ingress"
+  description       = "${var.description} (UDP)"
   from_port         = "20000"
   to_port           = "32000"
   protocol          = "udp"
