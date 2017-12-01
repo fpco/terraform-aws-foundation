@@ -16,10 +16,15 @@ variable "protocol" {
   default     = "tcp"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+}
 
-# add an ingress rule 
+
+# add an ingress rule
 resource "aws_security_group_rule" "ingress" {
   type              = "ingress"
+  description       = "${var.description}"
   from_port         = "${var.port}"
   to_port           = "${var.port}"
   protocol          = "${var.protocol}"
