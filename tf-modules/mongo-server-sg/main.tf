@@ -15,7 +15,7 @@ variable "cidr_blocks" {
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
-  default     = "Allow ingress, mongod's "
+  default     = "Allow ingress, mongod's"
 }
 # Security group for mongod servers
 resource "aws_security_group_rule" "mongo_tcp_1" {
