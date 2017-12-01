@@ -19,16 +19,18 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
-variable "wan_port" {
-  default     = "8302"
-  description = "The port to use for consul WAN"
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, consul's WAN serf port 8302"
 }
+
 
 # TCP/UDP for serf WAN communication
 resource "aws_security_group_rule" "serf_wan_tcp" {
   type              = "ingress"
-  from_port         = "${var.wan_port}"
-  to_port           = "${var.wan_port}"
+  description       = "${var.description} (TCP)"
+  from_port         = "8302"
+  to_port           = "8302"
   protocol          = "tcp"
   cidr_blocks       = ["${var.cidr_blocks}"]
   security_group_id = "${var.security_group_id}"
@@ -36,8 +38,9 @@ resource "aws_security_group_rule" "serf_wan_tcp" {
 
 resource "aws_security_group_rule" "serf_wan_udp" {
   type              = "ingress"
-  from_port         = "${var.wan_port}"
-  to_port           = "${var.wan_port}"
+  description       = "${var.description} (UDP)"
+  from_port         = "8302"
+  to_port           = "8302"
   protocol          = "udp"
   cidr_blocks       = ["${var.cidr_blocks}"]
   security_group_id = "${var.security_group_id}"
