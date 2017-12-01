@@ -19,12 +19,12 @@ variable "roles_count" {
 }
 
 variable "roles_names" {
-  type = "list"
+  type        = "list"
   description = "Role Name for which reading and/or writing of secrets will be enabled. Must correspond 1:1 with roles_arns"
 }
 
 variable "roles_arns" {
-  type = "list"
+  type        = "list"
   description = "Role ARN for which reading and/or writing of secrets will be enabled. Must correspond 1:1 with roles_names"
 }
 
@@ -39,12 +39,12 @@ variable "writer_policy_arn" {
 }
 
 variable "reader_context" {
-  default = ""
+  default     = ""
   description = "Optional space separated contex key/value pairs that are required to read encrypted values. Eg. env=dev svc=db"
 }
 
 variable "writer_context" {
-  default = ""
+  default     = ""
   description = "Optional space separated contex key/value pairs that will be used to encrypt values with credstash. Eg. env=dev svc=db"
 }
 
@@ -64,7 +64,6 @@ resource "aws_iam_role_policy_attachment" "credstash-reader-policy-attachment" {
   }
 }
 
-
 resource "aws_iam_role_policy_attachment" "credstash-writer-policy-attachment" {
   count      = "${var.writer_policy_arn == "" ? 0 : var.roles_count}"
   role       = "${var.roles_names[count.index]}"
@@ -80,4 +79,3 @@ resource "aws_iam_role_policy_attachment" "credstash-writer-policy-attachment" {
     command    = "${path.module}/grant.sh revoke ${var.kms_key_arn} ${var.roles_arns[count.index]}"
   }
 }
-
