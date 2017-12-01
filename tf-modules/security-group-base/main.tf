@@ -6,12 +6,17 @@
  */
 
 variable "name" {
-  description = "security group `name`"
+  description = "Tag the security group with `Name`"
+  type        = "string"
+}
+
+variable "hard_name" {
+  description = "security group `name`, hardcoded, change requires new resource"
   type        = "string"
 }
 
 variable "description" {
-  description = "security group `description`"
+  description = "security group `description`, hardcoded, change requires new resource"
   type        = "string"
 }
 
@@ -27,7 +32,7 @@ variable "extra_tags" {
 }
 
 resource "aws_security_group" "main" {
-  name        = "${var.name}"
+  name        = "${var.hard_name}"
   description = "${var.description}"
   vpc_id      = "${var.vpc_id}"
 
