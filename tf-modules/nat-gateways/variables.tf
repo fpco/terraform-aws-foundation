@@ -12,15 +12,15 @@ variable "nat_count" {
 
 variable "public_subnet_ids" {
   description = "Public subnet IDs where to place the gateways"
-  type = "list"
+  type        = "list"
 }
 
 variable "private_subnet_ids" {
   description = "Private subnet IDs for the route table associations, i.e subntes that will get internet acess"
-  type = "list"
+  type        = "list"
 }
 
 variable "extra_tags" {
-  default = {}
+  default     = {}
   description = "Any extra tags to assign to route tables"
 }

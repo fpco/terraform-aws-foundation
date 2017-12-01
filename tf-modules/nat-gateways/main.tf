@@ -10,7 +10,6 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = "${var.public_subnet_ids[count.index]}"
 }
 
-
 # Route tables. One per NAT gateway.
 resource "aws_route_table" "private" {
   count  = "${var.nat_count}"
@@ -29,4 +28,3 @@ resource "aws_route_table_association" "private-rta" {
   subnet_id      = "${var.private_subnet_ids[count.index]}"
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
 }
-
