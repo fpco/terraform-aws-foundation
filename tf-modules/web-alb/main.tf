@@ -1,5 +1,5 @@
 data "aws_acm_certificate" "web-server-cert" {
-  domain = "${coalesce(var.dns_ssl_name, var.dns_name)}"
+  domain   = "${coalesce(var.dns_ssl_name, var.dns_name)}"
   statuses = ["ISSUED"]
 }
 
@@ -76,7 +76,7 @@ resource "aws_alb_listener_rule" "http" {
   priority     = 99
 
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = "${var.http_target_group_arn}"
   }
 
@@ -85,7 +85,6 @@ resource "aws_alb_listener_rule" "http" {
     values = ["${var.dns_name}"]
   }
 }
-
 
 resource "aws_alb_listener" "https" {
   load_balancer_arn = "${aws_alb.web-server.arn}"
@@ -105,7 +104,7 @@ resource "aws_alb_listener_rule" "https" {
   priority     = 99
 
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = "${var.https_target_group_arn}"
   }
 
