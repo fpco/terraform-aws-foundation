@@ -37,7 +37,7 @@ variable "cidr_blocks" {
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
-  default     = "Allow ingress, consul's LAN serf port 8301"
+  default     = "Allow ingress, consul LAN serf port 8301"
 }
 
 # Serf LAN, used to handle gossip in the LAN. TCP and UDP.
