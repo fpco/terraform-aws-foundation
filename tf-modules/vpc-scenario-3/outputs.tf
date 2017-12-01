@@ -30,21 +30,25 @@ output "vpn_config" {
   value     = "${module.vpn.vpn_config}"
   sensitive = true
 }
+
 // IP of Tunnel 1
 output "vpn_tun1_ip" {
   value     = "${module.vpn.vpn_connection_tunnel1_address}"
   sensitive = true
 }
+
 // Pre-sharedkey of Tunnel 1
 output "vpn_tun1_key" {
   value     = "${module.vpn.vpn_connection_tunnel1_preshared_key}"
   sensitive = true
 }
+
 // IP of Tunnel 2
 output "vpn_tun2_ip" {
   value     = "${module.vpn.vpn_connection_tunnel2_address}"
   sensitive = true
 }
+
 // Pre-sharedkey of Tunnel 2
 output "vpn_tun2_key" {
   value     = "${module.vpn.vpn_connection_tunnel2_preshared_key}"
