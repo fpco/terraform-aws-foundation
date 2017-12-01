@@ -17,7 +17,7 @@ variable "cidr_blocks" {
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
-  default     = "Allow ingress, nomad's HTTP port 4646"
+  default     = "Allow ingress, nomads HTTP port 4646"
 }
 
 # open port 4646 (nomad http) tcp
