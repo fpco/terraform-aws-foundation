@@ -11,7 +11,7 @@ variable "cidr" {
 }
 
 variable "public_subnet_cidrs" {
-  type = "list"
+  type        = "list"
   description = "A list of public subnet CIDRs to deploy inside the VPC."
 }
 
