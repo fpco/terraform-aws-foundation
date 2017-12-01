@@ -21,7 +21,7 @@ variable "cidr_blocks" {
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
-  default     = "Allow ingress, consul's WAN serf port 8302"
+  default     = "Allow ingress, consuls WAN serf port 8302"
 }
 
 
