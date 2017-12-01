@@ -12,9 +12,15 @@ variable "dns_port" {
   default     = "53"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, DNS port "
+}
+
 # ingress rules for DNS servers
 resource "aws_security_group_rule" "dns_tcp" {
   type              = "ingress"
+  description       = "${var.description} ${var.dns_port} (TCP)"
   from_port         = "${var.dns_port}"
   to_port           = "${var.dns_port}"
   protocol          = "tcp"
@@ -24,6 +30,7 @@ resource "aws_security_group_rule" "dns_tcp" {
 
 resource "aws_security_group_rule" "dns_udp" {
   type              = "ingress"
+  description       = "${var.description} ${var.dns_port} (UDP)"
   from_port         = "${var.dns_port}"
   to_port           = "${var.dns_port}"
   protocol          = "udp"
