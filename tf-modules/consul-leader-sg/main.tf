@@ -56,16 +56,6 @@ resource "aws_security_group_rule" "serf_lan_udp" {
   security_group_id = "${var.security_group_id}"
 }
 
-# consul CLI RPC, used by all agents to handle RPC from the CLI. TCP only.
-resource "aws_security_group_rule" "cli_rpc_tcp" {
-  type              = "ingress"
-  from_port         = "8400"
-  to_port           = "8400"
-  protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
-}
-
 # HTTP API, used by clients to talk to the HTTP API. TCP only.
 resource "aws_security_group_rule" "http_tcp" {
   type              = "ingress"
