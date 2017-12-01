@@ -15,9 +15,15 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "OPEN ingress, all ports, all protocols"
+}
+
 # open ingress!
 resource "aws_security_group_rule" "open_ingress" {
   type              = "ingress"
+  description       = "${var.description}"
   from_port         = "0"
   to_port           = "0"
   protocol          = "-1"
