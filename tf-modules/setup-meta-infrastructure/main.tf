@@ -79,10 +79,12 @@ variable "set_password_policy" {
 output "admin-group-name" {
   value = "${aws_iam_group.admin.name}"
 }
+
 //`name` exported from the `power-user` `aws_iam_group`
 output "power-user-group-name" {
   value = "${aws_iam_group.power-user.name}"
 }
+
 //`name` exported from the `setup-mfa` `aws_iam_group`
 output "setup-mfa-group-name" {
   value = "${aws_iam_group.setup-mfa.name}"
@@ -132,7 +134,7 @@ output "power-user-role-arn" {
 # Data sources
 #----------------------------------------------------------------------
 
-data "aws_caller_identity" "current" { }
+data "aws_caller_identity" "current" {}
 
 #----------------------------------------------------------------------
 # Groups
@@ -158,22 +160,24 @@ resource "aws_iam_group" "setup-mfa" {
 #----------------------------------------------------------------------
 
 module "admin-role" {
-  source            = "../cross-account-role"
-  aws_cloud         = "${var.aws_cloud}"
-  name              = "admin"
+  source    = "../cross-account-role"
+  aws_cloud = "${var.aws_cloud}"
+  name      = "admin"
+
   trust_account_ids = [
     "${data.aws_caller_identity.current.account_id}",
-    "${var.trust_account_ids}"
+    "${var.trust_account_ids}",
   ]
 }
 
 module "power-user-role" {
-  source            = "../cross-account-role"
-  aws_cloud         = "${var.aws_cloud}"
-  name              = "power-user"
+  source    = "../cross-account-role"
+  aws_cloud = "${var.aws_cloud}"
+  name      = "power-user"
+
   trust_account_ids = [
     "${data.aws_caller_identity.current.account_id}",
-    "${var.trust_account_ids}"
+    "${var.trust_account_ids}",
   ]
 }
 
@@ -184,12 +188,16 @@ module "power-user-role" {
 # Has full access to everything, including IAM management.  Requires MFA.
 data "aws_iam_policy_document" "admin-with-mfa" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "*",
       "aws-portal:*",
-      "support:*"]
+      "support:*",
+    ]
+
     resources = ["*"]
+
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
@@ -206,11 +214,14 @@ resource "aws_iam_policy" "admin-with-mfa" {
 # Has full access to everything, including IAM management.  Does NOT require MFA.
 data "aws_iam_policy_document" "admin-no-mfa" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "*",
       "aws-portal:*",
-      "support:*"]
+      "support:*",
+    ]
+
     resources = ["*"]
   }
 }
@@ -225,41 +236,49 @@ module "assume-admin-role-policy" {
   aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-control-accounts-admin-role"
   role_name   = "${module.admin-role.name}"
+
   account_ids = [
     "${data.aws_caller_identity.current.account_id}",
-    "${var.admin_control_account_ids}"
+    "${var.admin_control_account_ids}",
   ]
 }
 
 # Has full access to AWS, _except_ for IAM management. Requires MFA.
 data "aws_iam_policy_document" "power-user-with-mfa" {
   statement {
-    effect      = "Allow"
+    effect = "Allow"
+
     not_actions = [
       "iam:*",
-      "organizations:*"
+      "organizations:*",
     ]
+
     resources = ["*"]
+
     condition {
-      test = "Bool"
+      test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values = ["true"]
+      values   = ["true"]
     }
   }
+
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "iam:ListAccount*",
       "iam:GetAccount*",
       "iam:ListUsers",
       "iam:ListRoles",
-      "organizations:DescribeOrganization"
+      "organizations:DescribeOrganization",
     ]
+
     resources = ["*"]
+
     condition {
-      test = "Bool"
+      test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values = ["true"]
+      values   = ["true"]
     }
   }
 }
@@ -272,22 +291,27 @@ resource "aws_iam_policy" "power-user-with-mfa" {
 # Has full access to AWS, _except_ for IAM management. Does NOT require MFA.
 data "aws_iam_policy_document" "power-user-no-mfa" {
   statement {
-    effect      = "Allow"
+    effect = "Allow"
+
     not_actions = [
       "iam:*",
-      "organizations:*"
+      "organizations:*",
     ]
+
     resources = ["*"]
   }
+
   statement {
     effect = "Allow"
+
     actions = [
       "iam:ListAccount*",
       "iam:GetAccount*",
       "iam:ListUsers",
       "iam:ListRoles",
-      "organizations:DescribeOrganization"
+      "organizations:DescribeOrganization",
     ]
+
     resources = ["*"]
   }
 }
@@ -302,9 +326,10 @@ module "assume-power-user-role-policy" {
   aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-control-accounts-power-user-role"
   role_name   = "${module.power-user-role.name}"
+
   account_ids = [
     "${data.aws_caller_identity.current.account_id}",
-    "${var.power_user_control_account_ids}"
+    "${var.power_user_control_account_ids}",
   ]
 }
 
@@ -319,30 +344,36 @@ data "aws_iam_policy_document" "setup-mfa" {
     actions   = ["iam:*VirtualMFADevice"]
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:mfa/&{aws:username}"]
   }
+
   statement {
-    sid     = "AllowUsersToEnableSyncDisableTheirOwnMFADevices"
-    effect  = "Allow"
+    sid    = "AllowUsersToEnableSyncDisableTheirOwnMFADevices"
+    effect = "Allow"
+
     actions = [
       "iam:DeactivateMFADevice",
       "iam:EnableMFADevice",
       "iam:ListMFADevices",
       "iam:ResyncMFADevice",
-      "iam:ChangePassword"
+      "iam:ChangePassword",
     ]
+
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
   }
+
   statement {
-    sid = "AllowUsersToGetAccountPasswordPolicy"
-    effect = "Allow"
-    actions = ["iam:GetAccountPasswordPolicy"]
+    sid       = "AllowUsersToGetAccountPasswordPolicy"
+    effect    = "Allow"
+    actions   = ["iam:GetAccountPasswordPolicy"]
     resources = ["*"]
   }
+
   statement {
     sid       = "AllowUsersToListVirtualMFADevices"
     effect    = "Allow"
     actions   = ["iam:ListVirtualMFADevices"]
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:mfa/*"]
   }
+
   statement {
     sid       = "AllowUsersToListUsersInConsole"
     effect    = "Allow"
@@ -359,36 +390,44 @@ resource "aws_iam_policy" "setup-mfa" {
 # Allow a user to change their password, manage their access keys, and resync their MFA device (but not change it).
 data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "iam:*LoginProfile",
       "iam:*AccessKey*",
       "iam:ResyncMFADevice",
-      "iam:ChangePassword"
+      "iam:ChangePassword",
     ]
+
     resources = ["arn:${var.aws_cloud}:iam::${data.aws_caller_identity.current.account_id}:user/&{aws:username}"]
-    condition {
-      test = "Bool"
-      variable = "aws:MultiFactorAuthPresent"
-      values = ["true"]
-    }
-  }
-  statement {
-    effect  = "Allow"
-    actions = [
-      "iam:ListAccount*",
-      "iam:GetAccount*",
-      "iam:ListUsers",
-      "iam:ListRoles",
-      "organizations:DescribeOrganization"
-    ]
-    resources = ["*"]
+
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
       values   = ["true"]
     }
   }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "iam:ListAccount*",
+      "iam:GetAccount*",
+      "iam:ListUsers",
+      "iam:ListRoles",
+      "organizations:DescribeOrganization",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:MultiFactorAuthPresent"
+      values   = ["true"]
+    }
+  }
+
   statement {
     # This helps tools like https://github.com/lonelyplanet/aws-mfa find out a user's MFA device ARN so that they can prompt for an MFA code.
     effect    = "Allow"
@@ -502,7 +541,7 @@ resource "aws_iam_group_membership" "setup-mfa" {
 #----------------------------------------------------------------------
 
 resource "aws_iam_account_password_policy" "default-password-policy" {
-  count = "${var.set_password_policy}"
+  count                          = "${var.set_password_policy}"
   minimum_password_length        = 12
   max_password_age               = 90
   require_lowercase_characters   = true
