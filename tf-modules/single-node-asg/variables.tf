@@ -14,6 +14,11 @@ variable "instance_type" {
   description = "The type of AWS instance (size)"
 }
 
+variable "placement_group" {
+  default     = ""
+  description = "The `id` of the `aws_placement_group` to associate with the ASG"
+}
+
 variable "name_suffix" {
   description = "suffix to include when naming the various resources"
 }

@@ -32,6 +32,7 @@ module "server" {
 
   # append this to the ASG name
   suffix           = "${var.name_suffix}-${data.aws_subnet.server-subnet.availability_zone}"
+  placement_group  = "${var.placement_group}"
   instance_type    = "${var.instance_type}"
   ami              = "${var.ami}"
   subnet_ids       = ["${var.subnet_id}"]
