@@ -18,9 +18,15 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, consul leader's "
+}
+
 # Server RPC, used by servers to handle incoming requests from other agents.
 resource "aws_security_group_rule" "server_rpc_tcp" {
   type              = "ingress"
+  description       = "${var.description} server rpc port 8300 (TCP)"
   from_port         = "8300"
   to_port           = "8300"
   protocol          = "tcp"
@@ -30,6 +36,7 @@ resource "aws_security_group_rule" "server_rpc_tcp" {
 
 resource "aws_security_group_rule" "server_rpc_udp" {
   type              = "ingress"
+  description       = "${var.description} server rpc port 8300 (UDP)"
   from_port         = "8300"
   to_port           = "8300"
   protocol          = "udp"
@@ -40,6 +47,7 @@ resource "aws_security_group_rule" "server_rpc_udp" {
 # Serf LAN, used to handle gossip in the LAN. TCP and UDP.
 resource "aws_security_group_rule" "serf_lan_tcp" {
   type              = "ingress"
+  description       = "${var.description} serf LAN port 8301 (TCP)"
   from_port         = "8301"
   to_port           = "8301"
   protocol          = "tcp"
@@ -49,6 +57,7 @@ resource "aws_security_group_rule" "serf_lan_tcp" {
 
 resource "aws_security_group_rule" "serf_lan_udp" {
   type              = "ingress"
+  description       = "${var.description} serf LAN port 8301 (UDP)"
   from_port         = "8301"
   to_port           = "8301"
   protocol          = "udp"
@@ -59,6 +68,7 @@ resource "aws_security_group_rule" "serf_lan_udp" {
 # HTTP API, used by clients to talk to the HTTP API. TCP only.
 resource "aws_security_group_rule" "http_tcp" {
   type              = "ingress"
+  description       = "${var.description} HTTP API port 8500 (TCP)"
   from_port         = "8500"
   to_port           = "8500"
   protocol          = "tcp"
@@ -69,6 +79,7 @@ resource "aws_security_group_rule" "http_tcp" {
 # DNS Interface, used to resolve DNS queries. TCP and UDP.
 resource "aws_security_group_rule" "dns_tcp" {
   type              = "ingress"
+  description       = "${var.description} DNS port 8600 (TCP)"
   from_port         = "8600"
   to_port           = "8600"
   protocol          = "tcp"
@@ -78,6 +89,7 @@ resource "aws_security_group_rule" "dns_tcp" {
 
 resource "aws_security_group_rule" "dns_udp" {
   type              = "ingress"
+  description       = "${var.description} DNS port 8600 (UDP)"
   from_port         = "8600"
   to_port           = "8600"
   protocol          = "udp"
