@@ -15,6 +15,7 @@ resource "aws_iam_instance_profile" "logstash-profile" {
 
 data "template_file" "certstrap" {
   template = "${file("${path.module}/data/certs.tpl.sh")}"
+
   vars {
     domain_name       = "${var.logstash_dns_name}"
     depot_path        = "${var.certstrap_depot_path}"
@@ -37,7 +38,9 @@ resource "aws_iam_role" "logstash-role" {
   provisioner "local-exec" {
     command = "${data.template_file.certstrap.rendered}"
   }
-  name_prefix  = "${var.name_prefix}-logstash-role-"
+
+  name_prefix = "${var.name_prefix}-logstash-role-"
+
   assume_role_policy = <<END_POLICY
 {
   "Version": "2012-10-17",
