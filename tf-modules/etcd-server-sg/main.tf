@@ -11,9 +11,15 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, etcd server ports 2379 and 2380 (TCP)"
+}
+
 # Security group for etcd servers
 resource "aws_security_group_rule" "etcd_server_tcp" {
   type              = "ingress"
+  description       = "${var.description} (TCP)"
   from_port         = "2379"
   to_port           = "2380"
   protocol          = "tcp"
