@@ -35,9 +35,15 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
+variable "description" {
+  description = "use this string to generate a description for the SG rules"
+  default     = "Allow ingress, consul's LAN serf port 8301"
+}
+
 # Serf LAN, used to handle gossip in the LAN. TCP and UDP.
 resource "aws_security_group_rule" "serf_lan_tcp" {
   type              = "ingress"
+  description       = "${var.description} (TCP)"
   from_port         = "8301"
   to_port           = "8301"
   protocol          = "tcp"
@@ -47,6 +53,7 @@ resource "aws_security_group_rule" "serf_lan_tcp" {
 
 resource "aws_security_group_rule" "serf_lan_udp" {
   type              = "ingress"
+  description       = "${var.description} (UDP)"
   from_port         = "8301"
   to_port           = "8301"
   protocol          = "udp"
