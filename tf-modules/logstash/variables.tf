@@ -1,10 +1,10 @@
 variable "name_prefix" {
-  default = "dev"
+  default     = "dev"
   description = "Prefix that will be added to names of all resources"
 }
 
 variable "name_suffix" {
-  default = ""
+  default     = ""
   description = "Suffix to use for Scaling Group, EC2 instances."
 }
 
@@ -18,17 +18,17 @@ variable "instance_type" {
 
 variable "min_server_count" {
   description = "Minimum number of EC2 instances running Logstash"
-  default = 1
+  default     = 1
 }
 
 variable "max_server_count" {
   description = "Maximum number of EC2 instances running Logstash"
-  default = 1
+  default     = 1
 }
 
 variable "desired_server_count" {
   description = "Desired number of EC2 instances running Logstash"
-  default = 1
+  default     = 1
 }
 
 variable "vpc_id" {
@@ -37,12 +37,12 @@ variable "vpc_id" {
 
 variable "private_subnet_ids" {
   description = "A list of private subnet ids to deploy Logstash servers in"
-  type = "list"
+  type        = "list"
 }
 
 variable "public_subnet_ids" {
   description = "A list of public subnet ids to deploy Logstash ELB in"
-  type = "list"
+  type        = "list"
 }
 
 variable "logstash_dns_name" {
@@ -58,22 +58,22 @@ variable "key_name" {
 }
 
 variable "certstrap_depot_path" {
-  default = ""
+  default     = ""
   description = "Local path, where generated SSL certifcates will be stored in. Certificates will be removed from local file system if left empty and will only be retained in credential store"
 }
 
 variable "certstrap_ca_force_new" {
-  default = false
+  default     = false
   description = "New CA certificate will be created even if there already one exitsts with the same CN"
 }
 
 variable "certstrap_ca_common_name" {
-  default = "Logstash"
+  default     = "Logstash"
   description = "Common Name to be used during CA certificate generation"
 }
 
 variable "certstrap_ca_passphrase" {
-  default = ""
+  default     = ""
   description = "Passphrase for SSL Key encryption to be used during CA certificate generation"
 }
 
@@ -98,46 +98,46 @@ variable "credstash_put_cmd" {
 }
 
 variable "extra_setup_snippet" {
-  default = ""
+  default     = ""
   description = "Extra snippet to run after logstash has been installed and configured"
 }
 
 variable "extra_sg_ids" {
-  default = []
+  default     = []
   description = "Extra Security Group IDs that will be added to all instances running Logstash. This is a way to add extra services, SSH access for instance."
 }
 
 variable "extra_elb_ingress_cidrs" {
-  default = []
+  default     = []
   description = "Extra CIDRs that are allowed to access Logstash. By default only CIDR from `public_subnet_ids` are allowed"
 }
 
 variable "extra_settings" {
-  default = ""
+  default     = ""
   description = "Extra Logstash setting in YAML format"
 }
 
 variable "extra_config" {
-  default = ""
+  default     = ""
   description = "Extra Logstash configuration. It will in the middle of the pipeline, between the main config, and the one that can be supplied through credstash with 'credstash_dynamic_config_name' keyname."
 }
 
 variable "extra_grok_patterns" {
-  default = ""
+  default     = ""
   description = "Extra grok Patterns for Logstash, which can be used during log parsing by setting: patterns_dir => ['/etc/logstash/patterns']"
 }
 
 variable "target_group_arns" {
-  default = []
+  default     = []
   description = "Application Load Balancer target groups to be used for Logstash auto scaling group"
 }
 
 variable "internal" {
-  default = true
+  default     = true
   description = "Set it to false if you want Logstash to be accessible by the outside world"
 }
 
 variable "logstash_version" {
-  default = "5.6.2"
+  default     = "5.6.2"
   description = "Which version of Logstash to install"
 }
