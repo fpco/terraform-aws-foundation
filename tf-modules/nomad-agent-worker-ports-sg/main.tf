@@ -20,7 +20,7 @@ variable "cidr_blocks" {
 resource "aws_security_group_rule" "nomad_worker_tcp" {
   type              = "ingress"
   from_port         = "20000"
-  to_port           = "60000"
+  to_port           = "32000"
   protocol          = "tcp"
   cidr_blocks       = ["${var.cidr_blocks}"]
   security_group_id = "${var.security_group_id}"
@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "nomad_worker_tcp" {
 resource "aws_security_group_rule" "nomad_worker_udp" {
   type              = "ingress"
   from_port         = "20000"
-  to_port           = "60000"
+  to_port           = "32000"
   protocol          = "udp"
   cidr_blocks       = ["${var.cidr_blocks}"]
   security_group_id = "${var.security_group_id}"
