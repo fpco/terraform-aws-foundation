@@ -67,10 +67,12 @@ resource "aws_instance" "dnsmasq" {
   vpc_security_group_ids = ["${var.security_group_ids}"]
   private_ip             = "${var.private_ips[count.index]}"
   key_name               = "${var.key_name}"
+
   root_block_device {
     volume_type = "${var.root_volume_type}"
     volume_size = "${var.root_volume_size}"
   }
+
   # Instance auto-recovery (see cloudwatch metric alarm below) doesn't support
   # instances with ephemeral storage, so this disables it.
   # See https://github.com/hashicorp/terraform/issues/5388#issuecomment-282480864
@@ -78,26 +80,32 @@ resource "aws_instance" "dnsmasq" {
     device_name = "/dev/sdb"
     no_device   = true
   }
+
   ephemeral_block_device {
     device_name = "/dev/sdc"
     no_device   = true
   }
+
   tags {
     Name = "${format(var.name_format, var.name_prefix, count.index + 1)}"
   }
+
   lifecycle {
     ignore_changes = ["ami"]
   }
+
   user_data = "${var.user_data}"
 }
 
 # Contains provisioner that is triggered whenever dnsmasq options are changed.
 resource "null_resource" "dnsmasq" {
   count = "${length(var.private_ips)}"
+
   triggers {
     dnsmasq_conf = "${var.dnsmasq_conf}"
     instance_id  = "${aws_instance.dnsmasq.*.id[count.index]}"
   }
+
   connection {
     type                = "ssh"
     host                = "${aws_instance.dnsmasq.*.private_ip[count.index]}"
@@ -107,10 +115,12 @@ resource "null_resource" "dnsmasq" {
     bastion_user        = "${var.bastion_user}"
     bastion_private_key = "${var.bastion_private_key}"
   }
+
   provisioner "file" {
     content     = "${var.dnsmasq_conf}"
     destination = "/tmp/dnsmasq.conf"
   }
+
   # this could be more cross-platform, but got to move on to other things
   provisioner "remote-exec" {
     inline = [
@@ -119,7 +129,7 @@ resource "null_resource" "dnsmasq" {
       "sudo chown root:root /etc/dnsmasq.conf",
       "sudo chmod 640 /etc/dnsmasq.conf",
       "sudo service dnsmasq restart",
-      "${var.post_init}"
+      "${var.post_init}",
     ]
   }
 }
@@ -132,18 +142,20 @@ data "aws_region" "current" {
 # Cloudwatch alarm that recovers the instance after two minutes of system status
 # check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
-  count = "${length(compact(var.private_ips))}"
-  alarm_name = "${format(var.name_format, var.name_prefix, count.index + 1)}"
-  metric_name = "StatusCheckFailed_System"
+  count               = "${length(compact(var.private_ips))}"
+  alarm_name          = "${format(var.name_format, var.name_prefix, count.index + 1)}"
+  metric_name         = "StatusCheckFailed_System"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods = "2"
+  evaluation_periods  = "2"
+
   dimensions {
     InstanceId = "${aws_instance.dnsmasq.*.id[count.index]}"
   }
-  namespace = "AWS/EC2"
-  period    = "60"
-  statistic = "Minimum"
-  threshold = "0"
+
+  namespace         = "AWS/EC2"
+  period            = "60"
+  statistic         = "Minimum"
+  threshold         = "0"
   alarm_description = "Auto-recover the instance if the system status check fails for two minutes"
   alarm_actions     = ["${compact(concat(list("arn:${var.aws_cloud}:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
 }
