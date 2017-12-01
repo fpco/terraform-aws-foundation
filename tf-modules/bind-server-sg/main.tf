@@ -14,7 +14,7 @@ variable "dns_port" {
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
-  default     = "Allow ingress, DNS port "
+  default     = "Allow ingress, DNS port"
 }
 
 # ingress rules for DNS servers
