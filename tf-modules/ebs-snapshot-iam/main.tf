@@ -10,6 +10,7 @@ resource "aws_iam_user" "snap-ebs" {
 resource "aws_iam_user_policy" "snap-ebs" {
   name = "${var.name}"
   user = "${aws_iam_user.snap-ebs.name}"
+
   policy = <<EOF
 {
   "Statement": [
@@ -34,6 +35,7 @@ resource "aws_iam_user_policy" "snap-ebs" {
 }
 EOF
 }
+
 // ARN of the IAM user created for the EBS snapshots service
 output "user_arn" {
   value = "${aws_iam_user.snap-ebs.arn}"
