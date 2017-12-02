@@ -1,5 +1,7 @@
 /**
- * ## Run Tests on the VPC Scenario 2 Module
+ * ## VPC Scenario 2 w/ EC2 NAT
+ *
+ * Run Tests on the VPC Scenario 2 NAT module, but deploy one NAT for all AZ.
  *
  *
  */
@@ -77,12 +79,10 @@ module "private-subnets" {
 }
 
 module "nat-instance" {
-  source           = "../../tf-modules/ec2-nat-instance"
-  az               = "${data.aws_availability_zones.available.names[0]}"
-  name_prefix      = "${var.name}"
-  key_name         = "${aws_key_pair.main.key_name}"
-  public_subnet_id = "${module.public-subnets.ids[0]}"
-
+  source               = "../../tf-modules/ec2-nat-instance"
+  name_prefix          = "${var.name}"
+  key_name             = "${aws_key_pair.main.key_name}"
+  public_subnet_ids    = ["${module.public-subnets.ids[0]}"]
   # the one instance can route for any private subnet
   private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
   security_group_ids   = ["${aws_security_group.nat_instance.id}"]
@@ -90,9 +90,8 @@ module "nat-instance" {
 
 # route table for the private subnets, hooks up the VPN gateway
 resource "aws_route_table" "private_subnets" {
-  vpc_id           = "${module.vpc.vpc_id}"
-
-  tags = "${map("Name", "${var.name}-private-subnets")}"
+  vpc_id = "${module.vpc.vpc_id}"
+  tags   = "${map("Name", "${var.name}-private-subnets")}"
 }
 
 # associate subnets to routing table
@@ -104,7 +103,7 @@ resource "aws_route_table_association" "private_subnets" {
 
 # network route for private subnets ---> NAT for 0.0.0.0/0
 resource "aws_route" "nat" {
-  instance_id             = "${module.nat-instance.id}"
+  instance_id             = "${module.nat-instance.instance_ids[0]}"
   route_table_id          = "${aws_route_table.private_subnets.id}"
   destination_cidr_block  = "0.0.0.0/0"
 }
@@ -119,6 +118,7 @@ resource "aws_security_group" "nat_instance" {
 module "nat-http-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 80
+  description       = "allow ingress, HTTP (80) for NAT"
   cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
   security_group_id = "${aws_security_group.nat_instance.id}"
 }
@@ -126,6 +126,7 @@ module "nat-http-rule" {
 module "nat-https-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 443
+  description       = "allow ingress, HTTPS (443) for NAT"
   cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
   security_group_id = "${aws_security_group.nat_instance.id}"
 }
@@ -160,6 +161,7 @@ resource "aws_security_group" "public_elb" {
 module "elb-http-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 80
+  description       = "allow ingress, HTTP (80) into ELB"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.public_elb.id}"
 }
@@ -179,6 +181,7 @@ resource "aws_security_group" "web_service" {
 module "web-service-http-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 3000
+  description       = "allow ingress, HTTP port 3000 for the web app service"
   cidr_blocks       = ["${module.public-subnets.cidr_blocks}"]
   security_group_id = "${aws_security_group.web_service.id}"
 }
@@ -306,7 +309,7 @@ output "elb_dns" {
 
 // Public IP of NAT instance
 output "nat_ip" {
-  value = "${module.nat-instance.public_ip}"
+  value = "${module.nat-instance.public_ips[0]}"
 }
 
 // region deployed to
