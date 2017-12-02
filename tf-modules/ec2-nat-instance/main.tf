@@ -55,7 +55,7 @@ END_INIT
 }
 
 module "ec2-nat" {
-  source = "../ec2-fixed-ip-auto-recover-instances"
+  source = "../ec2-auto-recover-instances"
   # name scheme looks like "name-ec2-nat-01" and so on
   name_prefix        = "${var.name_prefix}"
   name_format        = "%s-ec2-nat-%02d"
