@@ -8,17 +8,15 @@ generate-ssh-key:
 
 ## write out a tfvars file for a test deploy
 generate-tfvars:
-	@echo "key_file = \"./id_rsa.pub\"" > terraform.tfvars
+	@echo "ssh_pubkey = \"./id_rsa.pub\"" > terraform.tfvars
 	@echo "region = \"us-east-2\"" >> terraform.tfvars
 
 ## Use Terraform to create the VPC and core network resources in a specific order
 network:
 	@terraform init
-	@terraform plan -out=tf.out -target=module.vpc.public-subnets
+	@terraform plan -out=tf.out -target=module.vpc.module.public-subnets
 	@terraform apply tf.out
-	@terraform plan -out=tf.out -target=module.vpc.public-gateway
-	@terraform apply tf.out
-	@terraform plan -out=tf.out -target=module.vpc.nat-gateway
+	@terraform plan -out=tf.out -target=module.vpc.module.public-gateway
 	@terraform apply tf.out
 	@terraform plan -out=tf.out -target=module.vpc
 	@terraform apply tf.out
