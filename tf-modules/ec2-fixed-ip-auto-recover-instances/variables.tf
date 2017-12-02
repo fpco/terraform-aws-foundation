@@ -7,6 +7,11 @@ variable "aws_cloud" {
   default     = "aws"
 }
 
+variable "extra_tags" {
+  description = "map of tags to append to the Name tag, added to the instance"
+  default     = {}
+}
+
 variable "instance_type" {
   description = "Type of instance to run the servers"
   default     = "t2.nano"

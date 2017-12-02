@@ -73,9 +73,12 @@ resource "aws_instance" "auto-recover" {
     device_name = "/dev/sdc"
     no_device   = true
   }
-  tags {
-    Name = "${format(var.name_format, var.name_prefix, count.index + 1)}"
-  }
+
+  tags = "${merge(
+              map("Name", format(var.name_format, var.name_prefix, count.index + 1)),
+	      "${var.extra_tags}"
+	 )}"
+
   lifecycle {
     ignore_changes = ["ami"]
   }
