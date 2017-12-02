@@ -48,9 +48,20 @@
  *     }
  */
 
+# if we have no private_ips in our list, use the subnet_ids to determine how many
+# EC2 instances to create. This lets the module create N instances across M subnets
+# (interleave), or N instances across N subnets.
+data "template_file" "cnt" {
+  template = "$${ip_count ? ip_count : subnet_count}"
+
+  vars {
+    ip_count     = "${length(var.private_ips)}"
+    subnet_count = "${length(var.subnet_ids)}"
+  }
+}
+
 # The instance running the DNS server
 resource "aws_instance" "auto-recover" {
-  count                  = "${length(var.private_ips)}"
   ami                    = "${var.ami}"
   instance_type          = "${var.instance_type}"
   iam_instance_profile   = "${element(var.iam_profiles, count.index)}"
@@ -58,6 +69,8 @@ resource "aws_instance" "auto-recover" {
   vpc_security_group_ids = ["${var.security_group_ids}"]
   private_ip             = "${var.private_ips[count.index]}"
   key_name               = "${var.key_name}"
+  count                       = "${data.template_file.cnt.rendered}"
+  private_ip                  = "${data.template_file.cnt.rendered > 0 ? element(concat(var.private_ips, list("")), count.index) : ""}"
   root_block_device {
     volume_type = "${var.root_volume_type}"
     volume_size = "${var.root_volume_size}"
@@ -93,7 +106,7 @@ data "aws_region" "current" {
 # Cloudwatch alarm that recovers the instance after two minutes of system status
 # check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
-  count = "${length(compact(var.private_ips))}"
+  count               = "${data.template_file.cnt.rendered}"
   alarm_name          = "${format(var.name_format, var.name_prefix, count.index + 1)}"
   metric_name         = "${var.metric_name}"
   comparison_operator = "${var.comparison_operator}"
