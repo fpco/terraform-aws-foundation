@@ -29,7 +29,7 @@
  *
  *     # The DNS servers
  *     module "dns" {
- *       source = "../../vendor/fpco-terraform-aws/tf-modules/ec2-fixed-ip-auto-recover-instances"
+ *       source = "../../vendor/fpco-terraform-aws/tf-modules/ec2-auto-recover-instances"
  *       name_prefix         = "${var.name}"
  *       ami                 = "${data.aws_ami.ubuntu-xenial.id}"
  *       key_name            = "${aws_key_pair.main.id}"
