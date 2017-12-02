@@ -91,17 +91,19 @@ data "aws_region" "current" {
 # check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
   count = "${length(compact(var.private_ips))}"
-  alarm_name = "${format(var.name_format, var.name_prefix, count.index + 1)}"
-  metric_name = "StatusCheckFailed_System"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods = "2"
+  alarm_name          = "${format(var.name_format, var.name_prefix, count.index + 1)}"
+  metric_name         = "${var.metric_name}"
+  comparison_operator = "${var.comparison_operator}"
+  evaluation_periods  = "${var.evaluation_periods}"
+
   dimensions {
     InstanceId = "${aws_instance.auto-recover.*.id[count.index]}"
   }
-  namespace = "AWS/EC2"
-  period    = "60"
-  statistic = "Minimum"
-  threshold = "0"
-  alarm_description = "Auto-recover the instance if the system status check fails for two minutes"
+
+  namespace         = "${var.namespace}"
+  period            = "${var.max_failure_duration}"
+  statistic         = "${var.statistic}"
+  threshold         = "${var.threshold}"
+  alarm_description = "${var.alarm_description}"
   alarm_actions     = ["${compact(concat(list("arn:${var.aws_cloud}:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
 }
