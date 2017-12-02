@@ -1,6 +1,7 @@
 /**
- * ## Run Tests on the VPC Scenario 2 Module
+ * ## VPC Scenario 2 w/ EC2 NAT per AZ
  *
+ * Run Tests on the VPC Scenario 2 NAT module, but deploy one NAT _per_ AZ.
  *
  */
 
@@ -76,89 +77,38 @@ module "private-subnets" {
   public      = false
 }
 
-module "nat-instance-a" {
-  source           = "../../tf-modules/ec2-nat-instance"
-  az               = "${data.aws_availability_zones.available.names[0]}"
-  name_prefix      = "${var.name}"
-  key_name         = "${aws_key_pair.main.key_name}"
-  public_subnet_id = "${module.public-subnets.ids[0]}"
-
-  # the one instance can route for any private subnet
-  private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
-  security_group_ids   = ["${aws_security_group.nat_instance.id}"]
-}
-
-module "nat-instance-b" {
-  source           = "../../tf-modules/ec2-nat-instance"
-  az               = "${data.aws_availability_zones.available.names[1]}"
-  name_prefix      = "${var.name}"
-  key_name         = "${aws_key_pair.main.key_name}"
-  public_subnet_id = "${module.public-subnets.ids[1]}"
-
-  # the one instance can route for any private subnet
-  private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
-  security_group_ids   = ["${aws_security_group.nat_instance.id}"]
-}
-
-module "nat-instance-c" {
-  source           = "../../tf-modules/ec2-nat-instance"
-  az               = "${data.aws_availability_zones.available.names[2]}"
-  name_prefix      = "${var.name}"
-  key_name         = "${aws_key_pair.main.key_name}"
-  public_subnet_id = "${module.public-subnets.ids[2]}"
-
+module "nat-instances" {
+  source      = "../../tf-modules/ec2-nat-instance"
+  name_prefix = "${var.name}"
+  key_name    = "${aws_key_pair.main.key_name}"
+  # let AWS set IPs for us
+  private_ips = []
+  # list of subnets to deploy NAT instances into
+  public_subnet_ids    = ["${module.public-subnets.ids}"]
   # the one instance can route for any private subnet
   private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
   security_group_ids   = ["${aws_security_group.nat_instance.id}"]
 }
 
 # route tables for the private subnets, hook up the NAT instances
-resource "aws_route_table" "private_subnet_a" {
+resource "aws_route_table" "private_subnets" {
+  count  = "${length(var.private_subnet_cidrs)}"
   vpc_id = "${module.vpc.vpc_id}"
-  tags   = "${map("Name", "${var.name}-private-subnet_a")}"
+  tags   = "${map("Name", "${var.name}-private-subnet-${count.index + 1}")}"
 }
 
-resource "aws_route_table" "private_subnet_b" {
-  vpc_id = "${module.vpc.vpc_id}"
-  tags   = "${map("Name", "${var.name}-private-subnet_b")}"
-}
-
-resource "aws_route_table" "private_subnet_c" {
-  vpc_id = "${module.vpc.vpc_id}"
-  tags   = "${map("Name", "${var.name}-private-subnet_c")}"
-}
 # associate subnets to routing table
-resource "aws_route_table_association" "private_subnet_a" {
-  subnet_id      = "${module.private-subnets.ids[0]}"
-  route_table_id = "${aws_route_table.private_subnet_a.id}"
-}
-
-resource "aws_route_table_association" "private_subnet_b" {
-  subnet_id      = "${module.private-subnets.ids[1]}"
-  route_table_id = "${aws_route_table.private_subnet_b.id}"
-}
-
-resource "aws_route_table_association" "private_subnet_c" {
-  subnet_id      = "${module.private-subnets.ids[2]}"
-  route_table_id = "${aws_route_table.private_subnet_c.id}"
+resource "aws_route_table_association" "private_subnets" {
+  count          = "${length(var.private_subnet_cidrs)}"
+  subnet_id      = "${module.private-subnets.ids[count.index]}"
+  route_table_id = "${aws_route_table.private_subnets.*.id[count.index]}"
 }
 
 # network route for private subnets ---> NAT for 0.0.0.0/0
-resource "aws_route" "nat-a" {
-  instance_id             = "${module.nat-instance-a.id}"
-  route_table_id          = "${aws_route_table.private_subnet_a.id}"
-  destination_cidr_block  = "0.0.0.0/0"
-}
-
-resource "aws_route" "nat-b" {
-  instance_id             = "${module.nat-instance-b.id}"
-  route_table_id          = "${aws_route_table.private_subnet_b.id}"
-  destination_cidr_block  = "0.0.0.0/0"
-}
-
-resource "aws_route" "nat-c" {
-  instance_id             = "${module.nat-instance-c.id}"
-  route_table_id          = "${aws_route_table.private_subnet_c.id}"
+resource "aws_route" "nat" {
+  count                   = "${length(var.private_subnet_cidrs)}"
+  instance_id             = "${module.nat-instances.instance_ids[count.index]}"
+  route_table_id          = "${aws_route_table.private_subnets.*.id[count.index]}"
   destination_cidr_block  = "0.0.0.0/0"
 }
 
@@ -172,6 +122,7 @@ resource "aws_security_group" "nat_instance" {
 module "nat-http-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 80
+  description       = "allow ingress, HTTP (80) for NAT"
   cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
   security_group_id = "${aws_security_group.nat_instance.id}"
 }
@@ -179,6 +130,7 @@ module "nat-http-rule" {
 module "nat-https-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 443
+  description       = "allow ingress, HTTPS (443) for NAT"
   cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
   security_group_id = "${aws_security_group.nat_instance.id}"
 }
@@ -213,6 +165,7 @@ resource "aws_security_group" "public_elb" {
 module "elb-http-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 80
+  description       = "allow ingress, HTTP (80) into ELB"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.public_elb.id}"
 }
@@ -232,6 +185,7 @@ resource "aws_security_group" "web_service" {
 module "web-service-http-rule" {
   source            = "../../tf-modules/single-port-sg"
   port              = 3000
+  description       = "allow ingress, HTTP port 3000 for the web app service"
   cidr_blocks       = ["${module.public-subnets.cidr_blocks}"]
   security_group_id = "${aws_security_group.web_service.id}"
 }
@@ -359,11 +313,7 @@ output "elb_dns" {
 
 // Public IP of NAT instance
 output "nat_public_ips" {
-  value = [
-    "${module.nat-instance-a.public_ip}",
-    "${module.nat-instance-b.public_ip}",
-    "${module.nat-instance-c.public_ip}",
-  ]
+  value = ["${module.nat-instances.public_ips}"]
 }
 
 // region deployed to
