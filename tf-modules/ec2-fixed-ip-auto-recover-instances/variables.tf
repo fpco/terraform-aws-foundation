@@ -36,7 +36,6 @@ variable "key_name" {
   description = "SSH key-pair name to use for setup"
 }
 
-
 variable "name_prefix" {
   description = "Name prefix of the instances (will append 'dns-master-XX')"
 }
@@ -64,4 +63,44 @@ variable "root_volume_type" {
 variable "root_volume_size" {
   default     = "8"
   description = "Size (in GB) of EBS volume to use for the root block device"
+}
+
+variable "max_failure_duration" {
+  description = "seconds, maps to `period` in `aws_cloudwatch_metric_alarm`"
+  default     = "60"
+}
+
+variable "metric_name" {
+  description = "maps to `metric_name` in `aws_cloudwatch_metric_alarm`"
+  default     = "StatusCheckFailed_System"
+}
+
+variable "comparison_operator" {
+  description = "maps to `comparison_operator` in `aws_cloudwatch_metric_alarm`"
+  default     = "GreaterThanThreshold"
+}
+
+variable "evaluation_periods" {
+  description = "maps to `evaluation_periods` in `aws_cloudwatch_metric_alarm`"
+  default     = "2"
+}
+
+variable "statistic" {
+  description = "maps to `statistic` in `aws_cloudwatch_metric_alarm`"
+  default     = "Minimum"
+}
+
+variable "threshold" {
+  description = "maps to `threshold` in `aws_cloudwatch_metric_alarm`"
+  default     = "0"
+}
+
+variable "alarm_description" {
+  description = "maps to `alarm_description` in `aws_cloudwatch_metric_alarm`"
+  default     = "Auto-recover the instance if the system status check fails for two minutes"
+}
+
+variable "namespace" {
+  description = "maps to `namespace` in `aws_cloudwatch_metric_alarm`"
+  default     = "AWS/EC2"
 }
