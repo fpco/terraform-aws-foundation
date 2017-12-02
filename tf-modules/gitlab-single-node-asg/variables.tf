@@ -36,10 +36,6 @@ variable "region" {
   description = "The region for all of the resources"
 }
 
-variable "az" {
-  description = "The availability zone to create the instance in"
-}
-
 variable "vpc_id" {
   description = "The VPC to put the security group on"
 }

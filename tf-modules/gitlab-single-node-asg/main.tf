@@ -20,7 +20,6 @@
 module "gitlab-asg" {
   source                  = "../single-node-asg"
   name                    = "${var.name_prefix}"
-  az                      = "${var.az}"
   load_balancers          = "${var.load_balancers}"
   key_name                = "${var.key_name}"
   ami                     = "${var.instance_ami}"
