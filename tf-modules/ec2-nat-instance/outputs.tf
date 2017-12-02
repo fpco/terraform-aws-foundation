@@ -1,14 +1,9 @@
-// ID of EC2 instance
-output "id" {
-  value = "${aws_instance.ec2-nat.id}"
+// List of IDs for the EC2 instance(s)
+output "instance_ids" {
+  value = ["${module.ec2-nat.instance_ids}"]
 }
 
-// Public IP of EC2 instance
-output "public_ip" {
-  value = "${aws_instance.ec2-nat.public_ip}"
-}
-
-// Public DNS of EC2 instance
-output "public_dns" {
-  value = "${aws_instance.ec2-nat.public_dns}"
+// List of public IP address(es) for the EC2 instance(s)
+output "public_ips" {
+  value = ["${module.ec2-nat.public_ips}"]
 }
