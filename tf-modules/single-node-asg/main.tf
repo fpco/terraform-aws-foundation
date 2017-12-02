@@ -12,7 +12,7 @@
  */
 module "service-data" {
   source      = "../persistent-ebs"
-  name        = "${var.name}-${var.name_suffix}-data-${var.az}"
+  name        = "${var.name_prefix}-${var.name_suffix}-data-${var.az}"
   aws_cloud   = "${var.aws_cloud}"
   region      = "${var.region}"
   az          = "${var.az}"
@@ -27,7 +27,7 @@ module "service-data" {
 module "server" {
   source             = "../asg"
   security_group_ids = "${var.security_group_ids}"
-  name               = "${var.name}"
+  name               = "${var.name_prefix}"
 
   # append this to the ASG name
   suffix           = "${var.name_suffix}-${var.az}"

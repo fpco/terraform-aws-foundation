@@ -1,5 +1,5 @@
-variable "name" {
-  description = "The name of the environment to deploy to (beta/prod/etc)"
+variable "name_prefix" {
+  description = "Prefix for naming resources, usually project-related"
 }
 
 variable "key_name" {
