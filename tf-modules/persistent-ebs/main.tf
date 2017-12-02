@@ -38,6 +38,11 @@ output "iam_role_arn" {
   value = "${aws_iam_role.attach_ebs.arn}"
 }
 
+// `name` exported from the `aws_iam_role`
+output "iam_role_name" {
+  value = "${aws_iam_role.attach_ebs.name}"
+}
+
 // `id` exported from the `aws_ebs_volume`
 output "volume_id" {
   value = "${aws_ebs_volume.main.id}"

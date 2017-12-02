@@ -85,3 +85,8 @@ output "asg_iam_profile_arn" {
 output "asg_iam_role_arn" {
   value = "${module.gitlab-asg.asg_iam_role_arn}"
 }
+
+// `name` exported from the `persistent-ebs` module's `aws_iam_role`
+output "asg_iam_role_name" {
+  value = "${module.gitlab-asg.asg_iam_role_name}"
+}
