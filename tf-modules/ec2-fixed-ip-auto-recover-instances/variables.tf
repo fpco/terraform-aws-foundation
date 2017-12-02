@@ -27,9 +27,21 @@ variable "subnet_ids" {
   type        = "list"
 }
 
+variable "public_ip" {
+  description = "boolean to enable / disable public IP addresses for the instances"
+  type        = "string"
+  default     = "false"
+}
+
 variable "private_ips" {
   description = "Private IP addresses of servers, which must be within the subnets specified in 'subnet_ids' (in the same order).  These are specified explicitly since it's desirable to be able to replace a DNS server without its IP address changing.  Our convention is to use the first unreserved address in the subnet (which is to say, the '+4' address)."
   type        = "list"
+}
+
+variable "source_dest_check" {
+  description = "boolean to enable / disable source_dest_check on the instances"
+  type        = "string"
+  default     = "true"
 }
 
 variable "security_group_ids" {

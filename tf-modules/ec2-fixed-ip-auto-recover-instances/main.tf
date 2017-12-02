@@ -62,19 +62,22 @@ data "template_file" "cnt" {
 
 # The instance running the DNS server
 resource "aws_instance" "auto-recover" {
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type}"
-  iam_instance_profile   = "${element(var.iam_profiles, count.index)}"
-  subnet_id              = "${element(var.subnet_ids, count.index)}"
-  vpc_security_group_ids = ["${var.security_group_ids}"]
-  private_ip             = "${var.private_ips[count.index]}"
-  key_name               = "${var.key_name}"
   count                       = "${data.template_file.cnt.rendered}"
+  ami                         = "${var.ami}"
+  instance_type               = "${var.instance_type}"
+  iam_instance_profile        = "${data.template_file.cnt.rendered > 0 ? element(concat(var.iam_profiles, list("")), count.index) : ""}"
+  subnet_id                   = "${element(var.subnet_ids, count.index)}"
+  vpc_security_group_ids      = ["${var.security_group_ids}"]
+  associate_public_ip_address = "${var.public_ip}"
+  source_dest_check           = "${var.source_dest_check}"
   private_ip                  = "${data.template_file.cnt.rendered > 0 ? element(concat(var.private_ips, list("")), count.index) : ""}"
+  key_name                    = "${var.key_name}"
+
   root_block_device {
     volume_type = "${var.root_volume_type}"
     volume_size = "${var.root_volume_size}"
   }
+
   # Instance auto-recovery (see cloudwatch metric alarm below) doesn't support
   # instances with ephemeral storage, so this disables it.
   # See https://github.com/hashicorp/terraform/issues/5388#issuecomment-282480864
@@ -82,6 +85,7 @@ resource "aws_instance" "auto-recover" {
     device_name = "/dev/sdb"
     no_device   = true
   }
+
   ephemeral_block_device {
     device_name = "/dev/sdc"
     no_device   = true
@@ -95,6 +99,7 @@ resource "aws_instance" "auto-recover" {
   lifecycle {
     ignore_changes = ["ami"]
   }
+
   user_data = "${element(var.user_data, count.index)}"
 }
 
