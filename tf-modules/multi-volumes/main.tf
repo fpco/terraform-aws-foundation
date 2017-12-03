@@ -1,5 +1,5 @@
 /**
- *## Multi-Volumes (EBS)
+ * ## Multi-Volumes (EBS)
  *
  * Easily create multiple volumes from a comma-separated list of sizes.
  *
@@ -7,8 +7,10 @@
  * adding more aws_ebs_volumes and aws_volume_attachments following
  * the established pattern.
  *
- *NOTE: this module could be updated to support N number of volumes.
+ * NOTE: this module could be updated to support N number of volumes.
+ *
  */
+
 variable "instance_id" {
     description = "Instance to attach volumes to"
 }
