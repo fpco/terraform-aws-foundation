@@ -5,6 +5,7 @@ variable "aws_cloud" {
 
 variable "ami" {
   description = "AMI to use for instances.  Tested with Ubuntu 16.04."
+  type        = "string"
 }
 
 variable "instance_type" {
@@ -29,6 +30,7 @@ variable "security_group_ids" {
 
 variable "key_name" {
   description = "SSH key-pair name to use for setup"
+  type        = "string"
 }
 
 variable "ssh_key" {
