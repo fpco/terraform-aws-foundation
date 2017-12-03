@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Nomad Agent
+ *
+ * Document.
+ *
+ */
+
 data "template_file" "init_snippet" {
   template = "${file("${path.module}/snippet.tpl")}"
 
