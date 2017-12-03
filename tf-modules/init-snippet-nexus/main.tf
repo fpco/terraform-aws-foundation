@@ -1,3 +1,11 @@
+/**
+ * ## Init Snippet: Run Nexus (w/ Docker)
+ *
+ * Use Docker to run the Nexus package manager.
+ * DOCUMENT.
+ *
+ */
+
 variable "device_path" {
   default     = "/dev/xvdf"
   description = "path, to the device's path in /dev/"
