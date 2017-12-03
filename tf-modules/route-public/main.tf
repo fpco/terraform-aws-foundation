@@ -1,4 +1,4 @@
-/*
+/**
  * ## Gateway and Routing for Public Subnets
  *
  * This module provides an `aws_internet_gateway` and route table to use that
