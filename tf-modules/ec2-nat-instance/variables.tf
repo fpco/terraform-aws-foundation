@@ -1,8 +1,3 @@
-variable "is_govcloud" {
-  description = "If this is running on GovCloud or not"
-  default     = false
-}
-
 variable "aws_cloud" {
   description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
   default     = "aws"
