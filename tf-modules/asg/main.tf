@@ -1,14 +1,20 @@
 /**
- *## ASG (Autoscaling Group)
+ * ## ASG (Autoscaling Group)
  *
- *The purpose of this module is to provide a Launch Configuration and Autoscaling
- *Group as a pair.
+ * The purpose of this module is to provide a Launch Configuration and Autoscaling
+ * Group as a pair.
  *
- *The ASG supports spanning two Availability Zones and load balancers may be
- *specified. At present, the health checks are defaults and hardcoded (easy to
- *change). The Launch Configuration supports an arbitrary list of security groups,
- *public IPs may be enabled/disabled, and all important details (instance type,
- *ami, key, user data, iam profile) are specified as variables in the modules.
+ * The module supports:
+ *
+ * * spanning N Availability Zones
+ * * load balancers may be associated with the ASG
+ * * the health checks are not yet parametized, (easy to change)
+ * * the Launch Configuration supports an arbitrary list of security groups
+ * * `lifecycle` and `create_before_destroy` are used to ensure updates are graceful
+ * * public IPs may be enabled/disabled
+ * * supports appending `extra_tags`
+ * * all important details (instance type, ami, key, user data, iam profile) are
+ *   specified as variables in the modules.
  */
 # Auto-Scaling Group
 resource "aws_autoscaling_group" "cluster" {
