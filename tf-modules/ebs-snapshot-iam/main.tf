@@ -1,3 +1,11 @@
+/*
+ * ## IAM for Managing EBS Snapshots
+ *
+ * This module creates an `aws_iam_user_policy` that provides access to
+ * EBS volumes and managing their snapshots.
+ *
+ */
+
 variable "name" {
   default     = "snap-ebs"
   description = "name IAM resources, should match service name"
