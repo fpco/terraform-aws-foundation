@@ -1,9 +1,8 @@
 /**
- *##Nomad Agent Security Group
+ * ## Nomad Agent Security Group Rule
  *
- * Security group rules for the Nomad agents.
+ * Attach a security group rule for the Nomad agents, allowing port 4646.
  *
- * NOTE: need to make the agent port range (20000 to 60000) a variable.
  */
 
 variable "security_group_id" {
