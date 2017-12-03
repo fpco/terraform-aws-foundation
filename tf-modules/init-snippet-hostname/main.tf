@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Hostname Management (SaltStack version)
+ *
+ * Document.
+ *
+ */
+
 # variables used by this snippet of init shellcode
 variable "bootstrap_pillar_file" {
   default     = "/srv/pillar/bootstrap.sls"
