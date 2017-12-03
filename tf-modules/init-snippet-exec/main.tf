@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Shell Exec
+ *
+ * Document.
+ *
+ */
+
 variable "init" {
   description = "init shellcode for this snippet"
 }
