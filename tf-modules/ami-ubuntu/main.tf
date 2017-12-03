@@ -1,8 +1,8 @@
 /**
  * ## Ubuntu AMI lookup helper
  *
- * This module is a simple helper that looks up the AMI ID for a given release of
- * ubuntu. Use it like:
+ * This module is a simple helper that looks up the current AMI ID for a given
+ * release of ubuntu. Use it like:
  *
  * ```
  * module "ubuntu-xenial-ami" {
@@ -12,6 +12,11 @@
  * ```
  *
  * Then reference with: `${module.ubuntu-xenial-ami.id}`
+ *
+ * If you deploy an instance with this AMI, and later do a `terraform plan`, the
+ * most recent AMI will be looked up, and that may change the AMI for the instance.
+ * You can use `ignore_changes` or `-target`, depending on the type of workflow
+ * you would like to apply.
  *
  */
 
