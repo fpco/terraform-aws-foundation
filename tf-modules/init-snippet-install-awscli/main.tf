@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Install AWS CLI Tool
+ *
+ * Document.
+ *
+ */
+
 # variables used by this snippet of init shellcode
 variable "init_prefix" {
   default     = ""
