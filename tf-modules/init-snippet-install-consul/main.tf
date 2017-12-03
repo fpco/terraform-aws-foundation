@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Install Consul
+ *
+ * Document.
+ *
+ */
+
 # variables used by this snippet of init shellcode
 variable "version" {
   default     = "0.9.3"
