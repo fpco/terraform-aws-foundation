@@ -1,5 +1,7 @@
 /**
- * ## Setup KMS Master Key and a DynamoDB Table, which are required for credstash to work.
+ * ## Credstash Setup
+ *
+ * Setup KMS Master Key and a DynamoDB Table for use with Credstash.
  *
  * By default, this module doesn't need any variables to be set manually, but can
  * be overridden if necessary. By doing so it is possible to create either key or
