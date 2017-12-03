@@ -1,10 +1,12 @@
 /**
- *##Nomad Agent Task/Service/Worker Security Group
+ * ## Nomad Agent Task/Service/Worker Security Group Rules
  *
- * Security group rules for the task/service ports for Nomad workers (agents).
+ * Attach security group rules to open the task/service ports on the Nomad workers
+ * (agents).
  *
- * NOTE: need to make the agent port range (20000 to 60000) a variable. And enable
- * disable TCP or UDP separately with count.
+ * NOTE: could make the agent port range (20000 to 60000) a variable. Also consider
+ * enabling/disabling TCP or UDP separately with count.
+ *
  */
 
 variable "security_group_id" {
