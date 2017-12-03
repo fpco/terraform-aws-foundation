@@ -1,4 +1,6 @@
 /*
+ * ## Cross-Account Assume Role Policy
+ *
  * Creates an IAM policy that allows attached entities to assume given role(s)
  * in given account(s).
  *
