@@ -1,6 +1,9 @@
 /**
- *## S3 Bucket to Store Remote State
+ * ## S3 Bucket to Store Remote State
  *
+ * This module creates a private S3 bucket and IAM policy to access that bucket.
+ * The bucket can be used as a remote storage bucket for `terraform`, `kops`, or
+ * similar tools.
  * 
  */
 variable "bucket_name" {
