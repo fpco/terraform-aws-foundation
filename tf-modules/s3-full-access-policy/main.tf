@@ -1,5 +1,5 @@
 /**
- *## IAM Policy for Full Access on a List of S3 Buckets
+ * ## IAM Policy for Full Access on a List of S3 Buckets
  *
  */
 variable "name" {
