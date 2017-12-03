@@ -1,10 +1,10 @@
 /**
- *## Create an arbitrary number of EBS volumes
+ * ## Create an arbitrary number of EBS volumes
  *
  * This module provides EBS volumes and associated IAM policies to be
  * used with an EC2 instances or auto-scaling groups. This module is best when
- * used in conjunction with a single-node auto-scaling group, and `volume-mount-snippets`
- * can be used to attache EBS volumes on boot.
+ * used in conjunction with a single-node auto-scaling group, and
+ * `volume-mount-snippets` can be used to attache EBS volumes on boot.
  * Volumes created will be interleaved throughout the Avaialability Zones
  *
  */
