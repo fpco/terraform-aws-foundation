@@ -1,3 +1,12 @@
+/**
+ * ## Single Port Security Group Rule
+ *
+ * Document.
+ *
+ * TODO: support both TCP and UDP, use count to enable/disable.
+ *
+ */
+
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
 }
@@ -8,16 +17,16 @@ variable "cidr_blocks" {
 }
 
 variable "port" {
-  description = "TCP port to open"
+  description = "The port to open"
 }
 
 variable "protocol" {
-  description = "tcp/udp"
+  description = "The protocol, specify either `tcp` or `udp`"
   default     = "tcp"
 }
 
 variable "description" {
-  description = "use this string to generate a description for the SG rules"
+  description = "Use this string to add a description for the SG rule"
 }
 
 
