@@ -1,3 +1,10 @@
+/**
+ * ## NAT Gateways
+ *
+ * Document.
+ *
+ */
+
 # AWS Managed NAT Gateways
 resource "aws_eip" "nat" {
   count = "${var.nat_count}"
