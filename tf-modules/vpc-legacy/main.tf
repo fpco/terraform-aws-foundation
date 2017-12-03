@@ -1,8 +1,9 @@
 /**
- *## Virtual Private Cloud (VPC)
+ * ## Virtual Private Cloud (VPC)
  *
  * This module takes care of VPC deployment. Scenarios 1 and 2 are possible with
- * this module: http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenarios.html
+ * this module:
+ * http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenarios.html
  *
  */
 resource "aws_vpc" "main" {
