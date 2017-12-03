@@ -1,5 +1,5 @@
 /**
- *## AWS VPC, Scenario 1: VPC w/ Public Subnets
+ * ## AWS VPC, Scenario 1: VPC w/ Public Subnets
  *
  * This module creates a VPC with public subnets across one or more availability
  * zones, an internet gateway, and a route table for those subnets to pass
