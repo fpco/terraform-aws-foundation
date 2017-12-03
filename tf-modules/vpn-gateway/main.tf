@@ -1,3 +1,10 @@
+/**
+ * ## VPN Gateway
+ *
+ * Create a stand-alone `aws_instance` as a VPN gateway.
+ *
+ */
+
 resource "aws_key_pair" "vpn-gateway" {
   key_name = "${var.name_prefix}-vpn-gateway-key"
   public_key = "${var.public_key}"
@@ -101,7 +108,7 @@ resource "aws_route" "vpc-vpn-route" {
 }
 
 ## Associate Private Hosted Zone with current VPC.
-resource "aws_route53_zone_association" "e1c-net" {
+resource "aws_route53_zone_association" "main" {
   zone_id = "${var.route53_zone_id}"
   vpc_id  = "${var.vpc_id}"
 }
