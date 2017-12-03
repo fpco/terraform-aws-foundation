@@ -1,5 +1,5 @@
 /**
- *## Scale Auto-Scaling Groups
+ * ## Scale Auto-Scaling Groups
  *
  */
 variable "name" {}
