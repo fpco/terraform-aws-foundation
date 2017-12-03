@@ -1,7 +1,8 @@
 /**
- *##Nomad Server Security Group
+ * ## Nomad Server Security Group
  *
  * Security group for the Nomad Servers/Leaders.
+ *
  */
 
 variable "security_group_id" {
