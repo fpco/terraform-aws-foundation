@@ -1,5 +1,7 @@
 /**
- *## AWS VPC, Scenario 2: VPC w/ both Public & Private Subnets, NAT and Internet Gateway
+ * ## AWS VPC, Scenario 2
+ *
+ * **VPC with both Public and Private Subnets, NAT and Internet Gateway**
  *
  * This module creates a VPC with both public and private subnets across one or
  * more availability zones. The public subnets have routes to the public
