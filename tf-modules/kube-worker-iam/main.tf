@@ -1,3 +1,10 @@
+/**
+ * ## Kube Worker IAM
+ *
+ * Document.
+ *
+ */
+
 resource "aws_iam_role" "kube_node" {
   name               = "${var.name_prefix == "" ? "" : "${var.name_prefix}-"}kube_node"
   path               = "/"
