@@ -1,4 +1,4 @@
-/*
+/**
  * ## Kube-Stack (w/ Terraform and kubespray)
  *
  * ### Assumptions
@@ -7,9 +7,6 @@
  *
  * * the AMIs used are based on CoreOS
  * * the caller provides the list of security group ids, and subnets
- *
- *
- *
  *
  *
  * ### Example - how to use this module
