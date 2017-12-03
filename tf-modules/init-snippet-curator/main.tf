@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Curator
+ *
+ * Document.
+ *
+ */
+
 data "template_file" "curator-setup" {
   template = "${file("${path.module}/snippet.tpl.sh")}"
 
