@@ -1,3 +1,12 @@
+/**
+ * ## Init Snippet: Consul Template
+ *
+ * Configure and run `consul-template` as a system service using the
+ * `consul.template-tool.service` formula from `fpco-salt-formula`. This will
+ * write out bootstrap pillar before applying the formula.
+ *
+ */
+
 variable "bootstrap_pillar_file" {
   default     = "/srv/pillar/bootstrap.sls"
   description = "path, to the 'bootstrap' pillar file"
