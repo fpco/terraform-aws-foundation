@@ -5,11 +5,7 @@
  *specified. Specifically, an `aws_subnet` and `aws_route_table_association`
  *for each as a pair, named `a` and `c`.
  *
- *### TODO
- *
- *Need to overhaul use of region, how AZs are mapped/specified, and make use
- *of `count` and lists to keep the whole intention of this module dynamic and
- *flexible.
+ * **DEPRECATED**
  */
 # Subnets in each of two AZ in this region
 # (a and c are the only two in all three US regions)
