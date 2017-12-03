@@ -1,5 +1,7 @@
 /**
- *## Prometheus Server
+ * ## Prometheus Server
+ *
+ * Document.
  *
  */
 module "prometheus-data" {
