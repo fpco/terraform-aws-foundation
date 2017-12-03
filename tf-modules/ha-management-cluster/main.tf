@@ -1,7 +1,7 @@
 /**
- *## Highly Available Management Cluster
+ * ## Highly Available Management Cluster
  *
- *Not completed, WIP.
+ * Not completed, WIP.
  *
  */
 # create management cluster, the cluster to manage the others
