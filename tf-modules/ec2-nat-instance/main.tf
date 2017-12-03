@@ -15,7 +15,7 @@
 module "ubuntu-ami" {
   source      = "../ami-ubuntu"
   release     = "16.04"
-  is_govcloud = "${var.is_govcloud}"
+  is_govcloud = "${var.aws_cloud == "aws-us-gov" ? "true" : "false"}" # Canonical
 }
 
 # boxed module to update the EC2 node's hostname
