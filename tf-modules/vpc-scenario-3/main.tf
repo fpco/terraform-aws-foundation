@@ -1,5 +1,5 @@
 /**
- *## AWS VPC, Scenario 3: VPC w/ both Public & Private Subnets and a Hardware VPN
+ * ## AWS VPC, Scenario 3: VPC w/ Public, Private Subnets and a Hardware VPN
  *
  * This module creates a VPC with both public and private subnets spanning one or
  * more availability zones, an internet gateway for the public subnets and a
