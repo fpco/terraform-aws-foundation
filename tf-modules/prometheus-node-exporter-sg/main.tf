@@ -1,7 +1,8 @@
 /**
- *##Prometheus Node Exporter Security Group Rule
+ * ## Prometheus Node Exporter Security Group Rule
  *
  * Security group rule for the Prometheus node exporter.
+ *
  */
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
