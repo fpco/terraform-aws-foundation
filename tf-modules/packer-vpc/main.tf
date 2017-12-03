@@ -1,4 +1,11 @@
-# THE main VPC with an internet gateway
+/**
+ * ## Packer VPC
+ *
+ * Document.
+ *
+ */
+
+# THE VPC with an internet gateway
 resource "aws_vpc" "packer" {
   cidr_block           = "${var.vpc_cidr_prefix}.0.0/16"
   enable_dns_hostnames = true
