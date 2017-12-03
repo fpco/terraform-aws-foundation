@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Hostname (simple shell version)
+ *
+ * Document.
+ *
+ */
+
 # variables used by this snippet of init shellcode
 variable "init_prefix" {
   default     = ""
