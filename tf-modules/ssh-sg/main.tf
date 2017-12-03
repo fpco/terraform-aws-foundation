@@ -1,7 +1,8 @@
 /**
- *##SSH Security Group
+ * ## SSH Security Group Rule
  *
- *Security group to allow inbound SSH for administration
+ * Attach a security group rule to allow inbound SSH for administration.
+ *
  */
 
 variable "security_group_id" {
