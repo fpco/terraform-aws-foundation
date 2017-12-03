@@ -1,3 +1,10 @@
+/*
+ * ## BIND (DNS) Server Security Group Rule
+ *
+ * Defines `aws_security_group_rule`s for DNS servers
+ *
+ */
+
 variable "cidr_blocks" {
   description = "List of CIDR block ranges that the SG allows ingress from"
   type        = "list"
