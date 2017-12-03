@@ -1,3 +1,18 @@
+/**
+ * ## BIND (DNS) Server Security Group Rule
+ *
+ * Defines a `aws_security_group_rule` TCP/UDP on port 53, as used by BIND or
+ * other DNS servers.
+ *
+ * The `description` for each rule is auto-generated using the variables
+ * defined:
+ * 
+ * ```
+ * description = "${var.description} ${var.dns_port} (TCP)"
+ * ```
+ * 
+ */
+
 variable "cidr_blocks" {
   description = "List of CIDR block ranges that the SG allows ingress from"
   type        = "list"
