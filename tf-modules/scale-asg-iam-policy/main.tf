@@ -1,5 +1,7 @@
 /**
- *## Scale Auto-Scaling Groups
+ * ## Scale Auto-Scaling Groups
+ *
+ * This module is incomplete.
  *
  */
 variable "name" {}
