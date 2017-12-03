@@ -1,5 +1,5 @@
 /**
- *## AWS VPC, Scenario 4: VPC w/ Private Subnets, and VPN only
+ * ## AWS VPC, Scenario 4: VPC w/ Private Subnets, and VPN only
  *
  * This module creates a VPC with private subnets across one or more availability
  * zones, a hardware VPN gateway, and a route table for those subnets to pass
@@ -12,10 +12,16 @@
  * Terraform needs the user to add the VPC, Subnets, and then Route Tables. For
  * example, use targets to apply these updates sequentially:
  *
- *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.vpc
- *     ᐅ terraform apply tf.out
- *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.private-subnets
- *     ᐅ terraform apply tf.out
+ * ```
+ * ᐅ terraform plan -out=tf.out -target=module.vpc.module.vpc
+ * ᐅ terraform apply tf.out
+ * ᐅ terraform plan -out=tf.out -target=module.vpc.module.private-subnets
+ * ᐅ terraform apply tf.out
+ * ```
+ *
+ * This module is not as well tested as the other modules, let us know how it
+ * works for you.
+ *
  */
 
 module "vpc" {
