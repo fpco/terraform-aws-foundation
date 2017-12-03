@@ -1,5 +1,8 @@
 /**
  * ## init-snippet to run gitlab w/ docker
+ *
+ * Document.
+ *
  */
 
 variable "init_prefix" {
