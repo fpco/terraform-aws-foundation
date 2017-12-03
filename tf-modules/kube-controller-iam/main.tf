@@ -1,3 +1,10 @@
+/**
+ * ## Kube Controller IAM
+ *
+ * Document.
+ *
+ */
+
 resource "aws_iam_role" "kube_master" {
   name               = "${var.name_prefix == "" ? "" : "${var.name_prefix}-"}kube_master"
   path               = "/"
