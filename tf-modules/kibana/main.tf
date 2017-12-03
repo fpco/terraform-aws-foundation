@@ -1,10 +1,11 @@
 /**
- *## Kibana
+ * ## Kibana
  *
  * This module takes care of deployment of EC2 instances running Kibana using
  * an autoscaling group with a load balancer.
  *
  */
+
 # data "aws_acm_certificate" "kibana-cert" {
 #   domain = "${coalesce(var.kibana_dns_ssl_name, var.kibana_dns_name)}"
 #   statuses = ["ISSUED"]
