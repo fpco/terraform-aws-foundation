@@ -1,5 +1,8 @@
 /*
- * Fill-in the README
+ * ## Cross Account Group
+ *
+ * Write docs.
+ *
  */
 
 variable "aws_cloud" {
