@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Run Prometheus
+ *
+ * Document.
+ *
+ */
+
 variable "bootstrap_pillar_file" {
   default     = "/srv/pillar/bootstrap.sls"
   description = "path, to the 'bootstrap' pillar file"
