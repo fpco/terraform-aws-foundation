@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Attach EBS Volume
+ *
+ * Document.
+ *
+ */
+
 # variables used by this snippet of init shellcode
 variable "device_path" {
   default     = "/dev/xvdf"
