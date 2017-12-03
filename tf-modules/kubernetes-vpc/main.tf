@@ -1,5 +1,7 @@
 /**
- *## VPC for Kubernetes
+ * ## VPC for Kubernetes
+ *
+ * **DEPRECATED**
  *
  */
 resource "aws_vpc" "main" {
