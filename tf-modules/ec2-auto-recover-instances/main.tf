@@ -1,5 +1,7 @@
 /**
- * ## Fixed-IP and Auto-Recovering EC2 Instances
+ * ## Auto-Recovering EC2 Instances
+ *
+ * **UPDATE THESE DOCS**
  *
  * Use the `aws_instance` and `aws_cloudwatch_metric_alarm` resources in the
  * following pattern:
