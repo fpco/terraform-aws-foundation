@@ -14,6 +14,7 @@
  *
  *### Example
  *
+ *    ```
  *    module "dns" {
  *      source  = "../../vendor/fpco/terraform-aws/tf-modules/bind-server"
  *      name = "dns"
@@ -24,9 +25,11 @@
  *      key_name = "${aws_key_pair.admin.id}"
  *      named_conf_options = "${file("${path.module}/files/dns/named.conf.options")}"
  *    }
+ *    ```
  *
  *And `files/dns/named.conf.options` would be something like this:
  *
+ *    ```
  *    options {
  *    	directory "/var/cache/bind";
  *    	forward only;
@@ -52,6 +55,8 @@
  *    	type forward;
  *    	forwarders { 10.10.1.50; 10.10.1.51; };
  *    };
+ *    ```
+ *
  */
 
 # The instance running the DNS server
