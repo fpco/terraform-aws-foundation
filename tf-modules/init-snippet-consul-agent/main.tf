@@ -1,3 +1,11 @@
+/**
+ * ## Init Snippet: Consul Agent
+ *
+ * Configure and run the consul agent using the `consul.service` Salt formula
+ * from `fpco-salt-formula`.
+ *
+ */
+
 data "template_file" "init_snippet" {
   template = "${file("${path.module}/snippet.tpl")}"
 
