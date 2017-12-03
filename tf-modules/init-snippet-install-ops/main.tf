@@ -1,3 +1,10 @@
+/**
+ * ## Init Snippet: Install Ops
+ *
+ * Use shell to install the `ops` cli tool from FP Complete's S3 bucket.
+ *
+ */
+
 # variables used by this snippet of init shellcode
 variable "version" {
   default     = "0.3.2"
