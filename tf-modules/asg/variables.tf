@@ -1,8 +1,9 @@
-variable "name" {
+variable "name_prefix" {
+  type        = "string"
   description = "The name of this auto-scaling cluster, this should be unique"
 }
 
-variable "suffix" {
+variable "name_suffix" {
   default     = "cluster"
   description = "The suffix to the name of this auto-scaling cluster"
 }
