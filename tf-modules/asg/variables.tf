@@ -9,13 +9,13 @@ variable "name_suffix" {
 }
 
 variable "key_name" {
-  default     = ""
   description = "The name of the (AWS) SSH key to associate with the instance"
+  type        = "string"
 }
 
 variable "ami" {
-  default     = ""
   description = "The base AMI for each AWS instance created"
+  type        = "string"
 }
 
 variable "iam_profile" {
@@ -39,17 +39,17 @@ variable "user_data" {
 }
 
 variable "max_nodes" {
-  default     = 9
   description = "The maximum number of nodes in each group"
+  type        = "string"
 }
 
 variable "min_nodes" {
-  default     = 3
   description = "The minimum number of nodes in each group"
+  type        = "string"
 }
 
 variable "desired_capacity" {
-  default     = 7
+  default     = ""
   description = "The desired number of nodes in each group"
 }
 
@@ -59,18 +59,18 @@ variable "public_ip" {
 }
 
 variable "azs" {
-  default     = []
   description = "list of availability zones to associate with the ASG"
+  type        = "list"
 }
 
 variable "subnet_ids" {
-  default     = []
   description = "list of subnets to associate with the ASG (by id)"
+  type        = "list"
 }
 
 variable "security_group_ids" {
-  default     = []
   description = "list of security groups to associate with the ASG (by id)"
+  type        = "list"
 }
 
 variable "elb_names" {
