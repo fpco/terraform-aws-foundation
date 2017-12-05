@@ -1,12 +1,13 @@
 /**
- *## cluster-network
- *
- *This module creates subnets in each of two Availability Zones in the region
- *specified. Specifically, an `aws_subnet` and `aws_route_table_association`
- *for each as a pair, named `a` and `c`.
- *
- * **DEPRECATED**
+ * ## cluster-network
+ * 
+ * This module creates subnets in each of two Availability Zones in the region
+ * specified. Specifically, an `aws_subnet` and `aws_route_table_association`
+ * for each as a pair, named `a` and `c`.
+ * 
+ *  **DEPRECATED**
  */
+
 # Subnets in each of two AZ in this region
 # (a and c are the only two in all three US regions)
 # support 3 AZ / subnets in the future..
