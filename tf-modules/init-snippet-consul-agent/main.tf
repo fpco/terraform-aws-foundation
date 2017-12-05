@@ -1,7 +1,8 @@
 /**
  * ## Init Snippet: Consul Agent
  *
- * Document.
+ * Configure and run the consul agent using the `consul.service` Salt formula
+ * from `fpco-salt-formula`.
  *
  */
 
