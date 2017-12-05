@@ -1,3 +1,10 @@
+/**
+ * ## Cloud Watch EC2 Auto-Recovery
+ *
+ * Document.
+ *
+ */
+
 data "aws_region" "current" {
   current = true
 }
