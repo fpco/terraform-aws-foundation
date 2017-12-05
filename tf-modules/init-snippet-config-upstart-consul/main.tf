@@ -1,7 +1,8 @@
 /**
  * ## Init Snippet: Config Upstart, run Consul
  *
- * Document.
+ * Generate an init snippet that will configure Upstart to run `consul` as a
+ * system service.
  *
  */
 
