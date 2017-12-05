@@ -1,7 +1,7 @@
 /**
  * ## Autoscaling Clusters (built on Consul)
  * 
- * **DEPRECATED**
+ * **DEPRECATED** - This module will be removed in a future release.
  * 
  * This module reuses two other modules in this suite:
  * 
