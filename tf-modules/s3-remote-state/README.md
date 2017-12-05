@@ -18,13 +18,9 @@ Create a new Terraform project and a `main.tf` with the following:
 variable "bucket_name" {
     description = "the name to give the bucket"
 }
-variable "iam_users" {
+variable "principals" {
     default     = ""
-    description = "comma separated string-list of user names, full access to bucket"
-}
-variable "iam_groups" {
-    default     = ""
-    description = "comma separated string-list of group names, full access to bucket"
+    description = "list of IAM user/role ARNs with access to the bucket"
 }
 
 provider "aws" { }
@@ -44,8 +40,7 @@ output "bucket_name" {
 Create a `terraform.tfvars`, for example:
 
 ```hcl
-iam_users="john, alice"
-iam_groups="admin"
+principals="example needed here"
 bucket_name="foobar-remote-state"
 ```
 
@@ -124,11 +119,8 @@ output "iam_policy_arn" {
 output "iam_policy_name" {
     value = "${module.s3-remote-state-bucket.iam_policy_name}"
 }
-output "iam_users" {
-    value = "${module.s3-remote-state-bucket.iam_users}"
-}
-output "iam_groups" {
-    value = "${module.s3-remote-state-bucket.iam_groups}"
+output "principals" {
+    value = "${module.s3-remote-state-bucket.principals}"
 }
 ```
 
