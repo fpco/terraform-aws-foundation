@@ -1,17 +1,21 @@
 variable "name" {
   description = "The name of the environment to deploy to (beta/prod/etc)"
+  type        = "string"
 }
 
 variable "key_name" {
   description = "The name of the (AWS) SSH key to associate with the instance"
+  type        = "string"
 }
 
 variable "key_file" {
   description = "Path to the SSH private key to provide connection info as output"
+  type        = "string"
 }
 
 variable "ami" {
   description = "The base AMI for each AWS instance created"
+  type        = "string"
 }
 
 variable "instance_type" {
@@ -51,19 +55,22 @@ variable "public_ip" {
 
 variable "subnet_id" {
   description = "The ID of the subnet to use, depends on the availability zone"
+  type        = "string"
 }
 
 variable "security_group_ids" {
-  type        = "list"
   description = "The list of security groups (by ID) to associate with the ASG"
+  type        = "list"
 }
 
 variable "region" {
   description = "The AWS region to deploy to"
+  type        = "string"
 }
 
 variable "az" {
   description = "The AWS Availability Zone (AZ) to create the instance in"
+  type        = "string"
 }
 
 variable "load_balancers" {
