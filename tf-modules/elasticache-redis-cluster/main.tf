@@ -1,48 +1,46 @@
 /**
- *## Redis on AWS (Elasticache)
+ * ## Redis on AWS (Elasticache)
  *
- *This module creates the few pieces for an elasticache cluster including:
+ * This module creates the few pieces for an elasticache cluster including:
  *
- ** the `aws_elasticache_cluster` resource
- ** an associated `aws_elasticache_subnet_group`
- ** two (private) subnets and the route table associations
- ** a security group for internal redis communications between the nodes
+ * * the `aws_elasticache_cluster` resource
+ * * an associated `aws_elasticache_subnet_group`
+ * * two (private) subnets and the route table associations
+ * * a security group for internal redis communications between the nodes
  *
- *NOTES:
- ** should update to support N subnets)
- ** should make `map_public_ip_on_launch` a variable (default to `false`)
+ * NOTES: **should update to support N subnets, and to separate out the security group into its own module (called here)**
  *
  *
- *### How to Use this Module
+ * ### How to Use this Module
  *
- *```
- *resource "aws_security_group" "redis-inbound" {
- *    name = "${var.name}-queue-redis-inbound"
- *    vpc_id = "${aws_vpc.my_vpc.id}"
- *    ingress {
- *        from_port = 6379
- *        to_port = 6379
- *        protocol = "tcp"
- *        cidr_blocks = [ "${var.cidr_minion_a}", "${var.cidr_minion_c}"]
- *    }
- *    tags {
- *        Description = "Allow redis-client from workers cluster"
- *    }
- *}
+ * ```
+ * resource "aws_security_group" "redis-inbound" {
+ *     name = "${var.name}-queue-redis-inbound"
+ *     vpc_id = "${aws_vpc.my_vpc.id}"
+ *     ingress {
+ *         from_port = 6379
+ *         to_port = 6379
+ *         protocol = "tcp"
+ *         cidr_blocks = [ "${var.cidr_minion_a}", "${var.cidr_minion_c}"]
+ *     }
+ *     tags {
+ *         Description = "Allow redis-client from workers cluster"
+ *     }
+ * }
  *
- *module "my-ec-cluster" {
- *    source = "../tf-modules/elasticache-redis-cluster"
- *    name = "${var.name}-redis-ec"
- *    region = "${var.region}"
- *    cidr_a = "10.10.10.0/24"
- *    cidr_c = "10.10.11.0/24"
- *    route_table_id = "${aws_route_table.my_app.id}"
- *    vpc_id = "${aws_vpc.my_vpc.id}"
- *    inbound_security_group = "${aws_security_group.redis-inbound.id}"
- *    instance_type = "${var.instance_type.redis}"
- *}
- *```
- * 
+ * module "my-ec-cluster" {
+ *     source = "../tf-modules/elasticache-redis-cluster"
+ *     name = "${var.name}-redis-ec"
+ *     region = "${var.region}"
+ *     cidr_a = "10.10.10.0/24"
+ *     cidr_c = "10.10.11.0/24"
+ *     route_table_id = "${aws_route_table.my_app.id}"
+ *     vpc_id = "${aws_vpc.my_vpc.id}"
+ *     inbound_security_group = "${aws_security_group.redis-inbound.id}"
+ *     instance_type = "${var.instance_type.redis}"
+ * }
+ * ```
+ *
  */
 resource "aws_elasticache_cluster" "redis" {
   cluster_id      = "${var.name}"
