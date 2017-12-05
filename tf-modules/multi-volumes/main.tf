@@ -9,6 +9,8 @@
  *
  * NOTE: this module could be updated to support N number of volumes.
  *
+ * **TODO: REVIEW THE OTHER MODULES AND ASK THE ENGINEERS, IS THIS MODULE STILL IN USE?**
+ *
  */
 
 variable "instance_id" {
