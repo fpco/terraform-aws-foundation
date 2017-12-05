@@ -1,4 +1,4 @@
-/*
+/**
  * ## AWS IPSEC VPN
  *
  * This module packages the various resources needed to setup the IPSEC VPN
@@ -9,29 +9,35 @@
  * * `aws_vpn_connection`
  * * `aws_vpn_connection_route`
  *
+ * See the `vpc-scenario-4` module in this repo for an example that uses this
+ * module.
+ *
  */
 
 variable "name" {
   description = "Used to name the various VPN resources"
+  type        = "string"
 }
 
 variable "vpc_id" {
   description = "ID of the VPC to associate the VPN with"
+  type        = "string"
 }
 
 variable "remote_device_ip" {
   description = "The public IP address of the remote (client) device"
+  type        = "string"
 }
 
 variable "static_routes" {
-  type        = "list"
   description = "The list of CIDR blocks to create static routes for"
+  type        = "list"
 }
 
 variable "extra_tags" {
-  type        = "map"
-  default     = {}
   description = "Extra tags to append to various AWS resources"
+  default     = {}
+  type        = "map"
 }
 
 resource "aws_vpn_gateway" "main" {
