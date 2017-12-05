@@ -13,6 +13,23 @@
  *
  * Then reference with: `${module.ubuntu-xenial-ami.id}`
  *
+ * The module will filter the AMI by the following criteria:
+ *
+ * * Canonical's account ARN (for either corporate or govcloud partitions)
+ * * the most recent release
+ * * hvm-type AMIs
+ * * amd64
+ * * the `name` filter
+ *
+ * The `name` filter looks like:
+ *
+ * ```
+ * filter {
+     name   = "name"
+     values = ["ubuntu/images/hvm-ssd/ubuntu-${var.name_map[var.release]}-${var.release}-amd64-server-*"]
+ * }
+ * ```
+ *
  * If you deploy an instance with this AMI, and later do a `terraform plan`, the
  * most recent AMI will be looked up, and that may change the AMI for the instance.
  * You can use `ignore_changes` or `-target`, depending on the type of workflow
@@ -41,7 +58,7 @@ variable "release" {
 
 variable "is_govcloud" {
   default     = false
-  description = "boolean, defines `owners` below, as govcloud carries different ids"
+  description = "boolean, switch between Canonical's account ARN in `aws_ami.owners`"
 }
 
 data "aws_ami" "ubuntu" {
