@@ -8,6 +8,10 @@
  *   See `../elasticsearch` module for more information.
  * * Deploys multiple load balanced servers each running Logstash+Kibana. individual
  *   modules `../logstash` and `../kibana` for more information.
+ * * This module supports deploying ELK to AWS GovCloud.
+ *
+ * **TODO: REVIEW THIS MODULE SOURCE TO SEE IF THERE ARE OTHER "FEATURES"
+ * WE SHOULD LIST HERE.**
  *
  */
 
