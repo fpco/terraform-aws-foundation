@@ -1,4 +1,4 @@
-/*
+/**
  * ## BIND (DNS) Server Security Group Rule
  *
  * Defines `aws_security_group_rule`s for DNS servers
