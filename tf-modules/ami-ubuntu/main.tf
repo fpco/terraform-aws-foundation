@@ -53,11 +53,13 @@ variable "most_recent" {
 
 variable "name_map" {
   default = {
+    "17.10" = "artful"
+    "17.04" = "zesty"
     "16.04" = "xenial"
     "14.04" = "trusty"
   }
 
-  description = "map of release numbers to names"
+  description = "map of release numbers to names, including trusty, xenial, zesty, and artful"
 }
 
 variable "release" {
