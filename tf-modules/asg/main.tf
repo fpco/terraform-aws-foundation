@@ -15,6 +15,12 @@
  * * supports appending `extra_tags`
  * * all important details (instance type, ami, key, user data, iam profile) are
  *   specified as variables in the modules.
+ *
+ * Note that, Terraform does not run a rolling update when an ASG/LC pair have
+ * changed. After the ASG/LC have been updated, the EC2 instances running before
+ * the update will still be running. As a result, you will need to terminate each
+ * of those instances to perform a rolling update.
+ *
  */
 # Auto-Scaling Group
 resource "aws_autoscaling_group" "cluster" {
