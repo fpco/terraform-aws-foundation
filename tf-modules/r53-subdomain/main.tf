@@ -7,20 +7,24 @@
  */
 variable "name" {
   description = "name (FQDN) of the subdomain"
+  type        = "string"
 }
 
 variable "parent_zone_id" {
   description = "Zone ID of the parent domain"
+  type        = "string"
 }
 
 variable "ttl" {
-  default     = 172800
   description = "TTL for the NS records created"
+  default     = 172800
+  type        = "string"
 }
 
 variable "vpc_id" {
-  default     = ""
   description = "The VPC ID to associate a private zone with (leave blank for public zone)"
+  default     = ""
+  type        = "string"
 }
 
 resource "aws_route53_zone" "subdomain" {
