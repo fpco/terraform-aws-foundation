@@ -21,10 +21,10 @@ module "prometheus-data" {
 module "prometheus-server" {
   source             = "../asg"
   security_group_ids = ["${var.security_group_ids}"]
-  name               = "${var.name}"
+  name_prefix        = "${var.name}"
 
   # append this to the ASG name
-  suffix           = "prometheus-${var.az}"
+  name_suffix      = "prometheus-${var.az}"
   instance_type    = "${var.instance_type}"
   ami              = "${var.ami}"
   subnet_ids       = ["${var.subnet_id}"]
