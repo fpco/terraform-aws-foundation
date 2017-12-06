@@ -52,8 +52,8 @@ module "agent-asg" {
   max_nodes          = "${var.max_nodes}"
   min_nodes          = "${var.min_nodes}"
   key_name           = "${var.key_name}"
-  name               = "${var.name}"
-  suffix             = "cluster"
+  name_prefix        = "${var.name}"
+  name_suffix        = "cluster"
   subnet_ids         = ["${module.cluster-net.id_a}", "${module.cluster-net.id_c}"]
   security_group_ids = ["${var.cluster_security_group_ids}"]
   user_data          = "${var.user_data}"
