@@ -43,7 +43,7 @@ module "controller-asg" {
   source             = "../asg"
   azs                = ["${var.availability_zones}"]
   ami                = "${var.controller_ami}"
-  name               = "${var.name_prefix == "" ? "" : "${var.name_prefix}"}"
+  name_prefix        = "${var.name_prefix == "" ? "" : "${var.name_prefix}"}"
   elb_names          = ["${aws_elb.kube-controllers.name}"]
   iam_profile        = "${var.controller_iam_profile}"
   instance_type      = "${var.controller_instance_type}"
@@ -53,7 +53,7 @@ module "controller-asg" {
   max_nodes          = "${var.controller_max_nodes}"
   min_nodes          = "${var.controller_min_nodes}"
   key_name           = "${var.key_name}"
-  suffix             = "${var.controller_name_suffix}"
+  name_suffix        = "${var.controller_name_suffix}"
   public_ip          = "${var.controller_public_ip}"
   subnet_ids         = ["${var.controller_subnet_ids}"]
   security_group_ids = ["${var.controller_security_group_ids}"]
@@ -82,7 +82,7 @@ module "worker-asg" {
   source             = "../asg"
   azs                = ["${var.availability_zones}"]
   ami                = "${var.worker_ami}"
-  name               = "${var.name_prefix == "" ? "" : "${var.name_prefix}"}"
+  name_prefix        = "${var.name_prefix == "" ? "" : "${var.name_prefix}"}"
   iam_profile        = "${var.worker_iam_profile}"
   instance_type      = "${var.worker_instance_type}"
   root_volume_type   = "${var.worker_root_volume_type}"
@@ -91,7 +91,7 @@ module "worker-asg" {
   max_nodes          = "${var.worker_max_nodes}"
   min_nodes          = "${var.worker_min_nodes}"
   key_name           = "${var.key_name}"
-  suffix             = "${var.worker_name_suffix}"
+  name_suffix        = "${var.worker_name_suffix}"
   public_ip          = "${var.worker_public_ip}"
   subnet_ids         = ["${var.worker_subnet_ids}"]
   security_group_ids = ["${var.worker_security_group_ids}"]
