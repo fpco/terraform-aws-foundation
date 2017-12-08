@@ -39,7 +39,7 @@ terraform {
   }
 }
 module "credstash" {
-  source               = "github.com/fpco/fpco-terraform-aws/tf-modules/credstash-setup"
+  source               = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-setup"
   create_reader_policy = true # can be ommitted if secrets are writeonly from within EC2
   create_writer_policy = true # can be ommitted if secrets are readonly from within EC2
 }
@@ -148,7 +148,7 @@ data "terraform_remote_state" "credstash" {
   }
 }
 module "credstash-grant" {
-  source            = "github.com/fpco/fpco-terraform-aws/tf-modules/credstash-grant"
+  source            = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-grant"
   kms_key_arn       = "${data.terraform_remote_state.credstash.kms_key_arn}"
   reader_policy_arn = "${data.terraform_remote_state.credstash.reader_policy_arn}"
   roles_count       = 1
@@ -361,7 +361,7 @@ resource "aws_iam_role" "server-role" {
   ...
 }
 module "server-grant" {
-  source            = "github.com/fpco/fpco-terraform-aws/tf-modules/credstash-grant"
+  source            = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-grant"
   kms_key_arn       = "${data.terraform_remote_state.credstash.kms_key_arn}"
   reader_policy_arn = "${data.terraform_remote_state.credstash.reader_policy_arn}"
   reader_context    = "env=server"
@@ -376,7 +376,7 @@ resource "aws_iam_role" "client-role" {
   ...
 }
 module "client-grant" {
-  source            = "github.com/fpco/fpco-terraform-aws/tf-modules/credstash-grant"
+  source            = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-grant"
   kms_key_arn       = "${data.terraform_remote_state.credstash.kms_key_arn}"
   reader_policy_arn = "${data.terraform_remote_state.credstash.reader_policy_arn}"
   reader_context    = "env=client"
