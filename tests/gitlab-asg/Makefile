@@ -1,6 +1,15 @@
-.PHONY: generate-ssh-key network plan apply test destroy
+.PHONY: generate-ssh-key generate-tfvars generate-tls-certs upload-tls install-cfssl network plan apply test destroy
 
 .DEFAULT_GOAL = help
+
+## Use envsubst and vars.env to render the json config files for cfssl
+render-tls-configs:
+	@. ./vars.env && envsubst <ca-csr.tpl > ca-csr.json
+	@. ./vars.env && envsubst <server-csr.tpl > server-csr.json
+
+## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
+render-tfvars:
+	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
 
 ## Use ssh-keygen to generate a keypair for SSH
 generate-ssh-key:
@@ -10,6 +19,24 @@ generate-ssh-key:
 generate-tfvars:
 	@echo "ssh_pubkey = \"./id_rsa.pub\"" > terraform.tfvars
 	@echo "region = \"us-east-2\"" >> terraform.tfvars
+
+## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
+generate-tls-certs:
+	@./cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+	@./cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=gitlab server-csr.json | cfssljson -bare gitlab
+	@ls -Alh
+	@echo "ca-key.pem is the file to keep very safe"
+
+## use curl to download and install the cfssl executable
+install-cfssl:
+	@curl -s -L -o ./cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+	@curl -s -L -o ./cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+	@chmod +x ./cfssl ./cfssljson
+	@./cfssl version
+
+## Use AWS cli tools to upload the SSL cert to AWS
+upload-tls-certs:
+	@AWS_DEFAULT_REGION=us-east-1 aws acm import-certificate --certificate file://gitlab.pem --private-key file://gitlab-key.pem --certificate-chain file://ca.pem
 
 ## Use Terraform to create the VPC and core network resources in a specific order
 network:
