@@ -10,9 +10,10 @@
  * In particular, this means that the aws cli tool and ec2metadata are installed.
  *
  */
+
 module "service-data" {
   source      = "../persistent-ebs"
-  name        = "${var.name_prefix}-${var.name_suffix}-data-${var.az}"
+  name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
   aws_cloud   = "${var.aws_cloud}"
   region      = "${var.region}"
   az          = "${var.az}"
