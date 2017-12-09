@@ -6,7 +6,7 @@
  */
 module "prometheus-data" {
   source      = "../persistent-ebs"
-  name        = "${var.name}-prometheus-data"
+  name_prefix = "${var.name}-prometheus-data"
   region      = "${var.region}"
   az          = "${var.region}${var.az}"
   size        = "${var.data_volume_size}"
