@@ -1,4 +1,4 @@
-variable "name" {
+variable "name_prefix" {
   description = "The name of the environment to deploy to (beta/prod/etc)"
 }
 

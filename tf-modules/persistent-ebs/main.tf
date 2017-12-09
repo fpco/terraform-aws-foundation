@@ -7,6 +7,7 @@
  * init-snippet that attaches the named EBS volume on boot.
  *
  */
+
 resource "aws_ebs_volume" "main" {
   availability_zone = "${var.az}"
   size              = "${var.size}"
@@ -16,7 +17,7 @@ resource "aws_ebs_volume" "main" {
   encrypted   = "${var.encrypted}"
   kms_key_id  = "${var.kms_key_id}"
   snapshot_id = "${var.snapshot_id}"
-  tags        = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
+  tags        = "${merge(map("Name", "${var.name_prefix}-${var.az}"), "${var.extra_tags}")}"
 }
 
 //`id` exported from the `aws_iam_instance_profile`
