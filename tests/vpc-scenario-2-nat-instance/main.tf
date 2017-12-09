@@ -83,8 +83,6 @@ module "nat-instance" {
   name_prefix          = "${var.name}"
   key_name             = "${aws_key_pair.main.key_name}"
   public_subnet_ids    = ["${module.public-subnets.ids[0]}"]
-  # let AWS choose the IPs for these instances
-  private_ips          = []
   # the one instance can route for any private subnet
   private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
   security_group_ids   = ["${aws_security_group.nat_instance.id}"]
@@ -105,7 +103,7 @@ resource "aws_route_table_association" "private_subnets" {
 
 # network route for private subnets ---> NAT for 0.0.0.0/0
 resource "aws_route" "nat" {
-  instance_id             = "${module.nat-instance.ids[0]}"
+  instance_id             = "${module.nat-instance.instance_ids[0]}"
   route_table_id          = "${aws_route_table.private_subnets.id}"
   destination_cidr_block  = "0.0.0.0/0"
 }
