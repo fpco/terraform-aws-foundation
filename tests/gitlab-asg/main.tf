@@ -77,6 +77,14 @@ resource "aws_elb" "gitlab" {
   security_groups       = ["${aws_security_group.gitlab-elb.id}"]
 
   listener {
+    instance_port       = 8022
+    instance_protocol   = "tcp"
+    lb_port             = 22
+    lb_protocol         = "tcp"
+    ssl_certificate_id  = "${var.ssl_arn}"
+  }
+
+  listener {
     instance_port       = 80
     instance_protocol   = "http"
     lb_port             = 443
@@ -121,8 +129,8 @@ module "elb-https-rule" {
 
 module "elb-gitlab-ssh-rule" {
   source            = "../../tf-modules/single-port-sg"
-  port              = 8022
-  description       = "Allow ingress for Git over SSH, port 8022 (TCP), thru the ELB"
+  port              = 22
+  description       = "Allow ingress for Git over SSH, port 22 (TCP), thru the ELB"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.gitlab-elb.id}"
 }
