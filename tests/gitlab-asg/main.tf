@@ -271,3 +271,13 @@ output "region" {
 output "gitlab_asg_name" {
   value = "${var.name}-gitlab-asg-${element(data.aws_availability_zones.available.names, 0)}"
 }
+
+// URL to gitlab
+output "gitlab_url" {
+  value = "${aws_route53_record.gitlab.name}"
+}
+
+// URL to docker image registry
+output "registry_url" {
+  value = "${aws_route53_record.registry.name}"
+}
