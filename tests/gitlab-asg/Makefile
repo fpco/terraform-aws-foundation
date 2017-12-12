@@ -1,4 +1,4 @@
-.PHONY: generate-ssh-key generate-tfvars generate-tls-certs upload-tls install-cfssl network plan apply test destroy
+.PHONY: render-tls-configs render-tfvars render-ssh-config generate-ssh-key generate-tfvars generate-tls-certs upload-tls install-cfssl network plan apply test destroy
 
 .DEFAULT_GOAL = help
 
@@ -10,6 +10,10 @@ render-tls-configs:
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 render-tfvars:
 	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
+
+## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
+render-ssh-config:
+	@. ./vars.env && envsubst <ssh_config.tpl
 
 ## Use ssh-keygen to generate a keypair for SSH
 generate-ssh-key:
@@ -61,6 +65,9 @@ apply:
 get-ip:
 	@ops aws ec2 asg ips -r $$(terraform output region) $$(terraform output gitlab_asg_name)
 
+## Login to docker registry
+docker-login:
+	@docker login $$(terraform registry_url)
 
 ## Use Terraform to destory all resources in the test env
 destroy:
