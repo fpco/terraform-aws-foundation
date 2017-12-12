@@ -75,7 +75,7 @@ variable "gitlab_data_path" {
 # work with SSL and the AWS ELB
 data "template_file" "omnibus_config" {
   template = <<EOC
-GITLAB_OMNIBUS_CONFIG="external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; gitlab_rails['gitlab_shell_ssh_port']=$${ssh_port}; registry_nginx['listen_port']=$${http_port}; registry_nginx['listen_https'] = false; registry_nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; nginx['listen_port']=$${http_port}; nginx['listen_https'] = false; nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'};" \
+external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; registry_nginx['listen_port']=$${http_port}; registry_nginx['listen_https'] = false; registry_nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; nginx['listen_port']=$${http_port}; nginx['listen_https'] = false; nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'};
 EOC
 
   vars = {
@@ -100,7 +100,7 @@ docker run --detach \
   --volume ${var.gitlab_data_path}/config:/etc/gitlab \
   --volume ${var.gitlab_data_path}/logs:/var/log/gitlab \
   --volume ${var.gitlab_data_path}/data:/var/opt/gitlab \
-  --env ${data.template_file.omnibus_config.rendered}
+  --env GITLAB_OMNIBUS_CONFIG=\"${data.template_file.omnibus_config.rendered}\" \
   ${var.gitlab_image_repo}:${var.gitlab_image_tag}"
 echo "$cmd" > /etc/rc.local
 chmod +x /etc/rc.local
