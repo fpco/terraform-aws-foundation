@@ -33,8 +33,8 @@ variable "ssh_pubkey" {
   description = "The path to the SSH pub key to use"
 }
 
-variable "dns_zone_id" {
-  description = "The ID of the DNS zone on Route53, to create records in for gitlab"
+variable "dns_zone_name" {
+  description = "The name of the DNS zone on Route53 (example.com), to create records in for gitlab"
   type        = "string"
 }
 
@@ -175,7 +175,7 @@ module "init-install-ops" {
 
 module "init-gitlab-docker" {
   source        = "../../tf-modules/init-snippet-gitlab-docker"
-  gitlab_domain = "${data.aws_route53_zone.selected.name}"
+  gitlab_domain = "${var.dns_zone_name}"
 }
 
 module "vpc" {
@@ -232,7 +232,7 @@ module "open-egress-rule" {
 ## DNS setup
 
 data "aws_route53_zone" "selected" {
-  zone_id = "${var.dns_zone_id}"
+  name = "${var.dns_zone_name}"
 }
 
 resource "aws_route53_record" "gitlab" {
