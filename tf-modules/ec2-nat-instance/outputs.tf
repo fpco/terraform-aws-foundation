@@ -7,3 +7,8 @@ output "instance_ids" {
 output "public_ips" {
   value = ["${module.ec2-nat.public_ips}"]
 }
+
+// List of private IP address(es) for the EC2 instance(s)
+output "private_ips" {
+  value = ["${module.ec2-nat.private_ips}"]
+}
