@@ -86,10 +86,6 @@ variable "region" {
   description = "The AWS region to deploy to"
 }
 
-variable "az" {
-  description = "The AWS Availability Zone (AZ) to create the instance in"
-}
-
 variable "load_balancers" {
   default     = []
   description = "The list of load balancers names to pass to the ASG module"

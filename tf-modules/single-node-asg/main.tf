@@ -13,10 +13,10 @@
 
 module "service-data" {
   source      = "../persistent-ebs"
-  name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
+  name_prefix = "${var.name_prefix}-${var.name_suffix}-data-${data.aws_subnet.server-subnet.availability_zone}"
   aws_cloud   = "${var.aws_cloud}"
   region      = "${var.region}"
-  az          = "${var.az}"
+  az          = "${data.aws_subnet.server-subnet.availability_zone}"
   size        = "${var.data_volume_size}"
   iops        = "${var.data_volume_iops}"
   volume_type = "${var.data_volume_type}"
@@ -31,11 +31,11 @@ module "server" {
   name               = "${var.name_prefix}"
 
   # append this to the ASG name
-  suffix           = "${var.name_suffix}-${var.az}"
+  suffix           = "${var.name_suffix}-${data.aws_subnet.server-subnet.availability_zone}"
   instance_type    = "${var.instance_type}"
   ami              = "${var.ami}"
   subnet_ids       = ["${var.subnet_id}"]
-  azs              = ["${var.az}"]
+  azs              = ["${data.aws_subnet.server-subnet.availability_zone}"]
   public_ip        = "${var.public_ip}"
   key_name         = "${var.key_name}"
   elb_names        = ["${var.load_balancers}"]
@@ -61,4 +61,9 @@ module "init-attach-ebs" {
   source    = "../init-snippet-attach-ebs-volume"
   region    = "${var.region}"
   volume_id = "${module.service-data.volume_id}"
+}
+
+# Data source for AWS subnet
+data "aws_subnet" "server-subnet" {
+  id = "${var.subnet_id}"
 }
