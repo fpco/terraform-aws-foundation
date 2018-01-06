@@ -19,17 +19,32 @@ resource "aws_ebs_volume" "main" {
   tags = "${merge(map("Name", "${var.name_prefix}-${var.az}"), "${var.extra_tags}")}"
 }
 
-//`id` exported from the `aws_iam_instance_profile`
-output "iam_profile" {
+// `id` exported from the `aws_iam_instance_profile`
+output "iam_profile_id" {
   value = "${aws_iam_instance_profile.attach_ebs.id}"
 }
 
-//`arn` exported from the `aws_iam_instance_profile`
+// `arn` exported from the `aws_iam_instance_profile`
+output "iam_profile_arn" {
+  value = "${aws_iam_instance_profile.attach_ebs.arn}"
+}
+
+// `policy` exported from the `aws_iam_role_policy`
 output "iam_profile_policy_document" {
   value = "${aws_iam_role_policy.attach_ebs.policy}"
 }
 
-//`id` exported from the `aws_ebs_volume`
+// `arn` exported from the `aws_iam_role`
+output "iam_role_arn" {
+  value = "${aws_iam_role.attach_ebs.arn}"
+}
+
+// `name` exported from the `aws_iam_role`
+output "iam_role_name" {
+  value = "${aws_iam_role.attach_ebs.name}"
+}
+
+// `id` exported from the `aws_ebs_volume`
 output "volume_id" {
   value = "${aws_ebs_volume.main.id}"
 }
