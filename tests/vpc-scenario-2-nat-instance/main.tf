@@ -1,7 +1,5 @@
 /**
- * ## VPC Scenario 2 w/ EC2 NAT
- *
- * Run Tests on the VPC Scenario 2 NAT module, but deploy one NAT for all AZ.
+ * ## Run Tests on the VPC Scenario 2 Module
  *
  *
  */
@@ -26,11 +24,6 @@ variable "ssh_key" {
   default     = "./id_rsa"
 }
 
-variable "vpc_cidr_block" {
-  default     = "10.23.0.0/16"
-  description = "CIDR block to use with the VPC"
-}
-
 variable "public_subnet_cidrs" {
   default     = ["10.23.11.0/24", "10.23.12.0/24", "10.23.13.0/24"]
   description = "A list of public subnet CIDRs to deploy inside the VPC"
@@ -50,7 +43,7 @@ data "aws_availability_zones" "available" {}
 module "vpc" {
   source               = "../../tf-modules/vpc"
   region               = "${var.region}"
-  cidr                 = "${var.vpc_cidr_block}"
+  cidr                 = "10.23.0.0/16"
   name_prefix          = "${var.name}"
 }
 
@@ -79,19 +72,25 @@ module "private-subnets" {
 }
 
 module "nat-instance" {
-  source               = "../../tf-modules/ec2-nat-instance"
-  name_prefix          = "${var.name}"
-  key_name             = "${aws_key_pair.main.key_name}"
-  public_subnet_ids    = ["${module.public-subnets.ids[0]}"]
+  source           = "../../tf-modules/ec2-nat-instance"
+  name_prefix      = "${var.name}"
+  key_name         = "${aws_key_pair.main.key_name}"
+  public_subnet_id = "${module.public-subnets.ids[0]}"
+
   # the one instance can route for any private subnet
   private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
-  security_group_ids   = ["${aws_security_group.nat_instance.id}"]
+  security_group_ids   = [
+    "${module.open-egress-sg.id}",
+    "${module.public-ssh-sg.id}",
+    "${aws_security_group.nat_instance.id}",
+  ]
 }
 
 # route table for the private subnets, hooks up the VPN gateway
 resource "aws_route_table" "private_subnets" {
-  vpc_id = "${module.vpc.vpc_id}"
-  tags   = "${map("Name", "${var.name}-private-subnets")}"
+  vpc_id           = "${module.vpc.vpc_id}"
+
+  tags = "${map("Name", "${var.name}-private-subnets")}"
 }
 
 # associate subnets to routing table
@@ -103,7 +102,7 @@ resource "aws_route_table_association" "private_subnets" {
 
 # network route for private subnets ---> NAT for 0.0.0.0/0
 resource "aws_route" "nat" {
-  instance_id             = "${module.nat-instance.instance_ids[0]}"
+  instance_id             = "${module.nat-instance.id}"
   route_table_id          = "${aws_route_table.private_subnets.id}"
   destination_cidr_block  = "0.0.0.0/0"
 }
@@ -113,90 +112,68 @@ resource "aws_security_group" "nat_instance" {
     name = "${var.name}-nat-instance"
     description = "Allow HTTP/HTTPS thru the NAT"
     vpc_id = "${module.vpc.vpc_id}"
-}
-
-module "nat-http-rule" {
-  source            = "../../tf-modules/single-port-sg"
-  port              = 80
-  description       = "allow ingress, HTTP (80) for NAT"
-  cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
-  security_group_id = "${aws_security_group.nat_instance.id}"
-}
-
-module "nat-https-rule" {
-  source            = "../../tf-modules/single-port-sg"
-  port              = 443
-  description       = "allow ingress, HTTPS (443) for NAT"
-  cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
-  security_group_id = "${aws_security_group.nat_instance.id}"
-}
-
-module "nat-public-ssh-rule" {
-  source            = "../../tf-modules/ssh-sg"
-  security_group_id = "${aws_security_group.nat_instance.id}"
-}
-
-module "nat-instance-open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
-  security_group_id = "${aws_security_group.nat_instance.id}"
+    ingress {
+        from_port = 80
+        to_port = 80
+        protocol = "tcp"
+        cidr_blocks = ["${module.private-subnets.cidr_blocks}"]
+    }
+    ingress {
+        from_port = 443
+        to_port = 443
+        protocol = "tcp"
+        cidr_blocks = ["${module.private-subnets.cidr_blocks}"]
+    }
 }
 
 module "ubuntu-xenial-ami" {
   source  = "../../tf-modules/ami-ubuntu"
   release = "16.04"
-} 
+}
 
 resource "aws_key_pair" "main" {
   key_name   = "${var.name}"
   public_key = "${file(var.ssh_pubkey)}"
 }
 
+# shared security group for SSH
+module "public-ssh-sg" {
+  source              = "../../tf-modules/ssh-sg"
+  name                = "${var.name}"
+  vpc_id              = "${module.vpc.vpc_id}"
+  allowed_cidr_blocks = ["0.0.0.0/0"]
+}
+# shared security group, open egress (outbound from nodes)
+module "open-egress-sg" {
+  source = "../../tf-modules/open-egress-sg"
+  name   = "${var.name}"
+  vpc_id = "${module.vpc.vpc_id}"
+}
+
 # Security Group for ELB, gets public access
-resource "aws_security_group" "public_elb" {
+resource "aws_security_group" "public-elb" {
     name = "${var.name}-public-elb"
     description = "Allow public access to ELB"
     vpc_id = "${module.vpc.vpc_id}"
+    ingress {
+        from_port = 80
+        to_port = 80
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
 }
-
-module "elb-http-rule" {
-  source            = "../../tf-modules/single-port-sg"
-  port              = 80
-  description       = "allow ingress, HTTP (80) into ELB"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.public_elb.id}"
-}
-
-module "elb-open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
-  security_group_id = "${aws_security_group.public_elb.id}"
-}
-
 # Security Group for webapp ASG, only accessible from ELB
-resource "aws_security_group" "web_service" {
+resource "aws_security_group" "web-service" {
     name = "${var.name}-web-service"
-    description = "security group for web-service instances in the private subnet"
+    description = "Allow ELB to access the web-service in private subnet"
     vpc_id = "${module.vpc.vpc_id}"
+    ingress {
+        from_port = 3000
+        to_port = 3000
+        protocol = "tcp"
+        cidr_blocks = ["${module.public-subnets.cidr_blocks}"]
+    }
 }
-
-module "web-service-http-rule" {
-  source            = "../../tf-modules/single-port-sg"
-  port              = 3000
-  description       = "allow ingress, HTTP port 3000 for the web app service"
-  cidr_blocks       = ["${module.public-subnets.cidr_blocks}"]
-  security_group_id = "${aws_security_group.web_service.id}"
-}
-
-module "web-service-vpc-ssh-rule" {
-  source            = "../../tf-modules/ssh-sg"
-  cidr_blocks       = ["${var.vpc_cidr_block}"]
-  security_group_id = "${aws_security_group.web_service.id}"
-}
-
-module "web-service-open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
-  security_group_id = "${aws_security_group.web_service.id}"
-}
-
 resource "aws_elb" "web" {
     name = "${var.name}-public-elb"
     health_check {
@@ -216,7 +193,9 @@ resource "aws_elb" "web" {
         lb_protocol = "http"
     }
     # Ensure we allow incoming traffic to the ELB, HTTP/S
-    security_groups = ["${aws_security_group.public_elb.id}"]
+    security_groups = ["${aws_security_group.public-elb.id}",
+                       "${module.open-egress-sg.id}"
+    ]
     # ELBs in the public subnets, separate from the web ASG in private subnets
     subnets = ["${module.public-subnets.ids}"]
 }
@@ -234,9 +213,13 @@ module "web" {
   public_ip          = false
   key_name           = "${aws_key_pair.main.key_name}"
   subnet_ids         = ["${module.private-subnets.ids}"]
-  security_group_ids = ["${aws_security_group.web_service.id}"]
-  root_volume_type   = "gp2"
-  root_volume_size   = "8"
+  security_group_ids = ["${module.public-ssh-sg.id}",
+                        "${module.open-egress-sg.id}",
+                        "${aws_security_group.web-service.id}"
+  ]
+
+  root_volume_type = "gp2"
+  root_volume_size = "8"
 
   user_data = <<END_INIT
 #!/bin/bash
@@ -265,23 +248,6 @@ docker run                   \
 END_INIT
 }
 
-# Security Group for bastion instance
-#resource "aws_security_group" "bastion" {
-#    name = "${var.name}-bastion-instance"
-#    description = "Allow SSH to bastion"
-#    vpc_id = "${module.vpc.vpc_id}"
-#}
-#
-#module "bastion-public-ssh-rule" {
-#  source            = "../../tf-modules/ssh-sg"
-#  security_group_id = "${aws_security_group.nat_instance.id}"
-#}
-#
-#module "bastion-open-egress-rule" {
-#  source            = "../../tf-modules/open-egress-sg"
-#  security_group_id = "${aws_security_group.nat_instance.id}"
-#}
-#
 #resource "aws_instance" "bastion" {
 #  ami               = "${module.ubuntu-xenial-ami.id}"
 #  key_name          = "${aws_key_pair.main.key_name}"
@@ -309,15 +275,5 @@ output "elb_dns" {
 
 // Public IP of NAT instance
 output "nat_ip" {
-  value = "${module.nat-instance.public_ips[0]}"
-}
-
-// region deployed to
-output "region" {
-  value = "${var.region}"
-}
-
-// name of the web service autoscaling group
-output "web_asg_name" {
-  value = "${var.name}-web-cluster"
+  value = "${module.nat-instance.public_ip}"
 }
