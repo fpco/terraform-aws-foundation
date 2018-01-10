@@ -5,7 +5,7 @@
 ## Use envsubst and vars.env to render the json config files for cfssl
 render-tls-configs:
 	@. ./vars.env && envsubst <ca-csr.tpl > ca-csr.json
-	@. ./vars.env && envsubst <server-csr.tpl > server-csr.json
+	@. ./vars.env && envsubst <cert-csr.tpl > cert-csr.json
 
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 render-tfvars:
@@ -27,7 +27,7 @@ generate-tfvars:
 ## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
 generate-tls-certs:
 	@./cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
-	@./cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=gitlab server-csr.json | cfssljson -bare gitlab
+	@./cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=cert-config.json -profile=gitlab cert-csr.json | cfssljson -bare gitlab
 	@ls -Alh
 	@echo "ca-key.pem is the file to keep very safe"
 
