@@ -145,7 +145,6 @@ module "gitlab-asg" {
   name_prefix   = "${var.name}"
   name_suffix   = "gitlab-server"
   region        = "${var.region}"
-  az            = "${element(data.aws_availability_zones.available.names, 0)}"
   key_name      = "${aws_key_pair.main.key_name}"
   ami           = "${module.ubuntu-xenial-ami.id}"
   instance_type = "t2.medium"
