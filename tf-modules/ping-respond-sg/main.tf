@@ -19,7 +19,6 @@ variable "cidr_blocks" {
 
 resource "aws_security_group_rule" "ping_requests" {
   type              = "ingress"
-  description       = "Ping requests (ICMP Echo)"
   from_port         = "8"
   to_port           = "8"
   protocol          = "icmp"
@@ -29,7 +28,6 @@ resource "aws_security_group_rule" "ping_requests" {
 
 resource "aws_security_group_rule" "ping_response" {
   type              = "egress"
-  description       = "Ping responses (ICMP Echo Reply)"
   from_port         = "0"
   to_port           = "0"
   protocol          = "icmp"
