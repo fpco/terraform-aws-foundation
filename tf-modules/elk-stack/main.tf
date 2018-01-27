@@ -93,7 +93,7 @@ module "kibana" {
   key_name                  = ""
   ami                       = ""
   instance_type             = ""
-  elasticsearch_url         = "http://${var.elasticsearch_dns_name}:9200"
+  elasticsearch_url         = "http://${var.elasticsearch_internal_alb["dns_name"]}:9200"
   min_server_count          = 0
   max_server_count          = 0
   desired_server_count      = 0
@@ -115,7 +115,7 @@ module "logstash-kibana" {
   ami                         = "${coalesce(var.ami, module.ubuntu-ami.id)}"
   instance_type               = "${var.logstash_kibana_instance_type}"
   key_name                    = "${var.ssh_key_name}"
-  elasticsearch_url           = "http://${var.elasticsearch_dns_name}:9200"
+  elasticsearch_url           = "http://${var.elasticsearch_internal_alb["dns_name"]}:9200"
   min_server_count            = "${var.logstash_kibana_min_server_count}"
   max_server_count            = "${var.logstash_kibana_max_server_count}"
   desired_server_count        = "${var.logstash_kibana_desired_server_count}"
