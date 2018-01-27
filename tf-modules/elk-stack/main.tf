@@ -56,7 +56,7 @@ module "elasticsearch" {
   key_name                    = "${var.ssh_key_name}"
   public_subnet_ids           = ["${var.private_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
-  extra_sg_ids                = ["${aws_security_group.ssh.id}"]
+  extra_sg_ids                = ["${aws_security_group.ssh.*.id}"]
   node_ami                    = "${coalesce(var.ami, module.ubuntu-ami.id)}"
   elasticsearch_version       = "${var.elk_version}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
@@ -119,7 +119,10 @@ module "logstash-kibana" {
   min_server_count            = "${var.logstash_kibana_min_server_count}"
   max_server_count            = "${var.logstash_kibana_max_server_count}"
   desired_server_count        = "${var.logstash_kibana_desired_server_count}"
-  extra_sg_ids                = ["${module.kibana.security_group_id}", "${aws_security_group.ssh.id}"]
+  extra_sg_ids                = [
+    "${module.kibana.security_group_id}",
+    "${aws_security_group.ssh.*.id}"
+  ]
   extra_setup_snippet         = "${module.kibana.setup_snippet}"
   extra_elb_ingress_cidrs     = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_ingress_cidrs)}"]
   target_group_arns           = [
