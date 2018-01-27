@@ -168,7 +168,7 @@ resource "aws_alb_listener_rule" "elasticsearch-api" {
 
   condition {
     field  = "host-header"
-    values = ["${var.elasticsearch_dns_name}"]
+    values = ["${var.internal_alb["dns_name"]}"]
   }
 }
 
