@@ -141,37 +141,6 @@ resource "aws_security_group" "kibana-sg" {
   }
 }
 
-# resource "aws_security_group" "kibana-elb-sg" {
-#   name        = "${var.name_prefix}-kibana-elb"
-#   vpc_id      = "${var.vpc_id}"
-#   description = "Allow HTTP (80), HTTPS (443) and everything outbound."
-
-#   tags {
-#     Name = "${var.kibana_dns_name}"
-#   }
-
-#   ingress {
-#     from_port   = 443
-#     to_port     = 443
-#     protocol    = "tcp"
-#     cidr_blocks = ["${var.elb_ingress_cidrs}"]
-#   }
-
-#   ingress {
-#     from_port   = 80
-#     to_port     = 80
-#     protocol    = "tcp"
-#     cidr_blocks = ["${var.elb_ingress_cidrs}"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
 
 resource "aws_autoscaling_group" "kibana-asg" {
   count                = "${min(var.max_server_count, 1)}"
