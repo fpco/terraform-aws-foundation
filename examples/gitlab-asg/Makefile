@@ -69,6 +69,10 @@ get-ip:
 docker-login:
 	@docker login $$(terraform registry_url)
 
+## Use 'ops' tool to purge the docker registry's S3 bucket of all objects
+purge-docker-registry-storage:
+	@ops aws s3 purge $$(terraform output registry_bucket_name) -r $$(terraform output region)
+
 ## Use Terraform to destory all resources in the test env
 destroy:
 	@terraform destroy -force
