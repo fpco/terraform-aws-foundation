@@ -194,6 +194,7 @@ echo "LABEL=gitlab            /gitlab  ext4   defaults,nofail     0 2" >> /etc/f
 
 apt-get install -y docker docker.io
 ${module.init-gitlab-docker.init_snippet}
+${module.init-gitlab-runner.init_snippet}
 END_INIT
 }
 
@@ -213,6 +214,14 @@ module "init-gitlab-docker" {
   registry_bucket_region = "${var.region}"
 }
 
+module "init-gitlab-runner" {
+  source = "../../tf-modules/init-snippet-exec"
+  init   = <<END_INIT
+mkdir /etc/gitlab-runner
+cp /gitlab/gitlab-runner-config.toml /etc/gitlab-runner/config.toml
+curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh |  bash
+apt-get install -y gitlab-runner
+END_INIT
 }
 
 module "vpc" {
