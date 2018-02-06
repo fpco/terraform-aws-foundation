@@ -55,6 +55,10 @@ variable "gitlab_registry_name" {
   type        = "string"
 }
 
+variable "root_volume_size" {
+  default     = "30"
+  description = "GB of root data volume for the instance, make it larger than usual for docker builds"
+}
 
 variable "registry_bucket_name" {
   description = "The name of the S3 bucket to write docker images to"
@@ -177,6 +181,7 @@ module "gitlab-asg" {
 
   load_balancers        = ["${aws_elb.gitlab.name}"]
   security_group_ids    = ["${aws_security_group.gitlab.id}"]
+  root_volume_size      = "${var.root_volume_size}"
   data_volume_encrypted = false
 
   init_prefix = <<END_INIT
