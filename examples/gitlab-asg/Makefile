@@ -80,6 +80,18 @@ create-activate-swap:
 terminate-gitlab-server:
 	@ssh data-ops-gitlab "sudo halt"
 
+## SSH to the gitlab server and register the CI runner with the server
+register-gitlab-runner:
+	@ssh data-ops-gitlab "sudo gitlab-runner register"
+
+## SSH to the gitlab server and cat the runner's config file
+cat-gitlab-runner-config:
+	@ssh data-ops-gitlab "sudo cat /etc/gitlab-runner/config.toml"
+
+## SSH to the gitlab server and copy the runner's config file to the EBS volume
+copy-gitlab-runner-config:
+	@ssh data-ops-gitlab "sudo cp /etc/gitlab-runner/config.toml /gitlab/gitlab-runner-config.toml && ls -Alh /gitlab/"
+
 ## Login to docker registry
 docker-login:
 	@docker login $$(terraform registry_url)
