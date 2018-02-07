@@ -13,7 +13,7 @@ variable "aws_cloud" {
 
 variable "trust_account_ids" {
   description = "List of other accounts to trust to assume the role"
-  default = []
+  default     = []
 }
 
 variable "name" {
@@ -28,25 +28,27 @@ output "name" {
   value = "${aws_iam_role.role.name}"
 }
 
-data "aws_caller_identity" "current" { }
+data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "assume-role" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["sts:AssumeRole"]
+
     condition {
-      test = "Bool"
+      test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values = ["true"]
+      values   = ["true"]
     }
+
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["${formatlist("arn:${var.aws_cloud}:iam::%s:root",var.trust_account_ids)}"]
     }
   }
 }
 
 resource "aws_iam_role" "role" {
-  name = "${var.name}"
+  name               = "${var.name}"
   assume_role_policy = "${data.aws_iam_policy_document.assume-role.json}"
 }
