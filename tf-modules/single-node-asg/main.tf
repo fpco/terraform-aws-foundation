@@ -28,6 +28,7 @@ module "service-data" {
 module "server" {
   source             = "../asg"
   security_group_ids = "${var.security_group_ids}"
+
   # combine the prefix and suffix for the full name
   name_prefix      = "${var.name_prefix}"
   name_suffix      = "${var.name_suffix}-${data.aws_subnet.server-subnet.availability_zone}"
