@@ -1,8 +1,6 @@
-variable "name_prefix" {
-}
+variable "name_prefix" {}
 
-variable "ami" {
-}
+variable "ami" {}
 
 variable "instance_type" {
   default = "t2.micro"
@@ -10,17 +8,17 @@ variable "instance_type" {
 
 variable "min_server_count" {
   description = "Minimum number of EC2 instances running Kibana"
-  default = 1
+  default     = 1
 }
 
 variable "max_server_count" {
   description = "Maximum number of EC2 instances running Kibana"
-  default = 1
+  default     = 1
 }
 
 variable "desired_server_count" {
   description = "Desired number of EC2 instances running Kibana"
-  default = 1
+  default     = 1
 }
 
 variable "vpc_id" {
@@ -29,7 +27,7 @@ variable "vpc_id" {
 
 variable "private_subnet_ids" {
   description = "A list of private subnet ids to deploy EC2 instances running Kibana in"
-  type = "list"
+  type        = "list"
 }
 
 variable "elasticsearch_url" {
@@ -41,7 +39,7 @@ variable "key_name" {
 }
 
 variable "extra_sg_ids" {
-  default = []
+  default     = []
   description = "Extra Security Group IDs that will be added to all instances running Kibana. This is a way to add extra services, SSH access for instance."
 }
 
@@ -54,11 +52,11 @@ variable "credstash_get_cmd" {
 }
 
 variable "alb" {
-  type = "map"
+  type        = "map"
   description = "Information about ALB"
 }
 
 variable "kibana_version" {
-  default = "5.6.2"
+  default     = "5.6.2"
   description = "Which version of Kibana to install"
 }

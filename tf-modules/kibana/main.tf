@@ -56,7 +56,6 @@ data "aws_subnet" "private" {
 #   }
 # }
 
-
 resource "aws_alb_target_group" "kibana-https" {
   name     = "${var.name_prefix}-kibana-https"
   port     = 5602
@@ -92,7 +91,6 @@ resource "aws_alb_target_group" "kibana-http" {
   }
 }
 
-
 data "template_file" "kibana-setup" {
   template = "${file("${path.module}/data/setup.tpl.sh")}"
 
@@ -106,7 +104,6 @@ data "template_file" "kibana-setup" {
     nginx_password_key        = "${var.name_prefix}-kibana-basic-auth-password"
   }
 }
-
 
 resource "aws_security_group" "kibana-sg" {
   name        = "${var.name_prefix}-kibana-ec2"
@@ -172,7 +169,6 @@ resource "aws_security_group" "kibana-sg" {
 #   }
 # }
 
-
 resource "aws_autoscaling_group" "kibana-asg" {
   count                = "${min(var.max_server_count, 1)}"
   availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
@@ -190,9 +186,7 @@ resource "aws_autoscaling_group" "kibana-asg" {
     value               = "${var.name_prefix}-kibana"
     propagate_at_launch = true
   }]
-
 }
-
 
 resource "aws_launch_configuration" "kibana-lc" {
   count           = "${min(var.max_server_count, 1)}"
@@ -201,7 +195,8 @@ resource "aws_launch_configuration" "kibana-lc" {
   instance_type   = "${var.instance_type}"
   key_name        = "${var.key_name}"
   security_groups = "${concat(list(aws_security_group.kibana-sg.id), var.extra_sg_ids)}"
-  user_data       = <<USER_DATA
+
+  user_data = <<USER_DATA
 #!/bin/bash
 ${data.template_file.kibana-setup.rendered}
 USER_DATA
