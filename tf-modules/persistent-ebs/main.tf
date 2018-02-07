@@ -15,6 +15,7 @@ resource "aws_ebs_volume" "main" {
   encrypted         = "${var.encrypted}"
   kms_key_id        = "${var.kms_key_id}"
   snapshot_id       = "${var.snapshot_id}"
+
   # merge Name w/ extra_tags
   tags = "${merge(map("Name", "${var.name_prefix}-${var.az}"), "${var.extra_tags}")}"
 }
