@@ -21,22 +21,22 @@ variable "policy_name" {
 
 variable "account_ids" {
   description = "List of accounts in which the role specified by 'role_name' can be assumed.  Only for use in combination with 'role_name'."
-  default = []
+  default     = []
 }
 
 variable "role_name" {
   description = "The role that can be assumed in the accounts given in 'account_ids'.  Only for use in combination with 'account_ids'."
-  default = ""
+  default     = ""
 }
 
 variable "account_id" {
   description = "The account that can assume the roles specified by 'role_names'.  Only for use in combination with 'role_names'."
-  default = ""
+  default     = ""
 }
 
 variable "role_names" {
   description = "List of roles that can be assumed in the account specified in 'account_id'.  Only for use in combination with 'account_id'."
-  default = []
+  default     = []
 }
 
 output "arn" {
@@ -45,16 +45,17 @@ output "arn" {
 
 data "aws_iam_policy_document" "assume-role" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["sts:AssumeRole"]
+
     resources = [
       "${formatlist("arn:${var.aws_cloud}:iam::%s:role/%s",var.account_ids,var.role_name)}",
-      "${formatlist("arn:${var.aws_cloud}:iam::%s:role/%s",var.account_id,var.role_names)}"
+      "${formatlist("arn:${var.aws_cloud}:iam::%s:role/%s",var.account_id,var.role_names)}",
     ]
   }
 }
 
 resource "aws_iam_policy" "assume-role" {
-  name = "${var.policy_name}"
+  name   = "${var.policy_name}"
   policy = "${data.aws_iam_policy_document.assume-role.json}"
 }
