@@ -17,7 +17,8 @@ module "master-node-ebs-volumes" {
   encrypted    = "false"
   device_name  = "/dev/xvdf"
   max_wait     = 3600
-  extra_tags   = {
+
+  extra_tags = {
     cluster = "${var.name_prefix}-elasticsearch-cluster"
   }
 }
@@ -27,8 +28,8 @@ data "aws_region" "current" {
 }
 
 resource "aws_iam_role_policy_attachment" "master-node-attach-ebs-volume" {
-  count = "${var.master_node_count}"
-  role = "${element(aws_iam_role.master-node-role.*.name, count.index)}"
+  count      = "${var.master_node_count}"
+  role       = "${element(aws_iam_role.master-node-role.*.name, count.index)}"
   policy_arn = "${element(module.master-node-ebs-volumes.iam_volume_policy_arns, count.index)}"
 }
 
@@ -44,7 +45,8 @@ resource "aws_launch_configuration" "master-node-lc" {
   security_groups      = ["${concat(list(aws_security_group.transport-sg.id), var.extra_sg_ids)}"]
   security_groups      = ["${aws_security_group.transport-sg.id}"]
   user_data            = "${element(data.template_file.master-node-setup.*.rendered, count.index)}"
-  lifecycle            = {
+
+  lifecycle = {
     create_before_destroy = true
   }
 }
@@ -60,7 +62,8 @@ resource "aws_autoscaling_group" "master-node-asg" {
   launch_configuration = "${element(aws_launch_configuration.master-node-lc.*.name, count.index)}"
   health_check_type    = "EC2"
   vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]
-  lifecycle            = {
+
+  lifecycle = {
     create_before_destroy = true
   }
 
@@ -68,12 +71,13 @@ resource "aws_autoscaling_group" "master-node-asg" {
     key                 = "Name"
     value               = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     propagate_at_launch = true
-  },{
-    key                 = "cluster"
-    value               = "${var.name_prefix}-elasticsearch-cluster"
-    propagate_at_launch = true
-  }]
-
+  },
+    {
+      key                 = "cluster"
+      value               = "${var.name_prefix}-elasticsearch-cluster"
+      propagate_at_launch = true
+    },
+  ]
 }
 
 # Set up script for each master node
@@ -97,7 +101,8 @@ data "template_file" "master-node-setup" {
     credstash_context          = "env=${var.name_prefix}"
     is_master_node             = true
     logstash_beats_address     = "${var.logstash_beats_address}"
-    extra_setup_snippet        = <<EXTRA_SETUP
+
+    extra_setup_snippet = <<EXTRA_SETUP
 ${var.deploy_curator ? module.curator-setup.init_snippet : ""}
 
 ${var.extra_setup_snippet}
@@ -111,7 +116,6 @@ module "curator-setup" {
   extra_curator_actions  = "${var.extra_curator_actions}"
   master_only            = true
 }
-
 
 # Elasticsearch configuration file for each master node
 data "template_file" "master-node-config" {
@@ -129,4 +133,3 @@ data "template_file" "master-node-config" {
     extra_config       = "${var.extra_config}"
   }
 }
-

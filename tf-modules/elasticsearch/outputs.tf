@@ -13,5 +13,3 @@ output "master_node_ebs_volume_ids" {
 output "data_node_ebs_volume_ids" {
   value = ["${module.data-node-ebs-volumes.volume_ids}"]
 }
-
-

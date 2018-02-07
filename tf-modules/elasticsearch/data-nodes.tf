@@ -19,14 +19,15 @@ module "data-node-ebs-volumes" {
   encrypted    = "false"
   device_name  = "/dev/xvdf"
   max_wait     = 3600
-  extra_tags   = {
+
+  extra_tags = {
     cluster = "${var.name_prefix}-elasticsearch-cluster"
   }
 }
 
 resource "aws_iam_role_policy_attachment" "data-node-attach-ebs-volume" {
-  count = "${var.data_node_count}"
-  role = "${element(aws_iam_role.data-node-role.*.name, count.index)}"
+  count      = "${var.data_node_count}"
+  role       = "${element(aws_iam_role.data-node-role.*.name, count.index)}"
   policy_arn = "${element(module.data-node-ebs-volumes.iam_volume_policy_arns, count.index)}"
 }
 
@@ -39,11 +40,11 @@ resource "aws_launch_configuration" "data-node-lc" {
   key_name             = "${var.key_name}"
   security_groups      = ["${concat(list(aws_security_group.transport-sg.id, aws_security_group.elasticsearch-api-sg.id), var.extra_sg_ids)}"]
   user_data            = "${element(data.template_file.data-node-setup.*.rendered, count.index)}"
-  lifecycle            = {
+
+  lifecycle = {
     create_before_destroy = true
   }
 }
-
 
 # A single data node autoscaling group.
 resource "aws_autoscaling_group" "data-node-asg" {
@@ -57,7 +58,8 @@ resource "aws_autoscaling_group" "data-node-asg" {
   health_check_type    = "ELB"
   vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]
   target_group_arns    = ["${concat(list(aws_alb_target_group.elasticsearch-api.arn), aws_alb_target_group.elasticsearch-api-secured.*.arn)}"]
-  lifecycle            = {
+
+  lifecycle = {
     create_before_destroy = true
   }
 
@@ -65,11 +67,13 @@ resource "aws_autoscaling_group" "data-node-asg" {
     key                 = "Name"
     value               = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
     propagate_at_launch = true
-  },{
-    key                 = "cluster"
-    value               = "${var.name_prefix}-elasticsearch-cluster"
-    propagate_at_launch = true
-  }]
+  },
+    {
+      key                 = "cluster"
+      value               = "${var.name_prefix}-elasticsearch-cluster"
+      propagate_at_launch = true
+    },
+  ]
 }
 
 data "template_file" "data-node-setup" {
@@ -92,7 +96,8 @@ data "template_file" "data-node-setup" {
     credstash_context          = "env=${var.name_prefix}"
     is_master_node             = false
     logstash_beats_address     = "${var.logstash_beats_address}"
-    extra_setup_snippet        = <<EXTRA_SETUP
+
+    extra_setup_snippet = <<EXTRA_SETUP
 ${var.external_alb_setup ? data.template_file.proxy-setup.rendered : ""}
 
 ${var.extra_setup_snippet}
@@ -112,7 +117,6 @@ data "template_file" "proxy-setup" {
   }
 }
 
-
 data "template_file" "data-node-config" {
   count    = "${var.data_node_count}"
   template = "${file("${path.module}/data/config.tpl.yml")}"
@@ -129,10 +133,9 @@ data "template_file" "data-node-config" {
   }
 }
 
-
 # TODO: move out from here or require only when external_alb_setup = true
 data "aws_acm_certificate" "elasticsearch-cert" {
-  domain = "${coalesce(var.elasticsearch_dns_ssl_name, var.elasticsearch_dns_name)}"
+  domain   = "${coalesce(var.elasticsearch_dns_ssl_name, var.elasticsearch_dns_name)}"
   statuses = ["ISSUED"]
 }
 
@@ -141,6 +144,7 @@ resource "aws_alb_target_group" "elasticsearch-api" {
   port     = 9200
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
+
   health_check = {
     interval = 60
   }
@@ -162,7 +166,7 @@ resource "aws_alb_listener_rule" "elasticsearch-api" {
   priority     = 99
 
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = "${aws_alb_target_group.elasticsearch-api.arn}"
   }
 
@@ -172,7 +176,6 @@ resource "aws_alb_listener_rule" "elasticsearch-api" {
   }
 }
 
-
 // Optional ES API endpoint with BasicAuth
 resource "aws_alb_target_group" "elasticsearch-api-secured" {
   count    = "${var.external_alb_setup ? 1 : 0}"
@@ -180,6 +183,7 @@ resource "aws_alb_target_group" "elasticsearch-api-secured" {
   port     = 9201
   protocol = "HTTP"
   vpc_id   = "${var.vpc_id}"
+
   health_check {
     interval = 300
     matcher  = "401"
@@ -206,7 +210,7 @@ resource "aws_alb_listener_rule" "elasticsearch-api-secured" {
   priority     = 99
 
   action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = "${element(aws_alb_target_group.elasticsearch-api-secured.*.arn, 0)}"
   }
 
