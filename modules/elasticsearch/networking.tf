@@ -82,38 +82,3 @@ resource "aws_security_group_rule" "external-alb-rule" {
   cidr_blocks       = ["${var.external_alb_ingress_cidrs}"]
 }
 
-# resource "aws_security_group" "elasticsearch-alb-sg" {
-#   name        = "${var.name_prefix}-elasticsearch-alb"
-#   vpc_id      = "${var.vpc_id}"
-#   description = "Allow HTTP API (9200) from private subnet and everything outbound."
-
-
-#   tags {
-#     Name = "${var.elasticsearch_dns_name}"
-#   }
-
-
-#   ingress {
-#     from_port   = 9200
-#     to_port     = 9200
-#     protocol    = "tcp"
-#     cidr_blocks = ["${data.aws_subnet.public.*.cidr_block}"]
-#   }
-
-
-#   ingress {
-#     from_port   = 9201
-#     to_port     = 9201
-#     protocol    = "tcp"
-#     cidr_blocks = ["${var.auth_alb_ingress_cidrs}"]
-#   }
-
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-

@@ -55,7 +55,7 @@ module "elasticsearch" {
   key_name                    = "${var.ssh_key_name}"
   public_subnet_ids           = ["${var.private_subnet_ids}"]
   private_subnet_ids          = ["${var.private_subnet_ids}"]
-  extra_sg_ids                = ["${aws_security_group.ssh.id}"]
+  extra_sg_ids                = ["${aws_security_group.ssh.*.id}"]
   node_ami                    = "${coalesce(var.ami, module.ubuntu-ami.id)}"
   elasticsearch_version       = "${var.elk_version}"
   elasticsearch_dns_name      = "${var.elasticsearch_dns_name}"
@@ -92,7 +92,7 @@ module "kibana" {
   key_name                  = ""
   ami                       = ""
   instance_type             = ""
-  elasticsearch_url         = "http://${var.elasticsearch_dns_name}:9200"
+  elasticsearch_url         = "http://${var.elasticsearch_internal_alb["dns_name"]}:9200"
   min_server_count          = 0
   max_server_count          = 0
   desired_server_count      = 0
@@ -114,15 +114,17 @@ module "logstash-kibana" {
   ami                     = "${coalesce(var.ami, module.ubuntu-ami.id)}"
   instance_type           = "${var.logstash_kibana_instance_type}"
   key_name                = "${var.ssh_key_name}"
-  elasticsearch_url       = "http://${var.elasticsearch_dns_name}:9200"
+  elasticsearch_url       = "http://${var.elasticsearch_internal_alb["dns_name"]}:9200"
   min_server_count        = "${var.logstash_kibana_min_server_count}"
   max_server_count        = "${var.logstash_kibana_max_server_count}"
   desired_server_count    = "${var.logstash_kibana_desired_server_count}"
-  extra_sg_ids            = ["${module.kibana.security_group_id}", "${aws_security_group.ssh.id}"]
+  extra_sg_ids            = [
+    "${module.kibana.security_group_id}",
+    "${aws_security_group.ssh.*.id}"
+  ]
   extra_setup_snippet     = "${module.kibana.setup_snippet}"
   extra_elb_ingress_cidrs = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_ingress_cidrs)}"]
-
-  target_group_arns = [
+  target_group_arns       = [
     "${module.kibana.http_target_group_arn}",
     "${module.kibana.https_target_group_arn}",
   ]
