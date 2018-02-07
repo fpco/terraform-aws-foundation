@@ -7,8 +7,6 @@
  *
  */
 
-
-
 resource "aws_iam_user" "cache-s3-user" {
   name = "${var.prefix}${var.user_name}"
 }
@@ -44,13 +42,11 @@ resource "aws_iam_user_policy_attachment" "s3-full-access-attachment" {
   policy_arn = "${module.s3-full-access.arn}"
 }
 
-
 resource "aws_iam_user_policy_attachment" "s3-grant-public-read" {
   count      = "${var.user_grants_public ? 1 : 0}"
   user       = "${aws_iam_user.cache-s3-user.name}"
   policy_arn = "${element(aws_iam_policy.s3-grant-public-read.*.arn, 0)}"
 }
-
 
 resource "aws_iam_policy" "s3-grant-public-read" {
   count  = "${var.user_grants_public ? 1 : 0}"
@@ -59,12 +55,11 @@ resource "aws_iam_policy" "s3-grant-public-read" {
 }
 
 data "aws_iam_policy_document" "s3-grant-public-read" {
-
   statement {
     effect = "Allow"
 
     actions = [
-      "s3:PutObjectAcl"
+      "s3:PutObjectAcl",
     ]
 
     condition {
@@ -72,7 +67,7 @@ data "aws_iam_policy_document" "s3-grant-public-read" {
       variable = "s3:x-amz-acl"
       values   = ["public-read"]
     }
+
     resources = ["arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"]
   }
 }
-
