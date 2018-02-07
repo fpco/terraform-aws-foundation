@@ -46,7 +46,6 @@ resource "aws_security_group" "ssh" {
   }
 }
 
-
 module "elasticsearch" {
   source = "../elasticsearch"
 
@@ -77,10 +76,10 @@ module "elasticsearch" {
   credstash_get_cmd           = "${var.credstash_get_cmd}"
   logstash_beats_address      = "${var.logstash_dns_name}:5044"
 
-  internal_alb                = "${var.elasticsearch_internal_alb}"
-  external_alb_setup          = "${var.elasticsearch_external_alb_setup}"
-  external_alb                = "${var.elasticsearch_external_alb}"
-  external_alb_ingress_cidrs  = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
+  internal_alb               = "${var.elasticsearch_internal_alb}"
+  external_alb_setup         = "${var.elasticsearch_external_alb_setup}"
+  external_alb               = "${var.elasticsearch_external_alb}"
+  external_alb_ingress_cidrs = ["${var.elasticsearch_auth_elb_ingress_cidrs}"]
 }
 
 module "kibana" {
@@ -105,27 +104,29 @@ module "kibana" {
 module "logstash-kibana" {
   source = "../logstash"
 
-  name_prefix                 = "${var.name_prefix}"
-  name_suffix                 = "-kibana"
-  vpc_id                      = "${var.vpc_id}"
-  public_subnet_ids           = ["${var.public_subnet_ids}"]
-  private_subnet_ids          = ["${var.private_subnet_ids}"]
-  logstash_version            = "${var.elk_version}"
-  logstash_dns_name           = "${var.logstash_dns_name}"
-  ami                         = "${coalesce(var.ami, module.ubuntu-ami.id)}"
-  instance_type               = "${var.logstash_kibana_instance_type}"
-  key_name                    = "${var.ssh_key_name}"
-  elasticsearch_url           = "http://${var.elasticsearch_dns_name}:9200"
-  min_server_count            = "${var.logstash_kibana_min_server_count}"
-  max_server_count            = "${var.logstash_kibana_max_server_count}"
-  desired_server_count        = "${var.logstash_kibana_desired_server_count}"
-  extra_sg_ids                = ["${module.kibana.security_group_id}", "${aws_security_group.ssh.id}"]
-  extra_setup_snippet         = "${module.kibana.setup_snippet}"
-  extra_elb_ingress_cidrs     = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_ingress_cidrs)}"]
-  target_group_arns           = [
+  name_prefix             = "${var.name_prefix}"
+  name_suffix             = "-kibana"
+  vpc_id                  = "${var.vpc_id}"
+  public_subnet_ids       = ["${var.public_subnet_ids}"]
+  private_subnet_ids      = ["${var.private_subnet_ids}"]
+  logstash_version        = "${var.elk_version}"
+  logstash_dns_name       = "${var.logstash_dns_name}"
+  ami                     = "${coalesce(var.ami, module.ubuntu-ami.id)}"
+  instance_type           = "${var.logstash_kibana_instance_type}"
+  key_name                = "${var.ssh_key_name}"
+  elasticsearch_url       = "http://${var.elasticsearch_dns_name}:9200"
+  min_server_count        = "${var.logstash_kibana_min_server_count}"
+  max_server_count        = "${var.logstash_kibana_max_server_count}"
+  desired_server_count    = "${var.logstash_kibana_desired_server_count}"
+  extra_sg_ids            = ["${module.kibana.security_group_id}", "${aws_security_group.ssh.id}"]
+  extra_setup_snippet     = "${module.kibana.setup_snippet}"
+  extra_elb_ingress_cidrs = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_ingress_cidrs)}"]
+
+  target_group_arns = [
     "${module.kibana.http_target_group_arn}",
-    "${module.kibana.https_target_group_arn}"
+    "${module.kibana.https_target_group_arn}",
   ]
+
   certstrap_depot_path        = "${var.certstrap_depot_path}"
   certstrap_ca_common_name    = "${var.certstrap_ca_common_name}"
   certstrap_ca_passphrase     = "${var.certstrap_ca_passphrase}"

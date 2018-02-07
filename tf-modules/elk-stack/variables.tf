@@ -28,7 +28,7 @@ variable "user_ingress_cidrs" {
 }
 
 variable "elk_version" {
-  default = "5.6.2"
+  default     = "5.6.2"
   description = "Which versions of Elasticsearch/Logstash/Kibana to install"
 }
 
@@ -102,18 +102,18 @@ variable "elasticsearch_extra_config" {
 }
 
 variable "elasticsearch_internal_alb" {
-  type = "map"
+  type        = "map"
   description = "Internal ALB information for Elasticsearch API"
 }
 
 variable "elasticsearch_external_alb" {
-  type = "map"
-  default = {}
+  type        = "map"
+  default     = {}
   description = "External ALB information for Elasticsearch API secured with BasicAuth"
 }
 
 variable "elasticsearch_external_alb_setup" {
-  default = false
+  default     = false
   description = "Should external ALB be configured for Elasticsearch API. Reverse proxy with Basic Authentication will also be setup for ES API on port 9201"
 }
 
@@ -152,7 +152,7 @@ variable "logstash_dns_name" {
 }
 
 variable "kibana_alb" {
-  type = "map"
+  type        = "map"
   description = "ALB information for Kibana"
 }
 
@@ -202,6 +202,6 @@ variable "ssh_key_name" {
 }
 
 variable "ami" {
-  default = ""
+  default     = ""
   description = "Ubuntu AMI to use for all nodes. If left empty newest 16.04 will be used"
 }
