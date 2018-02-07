@@ -9,12 +9,12 @@ variable "cidr" {
 }
 
 variable "public_subnets" {
-  type = "list"
+  type        = "list"
   description = "A list of public subnet cidrs to deploy inside the VPC."
 }
 
 variable "azs" {
-  type = "list"
+  type        = "list"
   description = "A list of Availaiblity zones in the region"
 }
 
