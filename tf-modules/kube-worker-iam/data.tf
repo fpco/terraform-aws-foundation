@@ -1,10 +1,12 @@
 data "aws_iam_policy_document" "kube_node" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
+
     actions = [
       "elasticloadbalancing:*",
-      "ec2:Describe*"
+      "ec2:Describe*",
     ]
+
     resources = ["*"]
   }
 }
@@ -12,15 +14,16 @@ data "aws_iam_policy_document" "kube_node" {
 data "aws_iam_policy_document" "assume" {
   statement {
     effect = "Allow"
+
     actions = [
-      "sts:AssumeRole"
+      "sts:AssumeRole",
     ]
+
     sid = ""
 
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
   }
 }
-
