@@ -6,20 +6,23 @@
  */
 
 resource "aws_key_pair" "vpn-gateway" {
-  key_name = "${var.name_prefix}-vpn-gateway-key"
+  key_name   = "${var.name_prefix}-vpn-gateway-key"
   public_key = "${var.public_key}"
 }
 
 data "aws_ami" "ubuntu" {
   most_recent = true
+
   filter {
-    name = "name"
+    name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
   }
+
   filter {
-    name = "root-device-type"
+    name   = "root-device-type"
     values = ["ebs"]
   }
+
   owners = ["099720109477"] # Canonical
 }
 
@@ -33,13 +36,13 @@ resource "aws_instance" "vpn-gateway" {
   associate_public_ip_address = true
 
   connection {
-    type = "ssh"
-    user = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${var.private_key}"
   }
-  
+
   provisioner "file" {
-    source = "${path.module}/scripts/vpn-gateway"
+    source      = "${path.module}/scripts/vpn-gateway"
     destination = "/tmp"
   }
 
@@ -57,10 +60,10 @@ resource "aws_instance" "vpn-gateway" {
       "sudo cp /tmp/vpn-gateway/vpn-gateway /etc/init.d/vpn-gateway",
       "sudo chmod +x /etc/init.d/vpn-gateway",
       "sudo update-rc.d vpn-gateway defaults",
-      "sudo service vpn-gateway start"
+      "sudo service vpn-gateway start",
     ]
   }
-  
+
   tags = {
     Name = "${var.name_prefix}-vpn-gateway"
   }
