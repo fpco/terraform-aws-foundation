@@ -11,11 +11,11 @@ variable "route53_zone_id" {
 variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
 }
+
 variable "elasticsearch_lb" {
   description = "Elasticsearch DNS and LB info"
-  type = "map"
+  type        = "map"
 }
-
 
 # Example:
 # dns_name = "logstash.example.com"
@@ -26,11 +26,11 @@ variable "elasticsearch_lb" {
 variable "logstash_dns_name" {
   description = "DNS name for Logstash"
 }
+
 variable "logstash_lb" {
   description = "Logstash DNS and LB info"
-  type = "map"
+  type        = "map"
 }
-
 
 # Example:
 # kibana_dns_name = "kibana.example.com"
@@ -41,7 +41,8 @@ variable "logstash_lb" {
 variable "kibana_dns_name" {
   description = "DNS name for Kibana"
 }
+
 variable "kibana_lb" {
   description = "Kibana DNS and LB info"
-  type = "map"
+  type        = "map"
 }
