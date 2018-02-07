@@ -24,7 +24,6 @@ variable "description" {
   default     = "Allow ingress, consuls WAN serf port 8302"
 }
 
-
 # TCP/UDP for serf WAN communication
 resource "aws_security_group_rule" "serf_wan_tcp" {
   type              = "ingress"
