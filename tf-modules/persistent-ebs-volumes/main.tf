@@ -27,6 +27,7 @@ resource "aws_ebs_volume" "volumes" {
 data "template_file" "volume_mount_snippets" {
   count    = "${var.volume_count}"
   template = "${file("${path.module}/snippet.tpl.sh")}"
+
   vars {
     volume_id     = "${element(aws_ebs_volume.volumes.*.id, count.index)}"
     device_name   = "${var.device_name}"
