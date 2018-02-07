@@ -79,12 +79,13 @@ external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; registr
 EOC
 
   vars = {
-    gitlab_url     = "https://${var.gitlab_name}.${var.gitlab_domain}"
-    registry_url   = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
-    ssh_port       = "${var.gitlab_ssh_port}"
-    http_port      = "${var.gitlab_http_port}"
+    gitlab_url   = "https://${var.gitlab_name}.${var.gitlab_domain}"
+    registry_url = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
+    ssh_port     = "${var.gitlab_ssh_port}"
+    http_port    = "${var.gitlab_http_port}"
   }
 }
+
 # render init script snippet from the template
 data "template_file" "init_snippet" {
   template = <<END_INIT
