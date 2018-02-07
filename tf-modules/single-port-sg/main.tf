@@ -29,7 +29,6 @@ variable "description" {
   description = "Use this string to add a description for the SG rule"
 }
 
-
 # add an ingress rule
 resource "aws_security_group_rule" "ingress" {
   type              = "ingress"
@@ -40,4 +39,3 @@ resource "aws_security_group_rule" "ingress" {
   cidr_blocks       = ["${var.cidr_blocks}"]
   security_group_id = "${var.security_group_id}"
 }
-
