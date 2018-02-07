@@ -1,6 +1,6 @@
 # to provision the management cluster, and open access to its services
 module "management-cluster" {
-    source = "../tf-modules/ha-management-cluster"
+    source = "../modules/ha-management-cluster"
     name = "${var.name}"
     region = "${var.region}"
     access_key = "${var.access_key}"
@@ -22,7 +22,7 @@ module "management-cluster" {
 
 # boxed security group for nomad leader services, no egress/custom rules
 module "nomad-server-sg" {
-    source = "../tf-modules/nomad-server-sg"
+    source = "../modules/nomad-server-sg"
     name = "${var.name}-nomad-server-services"
     vpc_id = "${module.test-vpc.id}"
     region = "${var.region}"
@@ -33,7 +33,7 @@ module "nomad-server-sg" {
 }
 # boxed security group for nomad agents (leaders included), no egress/custom rules
 module "nomad-agent-sg" {
-    source = "../tf-modules/nomad-agent-sg"
+    source = "../modules/nomad-agent-sg"
     name = "${var.name}-nomad-agent"
     vpc_id = "${module.test-vpc.id}"
     region = "${var.region}"

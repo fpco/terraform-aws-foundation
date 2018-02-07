@@ -59,7 +59,7 @@ provider "aws" {
 }
 
 module "ubuntu-xenial-ami" {
-  source  = "../../tf-modules/ami-ubuntu"
+  source  = "../../modules/ami-ubuntu"
   release = "14.04"
 }
 
@@ -69,21 +69,21 @@ resource "aws_key_pair" "main" {
 }
 
 module "vpc1" {
-  source      = "../../tf-modules/vpc"
+  source      = "../../modules/vpc"
   name_prefix = "${var.name}-vpc1"
   region      = "${var.region}"
   cidr        = "${var.vpc1_cidr}"
 }
 
 module "vpc2" {
-  source      = "../../tf-modules/vpc"
+  source      = "../../modules/vpc"
   name_prefix = "${var.name}-vpc2"
   region      = "${var.region}"
   cidr        = "${var.vpc2_cidr}"
 }
 
 module "vpc1-public-subnets" {
-  source      = "../../tf-modules/subnets"
+  source      = "../../modules/subnets"
   azs         = "${var.aws_availability_zones}"
   vpc_id      = "${module.vpc1.vpc_id}"
   name_prefix = "${var.name}-vpc1-public"
@@ -92,7 +92,7 @@ module "vpc1-public-subnets" {
 }
 
 module "vpc2-public-subnets" {
-  source      = "../../tf-modules/subnets"
+  source      = "../../modules/subnets"
   azs         = "${var.aws_availability_zones}"
   vpc_id      = "${module.vpc2.vpc_id}"
   name_prefix = "${var.name}-vpc2-public"
@@ -101,49 +101,49 @@ module "vpc2-public-subnets" {
 }
 
 module "vpc1-sg" {
-  source      = "../../tf-modules/security-group-base"
+  source      = "../../modules/security-group-base"
   description = "Test project security group"
   name        = "${var.name}-vpc1-sg"
   vpc_id      = "${module.vpc1.vpc_id}"
 }
 
 module "vpc2-sg" {
-  source      = "../../tf-modules/security-group-base"
+  source      = "../../modules/security-group-base"
   description = "Test project security group"
   name        = "${var.name}-vpc2-sg"
   vpc_id      = "${module.vpc2.vpc_id}"
 }
 
 module "vpc1-open-ssh" {
-  source = "../../tf-modules/ssh-sg"
+  source = "../../modules/ssh-sg"
 
   # this is actually used as a name-prefix
   security_group_id = "${module.vpc1-sg.id}"
 }
 
 module "vpc1-open-egress" {
-  source = "../../tf-modules/open-egress-sg"
+  source = "../../modules/open-egress-sg"
 
   # this is actually used as a name-prefix
   security_group_id = "${module.vpc1-sg.id}"
 }
 
 module "vpc2-open-ssh" {
-  source = "../../tf-modules/ssh-sg"
+  source = "../../modules/ssh-sg"
 
   # this is actually used as a name-prefix
   security_group_id = "${module.vpc2-sg.id}"
 }
 
 module "vpc2-open-egress" {
-  source = "../../tf-modules/open-egress-sg"
+  source = "../../modules/open-egress-sg"
 
   # this is actually used as a name-prefix
   security_group_id = "${module.vpc2-sg.id}"
 }
 
 module "vpc1-public-gateway" {
-  source            = "../../tf-modules/route-public"
+  source            = "../../modules/route-public"
   vpc_id            = "${module.vpc1.vpc_id}"
   name_prefix       = "${var.name}-vpc1-public"
   extra_tags        = "${var.extra_tags}"
@@ -151,7 +151,7 @@ module "vpc1-public-gateway" {
 }
 
 module "vpc2-public-gateway" {
-  source            = "../../tf-modules/route-public"
+  source            = "../../modules/route-public"
   vpc_id            = "${module.vpc2.vpc_id}"
   name_prefix       = "${var.name}-vpc2-public"
   extra_tags        = "${var.extra_tags}"

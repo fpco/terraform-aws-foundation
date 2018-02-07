@@ -1,5 +1,5 @@
 module "test-vpc" {
-    source = "../tf-modules/vpc-network"
+    source = "../modules/vpc-network"
     name = "${var.name}"
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"
@@ -9,7 +9,7 @@ module "test-vpc" {
 
 # cluster of consul leaders
 module "cleaders" {
-    source = "../tf-modules/consul-leaders"
+    source = "../modules/consul-leaders"
     ami = "${var.ami}"
     name = "${var.name}"
     max_nodes = 5
@@ -31,7 +31,7 @@ module "cleaders" {
 }
 # provision consul leaders
 module "leader-init" {
-    source = "../tf-modules/consul-leaders-generic-init"
+    source = "../modules/consul-leaders-generic-init"
     datacenter = "${var.region}"
     cidr_prefix_a = "${var.cidr_prefix_leader_a}"
     cidr_prefix_c = "${var.cidr_prefix_leader_c}"
@@ -52,7 +52,7 @@ EOF
 }
 # boxed security group for consul leader services, no egress/custom rules
 module "consul-leader-sg" {
-    source = "../tf-modules/consul-leader-sg"
+    source = "../modules/consul-leader-sg"
     name = "${var.name}-consul-leader-services"
     vpc_id = "${module.test-vpc.id}"
     region = "${var.region}"
@@ -108,7 +108,7 @@ resource "aws_security_group" "worker-service" {
 }
 # cluster of workers, built on cluster of consul agents
 module "cworkers-a" {
-    source = "../tf-modules/consul-cluster"
+    source = "../modules/consul-cluster"
     ami = "${var.ami}"
     name = "${var.name}"
     max_nodes = 5
@@ -129,7 +129,7 @@ module "cworkers-a" {
 }
 # provisioning for worker cluster
 module "worker-init" {
-    source = "../tf-modules/consul-agent-generic-init"
+    source = "../modules/consul-agent-generic-init"
     region = "${var.region}"
     service = "worker"
     consul_secret_key = "${var.consul_secret_key}"
@@ -147,7 +147,7 @@ EOF
 }
 # boxed security group for consul agent service - allow whole VPC
 module "consul-agent-sg" {
-    source = "../tf-modules/consul-agent-sg"
+    source = "../modules/consul-agent-sg"
     name = "${var.name}"
     vpc_id = "${module.test-vpc.id}"
     region = "${var.region}"
@@ -157,7 +157,7 @@ module "consul-agent-sg" {
 }
 # shared security group for SSH
 module "public-ssh-sg" {
-    source = "../tf-modules/ssh-sg"
+    source = "../modules/ssh-sg"
     name = "${var.name}-consul-cluster"
     allowed_cidr_blocks = "0.0.0.0/0"
     vpc_id = "${module.test-vpc.id}"
@@ -189,7 +189,7 @@ resource "aws_subnet" "private" {
 }
 # set up nat gateway
 module "nat_gateways" {
-    source = "../tf-modules/nat-gateways"
+    source = "../modules/nat-gateways"
     vpc_id = "${module.test-vpc.id}"
     name_prefix = "${var.name}"
     nat_count = 1

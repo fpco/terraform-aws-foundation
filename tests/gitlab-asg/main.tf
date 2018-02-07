@@ -62,7 +62,7 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 module "ubuntu-xenial-ami" {
-  source  = "../../tf-modules/ami-ubuntu"
+  source  = "../../modules/ami-ubuntu"
   release = "16.04"
 } 
 
@@ -112,7 +112,7 @@ resource "aws_security_group" "gitlab-elb" {
 }
 
 module "elb-http-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 80
   description       = "Allow ingress for HTTP, port 80 (TCP), thru the ELB"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -120,7 +120,7 @@ module "elb-http-rule" {
 }
 
 module "elb-https-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 443
   description       = "Allow ingress for HTTPS, port 443 (TCP), thru the ELB"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -128,7 +128,7 @@ module "elb-https-rule" {
 }
 
 module "elb-gitlab-ssh-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 22
   description       = "Allow ingress for Git over SSH, port 22 (TCP), thru the ELB"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -136,12 +136,12 @@ module "elb-gitlab-ssh-rule" {
 }
 
 module "elb-open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
+  source            = "../../modules/open-egress-sg"
   security_group_id = "${aws_security_group.gitlab-elb.id}"
 }
 
 module "gitlab-asg" {
-  source        = "../../tf-modules/single-node-asg"
+  source        = "../../modules/single-node-asg"
   name_prefix   = "${var.name}"
   name_suffix   = "gitlab-server"
   region        = "${var.region}"
@@ -174,20 +174,20 @@ END_INIT
 }
 
 module "init-install-awscli" {
-  source = "../../tf-modules/init-snippet-install-awscli"
+  source = "../../modules/init-snippet-install-awscli"
 }
 
 module "init-install-ops" {
-  source = "../../tf-modules/init-snippet-install-ops"
+  source = "../../modules/init-snippet-install-ops"
 }
 
 module "init-gitlab-docker" {
-  source        = "../../tf-modules/init-snippet-gitlab-docker"
+  source        = "../../modules/init-snippet-gitlab-docker"
   gitlab_domain = "${var.dns_zone_name}"
 }
 
 module "vpc" {
-  source              = "../../tf-modules/vpc-scenario-1"
+  source              = "../../modules/vpc-scenario-1"
   azs                 = ["${slice(data.aws_availability_zones.available.names, 0, 1)}"]
   name_prefix         = "${var.name}"
   cidr                = "192.168.0.0/16"
@@ -202,13 +202,13 @@ resource "aws_security_group" "gitlab" {
 }
 
 module "ssh-rule" {
-  source            = "../../tf-modules/ssh-sg"
+  source            = "../../modules/ssh-sg"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.gitlab.id}"
 }
 
 module "http-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 80
   description       = "Allow ingress for HTTP, port 80 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -216,7 +216,7 @@ module "http-rule" {
 }
 
 module "https-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 443
   description       = "Allow ingress for HTTPS, port 443 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -224,7 +224,7 @@ module "https-rule" {
 }
 
 module "gitlab-ssh-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 8022
   description       = "Allow ingress for Git over SSH, port 8022 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -232,7 +232,7 @@ module "gitlab-ssh-rule" {
 }
 
 module "open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
+  source            = "../../modules/open-egress-sg"
   security_group_id = "${aws_security_group.gitlab.id}"
 }
 

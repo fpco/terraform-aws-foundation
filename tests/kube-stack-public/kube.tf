@@ -1,12 +1,12 @@
 module "etcd-server-sg" {
-  source      = "../../tf-modules/etcd-server-sg"
+  source      = "../../modules/etcd-server-sg"
   name_prefix = "${var.name}"
   vpc_id      = "${module.vpc.vpc_id}"
   cidr_blocks = ["${var.vpc_cidr}"]
 }
 
 module "kube-controller-sg" {
-  source      = "../../tf-modules/single-port-tcp-sg"
+  source      = "../../modules/single-port-tcp-sg"
   port        = "6443"
   name_prefix = "${var.name}"
   name_suffix = "kube-controller"
@@ -15,7 +15,7 @@ module "kube-controller-sg" {
 }
 
 module "kube-controller-lb-sg" {
-  source      = "../../tf-modules/single-port-tcp-sg"
+  source      = "../../modules/single-port-tcp-sg"
   port        = "443"
   name_prefix = "${var.name}"
   name_suffix = "kube-controller-lb"
@@ -24,7 +24,7 @@ module "kube-controller-lb-sg" {
 }
 
 module "kube-cluster" {
-  source                = "../../tf-modules/kube-stack"
+  source                = "../../modules/kube-stack"
   availability_zones    = ["${slice(data.aws_availability_zones.available.names, 0, 2)}"]
   name_prefix           = "${var.name}"
   key_name              = "${aws_key_pair.main.key_name}"

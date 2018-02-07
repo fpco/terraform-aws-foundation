@@ -41,7 +41,7 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
-  source      = "../../tf-modules/vpc-scenario-2"
+  source      = "../../modules/vpc-scenario-2"
   name_prefix = "${var.name}"
   region      = "${var.region}"
   cidr        = "10.23.0.0/16"
@@ -52,7 +52,7 @@ module "vpc" {
 }
 
 module "ubuntu-xenial-ami" {
-  source  = "../../tf-modules/ami-ubuntu"
+  source  = "../../modules/ami-ubuntu"
   release = "14.04"
 } 
 
@@ -63,14 +63,14 @@ resource "aws_key_pair" "main" {
 
 # shared security group for SSH
 module "public-ssh-sg" {
-  source              = "../../tf-modules/ssh-sg"
+  source              = "../../modules/ssh-sg"
   name                = "${var.name}"
   vpc_id              = "${module.vpc.vpc_id}"
   allowed_cidr_blocks = "0.0.0.0/0"
 }
 # shared security group, open egress (outbound from nodes)
 module "open-egress-sg" {
-  source = "../../tf-modules/open-egress-sg"
+  source = "../../modules/open-egress-sg"
   name   = "${var.name}"
   vpc_id = "${module.vpc.vpc_id}"
 }
@@ -126,7 +126,7 @@ resource "aws_elb" "web" {
 }
 
 module "web" {
-  source             = "../../tf-modules/asg"
+  source             = "../../modules/asg"
   ami                = "${module.ubuntu-xenial-ami.id}"
   azs                = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
   name               = "${var.name}-web"

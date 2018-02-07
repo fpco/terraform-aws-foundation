@@ -34,7 +34,7 @@ variable "key_file" {
 }
 
 module "vpc" {
-  source              = "../../tf-modules/vpc-scenario-1"
+  source              = "../../modules/vpc-scenario-1"
   azs                 = ["${var.az}"]
   name_prefix         = "nexus-single-node-asg"
   cidr                = "192.168.0.0/16"
@@ -43,7 +43,7 @@ module "vpc" {
 }
 
 module "snasg" {
-  source             = "../../tf-modules/single-node-asg"
+  source             = "../../modules/single-node-asg"
   name               = "test"
   name_suffix        = "nexus-asg"
   ami                = "ami-cd0f5cb6"
@@ -67,15 +67,15 @@ END_INIT
 }
 
 module "init-nexus" {
-  source = "../../tf-modules/init-snippet-nexus"
+  source = "../../modules/init-snippet-nexus"
 }
 
 module "init-install-awscli" {
-  source = "../../tf-modules/init-snippet-install-awscli"
+  source = "../../modules/init-snippet-install-awscli"
 }
 
 module "init-install-ops" {
-  source = "../../tf-modules/init-snippet-install-ops"
+  source = "../../modules/init-snippet-install-ops"
 }
 
 resource "aws_security_group" "nexus-asg" {

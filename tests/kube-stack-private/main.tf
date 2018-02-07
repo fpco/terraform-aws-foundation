@@ -8,7 +8,7 @@ resource "aws_key_pair" "main" {
 }
 
 module "vpc" {
-  source               = "../../tf-modules/vpc-scenario-2"
+  source               = "../../modules/vpc-scenario-2"
   region               = "${var.region}"
   cidr                 = "${var.vpc_cidr}"
   name_prefix          = "${var.name}"
@@ -20,28 +20,28 @@ module "vpc" {
 
 # shared security group for public access over SSH
 module "public-ssh-sg" {
-  source              = "../../tf-modules/ssh-sg"
+  source              = "../../modules/ssh-sg"
   name                = "${var.name}-public"
   vpc_id              = "${module.vpc.vpc_id}"
   allowed_cidr_blocks = "0.0.0.0/0"
 }
 # shared security group for SSH - for private subnet (access from VPC)
 module "private-ssh-sg" {
-  source              = "../../tf-modules/ssh-sg"
+  source              = "../../modules/ssh-sg"
   name                = "${var.name}-private"
   vpc_id              = "${module.vpc.vpc_id}"
   allowed_cidr_blocks = "${var.vpc_cidr}"
 }
 # shared security group, open ingress (inbound to nodes), for kube workers
 module "open-ingress-sg" {
-  source              = "../../tf-modules/open-ingress-sg"
+  source              = "../../modules/open-ingress-sg"
   name_prefix         = "${var.name}"
   vpc_id              = "${module.vpc.vpc_id}"
   allowed_cidr_blocks = "${var.vpc_cidr}"
 }
 # shared security group, open egress (outbound from nodes), use in public subnet
 module "open-egress-sg" {
-  source = "../../tf-modules/open-egress-sg"
+  source = "../../modules/open-egress-sg"
   name   = "${var.name}"
   vpc_id = "${module.vpc.vpc_id}"
 }

@@ -13,7 +13,7 @@ resource "aws_security_group" "redis-inbound" {
 }
 
 module "my-ec-cluster" {
-    source = "../tf-modules/elasticache-redis-cluster"
+    source = "../modules/elasticache-redis-cluster"
     name = "${var.name}"
     access_key = "${var.access_key}"
     secret_key = "${var.secret_key}"

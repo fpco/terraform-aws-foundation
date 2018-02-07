@@ -53,7 +53,7 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
-  source              = "../../tf-modules/vpc-scenario-1"
+  source              = "../../modules/vpc-scenario-1"
   azs                 = ["${slice(data.aws_availability_zones.available.names, 0, 1)}"]
   name_prefix         = "${var.name_prefix}-workspace"
   cidr                = "192.168.0.0/24"
@@ -67,27 +67,27 @@ resource "aws_key_pair" "main" {
 }
 
 module "ubuntu-xenial-ami" {
-  source  = "../../tf-modules/ami-ubuntu"
+  source  = "../../modules/ami-ubuntu"
   release = "16.04"
 }
 
 module "init-install-awscli" {
-  source = "../../tf-modules/init-snippet-install-awscli"
+  source = "../../modules/init-snippet-install-awscli"
 }
 
 module "init-install-ops" {
-  source = "../../tf-modules/init-snippet-install-ops"
+  source = "../../modules/init-snippet-install-ops"
 }
 
 # boxed module to attach the EBS volume to the node
 module "init-attach-ebs" {
-  source    = "../../tf-modules/init-snippet-attach-ebs-volume"
+  source    = "../../modules/init-snippet-attach-ebs-volume"
   region    = "${var.region}"
   volume_id = "${module.workspace-data.volume_id}"
 }
 
 module "workspace-data" {
-  source      = "../../tf-modules/persistent-ebs"
+  source      = "../../modules/persistent-ebs"
   name_prefix = "${var.name_prefix}-workspace-data"
   region      = "${var.region}"
   az          = "${element(data.aws_availability_zones.available.names, 0)}"
@@ -109,13 +109,13 @@ resource "aws_security_group" "workspace" {
 }
 
 module "ssh-rule" {
-  source            = "../../tf-modules/ssh-sg"
+  source            = "../../modules/ssh-sg"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.workspace.id}"
 }
 
 module "sandstorm-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 6080
   description       = "Allow ingress for sandcats HTTP, port 6080 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -123,7 +123,7 @@ module "sandstorm-rule" {
 }
 
 module "https-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 443
   description       = "Allow ingress for HTTPS, port 443 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -131,7 +131,7 @@ module "https-rule" {
 }
 
 module "open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
+  source            = "../../modules/open-egress-sg"
   security_group_id = "${aws_security_group.workspace.id}"
 }
 

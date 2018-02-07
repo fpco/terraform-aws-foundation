@@ -47,14 +47,14 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
-  source               = "../../tf-modules/vpc"
+  source               = "../../modules/vpc"
   region               = "${var.region}"
   cidr                 = "${var.vpc_cidr_block}"
   name_prefix          = "${var.name}"
 }
 
 module "public-subnets" {
-  source      = "../../tf-modules/subnets"
+  source      = "../../modules/subnets"
   azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
   vpc_id      = "${module.vpc.vpc_id}"
   name_prefix = "${var.name}-public"
@@ -62,14 +62,14 @@ module "public-subnets" {
 }
 
 module "public-gateway" {
-  source            = "../../tf-modules/route-public"
+  source            = "../../modules/route-public"
   vpc_id            = "${module.vpc.vpc_id}"
   name_prefix       = "${var.name}-public"
   public_subnet_ids = ["${module.public-subnets.ids}"]
 }
 
 module "private-subnets" {
-  source      = "../../tf-modules/subnets"
+  source      = "../../modules/subnets"
   azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
   vpc_id      = "${module.vpc.vpc_id}"
   name_prefix = "${var.name}-private"
@@ -78,7 +78,7 @@ module "private-subnets" {
 }
 
 module "nat-instances" {
-  source      = "../../tf-modules/ec2-nat-instance"
+  source      = "../../modules/ec2-nat-instance"
   name_prefix = "${var.name}"
   key_name    = "${aws_key_pair.main.key_name}"
   # let AWS set IPs for us
@@ -120,7 +120,7 @@ resource "aws_security_group" "nat_instance" {
 }
 
 module "nat-http-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 80
   description       = "allow ingress, HTTP (80) for NAT"
   cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
@@ -128,7 +128,7 @@ module "nat-http-rule" {
 }
 
 module "nat-https-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 443
   description       = "allow ingress, HTTPS (443) for NAT"
   cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
@@ -136,17 +136,17 @@ module "nat-https-rule" {
 }
 
 module "nat-public-ssh-rule" {
-  source            = "../../tf-modules/ssh-sg"
+  source            = "../../modules/ssh-sg"
   security_group_id = "${aws_security_group.nat_instance.id}"
 }
 
 module "nat-instance-open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
+  source            = "../../modules/open-egress-sg"
   security_group_id = "${aws_security_group.nat_instance.id}"
 }
 
 module "ubuntu-xenial-ami" {
-  source  = "../../tf-modules/ami-ubuntu"
+  source  = "../../modules/ami-ubuntu"
   release = "16.04"
 } 
 
@@ -163,7 +163,7 @@ resource "aws_security_group" "public_elb" {
 }
 
 module "elb-http-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 80
   description       = "allow ingress, HTTP (80) into ELB"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -171,7 +171,7 @@ module "elb-http-rule" {
 }
 
 module "elb-open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
+  source            = "../../modules/open-egress-sg"
   security_group_id = "${aws_security_group.public_elb.id}"
 }
 
@@ -183,7 +183,7 @@ resource "aws_security_group" "web_service" {
 }
 
 module "web-service-http-rule" {
-  source            = "../../tf-modules/single-port-sg"
+  source            = "../../modules/single-port-sg"
   port              = 3000
   description       = "allow ingress, HTTP port 3000 for the web app service"
   cidr_blocks       = ["${module.public-subnets.cidr_blocks}"]
@@ -191,13 +191,13 @@ module "web-service-http-rule" {
 }
 
 module "web-service-vpc-ssh-rule" {
-  source            = "../../tf-modules/ssh-sg"
+  source            = "../../modules/ssh-sg"
   cidr_blocks       = ["${var.vpc_cidr_block}"]
   security_group_id = "${aws_security_group.web_service.id}"
 }
 
 module "web-service-open-egress-rule" {
-  source            = "../../tf-modules/open-egress-sg"
+  source            = "../../modules/open-egress-sg"
   security_group_id = "${aws_security_group.web_service.id}"
 }
 
@@ -226,7 +226,7 @@ resource "aws_elb" "web" {
 }
 
 module "web" {
-  source             = "../../tf-modules/asg"
+  source             = "../../modules/asg"
   ami                = "${module.ubuntu-xenial-ami.id}"
   azs                = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
   name               = "${var.name}-web"
@@ -277,12 +277,12 @@ END_INIT
 #}
 #
 #module "bastion-public-ssh-rule" {
-#  source            = "../../tf-modules/ssh-sg"
+#  source            = "../../modules/ssh-sg"
 #  security_group_id = "${aws_security_group.nat_instance.id}"
 #}
 #
 #module "bastion-open-egress-rule" {
-#  source            = "../../tf-modules/open-egress-sg"
+#  source            = "../../modules/open-egress-sg"
 #  security_group_id = "${aws_security_group.nat_instance.id}"
 #}
 #
