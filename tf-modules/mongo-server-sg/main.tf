@@ -19,6 +19,7 @@ variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, mongod"
 }
+
 # Security group for mongod servers
 resource "aws_security_group_rule" "mongo_tcp_1" {
   type              = "ingress"
