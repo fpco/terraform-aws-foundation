@@ -55,7 +55,7 @@ resource "aws_launch_configuration" "master-node-lc" {
 resource "aws_autoscaling_group" "master-node-asg" {
   count                 = "${var.master_node_count}"
   availability_zones    = ["${element(data.aws_subnet.private.*.availability_zone, count.index)}"]
-  name                  = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}-${element(aws_launch_configuration.master-node-lc.*.id, count.index)}"
+  name                  = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}}"
   max_size              = 1
   min_size              = 1
   desired_capacity      = 1
