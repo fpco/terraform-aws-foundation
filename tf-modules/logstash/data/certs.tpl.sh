@@ -18,10 +18,10 @@ fi
 # Check if CA SSL already exist locally or on AWS
 if [ "$CA_CREATE" = "false" ]; then
   if [ ! -e "$DEPOT_PATH/${ca_common_name}.crt" ]; then
-    ${credstash_get_cmd} -a "${ca_cert_name}" ${credstash_context} > "$DEPOT_PATH/${ca_common_name}.crt" || CA_CREATE="true"
+    ${credstash_get_cmd} "${ca_cert_name}" ${credstash_context} > "$DEPOT_PATH/${ca_common_name}.crt" || CA_CREATE="true"
   fi
   if [ ! -e "$DEPOT_PATH/${ca_common_name}.key" ]; then
-    ${credstash_get_cmd} -a "${ca_key_name}" ${credstash_context} level=protected > "$DEPOT_PATH/${ca_common_name}.key" || CA_CREATE="true"
+    ${credstash_get_cmd} "${ca_key_name}" ${credstash_context} level=protected > "$DEPOT_PATH/${ca_common_name}.key" || CA_CREATE="true"
   fi
 fi
 if [ "$CA_CREATE" = "false" ]; then
