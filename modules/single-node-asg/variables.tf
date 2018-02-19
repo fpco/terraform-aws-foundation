@@ -92,6 +92,7 @@ variable "region" {
 }
 
 variable "load_balancers" {
+  type        = "list"
   default     = []
   description = "The list of load balancers names to pass to the ASG module"
 }
