@@ -3,7 +3,7 @@ output "logstash_role_name" {
 }
 
 output "asg_name" {
-  value = "${aws_autoscaling_group.logstash-asg.name}"
+  value = "${aws_autoscaling_group.logstash-asg.*.name}"
 }
 
 output "elb_name" {
