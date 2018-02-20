@@ -10,7 +10,7 @@ output "setup_snippet" {
 }
 
 output "asg_name" {
-  value = "${aws_autoscaling_group.kibana-asg.name}"
+  value = "${aws_autoscaling_group.kibana-asg.*.name}"
 }
 
 output "http_target_group_arn" {
