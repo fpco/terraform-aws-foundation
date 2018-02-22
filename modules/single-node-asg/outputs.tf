@@ -17,8 +17,3 @@ output "asg_iam_role_arn" {
 output "asg_iam_role_name" {
   value = "${module.service-data.iam_role_name}"
 }
-
-//`arn` exported from the Service Data `aws_iam_role`
-output "asg_iam_role_arn" {
-  value = "${module.service-data.iam_role_arn}"
-}
