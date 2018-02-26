@@ -1,0 +1,9 @@
+[Unit]
+Description=Sysbench CPU destroyer — triggers autoscaling group increase
+After=multi-user.target
+
+[Service]
+Type=forking
+Restart=no
+KillMode=process
+ExecStart=/usr/bin/sysbench cpu --cpu-max-prime=50000
