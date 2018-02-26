@@ -49,3 +49,7 @@ resource "aws_route53_record" "subdomain-NS" {
 output "zone_id" {
   value = "${aws_route53_zone.subdomain.zone_id}"
 }
+
+output "zone_name" {
+  value = "${aws_route53_zone.subdomain.name}"
+}
