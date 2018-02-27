@@ -47,9 +47,16 @@ resource "aws_route53_record" "subdomain-NS" {
 }
 
 output "zone_id" {
-  value = "${aws_route53_zone.subdomain.zone_id}"
+  description = "The ID of the DNS zone"
+  value       = "${aws_route53_zone.subdomain.zone_id}"
 }
 
 output "zone_name" {
-  value = "${aws_route53_zone.subdomain.name}"
+  description = "The name of the DNS zone"
+  value       = "${aws_route53_zone.subdomain.name}"
+}
+
+output "zone_name_without_trailing_dot" {
+  description = "The name of the DNS zone, without the trailing period"
+  value       = "${substr(aws_route53_zone.subdomain.name, 0, length(aws_route53_zone.subdomain.name) - 1)}"
 }
