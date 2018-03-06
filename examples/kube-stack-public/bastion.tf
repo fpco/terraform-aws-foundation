@@ -2,23 +2,30 @@ resource "aws_instance" "bastion" {
   ami               = "${data.aws_ami.ubuntu-xenial.id}"
   key_name          = "${aws_key_pair.main.key_name}"
   instance_type     = "t2.nano"
-  #instance_type     = "t2.micro"
   availability_zone = "${var.region}a"
+
   root_block_device {
     volume_type = "gp2"
     volume_size = "10"
   }
+
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.public-ssh-sg.id}",
-                                 "${module.open-egress-sg.id}"
+
+  vpc_security_group_ids = [
+    "${aws_security_group.public-ssh.id}",
+    "${aws_security_group.open-egress.id}",
   ]
+
   lifecycle = {
     ignore_changes = ["ami", "user_data"]
   }
+
   subnet_id = "${module.vpc.public_subnet_ids[0]}"
+
   tags {
     Name = "${var.name}-bastion"
   }
+
   user_data = <<END_INIT
 #!/bin/bash
 echo "hello!"
