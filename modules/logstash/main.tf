@@ -146,7 +146,7 @@ resource "aws_autoscaling_group" "logstash-asg" {
   launch_configuration      = "${aws_launch_configuration.logstash-lc.name}"
   health_check_type         = "ELB"
   health_check_grace_period = "600"
-  load_balancers            = ["${aws_elb.logstash-elb.name}"]
+  load_balancers            = ["${concat(list(aws_elb.logstash-elb.name), var.elb_names)}"]
   target_group_arns         = ["${var.target_group_arns}"]
 
   tag = [{

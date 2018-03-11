@@ -128,6 +128,16 @@ variable "credstash_get_cmd" {
   description = "Credstash get command with region and table values set."
 }
 
+/**
+ Argument is expected to have this structure:
+  * security_group_id (required)
+  * deploy_elb (optional, default: false) - if set to true ELB will be deployed.
+  * deploy_elb_internal (optional, default: true) - if set to false ELB will be deployed as an external one.
+  * deploy_elb_cross_zone (optional, default: true) - if set to false cross AZ for ELB will be off.
+  Below are only required if `deploy_elb` is set to `false` or ommited.
+  * arn - ALB ARN
+  * dns_name - host-header for ALB listener rule
+*/
 variable "internal_alb" {
   type        = "map"
   description = "Information about Internal ALB"
@@ -138,11 +148,9 @@ variable "external_alb_setup" {
   description = "Should an external access be allowed to ES API on port 9201 with HTTPS and BasicAuth."
 }
 
-variable "elasticsearch_dns_ssl_name" {
-  default     = ""
-  description = "DNS name for Elasticsearch endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'elasticsearch_dns_name' will be checked instead."
-}
-
+/* Same as `internal_alb`, except also requires a "certificate" variable, which is an
+   ARN for an ISSUED ACM certificate
+*/
 variable "external_alb" {
   type        = "map"
   default     = {}

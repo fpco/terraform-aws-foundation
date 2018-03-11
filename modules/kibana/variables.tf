@@ -30,6 +30,12 @@ variable "private_subnet_ids" {
   type        = "list"
 }
 
+variable "public_subnet_ids" {
+  description = "A list of public subnet ids to deploy ELB in. Unused when separately deployed AALB is being used."
+  default     = []
+  type        = "list"
+}
+
 variable "elasticsearch_url" {
   description = "Elasticsearch endpoint URL"
 }
@@ -51,6 +57,17 @@ variable "credstash_get_cmd" {
   description = "Credstash get command with region and table values set."
 }
 
+/**
+ Argument is expected to have this structure:
+  * security_group_id (required)
+  * certificate (required) - ARN of ACM certificate to be used.
+  * deploy_elb (optional, default: false) - if set to true ELB will be deployed.
+  * deploy_elb_internal (optional, default: true) - if set to false ELB will be deployed as an external one.
+  * deploy_elb_cross_zone (optional, default: true) - if set to false cross AZ for ELB will be off.
+  Below are only required if `deploy_elb` is set to `false` or ommited.
+  * arn - ALB ARN
+  * dns_name - host-header for ALB listener rule
+*/
 variable "alb" {
   type        = "map"
   description = "Information about ALB"

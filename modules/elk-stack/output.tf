@@ -24,6 +24,18 @@ output "elasticsearch_data_node_ebs_volume_ids" {
   value = ["${module.elasticsearch.data_node_ebs_volume_ids}"]
 }
 
+output "elasticsearch_internal_lb" {
+  value = "${module.elasticsearch.internal_lb}"
+}
+
+output "elasticsearch_external_lb" {
+  value = "${module.elasticsearch.external_lb}"
+}
+
+output "kibana_lb" {
+  value = "${module.kibana.lb}"
+}
+
 output "logstash_kibana_asg_name" {
   value = "${module.logstash-kibana.asg_name}"
 }

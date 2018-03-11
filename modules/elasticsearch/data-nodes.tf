@@ -3,9 +3,10 @@
  *
  * Just as with master nodes, each data node has a persistent EBS volume created for.
  * Data nodes also function as coordinators, thus each one has 9200 port open for the API.
- * Elastic load balancer is created for elasticsearch API enpoint. Every node is managed
- * by an auto scaling group, so if a helath check fails for an instance it will be
- * torn down and a new one deployed with the same EBS volume mounted.
+ * Elastic load balancer is created for elasticsearch API enpoint, unless ALBs are supplied
+ * as arguments. Every node is managed by an autoscaling group, so if a helath check fails
+ * for an instance it will be torn down and a new one deployed with the same EBS volume
+ * attached and mounted.
  */
 
 module "data-node-ebs-volumes" {
@@ -57,7 +58,8 @@ resource "aws_autoscaling_group" "data-node-asg" {
   launch_configuration = "${element(aws_launch_configuration.data-node-lc.*.name, count.index)}"
   health_check_type    = "ELB"
   vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]
-  target_group_arns    = ["${concat(list(aws_alb_target_group.elasticsearch-api.arn), aws_alb_target_group.elasticsearch-api-secured.*.arn)}"]
+  target_group_arns    = ["${concat(aws_alb_target_group.elasticsearch-api.*.arn, aws_alb_target_group.elasticsearch-api-secured.*.arn)}"]
+  load_balancers       = ["${concat(aws_elb.elasticsearch-internal-elb.*.name, aws_elb.elasticsearch-external-elb.*.name)}"]
 
   lifecycle = {
     create_before_destroy = true
@@ -133,13 +135,57 @@ data "template_file" "data-node-config" {
   }
 }
 
-# TODO: move out from here or require only when external_alb_setup = true
-data "aws_acm_certificate" "elasticsearch-cert" {
-  domain   = "${coalesce(var.elasticsearch_dns_ssl_name, var.elasticsearch_dns_name)}"
-  statuses = ["ISSUED"]
+resource "aws_elb" "elasticsearch-internal-elb" {
+  count           = "${lookup(var.internal_alb, "deploy_elb", false) ? 1 : 0}"
+  name            = "${var.name_prefix}-elasticsearch-internal"
+  subnets         = ["${var.private_subnet_ids}"]
+  security_groups = ["${var.internal_alb["security_group_id"]}"]
+  internal        = "${lookup(var.internal_alb, "deploy_elb_internal", true)}"
+
+  listener {
+    instance_port = 9200
+    instance_protocol = "http"
+    lb_port = 9200
+    lb_protocol = "http"
+  }
+
+  health_check {
+    healthy_threshold = 2
+    unhealthy_threshold = 3
+    timeout = 3
+    target = "HTTP:9200/"
+    interval = 60
+  }
+
+  cross_zone_load_balancing = "${lookup(var.internal_alb, "deploy_elb_cross_zone", true)}"
+  idle_timeout              = 30
+  connection_draining       = false
 }
 
+
+resource "aws_elb" "elasticsearch-external-elb" {
+  count           = "${lookup(var.external_alb, "deploy_elb", false) ? 1 : 0}"
+  name            = "${var.name_prefix}-elasticsearch-external"
+  subnets         = ["${var.public_subnet_ids}"]
+  security_groups = ["${var.external_alb["security_group_id"]}"]
+  internal        = "${lookup(var.external_alb, "deploy_elb_internal", true)}"
+
+  listener {
+    instance_port = 9201
+    instance_protocol = "http"
+    lb_port = 9201
+    lb_protocol = "https"
+    ssl_certificate_id = "${var.external_alb["certificate"]}"
+  }
+
+  cross_zone_load_balancing = "${lookup(var.internal_alb, "deploy_elb_cross_zone", true)}"
+  idle_timeout              = 30
+  connection_draining       = false
+}
+
+
 resource "aws_alb_target_group" "elasticsearch-api" {
+  count    = "${lookup(var.internal_alb, "deploy_elb", false) ? 0 : 1}"
   name     = "${var.name_prefix}-ES-api"
   port     = 9200
   protocol = "HTTP"
@@ -151,23 +197,25 @@ resource "aws_alb_target_group" "elasticsearch-api" {
 }
 
 resource "aws_alb_listener" "elasticsearch-api" {
-  load_balancer_arn = "${var.internal_alb["arn"]}"
+  count             = "${lookup(var.internal_alb, "deploy_elb", false) ? 0 : 1}"
+  load_balancer_arn = "${lookup(var.internal_alb, "arn", "")}"
   port              = 9200
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = "${aws_alb_target_group.elasticsearch-api.arn}"
+    target_group_arn = "${element(aws_alb_target_group.elasticsearch-api.*.arn, 0)}"
     type             = "forward"
   }
 }
 
 resource "aws_alb_listener_rule" "elasticsearch-api" {
+  count        = "${lookup(var.internal_alb, "deploy_elb", false) ? 0 : 1}"
   listener_arn = "${aws_alb_listener.elasticsearch-api.arn}"
   priority     = 99
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_alb_target_group.elasticsearch-api.arn}"
+    target_group_arn = "${element(aws_alb_target_group.elasticsearch-api.*.arn, 0)}"
   }
 
   condition {
@@ -178,7 +226,7 @@ resource "aws_alb_listener_rule" "elasticsearch-api" {
 
 // Optional ES API endpoint with BasicAuth
 resource "aws_alb_target_group" "elasticsearch-api-secured" {
-  count    = "${var.external_alb_setup ? 1 : 0}"
+  count    = "${var.external_alb_setup && !lookup(var.external_alb, "deploy_elb", false) ? 1 : 0}"
   name     = "${var.name_prefix}-ES-api-secured"
   port     = 9201
   protocol = "HTTP"
@@ -191,12 +239,12 @@ resource "aws_alb_target_group" "elasticsearch-api-secured" {
 }
 
 resource "aws_alb_listener" "elasticsearch-api-secured" {
-  count             = "${var.external_alb_setup ? 1 : 0}"
+  count             = "${var.external_alb_setup && !lookup(var.external_alb, "deploy_elb", false) ? 1 : 0}"
   load_balancer_arn = "${lookup(var.external_alb, "arn", "")}"
   port              = 9201
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${data.aws_acm_certificate.elasticsearch-cert.arn}"
+  certificate_arn   = "${var.external_alb["certificate"]}"
 
   default_action {
     target_group_arn = "${element(aws_alb_target_group.elasticsearch-api-secured.*.arn, 0)}"
@@ -205,7 +253,7 @@ resource "aws_alb_listener" "elasticsearch-api-secured" {
 }
 
 resource "aws_alb_listener_rule" "elasticsearch-api-secured" {
-  count        = "${var.external_alb_setup ? 1 : 0}"
+  count        = "${var.external_alb_setup && !lookup(var.external_alb, "deploy_elb", false) ? 1 : 0}"
   listener_arn = "${element(aws_alb_listener.elasticsearch-api-secured.*.arn, 0)}"
   priority     = 99
 

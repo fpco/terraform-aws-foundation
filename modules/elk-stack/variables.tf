@@ -36,11 +36,6 @@ variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
 }
 
-variable "elasticsearch_dns_ssl_name" {
-  default     = ""
-  description = "DNS name for Elasticsearch endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'elasticsearch_dns_name' will be checked instead."
-}
-
 variable "elasticsearch_master_node_count" {
   description = "Number of master nodes in the cluster. It should be either 1, 3 or more, in order to deal with split brain"
   default     = 1
