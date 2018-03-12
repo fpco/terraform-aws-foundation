@@ -29,9 +29,28 @@ variable "remote_device_ip" {
   type        = "string"
 }
 
+variable "bgp_asn" {
+  description = "The gateway's Border Gateway Protocol (BGP) Autonomous System Number (ASN)"
+  default     = "65000"
+  type        = "string"
+}
+
+variable "connection_type" {
+  description = "The type of VPN connection. The only type AWS supports at this time is `ipsec.1`"
+  default     = "ipsec.1"
+  type        = "string"
+}
+
+variable "static_routes_only" {
+  description = "Whether the VPN connection uses static routes exclusively. Static routes must be used for devices that don't support BGP"
+  default     = "true"
+  type        = "string"
+}
+
 variable "static_routes" {
   description = "The list of CIDR blocks to create static routes for"
   type        = "list"
+  default     = []
 }
 
 variable "extra_tags" {
@@ -47,17 +66,26 @@ resource "aws_vpn_gateway" "main" {
 
 resource "aws_customer_gateway" "main" {
   ip_address = "${var.remote_device_ip}"
-  bgp_asn    = "65000"                                                     # required, but I don't think it's used with a static config
-  type       = "ipsec.1"
+  bgp_asn    = "${var.bgp_asn}"
+  type       = "${var.connection_type}"
   tags       = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }
 
 resource "aws_vpn_connection" "main" {
   vpn_gateway_id      = "${aws_vpn_gateway.main.id}"
   customer_gateway_id = "${aws_customer_gateway.main.id}"
-  type                = "ipsec.1"
-  static_routes_only  = true
+  type                = "${var.connection_type}"
+  static_routes_only  = "${var.static_routes_only}"
   tags                = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
+
+  /**
+  * This is needed for FIPS VPN enpoints, as an un-documented `type` must be
+  * provided, but AWS does not report the type back correctly. This causes an
+  * erroneous change to be detected in TF.
+  */
+  lifecycle = {
+    ignore_changes = ["type"]
+  }
 }
 
 resource "aws_vpn_connection_route" "main" {
