@@ -74,6 +74,6 @@ EOF
 chmod a+x /etc/kibana/status-cronjob.sh
 TMP_CRON=$(mktemp -t "kibana-status-XXXXXX.txt")
 crontab -l > $TMP_CRON
-echo "* * * * * /etc/kibana/status-cronjob.sh" >> $TMP_CRON
+echo "* * * * * env PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games' bash /etc/kibana/status-cronjob.sh" >> $TMP_CRON
 crontab $TMP_CRON
 rm $TMP_CRON
