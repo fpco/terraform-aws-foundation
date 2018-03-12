@@ -57,20 +57,24 @@ variable "credstash_get_cmd" {
   description = "Credstash get command with region and table values set."
 }
 
-/**
- Argument is expected to have this structure:
-  * security_group_id (required)
-  * certificate (required) - ARN of ACM certificate to be used.
-  * deploy_elb (optional, default: false) - if set to true ELB will be deployed.
-  * deploy_elb_internal (optional, default: true) - if set to false ELB will be deployed as an external one.
-  * deploy_elb_cross_zone (optional, default: true) - if set to false cross AZ for ELB will be off.
-  Below are only required if `deploy_elb` is set to `false` or ommited.
-  * arn - ALB ARN
-  * dns_name - host-header for ALB listener rule
-*/
 variable "alb" {
   type        = "map"
-  description = "Information about ALB"
+  description = <<DOC
+Information on already existing Application LB or settings for a Classic LB to
+be deployed:
+  * certificate_arn (required) - ARN of ACM certificate to be used.
+  * security_group_id (required)
+  * deploy_elb (optional, default: false) - if set to true ELB will be deployed
+    and used instead of an ALB.
+  * deploy_elb_internal (optional, default: true) - if set to false ELB will be
+    deployed as an external one.
+  * deploy_elb_cross_zone (optional, default: true) - if set to false cross AZ
+    for ELB will be off.
+Below are only required if `deploy_elb` is set to `false` or omitted:
+  * arn - ALB ARN.
+  * dns_name - host-header for ALB listener rule.
+  * zone_id - not used directly, but will be returned in the `lb` output map.
+DOC
 }
 
 variable "kibana_version" {

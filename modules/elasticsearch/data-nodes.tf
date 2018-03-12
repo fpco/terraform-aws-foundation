@@ -175,7 +175,7 @@ resource "aws_elb" "elasticsearch-external-elb" {
     instance_protocol = "http"
     lb_port = 9201
     lb_protocol = "https"
-    ssl_certificate_id = "${var.external_alb["certificate"]}"
+    ssl_certificate_id = "${var.external_alb["certificate_arn"]}"
   }
 
   cross_zone_load_balancing = "${lookup(var.internal_alb, "deploy_elb_cross_zone", true)}"
@@ -244,7 +244,7 @@ resource "aws_alb_listener" "elasticsearch-api-secured" {
   port              = 9201
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${var.external_alb["certificate"]}"
+  certificate_arn   = "${var.external_alb["certificate_arn"]}"
 
   default_action {
     target_group_arn = "${element(aws_alb_target_group.elasticsearch-api-secured.*.arn, 0)}"

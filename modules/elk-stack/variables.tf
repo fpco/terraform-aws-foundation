@@ -98,13 +98,13 @@ variable "elasticsearch_extra_config" {
 
 variable "elasticsearch_internal_alb" {
   type        = "map"
-  description = "Internal ALB information for Elasticsearch API"
+  description = "Internal ALB information for Elasticsearch API. See `elasticsearch.internal_alb` variable for more info."
 }
 
 variable "elasticsearch_external_alb" {
   type        = "map"
   default     = {}
-  description = "External ALB information for Elasticsearch API secured with BasicAuth"
+  description = "External ALB information for Elasticsearch API secured with BasicAuth.  See `elasticsearch.external_alb` variable for more info."
 }
 
 variable "elasticsearch_external_alb_setup" {
@@ -148,7 +148,7 @@ variable "logstash_dns_name" {
 
 variable "kibana_alb" {
   type        = "map"
-  description = "ALB information for Kibana"
+  description = "ALB information for Kibana. See `kibana.alb` variable for more info."
 }
 
 variable "certstrap_depot_path" {
