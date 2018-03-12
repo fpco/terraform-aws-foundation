@@ -1,3 +1,15 @@
+module "kube-controller-iam" {
+  source = "../../modules/kube-controller-iam"
+
+  name_prefix = "${var.name}"
+}
+
+module "kube-worker-iam" {
+  source = "../../modules/kube-worker-iam"
+
+  name_prefix = "${var.name}"
+}
+
 module "kube-cluster" {
   source                 = "../../modules/kube-stack"
   availability_zones     = ["${slice(data.aws_availability_zones.available.names, 0, 2)}"]
