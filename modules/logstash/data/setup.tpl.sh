@@ -57,7 +57,7 @@ EOF
 chmod a+x /etc/logstash/credstash-cronjob.sh
 TMP_CRON=$(mktemp -t "dyn-config-cron-job-XXXXXX.txt")
 crontab -l > $TMP_CRON
-echo "* * * * * /etc/logstash/credstash-cronjob.sh" >> $TMP_CRON
+echo "* * * * * env PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games' bash /etc/logstash/credstash-cronjob.sh" >> $TMP_CRON
 crontab $TMP_CRON
 rm $TMP_CRON
 
