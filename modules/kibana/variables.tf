@@ -78,6 +78,5 @@ DOC
 }
 
 variable "kibana_version" {
-  default     = "5.6.2"
   description = "Which version of Kibana to install"
 }

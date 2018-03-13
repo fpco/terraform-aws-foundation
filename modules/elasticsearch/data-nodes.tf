@@ -130,7 +130,6 @@ data "template_file" "data-node-config" {
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
-    region             = "${data.aws_region.current.name}"
     extra_config       = "${var.extra_config}"
   }
 }

@@ -2,14 +2,13 @@ network.host: _ec2_
 network.bind_host: [_ec2_, localhost]
 node:
   name: "${node_name}"
-  master: ${is_master}
+  master: ${is_master ? true : false}
   data: ${is_master ? false : true}
   ingest: ${is_master ? false : true}
 http.port: 9200
 transport.tcp.port: 9300
 
 # discovery-ec2
-cloud.aws.region: ${region}
 cloud.node.auto_attributes: true
 cluster.routing.allocation.awareness.attributes: aws_availability_zone
 discovery:

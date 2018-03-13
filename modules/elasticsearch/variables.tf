@@ -181,6 +181,5 @@ variable "external_alb_ingress_cidrs" {
 }
 
 variable "elasticsearch_version" {
-  default     = "5.6.2"
   description = "Which version of elasticsearch to install"
 }

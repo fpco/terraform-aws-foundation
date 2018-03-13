@@ -143,6 +143,5 @@ variable "internal" {
 }
 
 variable "logstash_version" {
-  default     = "5.6.2"
   description = "Which version of Logstash to install"
 }
