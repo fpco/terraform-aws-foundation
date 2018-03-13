@@ -48,7 +48,7 @@ resource "aws_security_group_rule" "elasticsearch-api-rule" {
   source_security_group_id = "${var.internal_alb["security_group_id"]}"
 }
 
-// Rule that allows ingress to ALB from the private subnet only
+// Rule that allows ingress to internal ALB from private subnets only
 resource "aws_security_group_rule" "internal-alb-rule" {
   security_group_id = "${var.internal_alb["security_group_id"]}"
   type              = "ingress"
@@ -73,7 +73,6 @@ resource "aws_security_group_rule" "elasticsearch-api-secured-rule" {
 resource "aws_security_group_rule" "external-alb-rule" {
   count = "${var.external_alb_setup ? 1 : 0}"
 
-  # TODO: check if fails without default "" and with empty `external_alb`.
   security_group_id = "${lookup(var.external_alb, "security_group_id", "")}"
   type              = "ingress"
   from_port         = 9201

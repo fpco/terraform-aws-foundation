@@ -132,6 +132,11 @@ variable "target_group_arns" {
   description = "Application Load Balancer target groups to be used for Logstash auto scaling group"
 }
 
+variable "elb_names" {
+  default     = []
+  description = "Extra ELBs that should be attached to ASG. Useful for attaching Kibana ELB."
+}
+
 variable "internal" {
   default     = true
   description = "Set it to false if you want Logstash to be accessible by the outside world"

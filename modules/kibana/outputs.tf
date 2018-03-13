@@ -14,9 +14,23 @@ output "asg_name" {
 }
 
 output "http_target_group_arn" {
-  value = "${aws_alb_target_group.kibana-http.arn}"
+  value = "${element(coalescelist(aws_alb_target_group.kibana-http.*.arn, list("")), 0)}"
 }
 
 output "https_target_group_arn" {
-  value = "${aws_alb_target_group.kibana-https.arn}"
+  value = "${element(coalescelist(aws_alb_target_group.kibana-https.*.arn, list("")), 0)}"
+}
+
+
+//  ELB related info. Will either be ELB or ALB info.
+output "lb" {
+  value = {
+    "dns_name"          = "${element(coalescelist(aws_elb.kibana-elb.*.dns_name, list(lookup(var.alb, "dns_name", ""))), 0)}"
+    "zone_id"           = "${element(coalescelist(aws_elb.kibana-elb.*.zone_id, list(lookup(var.alb, "zone_id", ""))), 0)}"
+    "security_group_id" = "${var.alb["security_group_id"]}"
+  }
+}
+
+output "elb_name" {
+  value = "${aws_elb.kibana-elb.*.name}"
 }

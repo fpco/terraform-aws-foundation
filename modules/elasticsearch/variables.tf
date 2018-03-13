@@ -130,7 +130,21 @@ variable "credstash_get_cmd" {
 
 variable "internal_alb" {
   type        = "map"
-  description = "Information about Internal ALB"
+  description = <<DOC
+Information on already existing Application LB or settings for a Classic LB to
+be deployed:
+  * security_group_id (required)
+  * deploy_elb (optional, default: false) - if set to true ELB will be deployed
+    and used instead of an ALB.
+  * deploy_elb_internal (optional, default: true) - if set to false ELB will be
+    deployed as an external one.
+  * deploy_elb_cross_zone (optional, default: true) - if set to false cross AZ
+    for ELB will be off.
+Below are only required if `deploy_elb` is set to `false` or omitted:
+  * arn - ALB ARN.
+  * dns_name - host-header for ALB listener rule.
+  * zone_id - not used directly, but will be returned in the `lb` output map.
+DOC
 }
 
 variable "external_alb_setup" {
@@ -138,15 +152,27 @@ variable "external_alb_setup" {
   description = "Should an external access be allowed to ES API on port 9201 with HTTPS and BasicAuth."
 }
 
-variable "elasticsearch_dns_ssl_name" {
-  default     = ""
-  description = "DNS name for Elasticsearch endpoint SSL. An SSL certificate is expected to be present in ACM for this domain. If left empty 'elasticsearch_dns_name' will be checked instead."
-}
-
 variable "external_alb" {
   type        = "map"
   default     = {}
-  description = "Information about External ALB"
+  description = <<DOC
+ This variable is unused, unless `external_alb_setup` is set to true. Information on already
+ existing Application LB or settings for a Classic LB to be deployed:
+Information on already existing Application LB or settings for a Classic LB to
+be deployed:
+  * certificate_arn (required) - ARN of ACM certificate to be used.
+  * security_group_id (required)
+  * deploy_elb (optional, default: false) - if set to true ELB will be deployed
+    and used instead of an ALB.
+  * deploy_elb_internal (optional, default: true) - if set to false ELB will be
+    deployed as an external one.
+  * deploy_elb_cross_zone (optional, default: true) - if set to false cross AZ
+    for ELB will be off.
+Below are only required if `deploy_elb` is set to `false` or omitted:
+  * arn - ALB ARN.
+  * dns_name - host-header for ALB listener rule.
+  * zone_id - not used directly, but will be returned in the `lb` output map.
+DOC
 }
 
 variable "external_alb_ingress_cidrs" {

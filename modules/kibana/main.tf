@@ -14,6 +14,7 @@ data "aws_subnet" "private" {
 
 
 resource "aws_alb_target_group" "kibana-https" {
+  count    = "${lookup(var.alb, "deploy_elb", false) ? 0 : 1}"
   name     = "${var.name_prefix}-kibana-https"
   port     = 5602
   protocol = "HTTP"
@@ -37,6 +38,7 @@ resource "aws_alb_target_group" "kibana-https" {
 
 // Target group for redirect to https
 resource "aws_alb_target_group" "kibana-http" {
+  count    = "${lookup(var.alb, "deploy_elb", false) ? 0 : 1}"
   name     = "${var.name_prefix}-kibana-http"
   port     = 80
   protocol = "HTTP"
@@ -130,5 +132,45 @@ USER_DATA
 
   lifecycle = {
     create_before_destroy = true
+  }
+}
+
+resource "aws_elb" "kibana-elb" {
+  count           = "${lookup(var.alb, "deploy_elb", false) ? 1 : 0}"
+  name            = "${var.name_prefix}-kibana"
+  subnets         = ["${var.public_subnet_ids}"]
+  security_groups = ["${var.alb["security_group_id"]}"]
+  internal        = "${lookup(var.alb, "deploy_elb_internal", true)}"
+
+  listener {
+    instance_port      = 5602
+    instance_protocol  = "http"
+    lb_port            = 443
+    lb_protocol        = "https"
+    ssl_certificate_id = "${var.alb["certificate_arn"]}"
+  }
+
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  # health_check {
+  #   healthy_threshold = 2
+  #   unhealthy_threshold = 5
+  #   timeout = 10
+  #   target = "HTTP:5603/"
+  #   interval = 60
+  # }
+
+  cross_zone_load_balancing   = "${lookup(var.alb, "deploy_elb_cross_zone", true)}"
+  idle_timeout                = 60
+  connection_draining         = true
+  connection_draining_timeout = 60
+
+  tags {
+    Name = "${var.name_prefix}-kibana-elb"
   }
 }
