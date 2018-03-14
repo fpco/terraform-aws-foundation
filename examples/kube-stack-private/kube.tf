@@ -24,9 +24,9 @@ module "kube-cluster" {
     "${module.kube-load-balancer-sg.id}",
   ]
 
-  controller_ami        = "ami-3f061b45"
+  controller_ami        = "${var.coreos_stable_ami}"
   controller_subnet_ids = ["${module.vpc.private_subnet_ids}"]
-  worker_ami            = "ami-3f061b45"
+  worker_ami            = "${var.coreos_stable_ami}"
   worker_subnet_ids     = ["${module.vpc.private_subnet_ids}"]
 
   controller_security_group_ids = [
