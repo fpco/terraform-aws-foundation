@@ -26,9 +26,9 @@ module "kube-cluster" {
     "${aws_security_group.open-egress.id}",
   ]
 
-  controller_ami        = "ami-d88605b9"
+  controller_ami        = "${var.coreos_stable_ami_id}"
   controller_subnet_ids = ["${module.vpc.public_subnet_ids}"]
-  worker_ami            = "ami-d88605b9"
+  worker_ami            = "${var.coreos_stable_ami_id}"
   worker_subnet_ids     = ["${module.vpc.public_subnet_ids}"]
 
   controller_security_group_ids = [
