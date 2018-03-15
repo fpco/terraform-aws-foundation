@@ -18,8 +18,8 @@ resource "aws_vpc" "main" {
 // move these two into their own module? or combine with aws_vpc in a module?
 resource "aws_vpc_dhcp_options" "main" {
   domain_name         = "${var.region}.compute.internal"
-  domain_name_servers = "${var.dns_servers}"
-  ntp_servers         = "${var.ntp_servers}"
+  domain_name_servers = ["${var.dns_servers}"]
+  ntp_servers         = ["${var.ntp_servers}"]
 
   tags = "${merge(map("Name", "${var.name_prefix}"), "${var.extra_tags}")}"
 }
