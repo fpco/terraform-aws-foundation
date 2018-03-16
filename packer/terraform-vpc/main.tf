@@ -9,23 +9,23 @@ module "vpc" {
   source = "../../tf-modules/packer-vpc"
   region = "${var.region}"
 }
-// region
 output "region" {
   value = "${var.region}"
+  description = " region"
 }
-// VPC ID
 output "vpc_id" {
   value = "${module.vpc.vpc_id}"
+  description = " VPC ID"
 }
-// Subnet ID
 output "subnet_id" {
   value = "${module.vpc.subnet_id}"
+  description = " Subnet ID"
 }
-// ID of latest trusty AMI
 output "trusty_ami_id" {
   value = "${module.vpc.trusty_ami_id}"
+  description = " ID of latest trusty AMI"
 }
-// ID of latest xenial AMI
 output "xenial_ami_id" {
   value = "${module.vpc.xenial_ami_id}"
+  description = " ID of latest xenial AMI"
 }
