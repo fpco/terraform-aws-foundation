@@ -130,8 +130,12 @@ data "template_file" "data-node-config" {
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
-    region             = "${data.aws_region.current.name}"
-    extra_config       = "${var.extra_config}"
+    extra_config       = <<EXTRA_CONFIG
+# Only set the region for Elasticsearch 5.x, since it is deprecated in 6.x
+${element(split(".", var.elasticsearch_version), 0) < 6 ? "cloud.aws.region: ${data.aws_region.current.name}" : ""}
+
+${var.extra_config}
+EXTRA_CONFIG
   }
 }
 
