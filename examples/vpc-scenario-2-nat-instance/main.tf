@@ -302,22 +302,22 @@ END_INIT
 #  }
 #}
 
-// make the ELB accessible on the outside
 output "elb_dns" {
   value = "${aws_elb.web.dns_name}"
+  description = " make the ELB accessible on the outside"
 }
 
-// Public IP of NAT instance
 output "nat_ip" {
   value = "${module.nat-instance.public_ips[0]}"
+  description = " Public IP of NAT instance"
 }
 
-// region deployed to
 output "region" {
   value = "${var.region}"
+  description = " region deployed to"
 }
 
-// name of the web service autoscaling group
 output "web_asg_name" {
   value = "${var.name}-web-cluster"
+  description = " name of the web service autoscaling group"
 }

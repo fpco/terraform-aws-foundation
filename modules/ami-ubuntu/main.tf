@@ -88,7 +88,7 @@ data "aws_ami" "ubuntu" {
   owners = ["${var.is_govcloud == "true" ? "513442679011" : "099720109477"}"] # Canonical
 }
 
-// ID of the AMI
 output "id" {
   value = "${data.aws_ami.ubuntu.id}"
+  description = "ID of the AMI"
 }

@@ -1,11 +1,11 @@
-// AMI that was used for all EC2 instances in the stack
 output "ami" {
   value = "${module.ubuntu-ami.id}"
+  description = " AMI that was used for all EC2 instances in the stack"
 }
 
-// Security group that allows SSH access
 output "ssh_sg_id" {
   value = "${aws_security_group.ssh.*.id}"
+  description = " Security group that allows SSH access"
 }
 
 output "elasticsearch_master_node_asg_names" {

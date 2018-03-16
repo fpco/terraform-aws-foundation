@@ -19,7 +19,7 @@ data "template_file" "init_snippet" {
   }
 }
 
-// Rendered "init snippet" from the template file
 output "init_snippet" {
   value = "${data.template_file.init_snippet.rendered}"
+  description = " Rendered "init snippet" from the template file"
 }

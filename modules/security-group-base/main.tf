@@ -38,12 +38,12 @@ resource "aws_security_group" "main" {
   tags = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }
 
-// ID of the Security Group created
 output "id" {
   value = "${aws_security_group.main.id}"
+  description = " ID of the Security Group created"
 }
 
-// Name of the Security Group created
 output "name" {
   value = "${aws_security_group.main.name}"
+  description = " Name of the Security Group created"
 }

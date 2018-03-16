@@ -16,19 +16,19 @@ variable "aws_cloud" {
   default     = "aws"
 }
 
-//`id` exported from `aws_iam_policy`
 output "id" {
   value = "${aws_iam_policy.s3-full-access.id}"
+  description = "`id` exported from `aws_iam_policy`"
 }
 
-//`arn` exported from `aws_iam_policy`
 output "arn" {
   value = "${aws_iam_policy.s3-full-access.arn}"
+  description = "`arn` exported from `aws_iam_policy`"
 }
 
-//`name` exported from `aws_iam_policy`
 output "name" {
   value = "${aws_iam_policy.s3-full-access.name}"
+  description = "`name` exported from `aws_iam_policy`"
 }
 
 data "aws_iam_policy_document" "s3-full-access" {
