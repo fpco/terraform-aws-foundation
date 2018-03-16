@@ -129,7 +129,7 @@ $ curl -s -XPOST https://user:pass@elasticsearch.example.com:9201/_flush/synced
   one less than usual:
 
 ```
-$ curl -s https://fpco:e1c-testing@elasticsearch.dev-sandbox.fpcomplete.com:9201/_cluster/health?pretty
+$ curl -s https://user:pass@elasticsearch.example.com:9201/_cluster/health?pretty
 {
   "cluster_name" : "elasticsearch",
   "status" : "yellow",
