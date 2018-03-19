@@ -1,3 +1,22 @@
+module "bastion-sg" {
+  source      = "../../modules/security-group-base"
+  name        = "${var.name}-bastion"
+  vpc_id      = "${module.vpc.vpc_id}"
+  description = "Security group for the basion hosts in ${var.name}"
+}
+
+module "bastion-public-ssh-rule" {
+  source            = "../../modules/ssh-sg"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow public ssh to bastion host in ${var.name}"
+  security_group_id = "${module.bastion-sg.id}"
+}
+
+module "bastion-open-egress-rule" {
+  source            = "../../modules/open-egress-sg"
+  security_group_id = "${module.bastion-sg.id}"
+}
+
 resource "aws_instance" "bastion" {
   ami               = "${data.aws_ami.ubuntu-xenial.id}"
   key_name          = "${aws_key_pair.main.key_name}"
@@ -12,8 +31,7 @@ resource "aws_instance" "bastion" {
   associate_public_ip_address = "true"
 
   vpc_security_group_ids = [
-    "${aws_security_group.public-ssh.id}",
-    "${aws_security_group.open-egress.id}",
+    "${module.bastion-sg.id}",
   ]
 
   lifecycle = {
