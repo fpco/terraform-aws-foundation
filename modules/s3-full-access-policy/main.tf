@@ -17,17 +17,17 @@ variable "aws_cloud" {
 }
 
 output "id" {
-  value = "${aws_iam_policy.s3-full-access.id}"
+  value       = "${aws_iam_policy.s3-full-access.id}"
   description = "`id` exported from `aws_iam_policy`"
 }
 
 output "arn" {
-  value = "${aws_iam_policy.s3-full-access.arn}"
+  value       = "${aws_iam_policy.s3-full-access.arn}"
   description = "`arn` exported from `aws_iam_policy`"
 }
 
 output "name" {
-  value = "${aws_iam_policy.s3-full-access.name}"
+  value       = "${aws_iam_policy.s3-full-access.name}"
   description = "`name` exported from `aws_iam_policy`"
 }
 
