@@ -263,21 +263,21 @@ resource "aws_route53_record" "registry" {
 ## Outputs
 
 output "region" {
-  value = "${var.region}"
-  description = " region deployed to"
+  value       = "${var.region}"
+  description = "region deployed to"
 }
 
 output "gitlab_asg_name" {
-  value = "${var.name}-gitlab-asg-${element(data.aws_availability_zones.available.names, 0)}"
-  description = " name of the Gitlab autoscaling group"
+  value       = "${var.name}-gitlab-asg-${element(data.aws_availability_zones.available.names, 0)}"
+  description = "name of the Gitlab autoscaling group"
 }
 
 output "gitlab_url" {
-  value = "${aws_route53_record.gitlab.name}"
-  description = " URL to gitlab"
+  value       = "${aws_route53_record.gitlab.name}"
+  description = "URL to gitlab"
 }
 
 output "registry_url" {
-  value = "${aws_route53_record.registry.name}"
-  description = " URL to docker image registry"
+  value       = "${aws_route53_record.registry.name}"
+  description = "URL to docker image registry"
 }

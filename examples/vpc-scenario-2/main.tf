@@ -193,6 +193,6 @@ END_INIT
 #  }
 #}
 output "elb_dns" {
-  value = "${aws_elb.web.dns_name}"
-  description = " make the ELB accessible on the outside"
+  value       = "${aws_elb.web.dns_name}"
+  description = "make the ELB accessible on the outside"
 }

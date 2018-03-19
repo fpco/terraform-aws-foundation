@@ -39,11 +39,11 @@ resource "aws_security_group" "main" {
 }
 
 output "id" {
-  value = "${aws_security_group.main.id}"
-  description = " ID of the Security Group created"
+  value       = "${aws_security_group.main.id}"
+  description = "ID of the Security Group created"
 }
 
 output "name" {
-  value = "${aws_security_group.main.name}"
-  description = " Name of the Security Group created"
+  value       = "${aws_security_group.main.name}"
+  description = "Name of the Security Group created"
 }
