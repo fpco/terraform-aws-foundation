@@ -19,7 +19,7 @@ resource "aws_vpc" "main" {
 resource "aws_vpc_dhcp_options" "main" {
   domain_name         = "${var.region}.compute.internal"
   domain_name_servers = ["${var.dns_servers}"]
-  ntp_servers         = "${var.ntp_servers}"
+  ntp_servers         = ["${var.ntp_servers}"]
 
   tags = "${merge(map("Name", "${var.name_prefix}"), "${var.extra_tags}")}"
 }

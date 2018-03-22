@@ -4,7 +4,8 @@ set -x
 apt-get update
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
 apt-get install -y apt-transport-https
-echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-5.x.list
+MAJOR_VERSION=$(echo "${logstash_version}" | awk -F '.' '{printf $1}')
+echo "deb https://artifacts.elastic.co/packages/$MAJOR_VERSION.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-$MAJOR_VERSION.x.list
 
 # Install dependencies
 ${credstash_install_snippet}

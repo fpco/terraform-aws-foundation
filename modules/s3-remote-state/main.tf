@@ -129,31 +129,31 @@ resource "aws_iam_policy" "bucket-full-access-with-mfa" {
   name = "s3-${var.bucket_name}-full-access-with-mfa"
   policy = "${data.aws_iam_policy_document.bucket-full-access-with-mfa.json}"
 }
-//`arn` exported from `aws_s3_bucket`
 output "bucket_arn" {
-    value = "${aws_s3_bucket.remote-state.arn}"
+  value       = "${aws_s3_bucket.remote-state.arn}"
+  description = "`arn` exported from `aws_s3_bucket`"
 }
-//`id` exported from `aws_s3_bucket`
 output "bucket_id" {
-    value = "${aws_s3_bucket.remote-state.id}"
+  value       = "${aws_s3_bucket.remote-state.id}"
+  description = "`id` exported from `aws_s3_bucket`"
 }
-//`region` exported from `aws_s3_bucket`
 output "region" {
-    value = "${aws_s3_bucket.remote-state.region}"
+  value       = "${aws_s3_bucket.remote-state.region}"
+  description = "`region` exported from `aws_s3_bucket`"
 }
-//Derived URL to the S3 bucket
 output "url" {
-    value = "https://s3-${aws_s3_bucket.remote-state.region}.amazonaws.com/${aws_s3_bucket.remote-state.id}"
+  value       = "https://s3-${aws_s3_bucket.remote-state.region}.amazonaws.com/${aws_s3_bucket.remote-state.id}"
+  description = "Derived URL to the S3 bucket"
 }
-//Export `principals` variable (list of IAM user/role ARNs with access to the bucket)
 output "principals" {
-    value = "${var.principals}"
+  value       = "${var.principals}"
+  description = "Export `principals` variable (list of IAM user/role ARNs with access to the bucket)"
 }
-//ARN of IAM policy that grants access to the bucket (without requiring MFA)
 output "bucket-full-access-policy-arn" {
-  value = "${aws_iam_policy.bucket-full-access.arn}"
+  value       = "${aws_iam_policy.bucket-full-access.arn}"
+  description = "ARN of IAM policy that grants access to the bucket (without requiring MFA)"
 }
-//ARN of IAM policy that grants access to the bucket (with MFA required)
 output "bucket-full-access-with-mfa-policy-arn" {
-  value = "${aws_iam_policy.bucket-full-access-with-mfa.arn}"
+  value       = "${aws_iam_policy.bucket-full-access-with-mfa.arn}"
+  description = "ARN of IAM policy that grants access to the bucket (with MFA required)"
 }

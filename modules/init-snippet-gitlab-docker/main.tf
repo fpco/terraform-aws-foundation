@@ -110,18 +110,18 @@ ${var.init_suffix}
 END_INIT
 }
 
-// rendered init snippet to run gitlab with docker
 output "init_snippet" {
-  value = "${data.template_file.init_snippet.rendered}"
+  value       = "${data.template_file.init_snippet.rendered}"
+  description = "rendered init snippet to run gitlab with docker"
 }
 
-// connection details about gitlab
 output "gitlab_config" {
-  value = {
+  value       = {
     external_url          = "https://${var.gitlab_name}.${var.gitlab_domain}"
     registry_external_url = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
     ssh_port              = "${var.gitlab_ssh_port}"
     http_port             = "${var.gitlab_http_port}"
     https_port            = "${var.gitlab_https_port}"
   }
+  description = "connection details about gitlab"
 }

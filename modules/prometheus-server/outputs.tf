@@ -1,9 +1,9 @@
-//Export the `key_file` variable for convenience
 output "key_file" {
-  value = "${var.key_file}"
+  value       = "${var.key_file}"
+  description = "Export the `key_file` variable for convenience"
 }
 
-//`name` exported from the Prometheus Server `aws_autoscaling_group`
 output "asg_name" {
-  value = "${module.prometheus-server.name}"
+  value       = "${module.prometheus-server.name}"
+  description = "`name` exported from the Prometheus Server `aws_autoscaling_group`"
 }

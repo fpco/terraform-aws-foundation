@@ -76,19 +76,19 @@ variable "set_password_policy" {
 # Outputs
 #----------------------------------------------------------------------
 
-//`name` exported from the `admin` `aws_iam_group`
 output "admin-group-name" {
-  value = "${aws_iam_group.admin.name}"
+  value       = "${aws_iam_group.admin.name}"
+  description = "`name` exported from the `admin` `aws_iam_group`"
 }
 
-//`name` exported from the `power-user` `aws_iam_group`
 output "power-user-group-name" {
-  value = "${aws_iam_group.power-user.name}"
+  value       = "${aws_iam_group.power-user.name}"
+  description = "`name` exported from the `power-user` `aws_iam_group`"
 }
 
-//`name` exported from the `setup-mfa` `aws_iam_group`
 output "setup-mfa-group-name" {
-  value = "${aws_iam_group.setup-mfa.name}"
+  value       = "${aws_iam_group.setup-mfa.name}"
+  description = "`name` exported from the `setup-mfa` `aws_iam_group`"
 }
 
 output "admin-with-mfa-policy-arn" {

@@ -17,6 +17,11 @@ variable "instance_type" {
   description = "map of instance types to use"
 }
 
+variable "coreos_stable_ami_id" {
+  description = "set a stable coreos ami id from https://goo.gl/wLhUyH"
+  # for a different regions, change to https://goo.gl/wLhUyH
+}
+
 #variable "kube_cluster_name" {
 #  description = "name of the kube cluster deployed to the VPC, used to tag resources"
 #}
