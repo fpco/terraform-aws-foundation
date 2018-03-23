@@ -38,76 +38,20 @@ module "kube-cluster" {
   ]
 }
 
-# security group for kube controller
 module "kube-controller-sg" {
-  source      = "../../modules/security-group-base"
+  source      = "../../modules/kube-controller-sg"
   name        = "${var.name}-kube-controller"
-  vpc_id      = "${module.vpc.vpc_id}"
-  description = "Security group for the kube controllers in ${var.name}"
+  cidr_blocks = "${var.vpc_cidr}"
 }
 
-module "kube-controller-private-ssh-rule" {
-  source            = "../../modules/ssh-sg"
-  cidr_blocks       = ["${var.vpc_cidr}"]
-  security_group_id = "${module.kube-controller-sg.id}"
-}
-
-module "kube-controller-kube-api-rule" {
-  source            = "../../modules/single-port-sg"
-  port              = "6443"
-  protocol          = "tcp"
-  description       = "Allow access to kube api from hosts in ${var.name} VPC"
-  cidr_blocks       = ["${var.vpc_cidr}"]
-  security_group_id = "${module.kube-controller-sg.id}"
-}
-
-module "kube-controller-etcd-rule" {
-  source            = "../../modules/etcd-server-sg"
-  cidr_blocks       = ["${var.vpc_cidr}"]
-  security_group_id = "${module.kube-controller-sg.id}"
-}
-
-module "kube-controller-open-egress-rule" {
-  source            = "../../modules/open-egress-sg"
-  security_group_id = "${module.kube-controller-sg.id}"
-}
-
-# security group for kube worker
 module "kube-worker-sg" {
-  source      = "../../modules/security-group-base"
+  source      = "../../modules/kube-worker-sg"
   name        = "${var.name}-kube-worker"
-  vpc_id      = "${module.vpc.vpc_id}"
-  description = "Security group for the kube workers in ${var.name}"
+  cidr_blocks = "${var.vpc_cidr}"
 }
 
-# allow ingress on any port, to kube workers, from any host in the VPC
-module "kube-worker-open-ingress-rule" {
-  source            = "../../modules/open-ingress-sg"
-  cidr_blocks       = ["${var.vpc_cidr}"]
-  security_group_id = "${module.kube-worker-sg.id}"
-}
-
-module "kube-worker-open-egress-rule" {
-  source            = "../../modules/open-egress-sg"
-  security_group_id = "${module.kube-worker-sg.id}"
-}
-# security group for load balancer
-module "kube-load-balancer-sg" {
-  source      = "../../modules/security-group-base"
-  name        = "${var.name}-kube-load-balancer"
-  vpc_id      = "${module.vpc.vpc_id}"
-  description = "Security group for the kube load-balancer in ${var.name}"
-}
-
-module "kube-load-balancer-api-rule" {
-  source            = "../../modules/single-port-sg"
-  port              = "443"
-  description       = "Public ingress to ELB for Kubernetes API controller, port 443"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${module.kube-load-balancer-sg.id}"
-}
-
-module "kube-load-balancer-open-egress-rule" {
-  source            = "../../modules/open-egress-sg"
-  security_group_id = "${module.kube-load-balancer-sg.id}"
+module "kube-loadbalancer-sg" {
+  source      = "../../modules/kube-loadbalancer-sg"
+  name        = "${var.name}-kube-loadbalancer"
+  cidr_blocks = "${var.vpc_cidr}"
 }
