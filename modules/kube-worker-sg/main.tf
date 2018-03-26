@@ -3,33 +3,39 @@
  *
  * Define a security group for kube worker
  *
+ * provisioning Kube worker sg example:
+ * module "kube-worker-sg" {
+ *   source                = "../../modules/kube-worker-sg"
+ *   name_prefix           = "${var.name}"
+ *   name_suffix           = "kube-worker"
+ *   vpc_id                = "${module.vpc.vpc_id}"
+ *   vpc_cidr              = "${var.vpc_cidr}"
+ *   vpc_cidr_worker_ssh   = "${var.vpc_cidr_worker_ssh}"
+ * }
+ *
  */
 
-variable "cidr_blocks" {
-  description = "List of CIDR block ranges that the SG allows ingress from"
-  type        = "list"
-}
-
-variable "name" {
-  description = "Name of the Kube Controller security group"
-}
-
-# security group for kube worker
 module "kube-worker-sg" {
   source      = "../security-group-base"
-  name        = "${var.name}-kube-worker"
-  vpc_id      = "${module.vpc.vpc_id}"
+  name        = "${var.name_prefix}-${var.name_suffix}"
+  vpc_id      = "${var.vpc_id}"
   description = "Security group for the kube workers in ${var.name}"
 }
 
+module "private-ssh-rule" {
+  source            = "../ssh-sg"
+  cidr_blocks       = ["${var.vpc_cidr_worker_ssh}"]
+  security_group_id = "${module.kube-worker-sg.id}"
+}
+
 # allow ingress on any port, to kube workers, from any host in the VPC
-module "kube-worker-open-ingress-rule" {
+module "open-ingress-rule" {
   source            = "../open-ingress-sg"
   cidr_blocks       = ["${var.vpc_cidr}"]
   security_group_id = "${module.kube-worker-sg.id}"
 }
 
-module "kube-worker-open-egress-rule" {
+module "open-egress-rule" {
   source            = "../open-egress-sg"
   security_group_id = "${module.kube-worker-sg.id}"
 }

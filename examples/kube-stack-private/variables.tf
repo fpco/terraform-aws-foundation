@@ -1,5 +1,5 @@
 variable "region" {
-  default     = "us-west-2"
+  default     = "us-west-1"
   description = "AWS region this env is deployed to"
 }
 
@@ -19,6 +19,7 @@ variable "instance_type" {
 
 variable "coreos_stable_ami_id" {
   description = "set a stable coreos ami id from https://goo.gl/wLhUyH"
+  default = "ami-cc0900ac"
   # for a different regions, change to https://goo.gl/wLhUyH
 }
 
@@ -40,6 +41,26 @@ variable "ssh_key" {
 
 variable "vpc_cidr" {
   description = "Top-level CIDR for the whole VPC network space"
+  default     = "10.10.0.0/16"
+}
+
+variable "vpc_cidr_controller_api" {
+  description = "Top-level CIDR for kube api access"
+  default     = "10.10.0.0/16"
+}
+
+variable "vpc_cidr_controller_ssh" {
+  description = "Top-level CIDR for ssh access"
+  default     = "10.10.0.0/16"
+}
+
+variable "vpc_cidr_controller_etcd" {
+  description = "Top-level CIDR for etcd"
+  default     = "10.10.0.0/16"
+}
+
+variable "vpc_cidr_worker_ssh" {
+  description = "top-level cidr for the whole vpc network space"
   default     = "10.10.0.0/16"
 }
 

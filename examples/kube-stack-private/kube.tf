@@ -21,7 +21,7 @@ module "kube-cluster" {
   controller_iam_profile = "${module.kube-controller-iam.aws_iam_instance_profile_name}"
 
   lb_security_group_ids = [
-    "${module.kube-load-balancer-sg.id}",
+    "${module.sg-lb.id}",
   ]
 
   controller_ami        = "${var.coreos_stable_ami_id}"
@@ -39,19 +39,29 @@ module "kube-cluster" {
 }
 
 module "kube-controller-sg" {
-  source      = "../../modules/kube-controller-sg"
-  name        = "${var.name}-kube-controller"
-  cidr_blocks = "${var.vpc_cidr}"
+  source                    = "../../modules/kube-controller-sg"
+  name_prefix               = "${var.name}"
+  name_suffix               = "kube-controller"
+  vpc_id                    = "${module.vpc.vpc_id}"
+  vpc_cidr                  = "${var.vpc_cidr}"
+  vpc_cidr_controller_api   = "${var.vpc_cidr}"
+  vpc_cidr_controller_ssh   = "${var.vpc_cidr_controller_ssh}"
+  vpc_cidr_controller_etcd  = "${var.vpc_cidr_controller_etcd}"
 }
 
 module "kube-worker-sg" {
-  source      = "../../modules/kube-worker-sg"
-  name        = "${var.name}-kube-worker"
-  cidr_blocks = "${var.vpc_cidr}"
+  source                = "../../modules/kube-worker-sg"
+  name_prefix           = "${var.name}"
+  name_suffix           = "kube-worker"
+  vpc_id                = "${module.vpc.vpc_id}"
+  vpc_cidr              = "${var.vpc_cidr}"
+  vpc_cidr_worker_ssh   = "${var.vpc_cidr_worker_ssh}"
 }
 
-module "kube-loadbalancer-sg" {
+module "sg-lb" {
   source      = "../../modules/kube-loadbalancer-sg"
-  name        = "${var.name}-kube-loadbalancer"
-  cidr_blocks = "${var.vpc_cidr}"
+  name_prefix = "${var.name}"
+  name_suffix = "kube-loadbalancer"
+  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_cidr    = "${var.vpc_cidr}"
 }
