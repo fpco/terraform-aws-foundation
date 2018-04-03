@@ -22,7 +22,7 @@ generate-ssh-key:
 ## write out a tfvars file for a test deploy
 generate-tfvars:
 	@echo "ssh_pubkey = \"./id_rsa.pub\"" > terraform.tfvars
-	@echo "region = \"us-east-2\"" >> terraform.tfvars
+
 
 ## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
 generate-tls-certs:
