@@ -29,6 +29,12 @@ First, edit `vars.env` and review/update the variables defined there-in.
 
 Then, we run some make targets:
 
+*Note:*
+After the `make upload-tls-certs` step you can either manually copy the `ssl-arn` as instructed, or download the `jl` command from [here](https://github.com/chrisdone/jl/releases) and then run the following command in your terminal:
+```
+echo "ssl_arn = " `jl 'get "CertificateArn"' cert.json` >> terraform.tfvars
+```
+
 ```
 ᐅ make render-tls-configs
 ᐅ make render-tfvars
@@ -36,15 +42,15 @@ Then, we run some make targets:
 ᐅ make install-cfssl
 ᐅ make generate-tls-certs
 ᐅ make upload-tls-certs
+ᐅ make generate-tfvars
 ᐅ make network
 ᐅ make plan
 ᐅ make apply
 ᐅ make render-ssh-config
 ```
-
 #### SSH Config
 
-Add the hosts entry for SSH to `~/.ssh/config`.
+Add the hosts entry for SSH found in the `ssh_config` file to `~/.ssh/config`.
 
 ### Initial Setup
 
