@@ -14,5 +14,6 @@ site
 cfssl
 cfssljson
 id_rsa*
-tests/gitlab-asg/cert-csr.json
-tests/gitlab-asg/ca-csr.json
+examples/gitlab-asg/cert-csr.json
+examples/gitlab-asg/cert.json
+examples/gitlab-asg/ca-csr.json
