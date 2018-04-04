@@ -17,3 +17,4 @@ id_rsa*
 examples/gitlab-asg/cert-csr.json
 examples/gitlab-asg/cert.json
 examples/gitlab-asg/ca-csr.json
+examples/gitlab-asg/ssh_config
