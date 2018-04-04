@@ -106,11 +106,12 @@ resource "aws_elb" "gitlab" {
   security_groups = ["${aws_security_group.gitlab-elb.id}"]
 
   listener {
-    instance_port      = 8022
-    instance_protocol  = "tcp"
-    lb_port            = 22
-    lb_protocol        = "tcp"
-    ssl_certificate_id = "${var.ssl_arn}"
+    instance_port     = 8022
+    instance_protocol = "tcp"
+    lb_port           = 22
+    lb_protocol       = "tcp"
+
+    #ssl_certificate_id = "${var.ssl_arn}"
   }
 
   listener {
@@ -214,6 +215,7 @@ module "init-install-ops" {
 module "init-gitlab-docker" {
   source        = "../../modules/init-snippet-gitlab-docker"
   gitlab_domain = "${var.dns_zone_name}"
+
   # write docker images to this S3 bucket (created separate from this env)
   registry_bucket_name   = "${var.registry_bucket_name}"
   registry_bucket_region = "${var.region}"
@@ -221,7 +223,8 @@ module "init-gitlab-docker" {
 
 module "init-gitlab-runner" {
   source = "../../tf-modules/init-snippet-exec"
-  init   = <<END_INIT
+
+  init = <<END_INIT
 mkdir /etc/gitlab-runner
 cp /gitlab/gitlab-runner-config.toml /etc/gitlab-runner/config.toml
 curl -L https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh |  bash
@@ -324,6 +327,7 @@ output "registry_url" {
   value       = "${aws_route53_record.registry.name}"
   description = "URL to docker image registry"
 }
+
 // URL to S3 bucket where Docker images are stored
 output "registry_bucket_url" {
   value = "${module.docker-registry-s3-storage.url}"
