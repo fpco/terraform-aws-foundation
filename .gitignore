@@ -18,3 +18,5 @@ examples/gitlab-asg/cert-csr.json
 examples/gitlab-asg/cert.json
 examples/gitlab-asg/ca-csr.json
 examples/gitlab-asg/ssh_config
+examples/gitlab-asg/upload-gen-cert.sh
+examples/gitlab-asg/upload-gen-cert.json
