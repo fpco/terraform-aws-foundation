@@ -1,4 +1,5 @@
 dns_zone_name = "${DNS_ZONE_NAME}"
+gitlab_name = "${GITLAB_NAME}"
 region = "${REGION}"
 #ssl_arn = "${SSL_ARN}"
 name = "${ENVIRONMENT_NAME}"

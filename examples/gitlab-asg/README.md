@@ -32,7 +32,7 @@ Then, we run some make targets:
 *Note:*
 After the `make upload-tls-certs` step you can either manually copy the `ssl-arn` as instructed, or download the `jl` command from [here](https://github.com/chrisdone/jl/releases) and then run the following command in your terminal:
 ```
-echo "ssl_arn = " `jl 'get "CertificateArn"' cert.json` >> terraform.tfvars
+echo "ssl_arn = " `jl 'get "CertificateArn"' upload-gen-cert.json` >> terraform.tfvars
 ```
 
 ```

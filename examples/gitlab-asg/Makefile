@@ -21,7 +21,7 @@ generate-ssh-key:
 
 ## write out a tfvars file for a test deploy
 generate-tfvars:
-	@echo "ssh_pubkey = \"./id_rsa.pub\"" > terraform.tfvars
+	@echo "ssh_pubkey = \"./id_rsa.pub\"" >> terraform.tfvars
 	 
 	
 ## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
@@ -43,7 +43,7 @@ upload-tls-certs:
 	@. ./vars.env && envsubst < upload-gen-cert.tpl > upload-gen-cert.sh
 	@chmod +x ./upload-gen-cert.sh
 	@./upload-gen-cert.sh
-	@echo "manually copy the ssl_arn found in the file cert.json and assign it to" 
+	@echo "manually copy the ssl_arn found in the file upload-gen-cert.json and assign it to" 
 	@echo "the variable 'ssl_arn' in the file 'terraform-tfvars.tpl' then uncomment the line"
 	@echo "Alternatively follow the instructions in the Readme"
 
@@ -114,6 +114,8 @@ clean: destroy
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
 	@rm -rf id_rsa id_rsa.pub ssh_config
 	@rm -rf tf.out terraform.tfvars
+	@echo "You need to manually delete your certificate from AWS and then delete following files:"
+	@echo "'cert-csr.json' 'ca-csr.json' 'ca.csr' 'upload-gen-cert.json' 'upload-gen-cert.sh''gitlab.csr' '*.pem'
 
 ## Show help screen.
 help:
