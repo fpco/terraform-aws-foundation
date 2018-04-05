@@ -2,6 +2,10 @@
 
 .DEFAULT_GOAL = help
 
+## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
+render-tfvars:
+	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
+
 ## Use Terraform to create the VPC and core network resources in a specific order based on module VPC, Scenario 2
 network:
 	@terraform init
