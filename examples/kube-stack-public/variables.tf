@@ -9,16 +9,18 @@ variable "name" {
 }
 
 variable "instance_type" {
-  default     = {
+  default = {
     "bastion"         = "t2.nano"
     "kube_worker"     = "t2.medium"
     "kube_controller" = "t2.medium"
   }
+
   description = "map of instance types to use"
 }
 
 variable "coreos_stable_ami_id" {
   description = "set a stable coreos ami id from https://goo.gl/wLhUyH"
+
   # for a different regions, change to https://goo.gl/wLhUyH
 }
 

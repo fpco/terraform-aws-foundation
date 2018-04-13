@@ -55,6 +55,7 @@ module "kube-worker-sg" {
   name_prefix     = "${var.name}"
   vpc_id          = "${module.vpc.vpc_id}"
   cidr_blocks_ssh = ["${var.vpc_cidr}"]
+
   # allow ingress on any port, to kube workers, from any host in the VPC
   cidr_blocks_open_ingress = ["${var.vpc_cidr}"]
 }
