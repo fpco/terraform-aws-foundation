@@ -58,6 +58,7 @@ variable "extra_tags" {
   default     = {}
 }
 
+# to lookup AMIs (but not actually used ATM)
 variable "canonical_account_id" {
   description = "AWS  account it for Canonical, used to lookup Ubuntu AMIs"
   default     = "099720109477"

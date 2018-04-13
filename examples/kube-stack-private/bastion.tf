@@ -17,7 +17,6 @@ module "bastion-open-egress-rule" {
   security_group_id = "${module.bastion-sg.id}"
 }
 
-
 resource "aws_instance" "bastion" {
   ami               = "${data.aws_ami.ubuntu-xenial.id}"
   key_name          = "${aws_key_pair.main.key_name}"
