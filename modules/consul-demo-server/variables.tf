@@ -1,15 +1,10 @@
-variable "name" {
+variable "name_prefix" {
   description = "The name of the environment to deploy to (beta/prod/etc)"
   type        = "string"
 }
 
 variable "key_name" {
   description = "The name of the (AWS) SSH key to associate with the instance"
-  type        = "string"
-}
-
-variable "key_file" {
-  description = "Path to the SSH private key to provide connection info as output"
   type        = "string"
 }
 
@@ -65,11 +60,6 @@ variable "security_group_ids" {
 
 variable "region" {
   description = "The AWS region to deploy to"
-  type        = "string"
-}
-
-variable "az" {
-  description = "The AWS Availability Zone (AZ) to create the instance in"
   type        = "string"
 }
 
