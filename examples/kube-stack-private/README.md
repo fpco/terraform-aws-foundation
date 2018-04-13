@@ -7,14 +7,32 @@ The purpose of this example is to show you how to go through the process of buil
 This example has two stages. In the first stage we will use FPCO Terraform modules to create a cluster on AWS. Once the cluster is up and running properly, we will use Kubespray to install Kubernetes inside that cluster. Please note, that Kubespray in the Kubernetes Incubator is a work in progress. The state of any given master branch might have a problem that causes the Kubespray installation to fail at some point. Nonetheless, the steps below should at least get to you to the point of an operational Kubernetes cluster. We hope to provide a stable version of Kubespray soon, which you can use with this example.
 
 For the operations described below to work properly, you need valid credentials to access the resources on AWS. Use either a tool like [aws-env][1] or define the following three variables:
+
 ```bash
 export AWS_ACCESS_KEY_ID="xxxxx"
 export AWS_SECRET_ACCESS_KEY="yyyyy"
 export REGION="<region where you put the cluster>"
 ```
 
+The software required to run this example, besides Terraform, is:
+* Python
+* Pip - Python package manager
+* [Ansible][2] - a tool for automating software deployment used by Kubespray
+* [Virtualenvwrapper][3] - _Virtual environments_ is a technique used (particularly with Python) to work on more than one project at a time without introducing conflicts in their dependencies. This tool makes it easier to work with virtual environments.
+
+`Virtualenvwrapper` requires some specific steps to install and use:
+
+```bash
+pip install virtualenvwrapper
+export WORKON_HOME=~/Envs       # add this line to your .bashrc file as well
+mkdir -p $WORKON_HOME
+source /usr/local/bin/virtualenvwrapper.sh
+```
+
+To create an environment use the command `mkvirtualenv myenv`. To stop working on that environment issue the command `deactivate`. Then to work on that environment again, issue the command `workon myenv`. 
+
 #### Create the cluster using FPCO Terraform modules
-First, review the variables defined in `variables.tf`. You can change their values by adding corresponding values in `vars.env` and `terraform-tfvars.tpl` as per the 3 examples currently in `vars.env`. Be sure to review the current values as well. In particular it is likely necessary that you choose a new value for the CoreOS AMI by choosing an HVM AMI for your particular region from the list for the stable channel found [here][2] or [here][3]. The version currently there is likely out of date.
+First, review the variables defined in `variables.tf`. You can change their values by adding corresponding values in `vars.env` and `terraform-tfvars.tpl` as per the 3 examples currently in `vars.env`. Be sure to review the current values as well. In particular it is likely necessary that you choose a new value for the CoreOS AMI by choosing an HVM AMI for your particular region from the list for the stable channel found [here][4] or [here][5]. The version currently there is likely out of date.
 
 Once you've set up your variables, run these `make` targets:
 
@@ -26,6 +44,7 @@ Once you've set up your variables, run these `make` targets:
 ```
 
 After you have successfully completed creating the cluster infrastructure, add the following commands to your ssh configuration file `~/.ssh/config`:
+
 ```
 Host 10.10.*
   ProxyCommand ssh -W %h:%p bastion
@@ -41,19 +60,24 @@ Host bastion
   IdentityFile ~/.ssh/id_rsa
   ControlMaster auto
 ```
+
 Be sure to substitute the IP address for the bastion host. If you aren't sure what that is, run the command `terraform output bastion_ip`. If you used a different ssh key than the standard one, be sure to edit the config to reflect the key you actually used.
 
 ##### Install Kubernetes Using Kubespray
 
 You are now ready to use Kubespray to install Kubernetes in the cluster you just created. To do so, take the following steps:
-1. Use `pip` to install the following Python packages: `boto3`,`os`,`json`,`argparse`,`netaddr`
-2. If you don't already have it installed, use pip to install [`ansible`][4]
-3. `git clone` the [Kubespray repository][5] from the Kubernetes Incubator to your local machine and then go into the created directory
+1. Create a virtual environment within which you will work while deploying Kubespray:
+`bash
+mkvirtualenv kubespray
+```
+2. Use `pip` to install the following Python packages: `boto3`,`os`,`json`,`argparse`,`netaddr`
+2. If you don't already have it installed, use pip to install [`ansible`][6]
+3. `git clone` the [Kubespray repository][7] from the Kubernetes Incubator to your local machine and then go into the created directory
 4. We need to create a directory where we can define the specific parameters for our own cluster. In the `inventory` directory, copy the sample directory to a directory named after whatever you want to name your cluster, as follows:
 ```bash
 cp -R inventory/sample/ inventory/mycluster
 ```
-5. One set of parameters we need to create, is an inventory of how the different EC2 instances are allocated for different purposes in the Kubernetes cluster. The Terraform setup has added tags to each instance to define its role in the cluster. We will use a Python script to dynamically create the inventory list (to read more about this, see [here][6]. Copy the `kubespray-aws-inventory.py` Python script into the directory you just created:
+5. One set of parameters we need to create, is an inventory of how the different EC2 instances are allocated for different purposes in the Kubernetes cluster. The Terraform setup has added tags to each instance to define its role in the cluster. We will use a Python script to dynamically create the inventory list (to read more about this, see [here][8]. Copy the `kubespray-aws-inventory.py` Python script into the directory you just created:
 ```bash
 cp contrib/aws_inventory/kubespray-aws-inventory.py inventory/mycluster/
 ```
@@ -116,8 +140,10 @@ kubectl --kubeconfig="/<your home directory>/.kube/admin.conf" get nodes
 
 
 [1]:	https://github.com/fpco/devops-helpers/blob/master/doc/aws/aws-env.md
-[2]:	https://coreos.com/os/docs/latest/booting-on-ec2.html
-[3]:	http://stable.release.core-os.net/amd64-usr/current/coreos_production_ami_all.json
-[4]:	https://github.com/ansible/ansible
-[5]:	https://github.com/kubernetes-incubator/kubespray/
-[6]:	https://github.com/kubernetes-incubator/kubespray/blob/master/docs/aws.md
+[2]:	http://docs.ansible.com/ansible/latest/index.html
+[3]:	https://virtualenvwrapper.readthedocs.io/en/latest/command_ref.html
+[4]:	https://coreos.com/os/docs/latest/booting-on-ec2.html
+[5]:	http://stable.release.core-os.net/amd64-usr/current/coreos_production_ami_all.json
+[6]:	https://github.com/ansible/ansible
+[7]:	https://github.com/kubernetes-incubator/kubespray/
+[8]:	https://github.com/kubernetes-incubator/kubespray/blob/master/docs/aws.md
