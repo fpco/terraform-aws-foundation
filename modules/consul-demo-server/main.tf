@@ -10,11 +10,10 @@
 
 module "consul-server" {
   source                  = "../single-node-asg"
-  name                    = "${var.name}"
+  name_prefix             = "${var.name_prefix}"
   name_suffix             = "consul-server"
   aws_cloud               = "${var.aws_cloud}"
   region                  = "${var.region}"
-  az                      = "${var.az}"
   root_volume_type        = "gp2"
   root_volume_size        = "8"
   data_volume_type        = "gp2"
@@ -23,7 +22,6 @@ module "consul-server" {
   data_volume_kms_key_id  = "${var.data_volume_kms_key_id}"
   data_volume_snapshot_id = "${var.data_volume_snapshot_id}"
   key_name                = "${var.key_name}"
-  key_file                = "${var.key_file}"
   ami                     = "${var.ami}"
   instance_type           = "${var.instance_type}"
   public_ip               = "${var.public_ip}"
