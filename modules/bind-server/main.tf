@@ -185,9 +185,7 @@ resource "null_resource" "bind" {
 }
 
 # Current AWS region
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 # Cloudwatch alarm that recovers the instance after two minutes of system status check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
