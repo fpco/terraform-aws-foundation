@@ -1,5 +1,5 @@
 variable "name_prefix" {
-  default = "dev"
+  default     = "dev"
   description = "Prefix that will be added to names of all resources"
 }
 
@@ -23,7 +23,6 @@ variable "vpc_subnet_id" {
   description = "Subnet id where vpn-gateway should be deployed in."
 }
 
-
 variable "vpc_route_table_id" {
   description = "Route table, which will have the vpn-gateway added to."
 }
@@ -33,12 +32,12 @@ variable "route53_zone_id" {
 }
 
 variable "vpn_cidr" {
-  default = "10.0.0.0/8"
+  default     = "10.0.0.0/8"
   description = "Private network IP range."
 }
 
 variable "vpn_hostname" {
-  default = "connect.example.com"
+  default     = "connect.example.com"
   description = "VPN hostname."
 }
 
@@ -51,17 +50,16 @@ variable "vpn_password" {
 }
 
 variable "vpn_config_file" {
-  default = "/etc/vpn-gateway.conf"
+  default     = "/etc/vpn-gateway.conf"
   description = "VPN configuration file path."
 }
 
 variable "vpn_docker_image" {
-  default = "vpn-gateway"
+  default     = "vpn-gateway"
   description = "Docker image."
 }
 
 variable "instance_type" {
-  default = "mt2.small"
+  default     = "mt2.small"
   description = "EC2 instance type."
 }
-

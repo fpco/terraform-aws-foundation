@@ -29,7 +29,8 @@ module "init-nat-hostname" {
 # this code needs to escape through (terraform, init/bash/echo, shell)
 module "init-nat-config-iptables" {
   source = "../init-snippet-exec"
-  init   = <<END_INIT
+
+  init = <<END_INIT
 # write out script to setup nat
 echo '#!/bin/sh
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -48,7 +49,8 @@ END_INIT
 
 # create a list of template_file data sources with init for each instance
 data "template_file" "nat-init" {
-  count    = "${length(var.public_subnet_ids)}"
+  count = "${length(var.public_subnet_ids)}"
+
   template = <<END_INIT
 #!/bin/bash
 ${module.init-nat-hostname.init_snippet}
@@ -57,7 +59,8 @@ END_INIT
 }
 
 module "ec2-nat" {
-  source             = "../ec2-auto-recover-instances"
+  source = "../ec2-auto-recover-instances"
+
   # name scheme looks like "name-ec2-nat-01" and so on
   name_prefix        = "${var.name_prefix}"
   name_format        = "%s-ec2-nat-%02d"
@@ -69,10 +72,11 @@ module "ec2-nat" {
   iam_profiles       = ["${var.iam_profiles}"]
   security_group_ids = ["${var.security_group_ids}"]
   subnet_ids         = ["${var.public_subnet_ids}"]
+
   # let AWS choose IPs for these instances
-  private_ips        = []
-  source_dest_check  = false # NAT requires this
-  public_ip          = true  # NAT requires this
-  root_volume_size   = "${var.root_volume_size}"
-  user_data          = ["${data.template_file.nat-init.*.rendered}"]
+  private_ips       = []
+  source_dest_check = false                                         # NAT requires this
+  public_ip         = true                                          # NAT requires this
+  root_volume_size  = "${var.root_volume_size}"
+  user_data         = ["${data.template_file.nat-init.*.rendered}"]
 }

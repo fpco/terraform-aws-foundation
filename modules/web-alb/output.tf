@@ -5,5 +5,6 @@ output "alb" {
     "zone_id"           = "${aws_alb.web-server.zone_id}"
     "security_group_id" = "${aws_security_group.alb-sg.id}"
   }
+
   description = "ALB related info."
 }

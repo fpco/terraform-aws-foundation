@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "cloudwatch_exporter" {
 
     actions = [
       "cloudwatch:ListMetrics",
-      "cloudwatch:GetMetricStatistics"
+      "cloudwatch:GetMetricStatistics",
     ]
 
     resources = ["*"]

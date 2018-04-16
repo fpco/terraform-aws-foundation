@@ -129,7 +129,8 @@ variable "credstash_get_cmd" {
 }
 
 variable "internal_alb" {
-  type        = "map"
+  type = "map"
+
   description = <<DOC
 Information on already existing Application LB or settings for a Classic LB to
 be deployed:
@@ -153,8 +154,9 @@ variable "external_alb_setup" {
 }
 
 variable "external_alb" {
-  type        = "map"
-  default     = {}
+  type    = "map"
+  default = {}
+
   description = <<DOC
  This variable is unused, unless `external_alb_setup` is set to true. Information on already
  existing Application LB or settings for a Classic LB to be deployed:

@@ -41,15 +41,18 @@ module "vpc" {
   region      = "${var.region}"
   cidr        = "10.23.0.0/16"
   azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
-  extra_tags  = { kali = "ma" }
-  public_subnet_cidrs  = ["${var.public_subnet_cidrs}"]
 
+  extra_tags = {
+    kali = "ma"
+  }
+
+  public_subnet_cidrs = ["${var.public_subnet_cidrs}"]
 }
 
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
   release = "14.04"
-} 
+}
 
 resource "aws_key_pair" "main" {
   key_name   = "${var.name}"
@@ -63,6 +66,7 @@ module "public-ssh-sg" {
   vpc_id              = "${module.vpc.vpc_id}"
   allowed_cidr_blocks = "0.0.0.0/0"
 }
+
 # shared security group, open egress (outbound from nodes)
 module "open-egress-sg" {
   source = "../../modules/open-egress-sg"
@@ -76,18 +80,24 @@ resource "aws_instance" "web" {
   key_name          = "${aws_key_pair.main.key_name}"
   instance_type     = "t2.nano"
   availability_zone = "${var.region}a"
+
   root_block_device {
     volume_type = "gp2"
     volume_size = "8"
   }
+
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.public-ssh-sg.id}",
-                                 "${module.open-egress-sg.id}"
+
+  vpc_security_group_ids = ["${module.public-ssh-sg.id}",
+    "${module.open-egress-sg.id}",
   ]
+
   subnet_id = "${element(module.vpc.public_subnet_ids, count.index)}"
+
   tags {
     Name = "${var.name}-web-${count.index}"
   }
+
   user_data = <<END_INIT
 #!/bin/bash
 echo "hello!"
@@ -112,4 +122,3 @@ END_INIT
     }
   }
 }
-

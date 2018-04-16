@@ -47,7 +47,7 @@ resource "aws_vpn_gateway" "main" {
 
 resource "aws_customer_gateway" "main" {
   ip_address = "${var.remote_device_ip}"
-  bgp_asn    = "65000" # required, but I don't think it's used with a static config
+  bgp_asn    = "65000"                                                     # required, but I don't think it's used with a static config
   type       = "ipsec.1"
   tags       = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }

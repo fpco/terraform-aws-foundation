@@ -104,25 +104,27 @@ module "kibana" {
 module "logstash-kibana" {
   source = "../logstash"
 
-  name_prefix                 = "${var.name_prefix}"
-  name_suffix                 = "-kibana"
-  vpc_id                      = "${var.vpc_id}"
-  public_subnet_ids           = ["${var.public_subnet_ids}"]
-  private_subnet_ids          = ["${var.private_subnet_ids}"]
-  logstash_version            = "${var.elk_version}"
-  logstash_dns_name           = "${var.logstash_dns_name}"
-  ami                         = "${coalesce(var.ami, module.ubuntu-ami.id)}"
-  instance_type               = "${var.logstash_kibana_instance_type}"
-  key_name                    = "${var.ssh_key_name}"
-  elasticsearch_url           = "http://${module.elasticsearch.internal_lb["dns_name"]}:9200"
-  min_server_count            = "${var.logstash_kibana_min_server_count}"
-  max_server_count            = "${var.logstash_kibana_max_server_count}"
-  desired_server_count        = "${var.logstash_kibana_desired_server_count}"
-  extra_sg_ids                = [
+  name_prefix          = "${var.name_prefix}"
+  name_suffix          = "-kibana"
+  vpc_id               = "${var.vpc_id}"
+  public_subnet_ids    = ["${var.public_subnet_ids}"]
+  private_subnet_ids   = ["${var.private_subnet_ids}"]
+  logstash_version     = "${var.elk_version}"
+  logstash_dns_name    = "${var.logstash_dns_name}"
+  ami                  = "${coalesce(var.ami, module.ubuntu-ami.id)}"
+  instance_type        = "${var.logstash_kibana_instance_type}"
+  key_name             = "${var.ssh_key_name}"
+  elasticsearch_url    = "http://${module.elasticsearch.internal_lb["dns_name"]}:9200"
+  min_server_count     = "${var.logstash_kibana_min_server_count}"
+  max_server_count     = "${var.logstash_kibana_max_server_count}"
+  desired_server_count = "${var.logstash_kibana_desired_server_count}"
+
+  extra_sg_ids = [
     "${module.kibana.security_group_id}",
     "${aws_security_group.ssh.*.id}",
-    "${module.kibana.lb["security_group_id"]}"
+    "${module.kibana.lb["security_group_id"]}",
   ]
+
   extra_setup_snippet         = "${module.kibana.setup_snippet}"
   extra_elb_ingress_cidrs     = ["${concat(list(data.aws_vpc.current.cidr_block), var.logstash_extra_ingress_cidrs)}"]
   elb_names                   = ["${module.kibana.elb_name}"]

@@ -46,7 +46,11 @@ module "vpc" {
   region      = "${var.region}"
   cidr        = "10.23.0.0/16"
   azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
-  extra_tags  = { kali = "ma" }
+
+  extra_tags = {
+    kali = "ma"
+  }
+
   public_subnet_cidrs  = ["${var.public_subnet_cidrs}"]
   private_subnet_cidrs = ["${var.private_subnet_cidrs}"]
 }
@@ -54,7 +58,7 @@ module "vpc" {
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
   release = "14.04"
-} 
+}
 
 resource "aws_key_pair" "main" {
   key_name   = "${var.name}"
@@ -68,6 +72,7 @@ module "public-ssh-sg" {
   vpc_id              = "${module.vpc.vpc_id}"
   allowed_cidr_blocks = "0.0.0.0/0"
 }
+
 # shared security group, open egress (outbound from nodes)
 module "open-egress-sg" {
   source = "../../modules/open-egress-sg"
@@ -77,70 +82,80 @@ module "open-egress-sg" {
 
 # Security Group for ELB, gets public access
 resource "aws_security_group" "public-elb" {
-    name = "${var.name}-public-elb"
-    description = "Allow public access to ELB"
-    vpc_id = "${module.vpc.vpc_id}"
-    ingress {
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
+  name        = "${var.name}-public-elb"
+  description = "Allow public access to ELB"
+  vpc_id      = "${module.vpc.vpc_id}"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
+
 # Security Group for webapp ASG, only accessible from ELB
 resource "aws_security_group" "web-service" {
-    name = "${var.name}-web-service"
-    description = "Allow ELB to access the web-service in private subnet"
-    vpc_id = "${module.vpc.vpc_id}"
-    ingress {
-        from_port = 3000
-        to_port = 3000
-        protocol = "tcp"
-        cidr_blocks = ["${module.vpc.public_cidr_blocks}"]
-    }
+  name        = "${var.name}-web-service"
+  description = "Allow ELB to access the web-service in private subnet"
+  vpc_id      = "${module.vpc.vpc_id}"
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["${module.vpc.public_cidr_blocks}"]
+  }
 }
+
 resource "aws_elb" "web" {
-    name = "${var.name}-public-elb"
-    health_check {
-        healthy_threshold = 2
-        interval = 15
-        target = "TCP:3000"
-        timeout = "5"
-        unhealthy_threshold = 10
-    }
-    # public, or private to VPC?
-    internal = false
-    # route HTTPS to services app on port 8000
-    listener {
-        instance_port = 3000
-        instance_protocol = "http"
-        lb_port = 80
-        lb_protocol = "http"
-    }
-    # Ensure we allow incoming traffic to the ELB, HTTP/S
-    security_groups = ["${aws_security_group.public-elb.id}",
-                       "${module.open-egress-sg.id}"
-    ]
-    # ELBs in the public subnets, separate from the web ASG in private subnets
-    subnets = ["${module.vpc.public_subnet_ids}"]
+  name = "${var.name}-public-elb"
+
+  health_check {
+    healthy_threshold   = 2
+    interval            = 15
+    target              = "TCP:3000"
+    timeout             = "5"
+    unhealthy_threshold = 10
+  }
+
+  # public, or private to VPC?
+  internal = false
+
+  # route HTTPS to services app on port 8000
+  listener {
+    instance_port     = 3000
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  # Ensure we allow incoming traffic to the ELB, HTTP/S
+  security_groups = ["${aws_security_group.public-elb.id}",
+    "${module.open-egress-sg.id}",
+  ]
+
+  # ELBs in the public subnets, separate from the web ASG in private subnets
+  subnets = ["${module.vpc.public_subnet_ids}"]
 }
 
 module "web" {
-  source             = "../../modules/asg"
-  ami                = "${module.ubuntu-xenial-ami.id}"
-  azs                = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
-  name               = "${var.name}-web"
-  elb_names          = ["${aws_elb.web.name}"]
-  instance_type      = "t2.nano"
-  desired_capacity   = "${length(module.vpc.public_subnet_ids)}"
-  max_nodes          = "${length(module.vpc.public_subnet_ids)}"
-  min_nodes          = "${length(module.vpc.public_subnet_ids)}"
-  public_ip          = false
-  key_name           = "${aws_key_pair.main.key_name}"
-  subnet_ids         = ["${module.vpc.private_subnet_ids}"]
+  source           = "../../modules/asg"
+  ami              = "${module.ubuntu-xenial-ami.id}"
+  azs              = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
+  name             = "${var.name}-web"
+  elb_names        = ["${aws_elb.web.name}"]
+  instance_type    = "t2.nano"
+  desired_capacity = "${length(module.vpc.public_subnet_ids)}"
+  max_nodes        = "${length(module.vpc.public_subnet_ids)}"
+  min_nodes        = "${length(module.vpc.public_subnet_ids)}"
+  public_ip        = false
+  key_name         = "${aws_key_pair.main.key_name}"
+  subnet_ids       = ["${module.vpc.private_subnet_ids}"]
+
   security_group_ids = ["${module.public-ssh-sg.id}",
-                        "${module.open-egress-sg.id}",
-                        "${aws_security_group.web-service.id}"
+    "${module.open-egress-sg.id}",
+    "${aws_security_group.web-service.id}",
   ]
 
   root_volume_type = "gp2"

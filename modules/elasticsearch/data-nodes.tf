@@ -130,7 +130,8 @@ data "template_file" "data-node-config" {
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
-    extra_config       = <<EXTRA_CONFIG
+
+    extra_config = <<EXTRA_CONFIG
 # Only set the region for Elasticsearch 5.x, since it is deprecated in 6.x
 ${element(split(".", var.elasticsearch_version), 0) < 6 ? "cloud.aws.region: ${data.aws_region.current.name}" : ""}
 
@@ -147,25 +148,24 @@ resource "aws_elb" "elasticsearch-internal-elb" {
   internal        = "${lookup(var.internal_alb, "deploy_elb_internal", true)}"
 
   listener {
-    instance_port = 9200
+    instance_port     = 9200
     instance_protocol = "http"
-    lb_port = 9200
-    lb_protocol = "http"
+    lb_port           = 9200
+    lb_protocol       = "http"
   }
 
   health_check {
-    healthy_threshold = 2
+    healthy_threshold   = 2
     unhealthy_threshold = 3
-    timeout = 3
-    target = "HTTP:9200/"
-    interval = 60
+    timeout             = 3
+    target              = "HTTP:9200/"
+    interval            = 60
   }
 
   cross_zone_load_balancing = "${lookup(var.internal_alb, "deploy_elb_cross_zone", true)}"
   idle_timeout              = 30
   connection_draining       = false
 }
-
 
 resource "aws_elb" "elasticsearch-external-elb" {
   count           = "${lookup(var.external_alb, "deploy_elb", false) ? 1 : 0}"
@@ -175,10 +175,10 @@ resource "aws_elb" "elasticsearch-external-elb" {
   internal        = "${lookup(var.external_alb, "deploy_elb_internal", true)}"
 
   listener {
-    instance_port = 9201
-    instance_protocol = "http"
-    lb_port = 9201
-    lb_protocol = "https"
+    instance_port      = 9201
+    instance_protocol  = "http"
+    lb_port            = 9201
+    lb_protocol        = "https"
     ssl_certificate_id = "${var.external_alb["certificate_arn"]}"
   }
 
@@ -186,7 +186,6 @@ resource "aws_elb" "elasticsearch-external-elb" {
   idle_timeout              = 30
   connection_draining       = false
 }
-
 
 resource "aws_alb_target_group" "elasticsearch-api" {
   count    = "${lookup(var.internal_alb, "deploy_elb", false) ? 0 : 1}"

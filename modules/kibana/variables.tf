@@ -58,7 +58,8 @@ variable "credstash_get_cmd" {
 }
 
 variable "alb" {
-  type        = "map"
+  type = "map"
+
   description = <<DOC
 Information on already existing Application LB or settings for a Classic LB to
 be deployed:

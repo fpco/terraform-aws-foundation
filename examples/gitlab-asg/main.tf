@@ -64,7 +64,7 @@ data "aws_availability_zones" "available" {}
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
   release = "16.04"
-} 
+}
 
 resource "aws_key_pair" "main" {
   key_name   = "${var.name}"
@@ -72,24 +72,24 @@ resource "aws_key_pair" "main" {
 }
 
 resource "aws_elb" "gitlab" {
-  name                  = "${var.name}"
-  subnets               = ["${module.vpc.public_subnet_ids[0]}"]
-  security_groups       = ["${aws_security_group.gitlab-elb.id}"]
+  name            = "${var.name}"
+  subnets         = ["${module.vpc.public_subnet_ids[0]}"]
+  security_groups = ["${aws_security_group.gitlab-elb.id}"]
 
   listener {
-    instance_port       = 8022
-    instance_protocol   = "tcp"
-    lb_port             = 22
-    lb_protocol         = "tcp"
-    ssl_certificate_id  = "${var.ssl_arn}"
+    instance_port      = 8022
+    instance_protocol  = "tcp"
+    lb_port            = 22
+    lb_protocol        = "tcp"
+    ssl_certificate_id = "${var.ssl_arn}"
   }
 
   listener {
-    instance_port       = 80
-    instance_protocol   = "http"
-    lb_port             = 443
-    lb_protocol         = "https"
-    ssl_certificate_id  = "${var.ssl_arn}"
+    instance_port      = 80
+    instance_protocol  = "http"
+    lb_port            = 443
+    lb_protocol        = "https"
+    ssl_certificate_id = "${var.ssl_arn}"
   }
 
   health_check {

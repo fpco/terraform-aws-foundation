@@ -21,4 +21,3 @@ variable "cidr_blocks_api" {
   type        = "list"
   default     = ["0.0.0.0/0"]
 }
-

@@ -48,10 +48,10 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
-  source               = "../../modules/vpc"
-  region               = "${var.region}"
-  cidr                 = "${var.vpc_cidr_block}"
-  name_prefix          = "${var.name}"
+  source      = "../../modules/vpc"
+  region      = "${var.region}"
+  cidr        = "${var.vpc_cidr_block}"
+  name_prefix = "${var.name}"
 }
 
 module "public-subnets" {
@@ -79,10 +79,11 @@ module "private-subnets" {
 }
 
 module "nat-instance" {
-  source               = "../../modules/ec2-nat-instance"
-  name_prefix          = "${var.name}"
-  key_name             = "${aws_key_pair.main.key_name}"
-  public_subnet_ids    = ["${module.public-subnets.ids[0]}"]
+  source            = "../../modules/ec2-nat-instance"
+  name_prefix       = "${var.name}"
+  key_name          = "${aws_key_pair.main.key_name}"
+  public_subnet_ids = ["${module.public-subnets.ids[0]}"]
+
   # the one instance can route for any private subnet
   private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
   security_group_ids   = ["${aws_security_group.nat_instance.id}"]
@@ -103,16 +104,16 @@ resource "aws_route_table_association" "private_subnets" {
 
 # network route for private subnets ---> NAT for 0.0.0.0/0
 resource "aws_route" "nat" {
-  instance_id             = "${module.nat-instance.instance_ids[0]}"
-  route_table_id          = "${aws_route_table.private_subnets.id}"
-  destination_cidr_block  = "0.0.0.0/0"
+  instance_id            = "${module.nat-instance.instance_ids[0]}"
+  route_table_id         = "${aws_route_table.private_subnets.id}"
+  destination_cidr_block = "0.0.0.0/0"
 }
 
 # Security Group for NAT instance
 resource "aws_security_group" "nat_instance" {
-    name = "${var.name}-nat-instance"
-    description = "Allow HTTP/HTTPS thru the NAT"
-    vpc_id = "${module.vpc.vpc_id}"
+  name        = "${var.name}-nat-instance"
+  description = "Allow HTTP/HTTPS thru the NAT"
+  vpc_id      = "${module.vpc.vpc_id}"
 }
 
 module "nat-http-rule" {
@@ -144,7 +145,7 @@ module "nat-instance-open-egress-rule" {
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
   release = "16.04"
-} 
+}
 
 resource "aws_key_pair" "main" {
   key_name   = "${var.name}"
@@ -153,9 +154,9 @@ resource "aws_key_pair" "main" {
 
 # Security Group for ELB, gets public access
 resource "aws_security_group" "public_elb" {
-    name = "${var.name}-public-elb"
-    description = "Allow public access to ELB"
-    vpc_id = "${module.vpc.vpc_id}"
+  name        = "${var.name}-public-elb"
+  description = "Allow public access to ELB"
+  vpc_id      = "${module.vpc.vpc_id}"
 }
 
 module "elb-http-rule" {
@@ -173,9 +174,9 @@ module "elb-open-egress-rule" {
 
 # Security Group for webapp ASG, only accessible from ELB
 resource "aws_security_group" "web_service" {
-    name = "${var.name}-web-service"
-    description = "security group for web-service instances in the private subnet"
-    vpc_id = "${module.vpc.vpc_id}"
+  name        = "${var.name}-web-service"
+  description = "security group for web-service instances in the private subnet"
+  vpc_id      = "${module.vpc.vpc_id}"
 }
 
 module "web-service-http-rule" {
@@ -198,27 +199,32 @@ module "web-service-open-egress-rule" {
 }
 
 resource "aws_elb" "web" {
-    name = "${var.name}-public-elb"
-    health_check {
-        healthy_threshold = 2
-        interval = 15
-        target = "TCP:3000"
-        timeout = "5"
-        unhealthy_threshold = 10
-    }
-    # public, or private to VPC?
-    internal = false
-    # route HTTPS to services app on port 8000
-    listener {
-        instance_port = 3000
-        instance_protocol = "http"
-        lb_port = 80
-        lb_protocol = "http"
-    }
-    # Ensure we allow incoming traffic to the ELB, HTTP/S
-    security_groups = ["${aws_security_group.public_elb.id}"]
-    # ELBs in the public subnets, separate from the web ASG in private subnets
-    subnets = ["${module.public-subnets.ids}"]
+  name = "${var.name}-public-elb"
+
+  health_check {
+    healthy_threshold   = 2
+    interval            = 15
+    target              = "TCP:3000"
+    timeout             = "5"
+    unhealthy_threshold = 10
+  }
+
+  # public, or private to VPC?
+  internal = false
+
+  # route HTTPS to services app on port 8000
+  listener {
+    instance_port     = 3000
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  # Ensure we allow incoming traffic to the ELB, HTTP/S
+  security_groups = ["${aws_security_group.public_elb.id}"]
+
+  # ELBs in the public subnets, separate from the web ASG in private subnets
+  subnets = ["${module.public-subnets.ids}"]
 }
 
 module "web" {
