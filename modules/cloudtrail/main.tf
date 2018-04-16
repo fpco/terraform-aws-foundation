@@ -19,9 +19,7 @@ resource "aws_s3_bucket" "cloudtrail" {
   tags = "${merge(map("Name", "${var.name_prefix}-cloudtrail"), "${var.extra_tags}")}"
 }
 
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 data "aws_iam_policy_document" "cloudtrail-bucket" {
   statement {

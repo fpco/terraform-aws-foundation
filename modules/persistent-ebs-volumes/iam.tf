@@ -1,8 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 resource "aws_iam_policy" "ebs-volume-policy" {
   count = "${var.volume_count}"
