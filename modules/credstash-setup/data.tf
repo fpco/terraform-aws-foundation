@@ -1,8 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 data "template_file" "credstash-get-cmd" {
   template = "env credstash -r ${data.aws_region.current.name} -t ${var.db_table_name} get"

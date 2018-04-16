@@ -106,9 +106,7 @@ resource "aws_instance" "auto-recover" {
 }
 
 # Current AWS region
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 # Cloudwatch alarm that recovers the instance after two minutes of system status
 # check failure
