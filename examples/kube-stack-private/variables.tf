@@ -54,7 +54,7 @@ variable "private_subnet_cidrs" {
 }
 
 variable "extra_tags" {
-  description = "Extra tags that will be added to aws_subnet resources"
+  description = "Extra tags that will be added to all AWS resources that support tags"
   default     = {}
 }
 

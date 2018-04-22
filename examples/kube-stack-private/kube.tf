@@ -8,6 +8,8 @@ module "kube-worker-iam" {
   name_prefix = "${var.name}"
 }
 
+# we should pipe `extra_tags` variable through this to controller / worker inputs
+# for this module (TODO)
 module "kube-cluster" {
   source                 = "../../modules/kube-stack"
   availability_zones     = ["${slice(data.aws_availability_zones.available.names, 0, 2)}"]
