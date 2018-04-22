@@ -25,11 +25,39 @@ variable "azs" {
   description = "A list of Availaiblity Zones in the region"
 }
 
+# if the description here is confusing, see the semantics that `merge()` uses:
+# https://www.terraform.io/docs/configuration/interpolation.html#merge-map1-map2-
 variable "extra_tags" {
-  description = "Extra tags that will be added to VPC, DHCP Options, Internet Gateway, Subnets and Routing Table."
+  description = "Extra tags that will be added to ALL RESOURCES, use the resource-specific variables if you need that level of control. Note that keys may be overwritten in cases where there are duplicates."
   default     = {}
 }
 
+variable "vpc_extra_tags" {
+  description = "Extra tags that will be added to VPC and DHCP Options. Note that duplicate keys will overwrite those from the extra_tags variable."
+  default     = {}
+}
+
+variable "public_gateway_extra_tags" {
+  description = "Extra tags that will be added to Internet Gateway and public Routing Tables."
+  default     = {}
+}
+
+variable "public_subnet_extra_tags" {
+  description = "Extra tags that will be added to public subnets."
+  default     = {}
+}
+
+variable "private_subnet_extra_tags" {
+  description = "Extra tags that will be added to private subnets."
+  default     = {}
+}
+
+variable "nat_gateway_extra_tags" {
+  description = "Extra tags that will be added to NAT gateway and routing tables for the private subnets"
+  default     = {}
+}
+
+# DNS
 variable "enable_dns_hostnames" {
   default     = true
   description = "boolean, enable/disable VPC attribute, enable_dns_hostnames"
