@@ -756,7 +756,7 @@ module "vpc-scenario-3" {
   azs                 = ""
   cidr                = ""
   name_prefix         = ""
-  public_subnet_cidrs = []`
+  public_subnet_cidrs = []
   region              = ""
   vpn_remote_ip       = ""
   vpn_static_routes   = []
