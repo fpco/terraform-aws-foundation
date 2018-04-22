@@ -3,6 +3,11 @@ module "vpc" {
   region      = "${var.region}"
   cidr        = "${var.vpc_cidr}"
   name_prefix = "${var.name}"
+  extra_tags  = "${merge(
+    map("kubernetes.io/cluster/${var.name}",
+        "owned"),
+    "${var.extra_tags}",
+  )}"
 
   public_subnet_cidrs  = ["${var.public_subnet_cidrs}"]
   private_subnet_cidrs = ["${var.private_subnet_cidrs}"]
