@@ -18,3 +18,29 @@ data "template_file" "credstash-install-snippet" {
   pip install credstash; }
 END_TEMPLATE
 }
+
+# Writer Policy
+data "aws_iam_policy_document" "writer-policy" {
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:PutItem"]
+    resources = [
+      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+    ]
+  }
+}
+
+# Reader Policy
+data "aws_iam_policy_document" "reader-policy" {
+  statement {
+    effect    = "Allow"
+    actions   = [
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan"
+    ]
+    resources = [
+      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+    ]
+  }
+}

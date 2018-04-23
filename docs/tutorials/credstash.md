@@ -110,21 +110,19 @@ resource "aws_iam_instance_profile" "credstash-profile" {
 }
 resource "aws_iam_role" "credstash-role" {
   name_prefix  = "credstash-role-"
-  assume_role_policy = <<END_POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
+  assume_role_policy = "${data.aws_iam_policy_document.credstash-role.json}"
 }
-END_POLICY
+
+data "aws_iam_policy_document" "credstash-role" {
+  statement {
+    sid    = ""
+    effect = "Allow"
+    principal {
+      type = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+    action = ["sts:AssumeRole"]
+  }
 }
 ```
 
@@ -357,7 +355,7 @@ required, but certainly is a good idea security wise.
 ```
 resource "aws_iam_role" "server-role" {
   name_prefix  = "server-role-"
-  assume_role_policy = <<END_POLICY
+  assume_role_policy = "${data.aws_iam_policy_document.server-role.json}"
   ...
 }
 module "server-grant" {
@@ -372,7 +370,7 @@ module "server-grant" {
 
 resource "aws_iam_role" "client-role" {
   name_prefix  = "client-role-"
-  assume_role_policy = <<END_POLICY
+  assume_role_policy = "${data.aws_iam_policy_document.client-role.json}"
   ...
 }
 module "client-grant" {

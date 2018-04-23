@@ -33,60 +33,18 @@ module "credstash-grant" {
 }
 
 resource "aws_iam_role" "master-node-role" {
-  count = "${var.master_node_count}"
-  name  = "${var.name_prefix}-master-node-role-${format("%02d", count.index)}"
-
-  assume_role_policy = <<END_POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-END_POLICY
+  count  = "${var.master_node_count}"
+  name   = "${var.name_prefix}-master-node-role-${format("%02d", count.index)}"
+  assume_role_policy = "${data.aws_iam_policy_document.master-node-role.json}"
 }
 
 resource "aws_iam_role" "data-node-role" {
-  count = "${var.data_node_count}"
-  name  = "${var.name_prefix}-data-node-role-${format("%02d", count.index)}"
-
-  assume_role_policy = <<END_POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-END_POLICY
+  count  = "${var.data_node_count}"
+  name   = "${var.name_prefix}-data-node-role-${format("%02d", count.index)}"
+  assume_role_policy = "${data.aws_iam_policy_document.data-node-role.json}"
 }
 
 resource "aws_iam_policy" "ec2-discovery-policy" {
-  name = "${var.name_prefix}-ec2-discovery-policy"
-
-  policy = <<END_POLICY
-{
-  "Statement": [
-    {
-      "Action": ["ec2:DescribeInstances"],
-      "Effect": "Allow",
-      "Resource": ["*"]
-    }
-  ],
-  "Version": "2012-10-17"
-}
-END_POLICY
+  name   = "${var.name_prefix}-ec2-discovery-policy"
+  policy = "${data.aws_iam_policy_document.ec2-discovery-policy.json}"
 }
