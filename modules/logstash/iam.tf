@@ -47,10 +47,12 @@ data "aws_iam_policy_document" "logstash-role" {
   statement = {
     sid    = ""
     effect = "Allow"
+
     principal {
-      type = "Service"
+      type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
+
     action = ["sts:AssumeRole"]
   }
 }
