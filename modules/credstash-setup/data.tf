@@ -22,10 +22,11 @@ END_TEMPLATE
 # Writer Policy
 data "aws_iam_policy_document" "writer-policy" {
   statement {
-    effect    = "Allow"
-    actions   = ["dynamodb:PutItem"]
+    effect  = "Allow"
+    actions = ["dynamodb:PutItem"]
+
     resources = [
-      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
     ]
   }
 }
@@ -33,14 +34,16 @@ data "aws_iam_policy_document" "writer-policy" {
 # Reader Policy
 data "aws_iam_policy_document" "reader-policy" {
   statement {
-    effect    = "Allow"
-    actions   = [
+    effect = "Allow"
+
+    actions = [
       "dynamodb:GetItem",
       "dynamodb:Query",
-      "dynamodb:Scan"
+      "dynamodb:Scan",
     ]
+
     resources = [
-      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
+      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
     ]
   }
 }

@@ -50,15 +50,15 @@ resource "aws_dynamodb_table" "credstash-db" {
 ## Writer Policy
 
 resource "aws_iam_policy" "writer-policy" {
-  count   = "${var.create_writer_policy ? 1 : 0}"
-  name    = "${var.db_table_name}-writer"
-  policy  = "${data.aws_iam_policy_document.writer-policy.json}"
+  count  = "${var.create_writer_policy ? 1 : 0}"
+  name   = "${var.db_table_name}-writer"
+  policy = "${data.aws_iam_policy_document.writer-policy.json}"
 }
 
 ## Reader Policy
 
 resource "aws_iam_policy" "reader-policy" {
-  count   = "${var.create_reader_policy ? 1 : 0}"
-  name    = "${var.db_table_name}-reader"
-  policy  = "${data.aws_iam_policy_document.reader-policy.json}"
+  count  = "${var.create_reader_policy ? 1 : 0}"
+  name   = "${var.db_table_name}-reader"
+  policy = "${data.aws_iam_policy_document.reader-policy.json}"
 }

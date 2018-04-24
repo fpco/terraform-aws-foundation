@@ -2,29 +2,31 @@ data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "attach_ebs" {
   statement {
-    sid     = ""
-    effect  = "Allow"
+    sid    = ""
+    effect = "Allow"
+
     principals {
-      type  = "Service"
+      type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
+
     actions = ["sts:AssumeRole"]
   }
 }
 
 data "aws_iam_policy_document" "attach_ebs_policy" {
   statement {
-    sid     = ""
-    effect  = "Allow"
+    sid    = ""
+    effect = "Allow"
+
     actions = [
       "ec2:AttachVolume",
-      "ec2:DetachVolume"
+      "ec2:DetachVolume",
     ]
 
     resources = [
       "arn:${var.aws_cloud}:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:volume/${aws_ebs_volume.main.id}",
-      "arn:${var.aws_cloud}:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:instance/*"
+      "arn:${var.aws_cloud}:ec2:${var.region}:${data.aws_caller_identity.current.account_id}:instance/*",
     ]
   }
 }
-

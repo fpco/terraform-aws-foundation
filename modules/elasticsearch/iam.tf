@@ -33,14 +33,14 @@ module "credstash-grant" {
 }
 
 resource "aws_iam_role" "master-node-role" {
-  count  = "${var.master_node_count}"
-  name   = "${var.name_prefix}-master-node-role-${format("%02d", count.index)}"
+  count              = "${var.master_node_count}"
+  name               = "${var.name_prefix}-master-node-role-${format("%02d", count.index)}"
   assume_role_policy = "${data.aws_iam_policy_document.master-node-role.json}"
 }
 
 resource "aws_iam_role" "data-node-role" {
-  count  = "${var.data_node_count}"
-  name   = "${var.name_prefix}-data-node-role-${format("%02d", count.index)}"
+  count              = "${var.data_node_count}"
+  name               = "${var.name_prefix}-data-node-role-${format("%02d", count.index)}"
   assume_role_policy = "${data.aws_iam_policy_document.data-node-role.json}"
 }
 

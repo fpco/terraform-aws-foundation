@@ -17,7 +17,7 @@ resource "aws_iam_access_key" "s3" {
 }
 
 resource "aws_iam_policy" "s3" {
-  name = "${var.name}_all_access"
+  name   = "${var.name}_all_access"
   policy = "${data.aws_iam_policy_document.s3.json}"
 }
 
