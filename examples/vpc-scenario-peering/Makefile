@@ -46,8 +46,8 @@ plan:
 	@terraform plan -out=tf.out
 
 ## terraform destroy everything
-destroy-plan:
-	@terraform plan -destroy -out=tf.out
+destroy:
+	@terraform destroy
 
 ## terraform apply
 apply: check-plan-file

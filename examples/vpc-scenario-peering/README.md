@@ -24,7 +24,6 @@ The same test should work from the VCP2-MACHINE as well.
 
 To destroy the test environment run the following commands:
 
-* make destroy-plan
-* make apply
+* make destroy
 * make clean
 
