@@ -18,7 +18,7 @@ make apply
 
 *** Testing
 
-Get the public IP address of the vpc machine with the AWS console.
+Get the public IP address of the newly created ec2 web instance with the AWS console.
 
 SSH into the machine with the command:
 
