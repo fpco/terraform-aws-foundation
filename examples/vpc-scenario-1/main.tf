@@ -1,8 +1,12 @@
 /**
- * ## Run Tests on the VPC Scenario 1 Module
+ * ## Example to test the VPC Scenario 1 Module
  *
  *
  */
+variable "extra_tags" {
+  description = "Extra tags that will be added to aws_subnet resources"
+  default     = {}
+}
 
 variable "name" {
   description = "name of the project, use as prefix to names of resources created"
@@ -12,6 +16,11 @@ variable "name" {
 variable "region" {
   description = "Region where the project will be deployed"
   default     = "us-east-2"
+}
+
+variable "vpc_cidr" {
+  description = "Top-level CIDR for the whole VPC network space"
+  default     = "10.23.0.0/16"
 }
 
 variable "ssh_pubkey" {
@@ -35,11 +44,16 @@ provider "aws" {
 
 data "aws_availability_zones" "available" {}
 
+module "ubuntu-xenial-ami" {
+  source  = "../../modules/ami-ubuntu"
+  release = "14.04"
+}
+
 module "vpc" {
   source      = "../../modules/vpc-scenario-1"
   name_prefix = "${var.name}"
   region      = "${var.region}"
-  cidr        = "10.23.0.0/16"
+  cidr        = "${var.vpc_cidr}"
   azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
 
   extra_tags = {
@@ -49,29 +63,26 @@ module "vpc" {
   public_subnet_cidrs = ["${var.public_subnet_cidrs}"]
 }
 
-module "ubuntu-xenial-ami" {
-  source  = "../../modules/ami-ubuntu"
-  release = "14.04"
-}
-
-resource "aws_key_pair" "main" {
-  key_name   = "${var.name}"
-  public_key = "${file(var.ssh_pubkey)}"
+module "vpc-sg" {
+  source      = "../../modules/security-group-base"
+  description = "Test project security group"
+  name        = "${var.name}-vpc-sg"
+  vpc_id      = "${module.vpc.vpc_id}"
 }
 
 # shared security group for SSH
 module "public-ssh-sg" {
   source              = "../../modules/ssh-sg"
-  name                = "${var.name}"
-  vpc_id              = "${module.vpc.vpc_id}"
-  allowed_cidr_blocks = "0.0.0.0/0"
+
+  security_group_id = "${module.vpc-sg.id}"
 }
 
 # shared security group, open egress (outbound from nodes)
 module "open-egress-sg" {
   source = "../../modules/open-egress-sg"
-  name   = "${var.name}"
-  vpc_id = "${module.vpc.vpc_id}"
+
+  # vpc_id = "${module.vpc.vpc_id}"
+  security_group_id = "${module.vpc-sg.id}"
 }
 
 resource "aws_instance" "web" {
@@ -88,9 +99,7 @@ resource "aws_instance" "web" {
 
   associate_public_ip_address = "true"
 
-  vpc_security_group_ids = ["${module.public-ssh-sg.id}",
-    "${module.open-egress-sg.id}",
-  ]
+  vpc_security_group_ids = ["${module.vpc-sg.id}"]
 
   subnet_id = "${element(module.vpc.public_subnet_ids, count.index)}"
 
@@ -121,4 +130,9 @@ END_INIT
       private_key = "${file(var.ssh_key)}"
     }
   }
+}
+
+resource "aws_key_pair" "main" {
+  key_name   = "${var.name}"
+  public_key = "${file(var.ssh_pubkey)}"
 }

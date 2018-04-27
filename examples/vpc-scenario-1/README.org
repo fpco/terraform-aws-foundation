@@ -1,0 +1,40 @@
+** Example to test the VPC Scenario 1 Module
+
+*** Environment creation and deployment
+
+To use this example set up AWS credentials and then run the commands in the 
+following order:
+
+#+BEGIN_SRC bash
+make init
+make ssh-key
+make plan-vpc
+make apply
+make plan-subnets
+make apply
+make plan-gateway
+make apply
+#+END_SRC bash
+
+*** Testing
+
+Get the public IP address of the vpc machine with the AWS console.
+
+SSH into the machine with the command:
+
+#+BEGIN_SRC bash
+ssh -i id_rsa ubuntu@<vpc-ip-address>
+#+END_SRC bash
+
+*** Destruction
+
+To destroy the test environment run the following commands:
+
+#+BEGIN_SRC bash
+make destroy
+make clean
+#+END_SRC bash
+
+*** Notes
+- This example was last tested with ~Terraform v0.11.6~
+- This example assumes AWS credentials setup with access to the *us-east-2* region.
