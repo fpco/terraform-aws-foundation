@@ -6,13 +6,15 @@ To use this example set up AWS credentials and then run the commands in the
 following order:
 
 #+BEGIN_SRC bash
-make init
 make ssh-key
+make init
 make plan-vpc
 make apply
 make plan-subnets
 make apply
 make plan-gateway
+make apply
+make plan
 make apply
 #+END_SRC bash
 

@@ -31,6 +31,9 @@ plan-gateway:
     -target="module.vpc.module.public-gateway" \
     -out=tf.out
 
+plan:
+	@terraform plan -out=tf.out
+
 apply: check-plan-file
 	@terraform apply tf.out
 

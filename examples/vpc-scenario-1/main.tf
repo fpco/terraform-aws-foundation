@@ -86,7 +86,7 @@ module "open-egress-sg" {
 
 resource "aws_instance" "web" {
   ami               = "${module.ubuntu-xenial-ami.id}"
-  count             = "${length(module.vpc.public_subnet_ids)}"
+  count             = "1"
   key_name          = "${aws_key_pair.main.key_name}"
   instance_type     = "t2.nano"
   availability_zone = "${var.region}a"
