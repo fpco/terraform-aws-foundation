@@ -18,15 +18,15 @@ init:
 
 subnets-plan:
 	@terraform plan \
-    -target="module.vpc.module.public-subnets" \
-    -target="module.vpc.module.private-subnets" \
-    -out=tf.out
+		-target="module.vpc.module.public-subnets" \
+		-target="module.vpc.module.private-subnets" \
+		-out=tf.out
 
 gateways-plan:
 	@terraform plan \
-    -target="module.vpc.module.public-gateway" \
-    -target="module.vpc.module.nat-gateway" \
-    -out=tf.out
+		-target="module.vpc.module.public-gateway" \
+		-target="module.vpc.module.nat-gateway" \
+		-out=tf.out
 
 ## terraform plan (makes everything)
 plan:
