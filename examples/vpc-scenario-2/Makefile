@@ -23,7 +23,7 @@ subnets-plan:
     -out=tf.out
 
 gateways-plan:
-  @terraform plan \
+	@terraform plan \
     -target="module.vpc.module.public-gateway" \
     -target="module.vpc.module.nat-gateway" \
     -out=tf.out

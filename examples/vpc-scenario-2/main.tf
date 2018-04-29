@@ -4,6 +4,11 @@
  *
  */
 
+variable "extra_tags" {
+  description = "Extra tags that will be added to aws_subnet resources"
+  default     = {}
+}
+
 variable "name" {
   description = "name of the project, use as prefix to names of resources created"
   default     = "test-project"
@@ -12,6 +17,11 @@ variable "name" {
 variable "region" {
   description = "Region where the project will be deployed"
   default     = "us-east-2"
+}
+
+variable "vpc_cidr" {
+  description = "Top-level CIDR for the whole VPC network space"
+  default     = "10.23.0.0/16"
 }
 
 variable "ssh_pubkey" {
@@ -44,7 +54,7 @@ module "vpc" {
   source      = "../../modules/vpc-scenario-2"
   name_prefix = "${var.name}"
   region      = "${var.region}"
-  cidr        = "10.23.0.0/16"
+  cidr        = "${var.vpc_cidr}"
   azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
 
   extra_tags = {
@@ -60,24 +70,25 @@ module "ubuntu-xenial-ami" {
   release = "14.04"
 }
 
-resource "aws_key_pair" "main" {
-  key_name   = "${var.name}"
-  public_key = "${file(var.ssh_pubkey)}"
+module "vpc-sg" {
+  source      = "../../modules/security-group-base"
+  description = "Test project security group"
+  name        = "${var.name}-vpc-sg"
+  vpc_id      = "${module.vpc.vpc_id}"
 }
 
 # shared security group for SSH
 module "public-ssh-sg" {
   source              = "../../modules/ssh-sg"
-  name                = "${var.name}"
-  vpc_id              = "${module.vpc.vpc_id}"
-  allowed_cidr_blocks = "0.0.0.0/0"
+
+  security_group_id = "${module.vpc-sg.id}"
 }
 
 # shared security group, open egress (outbound from nodes)
 module "open-egress-sg" {
   source = "../../modules/open-egress-sg"
-  name   = "${var.name}"
-  vpc_id = "${module.vpc.vpc_id}"
+
+  security_group_id = "${module.vpc-sg.id}"
 }
 
 # Security Group for ELB, gets public access
@@ -131,8 +142,9 @@ resource "aws_elb" "web" {
   }
 
   # Ensure we allow incoming traffic to the ELB, HTTP/S
-  security_groups = ["${aws_security_group.public-elb.id}",
-    "${module.open-egress-sg.id}",
+  security_groups =
+  [ "${aws_security_group.public-elb.id}"
+  , "${module.vpc-sg.id}"
   ]
 
   # ELBs in the public subnets, separate from the web ASG in private subnets
@@ -143,7 +155,7 @@ module "web" {
   source           = "../../modules/asg"
   ami              = "${module.ubuntu-xenial-ami.id}"
   azs              = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
-  name             = "${var.name}-web"
+  name_prefix      = "${var.name}"
   elb_names        = ["${aws_elb.web.name}"]
   instance_type    = "t2.nano"
   desired_capacity = "${length(module.vpc.public_subnet_ids)}"
@@ -153,9 +165,9 @@ module "web" {
   key_name         = "${aws_key_pair.main.key_name}"
   subnet_ids       = ["${module.vpc.private_subnet_ids}"]
 
-  security_group_ids = ["${module.public-ssh-sg.id}",
-    "${module.open-egress-sg.id}",
-    "${aws_security_group.web-service.id}",
+  security_group_ids =
+  [ "${module.vpc-sg.id}"
+  , "${aws_security_group.web-service.id}"
   ]
 
   root_volume_type = "gp2"
@@ -207,7 +219,13 @@ END_INIT
 #    Name = "${var.name}-bastion"
 #  }
 #}
+
 output "elb_dns" {
   value       = "${aws_elb.web.dns_name}"
   description = "make the ELB accessible on the outside"
+}
+
+resource "aws_key_pair" "main" {
+  key_name   = "${var.name}"
+  public_key = "${file(var.ssh_pubkey)}"
 }
