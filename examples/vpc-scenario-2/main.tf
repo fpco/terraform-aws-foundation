@@ -70,25 +70,35 @@ module "ubuntu-xenial-ami" {
   release = "14.04"
 }
 
-module "vpc-sg" {
+resource "aws_key_pair" "main" {
+  key_name   = "${var.name}"
+  public_key = "${file(var.ssh_pubkey)}"
+}
+
+module "vpc-elb-sg" {
   source      = "../../modules/security-group-base"
-  description = "Test project security group"
-  name        = "${var.name}-vpc-sg"
+  description = "Test project ELB security group"
+  name        = "${var.name}-vpc-elb"
+  vpc_id      = "${module.vpc.vpc_id}"
+}
+
+module "vpc-web-sg" {
+  source      = "../../modules/security-group-base"
+  description = "Test project web instance security group"
+  name        = "${var.name}-vpc-web"
   vpc_id      = "${module.vpc.vpc_id}"
 }
 
 # shared security group for SSH
-module "public-ssh-sg" {
+module "public-ssh-sg-rule" {
   source              = "../../modules/ssh-sg"
-
-  security_group_id = "${module.vpc-sg.id}"
+  security_group_id   = "${module.vpc-elb-sg.id}"
 }
 
 # shared security group, open egress (outbound from nodes)
-module "open-egress-sg" {
-  source = "../../modules/open-egress-sg"
-
-  security_group_id = "${module.vpc-sg.id}"
+module "open-egress-sg-rule" {
+  source            = "../../modules/open-egress-sg"
+  security_group_id = "${module.vpc-elb-sg.id}"
 }
 
 # Security Group for ELB, gets public access
@@ -144,7 +154,8 @@ resource "aws_elb" "web" {
   # Ensure we allow incoming traffic to the ELB, HTTP/S
   security_groups =
   [ "${aws_security_group.public-elb.id}"
-  , "${module.vpc-sg.id}"
+  , "${module.vpc-elb-sg.id}"
+  , "${module.vpc-web-sg.id}"
   ]
 
   # ELBs in the public subnets, separate from the web ASG in private subnets
@@ -155,7 +166,7 @@ module "web" {
   source           = "../../modules/asg"
   ami              = "${module.ubuntu-xenial-ami.id}"
   azs              = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
-  name_prefix      = "${var.name}"
+  name_prefix      = "${var.name}-web"
   elb_names        = ["${aws_elb.web.name}"]
   instance_type    = "t2.nano"
   desired_capacity = "${length(module.vpc.public_subnet_ids)}"
@@ -166,7 +177,8 @@ module "web" {
   subnet_ids       = ["${module.vpc.private_subnet_ids}"]
 
   security_group_ids =
-  [ "${module.vpc-sg.id}"
+  [ "${module.vpc-elb-sg.id}"
+  , "${module.vpc-web-sg.id}"
   , "${aws_security_group.web-service.id}"
   ]
 
@@ -223,9 +235,4 @@ END_INIT
 output "elb_dns" {
   value       = "${aws_elb.web.dns_name}"
   description = "make the ELB accessible on the outside"
-}
-
-resource "aws_key_pair" "main" {
-  key_name   = "${var.name}"
-  public_key = "${file(var.ssh_pubkey)}"
 }
