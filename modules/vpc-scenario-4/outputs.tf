@@ -4,21 +4,16 @@ output "vpc_id" {
 }
 
 output "private_subnet_ids" {
-  value       = ["${module.subnets.private_ids}"]
-  description = "List of private subnet ids. None created if list is empty."
-}
-
-output "public_subnet_ids" {
-  value       = ["${module.subnets.public_ids}"]
-  description = "List of public subnet ids"
-}
-
-output "public_route_table_id" {
-  value       = "${aws_route_table.public.id}"
-  description = "Route table id associated with public subnets"
-}
-
-output "igw_id" {
   value       = ["${module.private-subnets.ids}"]
-  description = "Internet gateway id"
+  description = "List of IDs of private subnets. None created if list is empty."
+}
+
+output "vpn_route_table_id" {
+  value       = "${aws_route_table.private-vpn.id}"
+  description = "Route table id associated with VPN and private subnets"
+}
+
+output "vgw_id" {
+  value       = ["${module.vpn.vpn_gw_id}"]
+  description = "VPN gateway id"
 }
