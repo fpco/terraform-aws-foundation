@@ -1,5 +1,12 @@
 # v0.7.2
 
+* `ex/kube-stack-private`: tag public subnets for ELBs
+* `ex/kube-stack-private`: use `extra_tags` for changes in Kubernetes
+* `kube-stack`: add missing tag for kubernetes
+* `vpc-scenario-2`: refactor how extra_tags are used
+* `vpc-scenario-2`: use `var.private_subnet_cidrs` for `nat_count`
+* `vpc-scenario-4`: fixup outputs and subnet module parameters
+* `examples/nexus-asg`: Use the `ubuntu-ami` module, drop hardcoded AMI
 * `docs`: add `testing-design` doc
 * `examples/vpc-scenario-peering`: Correct destroy target in Makefile, this was
   previously unable to properly destroy the deployment.
