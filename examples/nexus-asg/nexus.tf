@@ -72,7 +72,7 @@ END_INIT
 }
 
 module "ubuntu-ami" {
-  source      = "../../tf-modules/ami-ubuntu"
+  source      = "../../modules/ami-ubuntu"
   release     = "16.04"
   is_govcloud = "${var.is_govcloud}"
 }
