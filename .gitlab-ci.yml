@@ -1,0 +1,4 @@
+image: registry.gitlab.fpcomplete.com/fpco/default-build-image:2722
+lint:
+  script:
+    -  scripts/ci/tflint.sh
