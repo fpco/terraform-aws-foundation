@@ -75,6 +75,7 @@ resource "aws_key_pair" "main" {
   public_key = "${file(var.ssh_pubkey)}"
 }
 
+# Security group for the elastic load balancer
 module "vpc-elb-sg" {
   source      = "../../modules/security-group-base"
   description = "Test project ELB security group"
@@ -82,6 +83,13 @@ module "vpc-elb-sg" {
   vpc_id      = "${module.vpc.vpc_id}"
 }
 
+# security group rule for elb open egress (outbound from nodes)
+module "vpc-elb-open-egress-rule" {
+  source            = "../../modules/open-egress-sg"
+  security_group_id = "${module.vpc-elb-sg.id}"
+}
+
+# Security group for the web instance
 module "vpc-web-sg" {
   source      = "../../modules/security-group-base"
   description = "Test project web instance security group"
@@ -89,16 +97,16 @@ module "vpc-web-sg" {
   vpc_id      = "${module.vpc.vpc_id}"
 }
 
-# shared security group for SSH
-module "public-ssh-sg-rule" {
+# security group rule for web instance SSH
+module "vpc-web-public-ssh-sg-rule" {
   source              = "../../modules/ssh-sg"
-  security_group_id   = "${module.vpc-elb-sg.id}"
+  security_group_id   = "${module.vpc-web-sg.id}"
 }
 
-# shared security group, open egress (outbound from nodes)
-module "open-egress-sg-rule" {
+# security group rule for web instance open egress (outbound from nodes)
+module "vpc-web-open-egress-sg-rule" {
   source            = "../../modules/open-egress-sg"
-  security_group_id = "${module.vpc-elb-sg.id}"
+  security_group_id = "${module.vpc-web-sg.id}"
 }
 
 # Security Group for ELB, gets public access
@@ -211,26 +219,6 @@ docker run                   \
 
 END_INIT
 }
-
-#resource "aws_instance" "bastion" {
-#  ami               = "${module.ubuntu-xenial-ami.id}"
-#  key_name          = "${aws_key_pair.main.key_name}"
-#  instance_type     = "t2.nano"
-#  availability_zone = "${data.aws_availability_zones.available.names[0]}"
-#  #availability_zone = "${join("", slice(data.aws_availability_zones.available.names, 0, 1))}"
-#  root_block_device {
-#    volume_type = "gp2"
-#    volume_size = "10"
-#  }
-#  associate_public_ip_address = "true"
-#  vpc_security_group_ids      = ["${module.public-ssh-sg.id}",
-#                                 "${module.open-egress-sg.id}"
-#  ]
-#  subnet_id = "${module.vpc.public_subnet_ids[0]}"
-#  tags {
-#    Name = "${var.name}-bastion"
-#  }
-#}
 
 output "elb_dns" {
   value       = "${aws_elb.web.dns_name}"
