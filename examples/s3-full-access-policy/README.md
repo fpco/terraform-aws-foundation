@@ -6,7 +6,20 @@ This example provides an environment to demonstrate and test the [s3-full-access
 
 ### Environment creation and deployment
 
-TODO
+To use this example set up AWS credentials and then run the commands in the 
+following order:
+
+```
+make init
+make plan
+make apply
+```
+
+Or simply run the following:
+
+```
+make init && make plan && make apply
+```
 
 ### Testing
 
@@ -14,7 +27,13 @@ TODO
 
 ### Destruction
 
-TODO
+To destroy the test environment run the following command:
+
+```
+make clean
+```
+
+This will delete the objects and buckets that were created with `terraform destroy`.
 
 ## Description
 

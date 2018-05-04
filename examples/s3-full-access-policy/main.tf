@@ -1,6 +1,6 @@
 variable "name" {
   description = "The name of the account or deployment to use with this policy."
-  default = "s3-full-access-policy-example"
+  default = "example"
 }
 
 variable "region" {
@@ -10,7 +10,7 @@ variable "region" {
 
 variable "bucket_names" {
   description = "list of bucket names to grant access to"
-  default = []
+  default = ["s3-full-access-policy-bucket"]
 }
 
 provider "aws" {
@@ -19,5 +19,15 @@ provider "aws" {
 
 module "s3-full-access-policy" {
   source       = "../../modules/s3-full-access-policy"
+  name         = "${var.name}"
   bucket_names = "${var.bucket_names}"
+}
+
+resource "aws_s3_bucket" "test-bucket" {
+  bucket = "${var.bucket_names[0]}"
+  acl = "private"
+
+  tags {
+    Name = "Test bucket for s3-full-access-policy module"
+  }
 }
