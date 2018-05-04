@@ -4,6 +4,11 @@
  *
  */
 
+variable "extra_tags" {
+  description = "Extra tags that will be added to aws_subnet resources"
+  default     = {}
+}
+
 variable "name" {
   description = "name of the project, use as prefix to names of resources created"
   default     = "test-project"
@@ -12,6 +17,11 @@ variable "name" {
 variable "region" {
   description = "Region where the project will be deployed"
   default     = "us-east-2"
+}
+
+variable "vpc_cidr" {
+  description = "Top-level CIDR for the whole VPC network space"
+  default     = "10.23.0.0/16"
 }
 
 variable "ssh_pubkey" {
@@ -44,7 +54,7 @@ module "vpc" {
   source      = "../../modules/vpc-scenario-2"
   name_prefix = "${var.name}"
   region      = "${var.region}"
-  cidr        = "10.23.0.0/16"
+  cidr        = "${var.vpc_cidr}"
   azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
 
   extra_tags = {
@@ -65,19 +75,38 @@ resource "aws_key_pair" "main" {
   public_key = "${file(var.ssh_pubkey)}"
 }
 
-# shared security group for SSH
-module "public-ssh-sg" {
-  source              = "../../modules/ssh-sg"
-  name                = "${var.name}"
-  vpc_id              = "${module.vpc.vpc_id}"
-  allowed_cidr_blocks = "0.0.0.0/0"
+# Security group for the elastic load balancer
+module "vpc-elb-sg" {
+  source      = "../../modules/security-group-base"
+  description = "Test project ELB security group"
+  name        = "${var.name}-vpc-elb"
+  vpc_id      = "${module.vpc.vpc_id}"
 }
 
-# shared security group, open egress (outbound from nodes)
-module "open-egress-sg" {
-  source = "../../modules/open-egress-sg"
-  name   = "${var.name}"
-  vpc_id = "${module.vpc.vpc_id}"
+# security group rule for elb open egress (outbound from nodes)
+module "vpc-elb-open-egress-rule" {
+  source            = "../../modules/open-egress-sg"
+  security_group_id = "${module.vpc-elb-sg.id}"
+}
+
+# Security group for the web instance
+module "vpc-web-sg" {
+  source      = "../../modules/security-group-base"
+  description = "Test project web instance security group"
+  name        = "${var.name}-vpc-web"
+  vpc_id      = "${module.vpc.vpc_id}"
+}
+
+# security group rule for web instance SSH
+module "vpc-web-public-ssh-sg-rule" {
+  source              = "../../modules/ssh-sg"
+  security_group_id   = "${module.vpc-web-sg.id}"
+}
+
+# security group rule for web instance open egress (outbound from nodes)
+module "vpc-web-open-egress-sg-rule" {
+  source            = "../../modules/open-egress-sg"
+  security_group_id = "${module.vpc-web-sg.id}"
 }
 
 # Security Group for ELB, gets public access
@@ -131,8 +160,10 @@ resource "aws_elb" "web" {
   }
 
   # Ensure we allow incoming traffic to the ELB, HTTP/S
-  security_groups = ["${aws_security_group.public-elb.id}",
-    "${module.open-egress-sg.id}",
+  security_groups =
+  [ "${aws_security_group.public-elb.id}"
+  , "${module.vpc-elb-sg.id}"
+  , "${module.vpc-web-sg.id}"
   ]
 
   # ELBs in the public subnets, separate from the web ASG in private subnets
@@ -143,7 +174,7 @@ module "web" {
   source           = "../../modules/asg"
   ami              = "${module.ubuntu-xenial-ami.id}"
   azs              = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
-  name             = "${var.name}-web"
+  name_prefix      = "${var.name}-web"
   elb_names        = ["${aws_elb.web.name}"]
   instance_type    = "t2.nano"
   desired_capacity = "${length(module.vpc.public_subnet_ids)}"
@@ -153,9 +184,10 @@ module "web" {
   key_name         = "${aws_key_pair.main.key_name}"
   subnet_ids       = ["${module.vpc.private_subnet_ids}"]
 
-  security_group_ids = ["${module.public-ssh-sg.id}",
-    "${module.open-egress-sg.id}",
-    "${aws_security_group.web-service.id}",
+  security_group_ids =
+  [ "${module.vpc-elb-sg.id}"
+  , "${module.vpc-web-sg.id}"
+  , "${aws_security_group.web-service.id}"
   ]
 
   root_volume_type = "gp2"
@@ -188,25 +220,6 @@ docker run                   \
 END_INIT
 }
 
-#resource "aws_instance" "bastion" {
-#  ami               = "${module.ubuntu-xenial-ami.id}"
-#  key_name          = "${aws_key_pair.main.key_name}"
-#  instance_type     = "t2.nano"
-#  availability_zone = "${data.aws_availability_zones.available.names[0]}"
-#  #availability_zone = "${join("", slice(data.aws_availability_zones.available.names, 0, 1))}"
-#  root_block_device {
-#    volume_type = "gp2"
-#    volume_size = "10"
-#  }
-#  associate_public_ip_address = "true"
-#  vpc_security_group_ids      = ["${module.public-ssh-sg.id}",
-#                                 "${module.open-egress-sg.id}"
-#  ]
-#  subnet_id = "${module.vpc.public_subnet_ids[0]}"
-#  tags {
-#    Name = "${var.name}-bastion"
-#  }
-#}
 output "elb_dns" {
   value       = "${aws_elb.web.dns_name}"
   description = "make the ELB accessible on the outside"

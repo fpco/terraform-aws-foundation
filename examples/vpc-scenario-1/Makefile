@@ -8,38 +8,35 @@ check-plan-file:
 		exit 1; \
 	fi
 
-ssh-key:
-	@ssh-keygen -q -N "" -b 4096 -C "SSH key for vpc-scenario-2 example" -f ./id_rsa
-
 ## Runs terraform get and terraform init for env
 init:
 	@terraform get
 	@terraform init
 
-subnets-plan:
+ssh-key:
+	@ssh-keygen -q -N "" -b 4096 -C "SSH key for vpc-scenario-1 example" -f ./id_rsa
+
+plan-vpc:
+	@terraform plan \
+		-target="module.vpc.module.vpc" \
+		-out=tf.out
+
+plan-subnets:
 	@terraform plan \
 		-target="module.vpc.module.public-subnets" \
-		-target="module.vpc.module.private-subnets" \
 		-out=tf.out
 
-gateways-plan:
+plan-gateway:
 	@terraform plan \
 		-target="module.vpc.module.public-gateway" \
-		-target="module.vpc.module.nat-gateway" \
 		-out=tf.out
 
-## terraform plan (makes everything)
 plan:
 	@terraform plan -out=tf.out
 
-## terraform apply
 apply: check-plan-file
 	@terraform apply tf.out
 
-test:
-	curl -v http://$(terraform output elb_dns)
-
-## terraform destroy everything
 destroy:
 	@terraform destroy
 
