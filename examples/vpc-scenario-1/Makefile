@@ -18,18 +18,18 @@ ssh-key:
 
 plan-vpc:
 	@terraform plan \
-    -target="module.vpc.module.vpc" \
-    -out=tf.out
+		-target="module.vpc.module.vpc" \
+		-out=tf.out
 
 plan-subnets:
 	@terraform plan \
-    -target="module.vpc.module.public-subnets" \
-    -out=tf.out
+		-target="module.vpc.module.public-subnets" \
+		-out=tf.out
 
 plan-gateway:
 	@terraform plan \
-    -target="module.vpc.module.public-gateway" \
-    -out=tf.out
+		-target="module.vpc.module.public-gateway" \
+		-out=tf.out
 
 plan:
 	@terraform plan -out=tf.out
