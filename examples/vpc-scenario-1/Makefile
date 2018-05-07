@@ -1,4 +1,4 @@
-.PHONY: ssh-key init plan-subnets plan-gateways plan apply test destroy clean
+.PHONY: init ssh-key plan-vpc plan-subnets plan-gateway plan apply destroy clean
 
 .DEFAULT_GOAL = help
 
@@ -12,41 +12,42 @@ check-plan-file:
 		exit 1; \
 	fi
 
-## Create ssh key
-ssh-key:
-	@ssh-keygen -q -N "" -b 4096 -C "SSH key for vpc-scenario-2 example" -f ./id_rsa
-
 ## Runs terraform get and terraform init for env
 init:
 	@terraform get
 	@terraform init
 
-## use 'terraform plan' to 'target' the public/private subnets in the vpc module
+## Create ssh key
+ssh-key:
+	@ssh-keygen -q -N "" -b 4096 -C "SSH key for vpc-scenario-1 example" -f ./id_rsa
+
+## use 'terraform plan' to 'target' the vpc in the vpc module
+plan-vpc:
+	@terraform plan \
+		-target="module.vpc.module.vpc" \
+		-out=tf.out
+
+## use 'terraform plan' to 'target' the public subnets in the vpc module
 plan-subnets:
 	@terraform plan \
 		-target="module.vpc.module.public-subnets" \
-		-target="module.vpc.module.private-subnets" \
 		-out=tf.out
 
-## use 'terraform plan' to 'target' the public and NAT gateways in the vpc module
-plan-gateways:
+## use 'terraform plan' to 'target' the public gateway in the vpc module
+plan-gateway:
 	@terraform plan \
 		-target="module.vpc.module.public-gateway" \
-		-target="module.vpc.module.nat-gateway" \
 		-out=tf.out
 
-## terraform plan (makes everything)
+## use 'terraform plan' to map out updates to apply
 plan:
 	@terraform plan -out=tf.out
 
-## terraform apply
+## use 'terraform apply' to apply updates in a 'tf.out' plan file
 apply: check-plan-file
 	@terraform apply tf.out
 
-test:
-	curl -v http://$(terraform output elb_dns)
-
-## terraform destroy everything
+## use 'terraform destroy' to remove all resources from AWS
 destroy:
 	@terraform destroy
 
