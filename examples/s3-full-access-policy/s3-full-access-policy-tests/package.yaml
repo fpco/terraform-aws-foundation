@@ -14,13 +14,15 @@ extra-source-files:
 # synopsis:            Short description of your package
 # category:            Web
 
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/s3-full-access-policy-tests#readme>
+description:         Please see the README on GitHub at <https://github.com/fpco/terraform-aws-foundation/examples/s3-full-access-policy/s3-full-access-policy-tests#readme>
 
 dependencies:
 - base >= 4.7 && < 5
+- amazonka == 1.5.0.*
+- amazonka-s3
+- text
+- conduit
+- lens
 
 library:
   source-dirs: src

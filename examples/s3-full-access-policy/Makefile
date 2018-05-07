@@ -26,6 +26,8 @@ plan:
 apply: check-plan-file
 	@terraform apply tf.out
 
+# test:
+
 clean:
 	@terraform destroy
 	@rm -f tf.out

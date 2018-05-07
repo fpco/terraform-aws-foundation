@@ -65,3 +65,8 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+nix:
+  enable: true
+  packages: [ zlib ]
+  pure: false # false in order to receive environmental variables for AWS

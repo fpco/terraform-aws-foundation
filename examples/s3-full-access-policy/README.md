@@ -23,7 +23,11 @@ make init && make plan && make apply
 
 ### Testing
 
-TODO
+To run the tests execute the command:
+
+```
+make test
+```
 
 ### Destruction
 

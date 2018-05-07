@@ -25,6 +25,7 @@ module "s3-full-access-policy" {
 
 resource "aws_s3_bucket" "test-bucket" {
   bucket = "${var.bucket_names[0]}"
+  region = "${var.region}"
   acl = "private"
 
   tags {
