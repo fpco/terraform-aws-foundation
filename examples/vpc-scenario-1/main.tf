@@ -90,10 +90,10 @@ module "web-open-egress-rule" {
 
 resource "aws_instance" "web" {
   ami               = "${module.ubuntu-xenial-ami.id}"
-  count             = "${length(module.vpc.public_subnet_ids)}"
+  count             = "${length(var.public_subnet_cidrs)}"
   key_name          = "${aws_key_pair.main.key_name}"
   instance_type     = "t2.nano"
-  availability_zone = "${var.region}a"
+  availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
 
   root_block_device {
     volume_type = "gp2"
