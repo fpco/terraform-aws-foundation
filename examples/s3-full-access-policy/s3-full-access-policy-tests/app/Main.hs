@@ -7,8 +7,6 @@
 
 module Main where
 
-import Cred (getCreds)
-
 import Control.Lens (view, (^.), set, (<&>))
 import Control.Monad (forM_)
 import Control.Monad.IO.Class (MonadIO, liftIO)
@@ -29,27 +27,22 @@ import Network.AWS.Auth (credProfile)
 import System.IO (stdout)
 
 main :: IO ()
-main = listAll AWS.NorthVirginia
+main = listAll
 
 say :: MonadIO m => Text -> m ()
 say = liftIO . Text.putStrLn
 
--- profile :: Text
--- profile = "fpco-dev-sandbox-admin"
-
 accessKey = "AWS_ACCESS_KEY_ID"
 secretKey = "AWS_SECRET_ACCESS_KEY"
 sessToken = "AWS_SESSION_TOKEN"
-region = "AWS_REGION"
+region    = "AWS_REGION"
 
-listAll :: AWS.Region -- ^ Region to operate in.
-        -> IO ()
-listAll r = do
+listAll :: IO ()
+listAll = do
     lgr <- AWST.newLogger AWST.Debug stdout
-    cred <- getCreds
-    -- env <- AWST.newEnv AWST.Discover <&> set AWST.envLogger lgr . set AWST.envRegion r
-    -- env <- AWST.newEnv cred <&> set AWST.envLogger lgr . set AWST.envRegion r
-    env <- AWST.newEnv (AWST.FromEnv accessKey secretKey (Just sessToken) (Just region) ) <&> set AWST.envLogger lgr . set AWST.envRegion r
+    env <- AWST.newEnv
+             (AWST.FromEnv accessKey secretKey (Just sessToken) (Just region))
+             <&> set AWST.envLogger lgr
 
     let val :: ToText a => Maybe a -> Text
         val   = maybe "Nothing" toText
