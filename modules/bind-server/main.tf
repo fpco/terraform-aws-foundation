@@ -61,7 +61,7 @@
 
 # The instance running the DNS server
 resource "aws_instance" "bind" {
-  count                  = "${length(var.private_ips)}"
+  count                  = "${length(compact(var.private_ips))}"
   ami                    = "${var.ami}"
   instance_type          = "${var.instance_type}"
   subnet_id              = "${element(var.subnet_ids, count.index)}"
@@ -121,7 +121,7 @@ data "template_file" "config_owner" {
 
 # Contains provisioner that is triggered whenever named options are changed.
 resource "null_resource" "bind" {
-  count = "${length(var.private_ips)}"
+  count = "${length(compact(var.private_ips))}"
 
   triggers {
     named_conf         = "${var.named_conf}"
