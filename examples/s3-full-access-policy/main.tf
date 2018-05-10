@@ -36,7 +36,7 @@ resource "aws_s3_bucket" "test-bucket" {
   bucket = "${var.bucket_names[0]}"
   region = "${var.region}"
   acl = "private"
-  
+
   tags {
     Name = "Test bucket for s3-full-access-policy module"
   }
