@@ -27,7 +27,8 @@ import Network.AWS.Auth (credProfile)
 import System.IO (stdout)
 
 main :: IO ()
-main = listAll
+main = do
+  checkBucketPolicy "s3-full-access-policy-bucket"
 
 say :: MonadIO m => Text -> m ()
 say = liftIO . Text.putStrLn
@@ -56,7 +57,25 @@ listAll = do
         say $ "Found " <> toText (length bs) <> " Buckets."
 
         forM_ bs $ \(view S3.bName -> b) -> do
+            bp <- view S3.gbprsPolicy <$> AWS.send (S3.getBucketPolicy b)
+            say $ "Found Bucket: " <> toText b
+            say $ "With policy: " <> toText (show bp)
+
+        forM_ bs $ \(view S3.bName -> b) -> do
             say $ "Listing Object Versions in: " <> toText b
             AWS.paginate (S3.listObjectVersions b)
                 =$= CL.concatMap (view S3.lovrsVersions)
                  $$ CL.mapM_     (say . mappend " -> " . key)
+
+
+checkBucketPolicy :: Text -> IO ()
+checkBucketPolicy bucketName = do
+  let target  = (S3.BucketName bucketName) :: S3.BucketName
+  lgr <- AWST.newLogger AWST.Debug stdout
+  env <- AWST.newEnv
+            (AWST.FromEnv accessKey secretKey (Just sessToken) (Just region))
+            <&> set AWST.envLogger lgr
+
+  AWST.runResourceT . AWST.runAWST env $ do
+    bp <- view S3.gbprsPolicy <$> AWS.send (S3.getBucketPolicy target)
+    say $ "With policy: "  <> toText (show bp)
