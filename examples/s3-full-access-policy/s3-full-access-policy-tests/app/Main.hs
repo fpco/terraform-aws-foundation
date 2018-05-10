@@ -77,5 +77,9 @@ checkBucketPolicy bucketName = do
             <&> set AWST.envLogger lgr
 
   AWST.runResourceT . AWST.runAWST env $ do
+    -- check if bucket exists
+    AWST.await S3.bucketExists $ S3.headBucket target
+    say $ "Found Bucket: " <> toText bucketName
+    -- get bucket policy
     bp <- view S3.gbprsPolicy <$> AWS.send (S3.getBucketPolicy target)
     say $ "With policy: "  <> toText (show bp)
