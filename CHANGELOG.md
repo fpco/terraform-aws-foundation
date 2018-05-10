@@ -1,3 +1,12 @@
+# v0.7.3
+
+* `bind-server`: support empty private_ips, allow disabling DNS
+* Initial CI setup, run `tflint`
+* `ex/vpc-scenario-1`: az bugfix for web instance, #125
+* update VPC Scenarios 1 and 2 for consistency with other example env
+* `docs`: how to setup ci, #113
+
+
 # v0.7.2
 
 * `ex/kube-stack-private`: tag public subnets for ELBs
