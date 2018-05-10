@@ -1,6 +1,6 @@
 variable "name" {
   description = "The name of policy that will be created."
-  default = "s3-full-access-example-policy"
+  default     = "s3-full-access-example-policy"
 }
 
 variable "region" {
@@ -10,17 +10,13 @@ variable "region" {
 
 variable "bucket_names" {
   description = "list of bucket names to grant access to"
-  default = ["s3-full-access-policy-bucket"]
+  default     = ["s3-full-access-policy-bucket"]
 }
 
 variable "user_name" {
   description = "Username for the IAM user that will be created with full access to the newly created S3 bucket."
-  default = "full-access-test-user"
+  default     = "full-access-test-user"
 }
-
-# variable "pgp_key" {
-#   description = "Name of PGP key to use for secret_key encryption, eg. keybase:username"
-# }
 
 provider "aws" {
   region = "${var.region}"
@@ -38,7 +34,6 @@ resource "aws_iam_user" "s3-full-access-policy-user" {
 
 resource "aws_iam_access_key" "full-access-user-access-key" {
   user    = "${aws_iam_user.s3-full-access-policy-user.name}"
-  # pgp_key = "${var.pgp_key}"
 }
 
 resource "aws_iam_user_policy_attachment" "s3-full-access-attachment" {
@@ -49,7 +44,7 @@ resource "aws_iam_user_policy_attachment" "s3-full-access-attachment" {
 resource "aws_s3_bucket" "test-bucket" {
   bucket = "${var.bucket_names[0]}"
   region = "${var.region}"
-  acl = "private"
+  acl    = "private"
 
   tags {
     Name = "Test bucket for s3-full-access-policy module"
