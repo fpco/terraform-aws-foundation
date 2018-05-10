@@ -1,6 +1,6 @@
 variable "name" {
-  description = "The name of the account or deployment to use with this policy."
-  default = "example"
+  description = "The name of policy that will be created."
+  default = "s3-full-access-example-policy"
 }
 
 variable "region" {
@@ -13,24 +13,38 @@ variable "bucket_names" {
   default = ["s3-full-access-policy-bucket"]
 }
 
-variable "user" {
-  description = "User to grant access to."
-  default = "fpco-dev-sandbox-admin"
+variable "user_name" {
+  description = "Username for the IAM user that will be created with full access to the newly created S3 bucket."
+  default = "full-access-test-user"
 }
+
+# variable "pgp_key" {
+#   description = "Name of PGP key to use for secret_key encryption, eg. keybase:username"
+# }
 
 provider "aws" {
   region = "${var.region}"
 }
 
-module "aws_iam_user_policy" "s3-full-access-policy" {
+module "s3-full-access-policy" {
   source       = "../../modules/s3-full-access-policy"
   name         = "${var.name}"
   bucket_names = "${var.bucket_names}"
 }
 
-# resource "aws_iam_user" "full-access-user" {
-#   name = ""
-# }
+resource "aws_iam_user" "s3-full-access-policy-user" {
+  name = "${var.user_name}"
+}
+
+resource "aws_iam_access_key" "full-access-user-access-key" {
+  user    = "${aws_iam_user.s3-full-access-policy-user.name}"
+  # pgp_key = "${var.pgp_key}"
+}
+
+resource "aws_iam_user_policy_attachment" "s3-full-access-attachment" {
+  user       = "${aws_iam_user.s3-full-access-policy-user.name}"
+  policy_arn = "${module.s3-full-access-policy.arn}"
+}
 
 resource "aws_s3_bucket" "test-bucket" {
   bucket = "${var.bucket_names[0]}"

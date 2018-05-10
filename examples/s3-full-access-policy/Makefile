@@ -13,16 +13,6 @@ init:
 	@terraform get
 	@terraform init
 
-buckets-plan:
-	@terraform plan \
-		-target="module.test-bucket" \
-		-out=tf.out
-
-policy-plan:
-	@terraform plan \
-		-target="module.s3-full-access-policy" \
-		-out=tf.out
-
 ## terraform plan (makes everything)
 plan:
 	@terraform plan -out=tf.out
