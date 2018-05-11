@@ -16,5 +16,5 @@ module "vpc" {
 
   public_subnet_cidrs  = ["${var.public_subnet_cidrs}"]
   private_subnet_cidrs = ["${var.private_subnet_cidrs}"]
-  azs                  = ["${slice(data.aws_availability_zones.available.names, 0, 2)}"]
+  azs                  = ["${local.azs}"]
 }

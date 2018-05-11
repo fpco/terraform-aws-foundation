@@ -12,7 +12,7 @@ module "kube-worker-iam" {
 # for this module (TODO)
 module "kube-cluster" {
   source                 = "../../modules/kube-stack"
-  availability_zones     = ["${slice(data.aws_availability_zones.available.names, 0, 2)}"]
+  availability_zones     = ["${local.azs}"]
   name_prefix            = "${var.name}"
   key_name               = "${aws_key_pair.main.key_name}"
   private_load_balancer  = false
