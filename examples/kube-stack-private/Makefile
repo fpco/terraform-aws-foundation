@@ -17,6 +17,8 @@ network:
 	@terraform apply tf.out
 	@terraform plan -out tf.out -target=module.vpc.module.private-subnets
 	@terraform apply tf.out
+	@terraform plan -out tf.out -target=module.vpc.module.nat-gateway
+	@terraform apply tf.out
 
 # Use Terraform to generate a planfile tf.out
 plan:
