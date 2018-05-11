@@ -28,15 +28,22 @@ module "s3-full-access-policy" {
   bucket_names = "${var.bucket_names}"
 }
 
+# Provides an IAM user.
 resource "aws_iam_user" "s3-full-access-policy-user" {
   name = "${var.user_name}"
 }
 
+# Provides an IAM access key. This is a set of credentials that allow API requests to be made as an IAM user.
 resource "aws_iam_access_key" "full-access-user-access-key" {
   user    = "${aws_iam_user.s3-full-access-policy-user.name}"
 }
 
-resource "aws_iam_user_policy_attachment" "s3-full-access-attachment" {
+# Provides an IAM policy.
+# resource "aws_iam_policy" "s3-full-access-iam-policy" {
+# }
+
+# Attaches a Managed IAM Policy to an IAM user
+resource "aws_iam_user_policy_attachment" "s3-full-access-policy-attachment" {
   user       = "${aws_iam_user.s3-full-access-policy-user.name}"
   policy_arn = "${module.s3-full-access-policy.arn}"
 }

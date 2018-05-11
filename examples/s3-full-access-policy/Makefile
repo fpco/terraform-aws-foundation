@@ -23,6 +23,7 @@ apply: check-plan-file
 
 # test:
 
+# clean up terrform and any other files
 clean:
 	@terraform destroy
 	@rm -f tf.out
