@@ -24,7 +24,7 @@ network:
 	@terraform plan -out tf.out -target=module.vpc.module.nat-gateway
 	@terraform apply tf.out
 
-# Use Terraform to generate a planfile tf.out
+## Use Terraform to generate a planfile tf.out
 plan:
 	@terraform plan -out=tf.out
 
@@ -36,7 +36,7 @@ apply:
 destroy:
 	@terraform destroy -force
 
-# rm -rf everything
+## rm -rf everything
 clean: destroy
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
 	@rm -rf tf.out
