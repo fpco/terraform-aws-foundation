@@ -1,10 +1,14 @@
-.PHONY: network plan apply test destroy
+.PHONY: generate-ssh-key network plan apply test destroy
 
 .DEFAULT_GOAL = help
 
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 render-tfvars:
 	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
+
+## Use ssh-keygen to generate a keypair for SSH
+generate-ssh-key:
+	@ssh-keygen -q -N "" -b 4096 -C "kube-stack" -f ./id_rsa
 
 ## Use Terraform to create the VPC and core network resources in a specific order based on module VPC, Scenario 2
 network:

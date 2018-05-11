@@ -38,6 +38,7 @@ Once you've set up your variables, run these `make` targets:
 
 ```bash
 ᐅ make render-tfvars
+ᐅ make generate-ssh-key
 ᐅ make network
 ᐅ make plan
 ᐅ make apply
