@@ -33,14 +33,11 @@ resource "aws_iam_user" "s3-full-access-policy-user" {
   name = "${var.user_name}"
 }
 
-# Provides an IAM access key. This is a set of credentials that allow API requests to be made as an IAM user.
+# Provides an IAM access key.
+# This is a set of credentials that allow API requests to be made as an IAM user.
 resource "aws_iam_access_key" "full-access-user-access-key" {
   user    = "${aws_iam_user.s3-full-access-policy-user.name}"
 }
-
-# Provides an IAM policy.
-# resource "aws_iam_policy" "s3-full-access-iam-policy" {
-# }
 
 # Attaches a Managed IAM Policy to an IAM user
 resource "aws_iam_user_policy_attachment" "s3-full-access-policy-attachment" {

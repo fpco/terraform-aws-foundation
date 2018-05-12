@@ -13,12 +13,13 @@ following order:
 make init
 make plan
 make apply
+make output
 ```
 
 Or simply run the following:
 
 ```
-make init && make plan && make apply
+make init && make plan && make apply && make output
 ```
 
 ### Testing

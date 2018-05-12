@@ -17,6 +17,10 @@ init:
 plan:
 	@terraform plan -out=tf.out
 
+## terraform output - send module output to config file
+output:
+	@terraform output -json > config.json
+
 ## terraform apply
 apply: check-plan-file
 	@terraform apply tf.out
