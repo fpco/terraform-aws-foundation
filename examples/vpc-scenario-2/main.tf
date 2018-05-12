@@ -55,7 +55,7 @@ module "vpc" {
   name_prefix = "${var.name}"
   region      = "${var.region}"
   cidr        = "${var.vpc_cidr}"
-  azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
+  azs         = ["${local.azs}"]
 
   extra_tags = {
     kali = "ma"
@@ -146,6 +146,7 @@ module "web" {
   source           = "../../modules/asg"
   ami              = "${module.ubuntu-xenial-ami.id}"
   azs              = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
+  azs              = "${local.azs}"
   name_prefix      = "${var.name}-web"
   elb_names        = ["${aws_elb.web.name}"]
   instance_type    = "t2.nano"
@@ -186,6 +187,11 @@ docker run                   \
     warp --docroot /var/www/html
 
 END_INIT
+}
+
+locals {
+  az_count = "${length(var.public_subnet_cidrs)}"
+  azs      = ["${slice(data.aws_availability_zones.available.names, 0, local.az_count)}"]
 }
 
 output "elb_dns" {

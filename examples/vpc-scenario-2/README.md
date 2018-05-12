@@ -8,9 +8,9 @@ following order:
 ```
 make ssh-key
 make init
-make subnets-plan
+make plan-subnets
 make apply
-make gateways-plan
+make plan-gateways
 make apply
 make plan
 make apply
