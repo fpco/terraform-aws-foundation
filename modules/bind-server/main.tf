@@ -98,6 +98,7 @@ resource "aws_instance" "bind" {
 
   provisioner "remote-exec" {
     connection {
+      type                = "ssh"
       host                = "${self.private_ip}"
       user                = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
       private_key         = "${file(var.ssh_key)}"
@@ -133,6 +134,7 @@ resource "null_resource" "bind" {
   }
 
   connection {
+    type                = "ssh"
     host                = "${aws_instance.bind.*.private_ip[count.index]}"
     user                = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
     private_key         = "${file(var.ssh_key)}"
@@ -163,7 +165,7 @@ resource "null_resource" "bind" {
   }
 
   provisioner "file" {
-    source      = "${var.db_records_folder}/"
+    source      = "${var.db_records_folder == "" ? "${path.module}/templates/db_records/" : "${var.db_records_folder}/" }"
     destination = "/tmp/db_records"
   }
 
