@@ -72,14 +72,20 @@ testIamUser = do
   let (bucketL, cred) = case mOutput of
         Just out ->
           ( bucketList out
-          , (AWST.FromKeys (AWS.AccessKey $ toBS (accessK out)) (AWS.SecretKey $ toBS (secretK out)))
+          , (AWST.FromKeys (AWS.AccessKey $
+                 toBS (accessK out)) (AWS.SecretKey $ toBS (secretK out)))
           )
         Nothing  ->
           ( ["s3-full-access-policy-bucket"]
           , (AWST.FromEnv accessKey secretKey (Just sessToken) (Just region))
           )
-      bucketName = head bucketL
-      target  = (S3.BucketName bucketName) :: S3.BucketName
+      bucketTextName = head bucketL
+      bucketName = (S3.BucketName bucketTextName) :: S3.BucketName
+      
+      val :: ToText a => Maybe a -> Text
+      val   = maybe "Nothing" toText
+      lat v = maybe mempty (mappend " - " . toText) (v ^. S3.ovIsLatest)
+      key v = val (v ^. S3.ovKey) <> ": " <> val (v ^. S3.ovVersionId) <> lat v
 
   lgr <- AWST.newLogger AWST.Debug stdout
   env <- AWST.newEnv cred
@@ -88,8 +94,9 @@ testIamUser = do
 
   AWST.runResourceT . AWST.runAWST env $ do
     -- check if bucket exists
-    AWST.await S3.bucketExists $ S3.headBucket target
-    say $ "Able to find  Bucket: " <> toText bucketName
+    AWST.await S3.bucketExists $ S3.headBucket bucketName
+    say $ "Able to find  Bucket: " <> toText bucketTextName
+
     -- upload a test file with put object
     let key :: S3.ObjectKey
         key  = S3.ObjectKey "test.txt"
@@ -98,5 +105,21 @@ testIamUser = do
         f :: FilePath
         f  = "test.txt"
     body <- AWS.chunkedFile c f
-    void . AWS.send $ S3.putObject target key body
-    -- TODO List, Delete and then List objects to further demonstrate access
+    void . AWS.send $ S3.putObject bucketName key body
+
+    -- list objects in bucket
+    say $ "Listing Object Versions in: " <> toText bucketName
+    objList <- view S3.lorsContents <$> AWS.send (S3.listObjects bucketName)
+    forM_ objList $ \(view S3.oKey -> (S3.ObjectKey k)) -> do
+        say $ "Found object: " <> k
+
+    -- delete the object that the test tried to put into the bucket
+    deletionRes <- view S3.dorsResponseStatus <$>
+                     AWS.send (S3.deleteObject bucketName key)
+    say (toText $ "Deletion returned response status: " <> show deletionRes) 
+
+    -- list objects in bucket to show object was deleted
+    say $ "Listing Object Versions in: " <> toText bucketName
+    objList' <- view S3.lorsContents <$> AWS.send (S3.listObjects bucketName)
+    forM_ objList' $ \(view S3.oKey -> (S3.ObjectKey k)) -> do
+        say $ "Found object: " <> k
