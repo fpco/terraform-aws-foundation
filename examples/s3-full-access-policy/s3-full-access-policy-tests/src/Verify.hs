@@ -2,7 +2,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
-module Test
+{-|
+Module      : Verify
+Description : Test the s3-full-access-policy terraform module.
+Copyright   : (c) 2015-2018 FP Complete
+License     : MIT
+Maintainer  : mike@fpcomplete.com
+
+-}
+module Verify
   ( testIamUser
   ) where
 

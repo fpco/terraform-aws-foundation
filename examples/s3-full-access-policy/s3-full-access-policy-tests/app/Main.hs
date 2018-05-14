@@ -5,7 +5,7 @@
 module Main where
 
 
-import Test
+import Verify
 import Sandbox
 
 main :: IO ()
