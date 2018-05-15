@@ -1,11 +1,21 @@
-output "access_key" {
+output "access_key_full_access_user" {
   sensitive = true
   value = "${aws_iam_access_key.full-access-user-access-key.id}"
 }
 
-output "secret_key" {
+output "secret_key_full_access_user" {
   sensitive = true
   value = "${aws_iam_access_key.full-access-user-access-key.secret}"
+}
+
+output "access_key_no_access_user" {
+  sensitive = true
+  value = "${aws_iam_access_key.no-access-user-access-key.id}"
+}
+
+output "secret_key_no_access_user" {
+  sensitive = true
+  value = "${aws_iam_access_key.no-access-user-access-key.secret}"
 }
 
 output "bucket_list" {

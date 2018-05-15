@@ -37,21 +37,32 @@ import System.IO (stdout)
 
 -- A data type to store the parsed output that terraform creates.
 data Output = Output
-  { accessK    :: Text
-  , secretK    :: Text
+  { accessKeyFullAccess :: Text
+  , secretKeyFullAccess :: Text
+  , accessKeyNoAccess :: Text
+  , secretKeyNoAccess :: Text
   , bucketList :: [Text]
   }
 
 instance FromJSON Output where
   parseJSON (Object v) = do
-    accKeyObj     <- v .: "access_key"
-    secKeyObj     <- v .: "secret_key"
+
+    accKeyObj <- v .: "access_key_full_access_user"
+    accessKeyFullAccess <- accKeyObj .: "value"
+    secKeyObj <- v .: "secret_key_full_access_user"
+    secretKeyFullAccess <- secKeyObj .: "value"
+
+    accKeyNoAccessObj <- v .: "access_key_no_access_user"
+    accessKeyNoAccess <- accKeyNoAccessObj .: "value"
+    secKeyNoAccessObj <- v .: "secret_key_no_access_user"
+    secretKeyNoAccess <- secKeyNoAccessObj .: "value"
+
     bucketListObj <- v .: "bucket_list"
-    accessK       <- accKeyObj .: "value"
-    secretK       <- secKeyObj .: "value"
     bucketList    <- bucketListObj .: "value"
     return Output{..}
 
+
+-- Set default environmental variables
 accessKey = "AWS_ACCESS_KEY_ID"
 secretKey = "AWS_SECRET_ACCESS_KEY"
 sessToken = "AWS_SESSION_TOKEN"
@@ -70,6 +81,7 @@ retrieveOutput = do
   return (decode' conf)
 
 
+-- TODO have this report a test result rather than ()
 -- | testWithEnv
 -- 
 -- Run tests to verify access to the given bucket with the given
@@ -118,33 +130,46 @@ testIamUser :: IO ()
 testIamUser = do
   mOutput <- retrieveOutput
 
-  let (bucketL, cred) = case mOutput of
+  let (bucketL, credFullAcc, credNoAcc) = case mOutput of
         Just out ->
           ( bucketList out
           , (AWST.FromKeys
-               (AWS.AccessKey $ toBS (accessK out))
-               (AWS.SecretKey $ toBS (secretK out)))
+               (AWS.AccessKey $ toBS (accessKeyFullAccess out))
+               (AWS.SecretKey $ toBS (secretKeyFullAccess out)))
+          , (AWST.FromKeys
+               (AWS.AccessKey $ toBS (accessKeyNoAccess out))
+               (AWS.SecretKey $ toBS (secretKeyNoAccess out)))
           )
-        Nothing  ->
+        Nothing ->
           ( ["s3-full-access-policy-bucket"]
-          , (AWST.FromEnv accessKey secretKey (Just sessToken) (Just region))
+          , AWST.FromEnv accessKey secretKey (Just sessToken) (Just region)
+          , AWST.FromKeys (AWS.AccessKey "") (AWS.SecretKey "")
           )
       bucketTextName = head bucketL
-      bucketName = (S3.BucketName bucketTextName) :: S3.BucketName
-      -- approximate what the public requests would look like (without cred).
-      noCred = AWST.FromKeys (AWS.AccessKey "") (AWS.SecretKey "")
+      bucketName     = (S3.BucketName bucketTextName) :: S3.BucketName
+      noCred         = AWST.FromKeys (AWS.AccessKey "") (AWS.SecretKey "")
+      reg            = AWST.Oregon
+      -- TODO set region based on Terraform output
 
   lgr <- AWST.newLogger AWST.Debug stdout
 
-  -- TODO set region based on Terraform output
-  env <- AWST.newEnv cred
-           <&> set AWST.envLogger lgr . set AWST.envRegion AWST.Oregon
+  -- test enviroment with full access
+  envFullAcc <- AWST.newEnv credFullAcc
+                 <&> set AWST.envLogger lgr . set AWST.envRegion reg
 
+  -- test enviroment with iam user with credentials that do not give access
+  envNoAcc <- AWST.newEnv credNoAcc
+                 <&> set AWST.envLogger lgr . set AWST.envRegion reg
+
+  -- simulate enviroment with no credentials
   envPublic <- AWST.newEnv noCred
-                 <&> set AWST.envLogger lgr . set AWST.envRegion AWST.Oregon
+                 <&> set AWST.envLogger lgr . set AWST.envRegion reg
 
   -- test with full access
-  testWithEnv bucketName env
+  testWithEnv bucketName envFullAcc
+
+  -- test with credentials that don't grant access
+  testWithEnv bucketName envNoAcc
 
   -- test as public
   testWithEnv bucketName envPublic
