@@ -69,41 +69,18 @@ retrieveOutput = do
   conf <- BSL.readFile "../config.json"
   return (decode' conf)
 
--- | testIamUser
---
--- A function to test if the IAM user and credentials created by terraform
--- can be accessed and used
-testIamUser :: IO ()
-testIamUser = do
-  mOutput <- retrieveOutput
 
-  let (bucketL, cred) = case mOutput of
-        Just out ->
-          ( bucketList out
-          , (AWST.FromKeys (AWS.AccessKey $
-                 toBS (accessK out)) (AWS.SecretKey $ toBS (secretK out)))
-          )
-        Nothing  ->
-          ( ["s3-full-access-policy-bucket"]
-          , (AWST.FromEnv accessKey secretKey (Just sessToken) (Just region))
-          )
-      bucketTextName = head bucketL
-      bucketName = (S3.BucketName bucketTextName) :: S3.BucketName
-      
-      val :: ToText a => Maybe a -> Text
-      val   = maybe "Nothing" toText
-      lat v = maybe mempty (mappend " - " . toText) (v ^. S3.ovIsLatest)
-      key v = val (v ^. S3.ovKey) <> ": " <> val (v ^. S3.ovVersionId) <> lat v
-
-  lgr <- AWST.newLogger AWST.Debug stdout
-  env <- AWST.newEnv cred
-           <&> set AWST.envLogger lgr . set AWST.envRegion AWST.Oregon
-           -- TODO set region based on Terraform output
-
+-- | testWithEnv
+-- 
+-- Run tests to verify access to the given bucket with the given
+-- enviroment/credentials
+testWithEnv :: S3.BucketName -> AWS.Env -> IO () 
+testWithEnv bucketName@(S3.BucketName bucketTextName) env = do
   AWST.runResourceT . AWST.runAWST env $ do
+
     -- check if bucket exists
     AWST.await S3.bucketExists $ S3.headBucket bucketName
-    say $ "Able to find  Bucket: " <> toText bucketTextName
+    say $ "Able to find  Bucket: " <> bucketTextName
 
     -- upload a test file with put object
     let key :: S3.ObjectKey
@@ -116,7 +93,7 @@ testIamUser = do
     void . AWS.send $ S3.putObject bucketName key body
 
     -- list objects in bucket
-    say $ "Listing Object Versions in: " <> toText bucketName
+    say $ "Listing Object Versions in: " <> bucketTextName
     objList <- view S3.lorsContents <$> AWS.send (S3.listObjects bucketName)
     forM_ objList $ \(view S3.oKey -> (S3.ObjectKey k)) -> do
         say $ "Found object: " <> k
@@ -124,10 +101,50 @@ testIamUser = do
     -- delete the object that the test tried to put into the bucket
     deletionRes <- view S3.dorsResponseStatus <$>
                      AWS.send (S3.deleteObject bucketName key)
-    say (toText $ "Deletion returned response status: " <> show deletionRes) 
+    say (toText $ "Deletion returned response status: " <> show deletionRes)
 
     -- list objects in bucket to show object was deleted
-    say $ "Listing Object Versions in: " <> toText bucketName
+    say $ "Listing Object Versions in: " <> bucketTextName
     objList' <- view S3.lorsContents <$> AWS.send (S3.listObjects bucketName)
     forM_ objList' $ \(view S3.oKey -> (S3.ObjectKey k)) -> do
         say $ "Found object: " <> k
+
+
+-- | testIamUser
+--
+-- A function to test if the IAM user and credentials created by terraform
+-- can be accessed and used
+testIamUser :: IO ()
+testIamUser = do
+  mOutput <- retrieveOutput
+
+  let (bucketL, cred) = case mOutput of
+        Just out ->
+          ( bucketList out
+          , (AWST.FromKeys
+               (AWS.AccessKey $ toBS (accessK out))
+               (AWS.SecretKey $ toBS (secretK out)))
+          )
+        Nothing  ->
+          ( ["s3-full-access-policy-bucket"]
+          , (AWST.FromEnv accessKey secretKey (Just sessToken) (Just region))
+          )
+      bucketTextName = head bucketL
+      bucketName = (S3.BucketName bucketTextName) :: S3.BucketName
+      -- approximate what the public requests would look like (without cred).
+      noCred = AWST.FromKeys (AWS.AccessKey "") (AWS.SecretKey "")
+
+  lgr <- AWST.newLogger AWST.Debug stdout
+
+  -- TODO set region based on Terraform output
+  env <- AWST.newEnv cred
+           <&> set AWST.envLogger lgr . set AWST.envRegion AWST.Oregon
+
+  envPublic <- AWST.newEnv noCred
+                 <&> set AWST.envLogger lgr . set AWST.envRegion AWST.Oregon
+
+  -- test with full access
+  testWithEnv bucketName env
+
+  -- test as public
+  testWithEnv bucketName envPublic
