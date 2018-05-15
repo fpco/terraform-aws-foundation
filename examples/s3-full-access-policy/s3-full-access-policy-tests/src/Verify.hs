@@ -11,7 +11,7 @@ Maintainer  : mike@fpcomplete.com
 
 -}
 module Verify
-  ( testIamUser
+  ( testS3Access
   ) where
 
 import Control.Lens (view, (^.), set, (<&>))
@@ -122,12 +122,18 @@ testWithEnv bucketName@(S3.BucketName bucketTextName) env = do
         say $ "Found object: " <> k
 
 
--- | testIamUser
+-- | testS3Access
 --
--- A function to test if the IAM user and credentials created by terraform
--- can be accessed and used
-testIamUser :: IO ()
-testIamUser = do
+-- A function to test access to the s3 resources created by terraform.
+--
+-- This will run the same access tests in each of the three scenario environments:
+--
+--   * The iam user which terraform created and attached the full-access policy.
+--   * With requests from the iam user created which does not have any policy attached giving access. 
+--   * Simulated public requests - no user and no access.
+--
+testS3Access :: IO ()
+testS3Access = do
   mOutput <- retrieveOutput
 
   let (bucketL, credFullAcc, credNoAcc) = case mOutput of
@@ -145,7 +151,7 @@ testIamUser = do
           , AWST.FromEnv accessKey secretKey (Just sessToken) (Just region)
           , AWST.FromKeys (AWS.AccessKey "") (AWS.SecretKey "")
           )
-      bucketTextName = head bucketL
+      bucketTextName = head bucketL -- TODO handle scenario with more than one bucket
       bucketName     = (S3.BucketName bucketTextName) :: S3.BucketName
       noCred         = AWST.FromKeys (AWS.AccessKey "") (AWS.SecretKey "")
       reg            = AWST.Oregon

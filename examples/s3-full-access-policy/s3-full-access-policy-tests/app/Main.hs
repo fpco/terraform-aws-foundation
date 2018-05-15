@@ -11,4 +11,4 @@ import Sandbox
 main :: IO ()
 main = do
   -- checkBucketPolicy "s3-full-access-policy-bucket"
-  testIamUser
+  testS3Access
