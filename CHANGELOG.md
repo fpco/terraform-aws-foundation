@@ -1,10 +1,55 @@
 # v0.7.3
 
-* `bind-server`: support empty private_ips, allow disabling DNS
+### Examples
+
+#### `cloud-dev-workspace`
+
+* correct `vpc_cidr`
+
+#### `kube-stack-private`
+
+* fixup helpdoc in Makefile, #76
+* refactor out hardcoded AZ list, use `locals`
+* add `generate-ssh-key` target to Makefile
+* `make network` should target `nat-gateways`
+
+#### `vpc-scenario-1`
+
+* az bugfix for web instance, #125
+* update for consistency with other example env
+
+#### `vpc-scenario-2`
+
+* fixup README
+* fixup `make test`
+* add missing security group rule for ELB
+* update for consistency with other example env
+
+#### `vpc-scenario-2-nat-instance`
+
+* fix build, improve Makefile
+
+#### `vpc-scenario-2-nat-instance-per-az`
+
+* fix build, improve Makefile
+
+
+### Modules
+
+#### `nat-gateways`:
+
+* use `aws_subnet` data source to lookup subnets
+* use `element()` instead of `var.foo[]` syntax
+
+#### `bind-server`
+
+* support empty private_ips, allow disabling DNS
 * Initial CI setup, run `tflint`
-* `ex/vpc-scenario-1`: az bugfix for web instance, #125
-* update VPC Scenarios 1 and 2 for consistency with other example env
-* `docs`: how to setup ci, #113
+
+
+### Documentation
+
+* how to setup ci, #113
 
 
 # v0.7.2
