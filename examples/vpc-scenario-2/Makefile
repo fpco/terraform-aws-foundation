@@ -43,8 +43,9 @@ plan:
 apply: check-plan-file
 	@terraform apply tf.out
 
+## use curl to hit the ELB to confirm the VPC came online ok
 test:
-	curl -v http://$(terraform output elb_dns)
+	@curl -v http://$$(terraform output elb_dns)/
 
 ## terraform destroy everything
 destroy:
