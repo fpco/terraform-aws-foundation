@@ -15,7 +15,6 @@ module "prometheus-data" {
   encrypted   = "${var.data_volume_encrypted}"
   kms_key_id  = "${var.data_volume_kms_key_id}"
   snapshot_id = "${var.data_volume_snapshot_id}"
-  account_arn = "${var.account_arn}"
 }
 
 module "prometheus-server" {
@@ -39,7 +38,7 @@ module "prometheus-server" {
   root_volume_size = "${var.root_volume_size}"
 
   #
-  iam_profile = "${module.prometheus-data.iam_profile}"
+  iam_profile = "${module.prometheus-data.iam_profile_id}"
 
   user_data = <<END_INIT
 #!/bin/bash

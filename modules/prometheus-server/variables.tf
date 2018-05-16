@@ -87,6 +87,10 @@ variable "security_group_ids" {
   description = "list of security groups (by ID) to associate with the ASG"
 }
 
+variable "az" {
+  description = "The AWS Availability Zone to deploy to"
+}
+
 variable "region" {
   description = "The AWS region to deploy to"
 }
@@ -94,8 +98,4 @@ variable "region" {
 variable "load_balancers" {
   default     = []
   description = "The list of load balancers names to pass to the ASG module"
-}
-
-variable "account_arn" {
-  description = "The AWS account number, for IAM role assigned to the ASG"
 }

@@ -605,8 +605,8 @@ module "prometheus-node-exporter-sg" {
 module "prometheus-server" {
   source = "../modules/prometheus-server"
 
-  account_arn        = ""
   ami                = ""
+	az                 = ""
   instance_type      = ""
   key_file           = ""
   key_name           = ""
