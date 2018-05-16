@@ -67,6 +67,7 @@ resource "aws_instance" "dnsmasq" {
   vpc_security_group_ids = ["${var.security_group_ids}"]
   private_ip             = "${var.private_ips[count.index]}"
   key_name               = "${var.key_name}"
+	iam_instance_profile   = ""
 
   root_block_device {
     volume_type = "${var.root_volume_type}"
