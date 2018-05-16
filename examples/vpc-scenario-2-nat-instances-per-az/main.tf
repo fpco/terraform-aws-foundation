@@ -78,12 +78,9 @@ module "private-subnets" {
 }
 
 module "nat-instances" {
-  source      = "../../modules/ec2-nat-instance"
+  source      = "../../modules/ec2-nat-instances"
   name_prefix = "${var.name}"
   key_name    = "${aws_key_pair.main.key_name}"
-
-  # let AWS set IPs for us
-  private_ips = []
 
   # list of subnets to deploy NAT instances into
   public_subnet_ids = ["${module.public-subnets.ids}"]
@@ -237,7 +234,8 @@ module "web" {
   source             = "../../modules/asg"
   ami                = "${module.ubuntu-xenial-ami.id}"
   azs                = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
-  name               = "${var.name}-web"
+  name_prefix        = "${var.name}"
+  name_suffix        = "webapp-server"
   elb_names          = ["${aws_elb.web.name}"]
   instance_type      = "t2.nano"
   desired_capacity   = "${length(module.public-subnets.ids)}"
