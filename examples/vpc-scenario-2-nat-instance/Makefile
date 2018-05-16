@@ -11,9 +11,12 @@ generate-tfvars:
 	@echo "key_file = \"./id_rsa.pub\"" > terraform.tfvars
 	@echo "region = \"us-east-2\"" >> terraform.tfvars
 
-## Use Terraform to create the VPC and core network resources in a specific order
-network:
+## run 'terraform init'
+init:
 	@terraform init
+
+## Use Terraform to create the VPC and core network resources in a specific order
+network: init
 	@terraform plan -out=tf.out -target=module.public-subnets
 	@terraform apply tf.out
 	@terraform plan -out=tf.out -target=module.private-subnets
@@ -45,7 +48,7 @@ destroy:
 	@terraform destroy -force
 
 ## rm -rf everything
-clean: destroy
+clean:
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
 	@rm -rf id_rsa id_rsa.pub
 	@rm -rf tf.out terraform.tfvars
