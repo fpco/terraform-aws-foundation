@@ -8,9 +8,9 @@ following order:
 ```
 make ssh-key
 make init
-make subnets-plan
+make plan-subnets
 make apply
-make gateways-plan
+make plan-gateways
 make apply
 make plan
 make apply
@@ -36,5 +36,6 @@ make clean
 ```
 
 ## Notes
-- This example was last tested with `Terraform v0.11.6`
-- This example assumes AWS credentials setup with access to the **us-east-2** region.
+
+* This example was last tested with `Terraform v0.11.7`
+* This example assumes AWS credentials setup with access to the **us-east-2** region.
