@@ -83,6 +83,15 @@ module "elb-sg" {
   vpc_id      = "${module.vpc.vpc_id}"
 }
 
+# security group rule for elb open inbound http
+module "elb-http-rule" {
+  source            = "../../modules/single-port-sg"
+	port              = 80
+	cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${module.elb-sg.id}"
+	description       = "open HTTP on the ELB to public access"
+}
+
 # security group rule for elb open egress (outbound from nodes)
 module "elb-open-egress-rule" {
   source            = "../../modules/open-egress-sg"
