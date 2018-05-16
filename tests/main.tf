@@ -713,16 +713,6 @@ module "vpc" {
   region      = ""
 }
 
-module "vpc-legacy" {
-  source = "../modules/vpc-legacy"
-
-  azs                 = ""
-  cidr                = ""
-  name_prefix         = ""
-  public_subnet_cidrs = []
-  region              = ""
-}
-
 module "vpc-network" {
   source = "../modules/vpc-network"
 
