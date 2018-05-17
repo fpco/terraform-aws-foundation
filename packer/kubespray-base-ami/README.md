@@ -15,7 +15,8 @@ Create the necessary `packer.vars` file:
     cat << EOF > packer.vars
     {
         "aws_vpc_id": "vpc-xxxx",
-        "aws_subnet_id": "subnet-xxx"
+        "aws_subnet_id": "subnet-xxx",
+        "docker_release_tag": "latest"
     }
     EOF
 

@@ -11,7 +11,7 @@ docker run --privileged --net=host --rm \
     -e ANSIBLE_SSH_ARGS="-i /tmp/id_rsa" \
     -e ANSIBLE_HOST_KEY_CHECKING=False \
     -e PYTHONUNBUFFERED=True \
-    fpco/kubespray ansible-playbook \
+    fpco/kubespray:$TAG ansible-playbook \
         -u core -b -i inventory/localhost \
         --extra-vars="@vars.yml" \
         --tags="bootstrap-os,adduser,download" \
