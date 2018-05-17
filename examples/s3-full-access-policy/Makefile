@@ -25,7 +25,11 @@ output:
 apply: check-plan-file
 	@terraform apply tf.out
 
-# test:
+## build and run the test executable
+test:
+	@cd s3-full-access-policy-tests && \
+			stack build && \
+			stack exec s3-full-access-policy-tests-exe
 
 # clean up terrform and any other files
 clean:

@@ -24,11 +24,13 @@ make init && make plan && make apply && make output
 
 ### Testing
 
-To run the tests execute the command:
+To run the tests, after resource creation, execute the command:
 
 ```
 make test
 ```
+
+This will build and run the test executable. The tests poll for around 20 seconds until they find the target bucket. Expect the test overall to take around a minute to run.
 
 ### Destruction
 
@@ -65,6 +67,8 @@ This will delete the objects and buckets that were created with `terraform destr
 2. The included Haskell code will perform tests and API calls using these resources and roles as targets.
 
 ### Notes
+
+This example currently only creates a single bucket to test the terraform module on. The test executable currently only tests the first bucket it sees in the json output produced by terraform.
 
 This proposal is for issue [122](https://github.com/fpco/terraform-aws-foundation/issues/122).
 

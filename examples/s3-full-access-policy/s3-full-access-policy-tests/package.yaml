@@ -19,12 +19,14 @@ description:         Please see the README on GitHub at <https://github.com/fpco
 dependencies:
 - base >= 4.7 && < 5
 - amazonka == 1.5.0.*
+- amazonka-core
 - amazonka-s3
 - text
 - conduit
 - lens
 - bytestring
 - aeson
+- safe-exceptions
 
 library:
   source-dirs: src
