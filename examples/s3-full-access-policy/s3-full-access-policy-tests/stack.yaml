@@ -1,0 +1,10 @@
+resolver: lts-10.10
+
+packages:
+- .
+
+# Uncomment on NixOS based systems.
+# nix:
+#   enable: true
+#   packages: [ zlib ]
+#   pure: false # false for now in order to receive environmental variables for AWS
