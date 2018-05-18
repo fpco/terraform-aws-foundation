@@ -311,10 +311,6 @@ testS3Access = do
   envNoAcc <- AWST.newEnv credNoAcc
                  <&> set AWST.envLogger lgr . set AWST.envRegion reg
 
-  -- simulate enviroment with no credentials
-  envPublic <- AWST.newEnv noCred
-                 <&> set AWST.envLogger lgr . set AWST.envRegion reg
-
   -- test with full access
   say "\nTesting full access.\n"
   fullAccessResult <- testWithEnv bucketName envFullAcc FullAccessUser
@@ -323,15 +319,10 @@ testS3Access = do
   say "\nTesting user with no access.\n"
   noAccessResult <- testWithEnv bucketName envNoAcc NoAccessUser
 
-  -- test as public
-  say "\nTesting as public.\n"
-  publicAccessResult <- testWithEnv bucketName envPublic Public
-
   say "\nTests complete.\n"
 
   let testResults = [ fullAccessResult
                     , noAccessResult
-                    , publicAccessResult
                     ]
       testsPassed    = and (map allTestsPassed testResults)
       testsThatFailed = filter (not . allTestsPassed) testResults
