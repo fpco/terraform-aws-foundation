@@ -63,6 +63,10 @@ instance FromJSON Output where
     bucketList    <- bucketListObj .: "value"
     return Output{..}
 
+-- | UserTestCase
+--
+-- A data type which represents the two possible user test scenarios that are
+-- currently being scrutinized.
 data UserTestCase = FullAccessUser
                   | NoAccessUser
                   | Public
@@ -152,7 +156,7 @@ listReport _ (Right _) =
   Left "Test failed. User without access - or public - able to list bucket objects"
 listReport _ (Left  e) =
   Right $ toText $
-    "Text passed. User without access - or public - not able to \
+    "Test passed. User without access - or public - not able to \
     \list bucket objects. Exception caught: " <> show e
 
 -- | Evaluate whether or not the uploaded object was actually uploaded
@@ -170,7 +174,7 @@ putReport _ (Right _) key =
   Left  "Test failed. User without access - or public - able to list bucket objects"
 putReport _ (Left e) key =
   Right $ toText $
-    "Text passed. User without access - or public - not able to list bucket \
+    "Test passed. User without access - or public - not able to list bucket \
     \ objects. Exception caught: " <> show e
 
 -- | Evaluate the response given for each scenario if the user can delete
@@ -193,11 +197,11 @@ deleteReport _ (Right i) =
              toText $ "Test failed. User without access - or public - able to \
                       \ send delete request. Status code: " <> show i
     False -> Right $
-             toText $ "Text passed. User without access - or public - not able \
+             toText $ "Test passed. User without access - or public - not able \
                       \ to send delete request. Status code: " <> show i
 deleteReport _ (Left e) =
   Right $ toText $
-    "Text passed. User without access - or public - not able to send delete \
+    "Test passed. User without access - or public - not able to send delete \
     \ request. Exception caught" <> show e
 
 
@@ -216,13 +220,13 @@ removedReport _ (Right _) key =
   Left  "Test failed. User without access - or public - able to list bucket objects"
 removedReport _ (Left  e) key =
   Right $ toText $
-    "Text passed. User without access - or public - not able to list bucket \
+    "Test passed. User without access - or public - not able to list bucket \
     \objects. Exception caught: " <> show e
 
 -- | testWithEnv
 --
 -- Run tests to verify access to the given bucket with the given
--- enviroment/credentials
+-- environment/credentials
 testWithEnv :: S3.BucketName -> AWS.Env -> UserTestCase -> IO Report
 -- testWithEnv :: S3.BucketName -> AWS.Env -> UserTestCase -> IO Report
 testWithEnv bucketName@(S3.BucketName bucketTextName) env userTestCase = do
@@ -303,11 +307,11 @@ testS3Access = do
 
   lgr <- AWST.newLogger AWST.Debug stdout
 
-  -- test enviroment with full access
+  -- test environment with full access
   envFullAcc <- AWST.newEnv credFullAcc
                  <&> set AWST.envLogger lgr . set AWST.envRegion reg
 
-  -- test enviroment with iam user with credentials that do not give access
+  -- test environment with iam user with credentials that do not give access
   envNoAcc <- AWST.newEnv credNoAcc
                  <&> set AWST.envLogger lgr . set AWST.envRegion reg
 

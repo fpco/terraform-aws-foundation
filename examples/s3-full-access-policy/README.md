@@ -30,11 +30,12 @@ To run the tests, after resource creation, execute the command:
 make test
 ```
 
-This will build and run the test executable. The tests poll for around 20 seconds until they find the target bucket. Expect the test overall to take around a minute to run.
+This will build and run the test executable. The tests poll for around 20 seconds until they find the target bucket. Expect the test overall to take around a minute to run after the executable build is complete.
+Stack is a dependency of this step and must be installed in order to build and run the tests.
 
 ### Destruction
 
-To destroy the test environment run the following command:
+To destroy the test environment and all buckets and other resources created by the example run the following command:
 
 ```
 make clean
@@ -44,16 +45,19 @@ This will delete the objects and buckets that were created with `terraform destr
 
 ## Description
 
-### Abstract High Level Goals
+### Abstract high level goals for this example
 
 - Implement tests that confirm correctness for IAM policies in the [s3-full-access-policy](https://github.com/fpco/terraform-aws-foundation/tree/master/modules/s3-full-access-policy) module.
-  * Test the permissions that the modules sets up. This should cover the IAM policy based permissions that the module sets up and will demostrate that the appropriate IAM role/user has access to an S3 bucket.
+  * Test the policy permissions that the module sets up and demonstrate that the appropriate IAM role/user has access to an S3 bucket.
   * Further, other roles/users should be shown not to have access/permission to that S3 bucket.
 
-### Requirements
+### Completed Requirements
 
 - Tests to demonstrate that correct user has access.
-- Tests to demonstrate that all other users do **not** have access.
+- Tests to demonstrate that other users do **not** have access.
+
+### Remaining Requirements
+
 - Other tests for possible combinations from the module of include-lists and exclude-lists that IAM uses.
 - After S3 buckets are created for testing they should be purged - this would require tests to show that buckets have been removed.
 - The resulting resource costs from testing need to be tracked.

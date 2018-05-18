@@ -1,14 +1,16 @@
--- |
--- Test code for make AWS api calls. Based on the example at:
--- https://github.com/brendanhay/amazonka/blob/master/examples/src/Example/S3.hs
+{-|
+Module      : Main
+Description : Test the s3-full-access-policy terraform module.
+Copyright   : (c) 2015-2018 FP Complete
+License     : MIT
+Maintainer  : mike@fpcomplete.com
 
+Run the test code for make AWS api calls against the the s3-full-access-policy
+terraform module.
+-}
 module Main where
 
-
 import Verify
-import Sandbox
 
 main :: IO ()
-main = do
-  -- checkBucketPolicy "s3-full-access-policy-bucket"
-  testS3Access
+main = testS3Access
