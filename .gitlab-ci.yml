@@ -1,4 +1,4 @@
-image: registry.gitlab.fpcomplete.com/fpco/default-build-image:2722
+image: registry.gitlab.fpcomplete.com/fpco/default-build-image:2937
 
 lint:
   script:
