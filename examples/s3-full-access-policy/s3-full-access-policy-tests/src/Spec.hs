@@ -71,15 +71,7 @@ instance FromJSON Output where
 -- currently being scrutinized.
 data UserTestCase = FullAccessUser
                   | NoAccessUser
-                  | Public
                   deriving Show
-
-
--- Set default environmental variables
-accessKey = "AWS_ACCESS_KEY_ID"
-secretKey = "AWS_SECRET_ACCESS_KEY"
-sessToken = "AWS_SESSION_TOKEN"
-region    = "AWS_REGION"
 
 say :: MonadIO m => Text -> m ()
 say = liftIO . Text.putStrLn
