@@ -277,7 +277,7 @@ testWithEnv bucketName@(S3.BucketName bucketTextName) env userTestCase = do
 -- This will run the same access tests in each of the three scenario environments:
 --
 --   * The iam user which terraform created and attached the full-access policy.
---   * With requests from the iam user created which does not have any policy attached giving access. 
+--   * With requests from the iam user created which does not have any policy attached giving access.
 --   * Simulated public requests - no user and no access.
 --
 testS3Access :: IO ()

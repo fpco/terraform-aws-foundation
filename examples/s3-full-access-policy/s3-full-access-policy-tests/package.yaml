@@ -27,6 +27,7 @@ dependencies:
 - bytestring
 - aeson
 - safe-exceptions
+- hspec
 
 library:
   source-dirs: src
