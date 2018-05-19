@@ -101,18 +101,16 @@ bucketTest bucketName env =
   AWST.runResourceT . AWST.runAWST env $ do
     AWST.await S3.bucketExists $ S3.headBucket bucketName
 
-bucketReport :: S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
+bucketReport :: S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 bucketReport bucketName env FullAccessUser = do
-  hspec $ do
-    describe "bucket report" $ do
-      it "Full access user can list and find target bucket" $ do
-        a <- bucketTest bucketName env
-        shouldSatisfy a (==AcceptSuccess)
+  describe "bucket report" $ do
+    it "Full access user can list and find target bucket" $ do
+      a <- bucketTest bucketName env
+      shouldSatisfy a (==AcceptSuccess)
 bucketReport bucketName env _ = do
-  hspec $ do
-    describe "bucket report" $ do
-      it "Users without access cannot list and find bucket" $ do
-        shouldThrow (bucketTest bucketName env) anyException
+  describe "bucket report" $ do
+    it "Users without access cannot list and find bucket" $ do
+      shouldThrow (bucketTest bucketName env) anyException
 
 
 uploadTest :: S3.ObjectKey -> AWS.RqBody -> S3.BucketName -> AWS.Env -> IO (AWS.Rs S3.PutObject)
@@ -120,19 +118,17 @@ uploadTest key body bucketName env =
   AWST.runResourceT . AWST.runAWST env $ do
     AWS.send $ S3.putObject bucketName key body
 
-uploadReport :: S3.ObjectKey -> AWS.RqBody -> S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
+uploadReport :: S3.ObjectKey -> AWS.RqBody -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 uploadReport key body bucketName env FullAccessUser = do
-  hspec $ do
-    describe "upload report" $ do
-      it "full access user put" $ do
-        status <- uploadTest key body bucketName env
-        shouldSatisfy (view S3.porsResponseStatus status) (\i -> (i >= 200) && (i < 300))
+  describe "upload report" $ do
+    it "full access user put" $ do
+      status <- uploadTest key body bucketName env
+      shouldSatisfy (view S3.porsResponseStatus status) (\i -> (i >= 200) && (i < 300))
 uploadReport key body bucketName env _ = do
-  hspec $ do
-    describe "upload report" $ do
-      it "upload" $ do
-        -- this should handle the exeception thrown in upload test for this case
-        shouldThrow (uploadTest key body bucketName env) anyException
+  describe "upload report" $ do
+    it "upload" $ do
+      -- this should handle the exeception thrown in upload test for this case
+      shouldThrow (uploadTest key body bucketName env) anyException
 
 listTest :: S3.BucketName -> AWS.Env -> IO [S3.Object]
 listTest bucketName env = do
@@ -141,32 +137,29 @@ listTest bucketName env = do
 
 -- | Report whether the full access user was able to list out the objects
 -- in the bucket (and the other user cases were not).
-listReport key body bucketName env FullAccessUser = do
-  hspec $ do
-    describe "list report" $ do
-      it "full access can list objects" $ do
-        objList <- listTest bucketName env
-        length objList `shouldSatisfy` (>=1)
-listReport key body bucketName env _ = do
-  hspec $ do
-    describe "list report" $ do
-      it "non-access user try to list objects" $ do
-        shouldThrow (listTest bucketName env) anyException
+listReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
+listReport key bucketName env FullAccessUser = do
+  describe "list report" $ do
+    it "full access can list objects" $ do
+      objList <- listTest bucketName env
+      length objList `shouldSatisfy` (>=1)
+listReport key bucketName env _ = do
+  describe "list report" $ do
+    it "non-access user try to list objects" $ do
+      shouldThrow (listTest bucketName env) anyException
 
 -- | Evaluate whether or not the uploaded object was actually uploaded
 -- and is now in the bucket.
-putReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
+putReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 putReport key bucketName env FullAccessUser = do
-  hspec $ do
-    describe "list report" $ do
-      it "Full access user found uploaded item" $ do
-        objList <- listTest bucketName env
-        elem key (map (\o -> view S3.oKey o) objList) `shouldBe` True
+  describe "put report" $ do
+    it "Full access user found uploaded item" $ do
+      objList <- listTest bucketName env
+      elem key (map (\o -> view S3.oKey o) objList) `shouldBe` True
 putReport _key bucketName env _ = do
-  hspec $ do
-    describe "list report" $ do
-      it "User without access trying to list objects" $ do
-        shouldThrow (listTest bucketName env) anyException
+  describe "put report" $ do
+    it "User without access trying to list objects" $ do
+      shouldThrow (listTest bucketName env) anyException
 
 deleteTest :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> IO Int
 deleteTest key bucketName env =
@@ -174,33 +167,47 @@ deleteTest key bucketName env =
     view S3.dorsResponseStatus <$> AWS.send (S3.deleteObject bucketName key)
 
 -- | Evaluate the response given for if the user has access to delete
-deleteReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
+deleteReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 deleteReport key bucketName env FullAccessUser = do
-  hspec $ do
-    describe "delete report" $ do
-      it "full access user should be able to send delete request" $ do
-        statusCode <- deleteTest key bucketName env
-        shouldSatisfy statusCode (\i -> (i >= 200) && (i < 300))
+  describe "delete report" $ do
+    it "full access user should be able to send delete request" $ do
+      statusCode <- deleteTest key bucketName env
+      shouldSatisfy statusCode (\i -> (i >= 200) && (i < 300))
 deleteReport key bucketName env _ = do
-  hspec $ do
-    describe "delete report" $ do
-      it "Users without access should not be able to make delete requests" $ do
-        shouldThrow (deleteTest key bucketName env) anyException
+  describe "delete report" $ do
+    it "Users without access should not be able to make delete requests" $ do
+      shouldThrow (deleteTest key bucketName env) anyException
 
 -- | Evaluate whether or not the uploaded object was actually deleted and is no
 -- longer in the bucket.
-removedReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
+removedReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 removedReport key bucketName env FullAccessUser = do
-  hspec $ do
-    describe "list report" $ do
-      it "Full access user should not find deleted object" $ do
-        objList <- listTest bucketName env
-        elem key (map (\o -> view S3.oKey o) objList) `shouldBe` False
+  describe "removed report" $ do
+    it "Full access user should not find deleted object" $ do
+      objList <- listTest bucketName env
+      elem key (map (\o -> view S3.oKey o) objList) `shouldBe` False
 removedReport _key bucketName env _ = do
+  describe "removed report" $ do
+    it "User without access trying to list objects" $ do
+      shouldThrow (listTest bucketName env) anyException
+
+generateReport :: S3.ObjectKey -> AWS.RqBody -> S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
+generateReport key body bucketName env FullAccessUser = do
   hspec $ do
-    describe "list report" $ do
-      it "User without access trying to list objects" $ do
-        shouldThrow (listTest bucketName env) anyException
+    bucketReport bucketName env FullAccessUser
+    uploadReport key body bucketName env FullAccessUser
+    listReport key bucketName env FullAccessUser
+    putReport key bucketName env FullAccessUser
+    deleteReport key bucketName env FullAccessUser
+    removedReport key bucketName env FullAccessUser
+generateReport key body bucketName env userTestCase = do
+  hspec $ do
+    bucketReport bucketName env userTestCase
+    uploadReport key body bucketName env userTestCase
+    listReport key bucketName env userTestCase
+    putReport key bucketName env userTestCase
+    deleteReport key bucketName env userTestCase
+    removedReport key bucketName env userTestCase
 
 -- | testWithEnv
 --
@@ -209,10 +216,6 @@ removedReport _key bucketName env _ = do
 testWithEnv :: S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
 testWithEnv bucketName env userTestCase = do
   AWST.runResourceT . AWST.runAWST env $ do
-
-    say "List and find target bucket"
-    liftIO $ bucketReport bucketName env userTestCase
-
     -- create test file parts to use to put/upload to bucket
     let key :: S3.ObjectKey
         key  = S3.ObjectKey "test.txt"
@@ -223,21 +226,8 @@ testWithEnv bucketName env userTestCase = do
     body <- AWS.chunkedFile chunkSize file
 
     liftIO $ do
-      Text.putStrLn "Test upload/put."
-      uploadReport key body bucketName env userTestCase
-
-      Text.putStrLn "Test ability to list objects in bucket."
-      listReport key body bucketName env userTestCase
-
-      Text.putStrLn "Test to find uploaded item."
-      putReport key bucketName env userTestCase
-
-      Text.putStrLn "Delete object."
-      deleteReport key bucketName env userTestCase
-
-      Text.putStrLn "Test to verify deleted item was removed."
-      removedReport key bucketName env userTestCase
-
+      Text.putStrLn "Running tests."
+      generateReport key body bucketName env userTestCase
 
 -- | testS3Access
 --
