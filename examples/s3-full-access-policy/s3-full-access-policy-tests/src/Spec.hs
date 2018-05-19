@@ -112,24 +112,26 @@ bucketReport bucketName env _ = do
     it "Users without access cannot list and find bucket" $ do
       shouldThrow (bucketTest bucketName env) anyException
 
-
+-- | Test the ability to put objects to the target bucket
 uploadTest :: S3.ObjectKey -> AWS.RqBody -> S3.BucketName -> AWS.Env -> IO (AWS.Rs S3.PutObject)
 uploadTest key body bucketName env =
   AWST.runResourceT . AWST.runAWST env $ do
     AWS.send $ S3.putObject bucketName key body
 
+-- | Report whether the full access user was able to list out the buckets
+-- (and the other user cases were not).
 uploadReport :: S3.ObjectKey -> AWS.RqBody -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 uploadReport key body bucketName env FullAccessUser = do
-  describe "upload report" $ do
-    it "full access user put" $ do
+  describe "Upload report" $ do
+    it "Full access user put" $ do
       status <- uploadTest key body bucketName env
       shouldSatisfy (view S3.porsResponseStatus status) (\i -> (i >= 200) && (i < 300))
 uploadReport key body bucketName env _ = do
-  describe "upload report" $ do
-    it "upload" $ do
-      -- this should handle the exeception thrown in upload test for this case
+  describe "Upload report" $ do
+    it "Users without access should are not able to upload." $ do
       shouldThrow (uploadTest key body bucketName env) anyException
 
+-- | Test the ability to list out the objects in the target buckets
 listTest :: S3.BucketName -> AWS.Env -> IO [S3.Object]
 listTest bucketName env = do
   AWST.runResourceT . AWST.runAWST env $ do
@@ -139,26 +141,26 @@ listTest bucketName env = do
 -- in the bucket (and the other user cases were not).
 listReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 listReport key bucketName env FullAccessUser = do
-  describe "list report" $ do
-    it "full access can list objects" $ do
+  describe "List report" $ do
+    it "Full access can list objects" $ do
       objList <- listTest bucketName env
       length objList `shouldSatisfy` (>=1)
 listReport key bucketName env _ = do
-  describe "list report" $ do
-    it "non-access user try to list objects" $ do
+  describe "List report" $ do
+    it "Users without access cannot list objects." $ do
       shouldThrow (listTest bucketName env) anyException
 
 -- | Evaluate whether or not the uploaded object was actually uploaded
 -- and is now in the bucket.
 putReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 putReport key bucketName env FullAccessUser = do
-  describe "put report" $ do
+  describe "Put report" $ do
     it "Full access user found uploaded item" $ do
       objList <- listTest bucketName env
       elem key (map (\o -> view S3.oKey o) objList) `shouldBe` True
 putReport _key bucketName env _ = do
-  describe "put report" $ do
-    it "User without access trying to list objects" $ do
+  describe "Put report" $ do
+    it "Users without access should not be able to list and search objects." $ do
       shouldThrow (listTest bucketName env) anyException
 
 deleteTest :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> IO Int
@@ -169,26 +171,26 @@ deleteTest key bucketName env =
 -- | Evaluate the response given for if the user has access to delete
 deleteReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 deleteReport key bucketName env FullAccessUser = do
-  describe "delete report" $ do
-    it "full access user should be able to send delete request" $ do
+  describe "Delete report" $ do
+    it "Full access user should be able to send delete request." $ do
       statusCode <- deleteTest key bucketName env
       shouldSatisfy statusCode (\i -> (i >= 200) && (i < 300))
 deleteReport key bucketName env _ = do
-  describe "delete report" $ do
-    it "Users without access should not be able to make delete requests" $ do
+  describe "Delete report" $ do
+    it "Users without access should not be able to make delete requests." $ do
       shouldThrow (deleteTest key bucketName env) anyException
 
 -- | Evaluate whether or not the uploaded object was actually deleted and is no
 -- longer in the bucket.
 removedReport :: S3.ObjectKey -> S3.BucketName -> AWS.Env -> UserTestCase -> SpecWith ()
 removedReport key bucketName env FullAccessUser = do
-  describe "removed report" $ do
-    it "Full access user should not find deleted object" $ do
+  describe "Removed report" $ do
+    it "Full access user should not find deleted object." $ do
       objList <- listTest bucketName env
       elem key (map (\o -> view S3.oKey o) objList) `shouldBe` False
 removedReport _key bucketName env _ = do
-  describe "removed report" $ do
-    it "User without access trying to list objects" $ do
+  describe "Removed report" $ do
+    it "User without access cannot list and search objects." $ do
       shouldThrow (listTest bucketName env) anyException
 
 generateReport :: S3.ObjectKey -> AWS.RqBody -> S3.BucketName -> AWS.Env -> UserTestCase -> IO ()
@@ -237,12 +239,10 @@ testWithEnv bucketName env userTestCase = do
 --
 --   * The iam user which terraform created and attached the full-access policy.
 --   * With requests from the iam user created which does not have any policy attached giving access.
---   * Simulated public requests - no user and no access.
 --
 testS3Access :: IO ()
 testS3Access = do
   mOutput <- retrieveOutput
-
   let (bucketL, credFullAcc, credNoAcc) = case mOutput of
         Just out ->
           ( bucketList out
@@ -253,13 +253,9 @@ testS3Access = do
                (AWS.AccessKey $ toBS (accessKeyNoAccess out))
                (AWS.SecretKey $ toBS (secretKeyNoAccess out)))
           )
-        Nothing ->
-          ( ["s3-full-access-policy-bucket"]
-          , AWST.FromEnv accessKey secretKey (Just sessToken) (Just region)
-          , AWST.FromKeys (AWS.AccessKey "") (AWS.SecretKey "")
-          )
-      -- TODO handle scenario with more than one bucket
+        Nothing -> error "Unable to parse Terraform output config.json file."
       bucketName     = (S3.BucketName (head bucketL)) :: S3.BucketName
+      -- TODO handle scenario with more than one bucket
       reg            = AWST.Oregon
       -- TODO set region based on Terraform output
 

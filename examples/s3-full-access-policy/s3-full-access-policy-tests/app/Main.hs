@@ -10,9 +10,7 @@ terraform module.
 -}
 module Main where
 
-import qualified Verify
 import qualified Spec
 
 main :: IO ()
 main = Spec.testS3Access
-  -- Verify.testS3Access
