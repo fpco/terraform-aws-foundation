@@ -1,6 +1,7 @@
 variable "aws_cloud" {
   description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
   default     = "aws"
+  type        = "string"
 }
 
 variable "ami" {
@@ -11,6 +12,7 @@ variable "ami" {
 variable "instance_type" {
   description = "Type of instance to run the DNS servers"
   default     = "t2.nano"
+  type        = "string"
 }
 
 variable "subnet_ids" {
@@ -36,64 +38,77 @@ variable "key_name" {
 variable "ssh_key" {
   description = "File path to the private key for SSH"
   default     = "/dev/null"
+  type        = "string"
 }
 
 variable "name" {
   description = "Name prefix of the instances (will have server number appended).  One of 'name' or 'names' may be specified."
   default     = "dns"
+  type        = "string"
 }
 
 variable "names" {
   description = "List of names for each instance.  One of 'name' or 'names' may be specified."
   default     = []
+  type        = "list"
 }
 
 variable "named_conf" {
   description = "Complete content of '/etc/bind/named.conf'."
   default     = "//"
+  type        = "string"
 }
 
 variable "named_conf_options" {
   description = "Complete content of '/etc/bind/named.conf.options'."
   default     = "//"
+  type        = "string"
 }
 
 variable "named_conf_local" {
   description = "Complete content of '/etc/bind/named.conf.local'."
   default     = "//"
+  type        = "string"
 }
 
 variable "db_records_folder" {
   description = "Path to locally rendered directory of zone files."
   default     = ""
+  type        = "string"
 }
 
 variable "log_files" {
   description = "A list of configured log files.  These will be created with correct ownership before reloading configuration."
   default     = []
+  type        = "list"
 }
 
 variable "distro" {
   description = "Linux distribution that AMI runs: 'ubuntu' or 'amazon'"
   default     = "ubuntu"
+  type        = "string"
 }
 
 variable "alarm_actions" {
-  description = "list of alarm actions to append to the default (optional)"
   default     = []
+  description = "list of alarm actions to append to the default (optional)"
+  type        = "list"
 }
 
 variable "bastion_host" {
   default     = ""
   description = "maps to `bastion_host` attribute for the `ssh` `connection` to the `aws_instance` provisioners"
+  type        = "string"
 }
 
 variable "bastion_user" {
   default     = ""
   description = "maps to `bastion_user` attribute for the `ssh` `connection` to the `aws_instance` provisioners"
+  type        = "string"
 }
 
 variable "bastion_private_key" {
   default     = ""
   description = "maps to `bastion_private_key` attribute for the `ssh` `connection` to the `aws_instance` provisioners"
+  type        = "string"
 }
