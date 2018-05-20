@@ -4,7 +4,10 @@
  * This module is incomplete.
  *
  */
-variable "name" {}
+variable "name" {
+  description = "name for resources"
+  type        = "string"
+}
 
 resource "aws_iam_policy" "main" {
   name        = "${var.name}-scale-all-asgs"
