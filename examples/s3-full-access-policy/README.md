@@ -30,7 +30,8 @@ To run the tests, after resource creation, execute the command:
 make test
 ```
 
-This will build and run the test executable. The tests poll for around 20 seconds until they find the target bucket. Expect the test overall to take around a minute to run after the executable build is complete.
+This will build and run the test executable. The output is currently the HSpec reports and the output from the logger.
+The tests poll for around 20 seconds until they find the target bucket. Expect the test overall to take around a minute to run after the executable build is complete.
 Stack is a dependency of this step and must be installed in order to build and run the tests.
 
 ### Destruction
