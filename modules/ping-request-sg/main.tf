@@ -15,6 +15,7 @@
 
 variable "security_group_id" {
   description = "security group to attach rules to"
+  type        = "string"
 }
 
 variable "cidr_blocks" {
