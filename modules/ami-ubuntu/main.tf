@@ -49,6 +49,7 @@
 variable "most_recent" {
   default     = true
   description = "boolean, maps to `most_recent` parameter for `aws_ami` data source"
+  type        = "string"
 }
 
 variable "name_map" {
@@ -60,16 +61,19 @@ variable "name_map" {
   }
 
   description = "map of release numbers to names, including trusty, xenial, zesty, and artful"
+  type        = "map"
 }
 
 variable "release" {
   default     = "16.04"
   description = "default ubuntu release to target"
+  type        = "string"
 }
 
 variable "is_govcloud" {
   default     = false
   description = "boolean, switch between Canonical's account ARN in `aws_ami.owners`"
+  type        = "string"
 }
 
 data "aws_ami" "ubuntu" {
