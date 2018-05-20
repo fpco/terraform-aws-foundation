@@ -1,5 +1,6 @@
 variable "route53_zone_id" {
   description = "Route53 Zone id where records for LBs will be added to"
+  type        = "string"
 }
 
 # Example:
@@ -10,6 +11,7 @@ variable "route53_zone_id" {
 #  }
 variable "elasticsearch_dns_name" {
   description = "DNS name for Elasticsearch"
+  type        = "string"
 }
 
 variable "elasticsearch_lb" {
@@ -25,6 +27,7 @@ variable "elasticsearch_lb" {
 #  }
 variable "logstash_dns_name" {
   description = "DNS name for Logstash"
+  type        = "string"
 }
 
 variable "logstash_lb" {
@@ -40,6 +43,7 @@ variable "logstash_lb" {
 #  }
 variable "kibana_dns_name" {
   description = "DNS name for Kibana"
+  type        = "string"
 }
 
 variable "kibana_lb" {
