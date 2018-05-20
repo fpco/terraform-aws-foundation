@@ -87,7 +87,7 @@ variable "elasticsearch_data_node_ebs_size" {
 variable "elasticsearch_data_node_snapshot_ids" {
   default     = [""]
   description = "List of snapshots ids to use for data nodes."
-  type        = "string"
+  type        = "list"
 }
 
 variable "elasticsearch_index_retention_period" {
