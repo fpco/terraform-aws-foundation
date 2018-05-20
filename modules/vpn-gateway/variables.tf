@@ -60,6 +60,6 @@ variable "vpn_docker_image" {
 }
 
 variable "instance_type" {
-  default     = "mt2.small"
+  default     = "t2.small"
   description = "EC2 instance type."
 }
