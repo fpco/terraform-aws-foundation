@@ -6,6 +6,7 @@ variable "name_prefix" {
 variable "name_suffix" {
   default     = "cluster"
   description = "The suffix to the name of this auto-scaling cluster"
+  type        = "string"
 }
 
 variable "key_name" {
@@ -21,21 +22,25 @@ variable "ami" {
 variable "iam_profile" {
   default     = ""
   description = "The IAM profile to associate with AWS instances in the ASG"
+  type        = "string"
 }
 
 variable "instance_type" {
   default     = "t2.micro"
   description = "The type of AWS instance (size)"
+  type        = "string"
 }
 
 variable "placement_group" {
   default     = ""
   description = "The `id` of the `aws_placement_group` to associate with the ASG"
+  type        = "string"
 }
 
 variable "user_data" {
   default     = ""
   description = "The user_data string to pass to cloud-init"
+  type        = "string"
 }
 
 variable "max_nodes" {
@@ -51,11 +56,13 @@ variable "min_nodes" {
 variable "desired_capacity" {
   default     = ""
   description = "The desired number of nodes in each group"
+  type        = "string"
 }
 
 variable "public_ip" {
   default     = "true"
   description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"
+  type        = "string"
 }
 
 variable "azs" {
@@ -76,22 +83,26 @@ variable "security_group_ids" {
 variable "elb_names" {
   default     = []
   description = "list of load balancers to associate with the ASG (by name)"
+  type        = "list"
 }
 
 variable "root_volume_type" {
   default     = "gp2"
   description = "The type of EBS volume to use for the root block device"
+  type        = "string"
 }
 
 variable "root_volume_size" {
   default     = "15"
   description = "The size of the EBS volume (in GB) for the root block device"
+  type        = "string"
 }
 
 // List of maps, as extra tags to append to the Auto-Scaling Group
 variable "extra_tags" {
-  description = "Extra tags that will be added to ASG, as a list of maps"
   default     = []
+  description = "Extra tags that will be added to ASG, as a list of maps"
+  type        = "type"
 
   # see the example in this TF doc for more info:
   # https://www.terraform.io/docs/providers/aws/r/autoscaling_group.html
