@@ -8,6 +8,7 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
+  type        = "string"
 }
 
 variable "cidr_blocks" {
@@ -18,6 +19,7 @@ variable "cidr_blocks" {
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, etcd server ports 2379 and 2380 (TCP)"
+  type        = "string"
 }
 
 # Security group for etcd servers
