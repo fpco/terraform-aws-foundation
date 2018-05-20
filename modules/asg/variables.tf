@@ -102,7 +102,7 @@ variable "root_volume_size" {
 variable "extra_tags" {
   default     = []
   description = "Extra tags that will be added to ASG, as a list of maps"
-  type        = "map"
+  type        = "list"
 
   # see the example in this TF doc for more info:
   # https://www.terraform.io/docs/providers/aws/r/autoscaling_group.html
