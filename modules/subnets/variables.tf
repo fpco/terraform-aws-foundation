@@ -1,28 +1,32 @@
 variable "name_prefix" {
   description = "Name to prefix subnets with"
+  type        = "string"
 }
 
 variable "vpc_id" {
   description = "VPC ID where subnets will be created"
+  type        = "string"
 }
 
 variable "cidr_blocks" {
-  type        = "list"
   description = "A list of CIDR blocks for the subnets"
+  type        = "list"
 }
 
 variable "azs" {
-  type        = "list"
   description = "A list of Availaiblity Zones to create subnets in"
+  type        = "list"
 }
 
 variable "extra_tags" {
-  description = "Extra tags that will be added to aws_subnet resources"
   default     = {}
+  description = "Extra tags that will be added to aws_subnet resources"
+  type        = "map"
 }
 
-// default to creating public subnets
+# default to creating public subnets
 variable "public" {
-  description = "Boolean, maps to the map_public_ip_on_launch variable"
   default     = true
+  description = "Boolean, maps to the map_public_ip_on_launch variable"
+  type        = "string"  # no boolean type...
 }
