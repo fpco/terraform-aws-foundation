@@ -14,11 +14,13 @@
 
 variable "kms_key_arn" {
   description = "ARN for the KMS Master key created by 'credstash-setup' module"
+  type        = "string"
 }
 
 // Roles count is only necessary to circumvent [terraform #4149](https://github.com/hashicorp/terraform/issues/4149) issue.
 variable "roles_count" {
   description = "Number of roles that will be used during a grant process, i.e. how many roles_names there is."
+  type        = "string"
 }
 
 variable "roles_names" {
@@ -34,21 +36,25 @@ variable "roles_arns" {
 variable "reader_policy_arn" {
   default     = ""
   description = "Secrets Reader Policy ARN that was created by 'credstash-setup' module. Reading will be disabled if not supplied."
+  type        = "string"
 }
 
 variable "writer_policy_arn" {
   default     = ""
   description = "Secrets Writer Policy ARN that was created by 'credstash-setup' module. Writing will be disabled if not supplied."
+  type        = "string"
 }
 
 variable "reader_context" {
   default     = ""
   description = "Optional space separated contex key/value pairs that are required to read encrypted values. Eg. env=dev svc=db"
+  type        = "string"
 }
 
 variable "writer_context" {
   default     = ""
   description = "Optional space separated contex key/value pairs that will be used to encrypt values with credstash. Eg. env=dev svc=db"
+  type        = "string"
 }
 
 resource "aws_iam_role_policy_attachment" "credstash-reader-policy-attachment" {
