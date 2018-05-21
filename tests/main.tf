@@ -606,7 +606,7 @@ module "prometheus-server" {
   source = "../modules/prometheus-server"
 
   ami                = ""
-	az                 = ""
+  az                 = ""
   instance_type      = ""
   key_file           = ""
   key_name           = ""
