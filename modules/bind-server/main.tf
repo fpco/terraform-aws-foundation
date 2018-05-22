@@ -61,13 +61,14 @@
 
 # The instance running the DNS server
 resource "aws_instance" "bind" {
-  count                  = "${length(var.private_ips)}"
+  count                  = "${length(compact(var.private_ips))}"
   ami                    = "${var.ami}"
   instance_type          = "${var.instance_type}"
   subnet_id              = "${element(var.subnet_ids, count.index)}"
   vpc_security_group_ids = ["${var.security_group_ids}"]
   private_ip             = "${var.private_ips[count.index]}"
   key_name               = "${var.key_name}"
+	iam_instance_profile   = ""
 
   root_block_device {
     volume_type = "gp2"
@@ -97,6 +98,7 @@ resource "aws_instance" "bind" {
 
   provisioner "remote-exec" {
     connection {
+      type                = "ssh"
       host                = "${self.private_ip}"
       user                = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
       private_key         = "${file(var.ssh_key)}"
@@ -121,7 +123,7 @@ data "template_file" "config_owner" {
 
 # Contains provisioner that is triggered whenever named options are changed.
 resource "null_resource" "bind" {
-  count = "${length(var.private_ips)}"
+  count = "${length(compact(var.private_ips))}"
 
   triggers {
     named_conf         = "${var.named_conf}"
@@ -132,6 +134,7 @@ resource "null_resource" "bind" {
   }
 
   connection {
+    type                = "ssh"
     host                = "${aws_instance.bind.*.private_ip[count.index]}"
     user                = "${var.distro == "ubuntu" ? "ubuntu" : "ec2-user"}"
     private_key         = "${file(var.ssh_key)}"
@@ -162,7 +165,7 @@ resource "null_resource" "bind" {
   }
 
   provisioner "file" {
-    source      = "${var.db_records_folder}/"
+    source      = "${var.db_records_folder == "" ? "${path.module}/templates/db_records/" : "${var.db_records_folder}/" }"
     destination = "/tmp/db_records"
   }
 
@@ -185,9 +188,7 @@ resource "null_resource" "bind" {
 }
 
 # Current AWS region
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 # Cloudwatch alarm that recovers the instance after two minutes of system status check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {

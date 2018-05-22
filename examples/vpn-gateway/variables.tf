@@ -14,7 +14,7 @@ variable "token" {
 # VPC
 variable "name_prefix" {
   description = "The name of the environment together with the project name."
-  default = "dev"
+  default     = "dev"
 }
 
 variable "vpc_azs" {
@@ -30,14 +30,14 @@ variable "vpc_public_subnet_cidrs" {
 }
 
 variable "pub_key_file" {
-  default = "ssh_key.pub"
+  default     = "ssh_key.pub"
   description = "Path to the SSH public key file to use for connecting to the instance."
 }
+
 variable "priv_key_file" {
-  default = "ssh_key"
+  default     = "ssh_key"
   description = "Path to the SSH private key file to use for connecting to the instance."
 }
-
 
 # VPN Gateway
 variable "route53_zone_id" {
@@ -59,4 +59,3 @@ variable "vpn_username" {
 variable "vpn_password" {
   description = "VPN password."
 }
-

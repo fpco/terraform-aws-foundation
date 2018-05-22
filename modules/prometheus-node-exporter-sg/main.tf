@@ -6,6 +6,7 @@
  */
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
+  type        = "string"
 }
 
 variable "cidr_blocks" {

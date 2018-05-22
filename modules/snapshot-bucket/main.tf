@@ -17,36 +17,8 @@ resource "aws_iam_access_key" "s3" {
 }
 
 resource "aws_iam_policy" "s3" {
-  name = "${var.name}_all_access"
-
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListBucket"
-            ],
-            "Resource": [
-                "arn:${var.aws_cloud}:s3:::${var.name}"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListObjects",
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:CreateMultipartUpload"
-            ],
-            "Resource": [
-                "arn:${var.aws_cloud}:s3:::${var.name}/*"
-            ]
-        }
-    ]
-}
-EOF
+  name   = "${var.name}_all_access"
+  policy = "${data.aws_iam_policy_document.s3.json}"
 }
 
 resource "aws_iam_policy_attachment" "s3" {

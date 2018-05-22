@@ -23,7 +23,7 @@ variable "instance_type" {
 variable "vpc_cidr" {
   description = "Network CIDR for the VPC"
   type        = "string"
-  default     = "192.168.0.1/24"
+  default     = "192.168.0.0/24"
 }
 
 variable "ssh_pubkey" {

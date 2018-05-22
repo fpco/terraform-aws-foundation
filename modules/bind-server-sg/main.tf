@@ -20,16 +20,19 @@ variable "cidr_blocks" {
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
+  type        = "string"
 }
 
 variable "dns_port" {
   description = "Port where DNS is listening"
   default     = "53"
+  type        = "string"
 }
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, DNS port"
+  type        = "string"
 }
 
 # ingress rules for DNS servers

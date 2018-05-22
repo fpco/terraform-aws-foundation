@@ -1,6 +1,6 @@
 { "variables": {
     "ssh_keypair_name": "Packer-Kubespray-Builder",
-    "aws_region": "us-east-1",
+    "aws_region": "us-west-1",
     "aws_virtualization_type": "hvm",
     "ami_image_name_regex": "CoreOS-stable-*-hvm-*",
     "ami_owner": "679593333241",
@@ -9,7 +9,8 @@
     "aws_vpc_id": "changeme",
     "aws_subnet_id": "changeme",
     "ops_tool_version": "0.3.2",
-    "aws_ami_description": ""
+    "aws_ami_description": "",
+    "docker_release_tag": "latest"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -42,11 +43,12 @@
     {
       "type": "shell",
       "inline": [
-        "docker pull fpco/kubespray"
+        "docker pull fpco/kubespray:{{ user `docker_release_tag` }}"
       ]
     },
     {
       "type": "shell",
+      "environment_vars": ["TAG={{ user `docker_release_tag` }}"],
       "script": "run.sh"
     },
     {

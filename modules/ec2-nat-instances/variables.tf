@@ -7,6 +7,7 @@ variable "aws_cloud" {
 variable "instance_type" {
   description = "AWS instance type, use larger instances for high-volume traffic"
   default     = "t2.nano"
+  type        = "string"
 }
 
 variable "root_volume_size" {
@@ -23,6 +24,7 @@ variable "name_prefix" {
 variable "extra_tags" {
   description = "map of tags to append to the Name tag, added to the instance"
   default     = {}
+  type        = "map"
 }
 
 variable "public_subnet_ids" {

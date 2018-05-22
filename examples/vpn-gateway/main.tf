@@ -34,18 +34,19 @@ module "vpn-gateway" {
   vpn_hostname       = "${var.vpn_hostname}"
 }
 
-
 resource "aws_instance" "ec2-test-instance" {
   ami             = "${module.vpn-gateway.ami}"
   instance_type   = "t2.nano"
   subnet_id       = "${module.vpc.public_subnet_ids[1]}"
   security_groups = ["${aws_security_group.ec2-test-sg.id}"]
   key_name        = "${aws_key_pair.ec2-test-key.id}"
+
   connection {
-    type = "ssh"
-    user = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = "${file("${var.priv_key_file}")}"
   }
+
   associate_public_ip_address = true
 
   tags {
@@ -81,7 +82,7 @@ resource "aws_security_group" "ec2-test-sg" {
 }
 
 resource "aws_key_pair" "ec2-test-key" {
-  key_name = "ec2-test-key"
+  key_name   = "ec2-test-key"
   public_key = "${file("${var.pub_key_file}")}"
 }
 

@@ -16,10 +16,15 @@ resource "aws_eip" "nat" {
   vpc   = true
 }
 
+data "aws_subnet" "public" {
+  count = "${length(var.public_subnet_ids)}"
+  id    = "${element(var.public_subnet_ids, count.index)}"
+}
+
 resource "aws_nat_gateway" "nat" {
   count         = "${var.nat_count}"
+  subnet_id     = "${element(data.aws_subnet.public.*.id, count.index)}"
   allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
-  subnet_id     = "${var.public_subnet_ids[count.index]}"
 }
 
 # Route tables. One per NAT gateway.
@@ -37,6 +42,6 @@ resource "aws_route_table" "private" {
 
 resource "aws_route_table_association" "private-rta" {
   count          = "${var.nat_count}"
-  subnet_id      = "${var.private_subnet_ids[count.index]}"
+  subnet_id      = "${element(var.private_subnet_ids, count.index)}"
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
 }

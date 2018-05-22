@@ -1,9 +1,11 @@
 variable "name_prefix" {
   description = "Name to prefix various resources with"
+  type        = "string"
 }
 
 variable "vpc_id" {
   description = "VPC ID where subnets will be created"
+  type        = "string"
 }
 
 variable "extra_tags" {

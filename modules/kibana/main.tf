@@ -12,7 +12,6 @@ data "aws_subnet" "private" {
   vpc_id = "${var.vpc_id}"
 }
 
-
 resource "aws_alb_target_group" "kibana-https" {
   count    = "${lookup(var.alb, "deploy_elb", false) ? 0 : 1}"
   name     = "${var.name_prefix}-kibana-https"
@@ -97,7 +96,6 @@ resource "aws_security_group" "kibana-sg" {
   }
 }
 
-
 resource "aws_autoscaling_group" "kibana-asg" {
   count                = "${min(var.max_server_count, 1)}"
   availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
@@ -169,7 +167,6 @@ resource "aws_elb" "kibana-elb" {
   idle_timeout                = 60
   connection_draining         = true
   connection_draining_timeout = 60
-
   tags {
     Name = "${var.name_prefix}-kibana-elb"
   }

@@ -5,9 +5,7 @@
  *
  */
 
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
   count               = "${length(compact(var.ec2_instance_ids))}"

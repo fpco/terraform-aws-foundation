@@ -1,8 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 data "template_file" "credstash-get-cmd" {
   template = "env credstash -r ${data.aws_region.current.name} -t ${var.db_table_name} get"
@@ -19,4 +17,33 @@ data "template_file" "credstash-install-snippet" {
   pip install --upgrade pip;
   pip install credstash; }
 END_TEMPLATE
+}
+
+# Writer Policy
+data "aws_iam_policy_document" "writer-policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["dynamodb:PutItem"]
+
+    resources = [
+      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
+    ]
+  }
+}
+
+# Reader Policy
+data "aws_iam_policy_document" "reader-policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+    ]
+
+    resources = [
+      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
+    ]
+  }
 }

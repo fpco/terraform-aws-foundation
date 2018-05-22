@@ -80,4 +80,3 @@ resource "aws_security_group_rule" "external-alb-rule" {
   protocol          = "tcp"
   cidr_blocks       = ["${var.external_alb_ingress_cidrs}"]
 }
-

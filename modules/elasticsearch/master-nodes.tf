@@ -23,9 +23,7 @@ module "master-node-ebs-volumes" {
   }
 }
 
-data "aws_region" "current" {
-  current = true
-}
+data "aws_region" "current" {}
 
 resource "aws_iam_role_policy_attachment" "master-node-attach-ebs-volume" {
   count      = "${var.master_node_count}"
@@ -129,7 +127,8 @@ data "template_file" "master-node-config" {
     security_groups    = "[${aws_security_group.transport-sg.id}, ${aws_security_group.elasticsearch-api-sg.id}]"
     availability_zones = "[${join(",", data.aws_subnet.private.*.availability_zone)}]"
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
-    extra_config       = <<EXTRA_CONFIG
+
+    extra_config = <<EXTRA_CONFIG
 # Only set the region for Elasticsearch 5.x, since it is deprecated in 6.x
 ${element(split(".", var.elasticsearch_version), 0) < 6 ? "cloud.aws.region: ${data.aws_region.current.name}" : ""}
 

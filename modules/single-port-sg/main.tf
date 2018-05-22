@@ -9,6 +9,7 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
+  type        = "string"
 }
 
 variable "cidr_blocks" {
@@ -18,15 +19,18 @@ variable "cidr_blocks" {
 
 variable "port" {
   description = "The port to open"
+  type        = "string"
 }
 
 variable "protocol" {
   description = "The protocol, specify either `tcp` or `udp`"
   default     = "tcp"
+  type        = "string"
 }
 
 variable "description" {
   description = "Use this string to add a description for the SG rule"
+  type        = "string"
 }
 
 # add an ingress rule

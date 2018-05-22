@@ -32,7 +32,10 @@ module "vpc" {
   enable_dns_hostnames = "${var.enable_dns_hostnames}"
   enable_dns_support   = "${var.enable_dns_support}"
   dns_servers          = ["${var.dns_servers}"]
-  extra_tags           = "${var.extra_tags}"
+  extra_tags           = "${merge(
+	  "${var.extra_tags}",
+	  "${var.vpc_extra_tags}",
+	)}"
 }
 
 module "public-subnets" {
@@ -41,15 +44,21 @@ module "public-subnets" {
   vpc_id      = "${module.vpc.vpc_id}"
   name_prefix = "${var.name_prefix}-public"
   cidr_blocks = "${var.public_subnet_cidrs}"
-  extra_tags  = "${var.extra_tags}"
+  extra_tags  = "${merge(
+	  "${var.extra_tags}",
+	  "${var.public_subnet_extra_tags}",
+	)}"
 }
 
 module "public-gateway" {
   source            = "../route-public"
   vpc_id            = "${module.vpc.vpc_id}"
   name_prefix       = "${var.name_prefix}-public"
-  extra_tags        = "${var.extra_tags}"
   public_subnet_ids = ["${module.public-subnets.ids}"]
+  extra_tags  = "${merge(
+	  "${var.extra_tags}",
+	  "${var.public_gateway_extra_tags}",
+	)}"
 }
 
 module "private-subnets" {
@@ -59,15 +68,21 @@ module "private-subnets" {
   name_prefix = "${var.name_prefix}-private"
   cidr_blocks = "${var.private_subnet_cidrs}"
   public      = false
-  extra_tags  = "${var.extra_tags}"
+  extra_tags  = "${merge(
+	  "${var.extra_tags}",
+	  "${var.private_subnet_extra_tags}",
+	)}"
 }
 
 module "nat-gateway" {
   source             = "../nat-gateways"
   vpc_id             = "${module.vpc.vpc_id}"
   name_prefix        = "${var.name_prefix}"
-  nat_count          = "${length(module.private-subnets.ids)}"
+  nat_count          = "${length(var.private_subnet_cidrs)}"
   public_subnet_ids  = ["${module.public-subnets.ids}"]
   private_subnet_ids = ["${module.private-subnets.ids}"]
-  extra_tags         = "${var.extra_tags}"
+  extra_tags         = "${merge(
+	  "${var.extra_tags}",
+	  "${var.nat_gateway_extra_tags}",
+	)}"
 }

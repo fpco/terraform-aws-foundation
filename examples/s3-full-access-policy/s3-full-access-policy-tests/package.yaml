@@ -1,0 +1,55 @@
+name:                s3-full-access-policy-tests
+version:             0.1.0.0
+github:              "fpco/terraform-aws-foundation"
+license:             MIT
+author:              "Mike McGirr"
+maintainer:          "mike@fpcomplete.com"
+copyright:           "2018 FP Complete"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+description:         Please see the README on GitHub at <https://github.com/fpco/terraform-aws-foundation/examples/s3-full-access-policy/s3-full-access-policy-tests#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- amazonka == 1.5.0.*
+- amazonka-core
+- amazonka-s3
+- text
+- conduit
+- lens
+- bytestring
+- aeson
+- safe-exceptions
+- hspec
+
+library:
+  source-dirs: src
+
+executables:
+  s3-full-access-policy-tests-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - s3-full-access-policy-tests
+
+tests:
+  s3-full-access-policy-tests-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - s3-full-access-policy-tests

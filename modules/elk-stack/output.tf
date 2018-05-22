@@ -1,10 +1,10 @@
 output "ami" {
-  value = "${module.ubuntu-ami.id}"
+  value       = "${module.ubuntu-ami.id}"
   description = "AMI that was used for all EC2 instances in the stack"
 }
 
 output "ssh_sg_id" {
-  value = "${aws_security_group.ssh.*.id}"
+  value       = "${aws_security_group.ssh.*.id}"
   description = "Security group that allows SSH access"
 }
 

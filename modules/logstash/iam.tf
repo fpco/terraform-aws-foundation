@@ -39,21 +39,20 @@ resource "aws_iam_role" "logstash-role" {
     command = "${data.template_file.certstrap.rendered}"
   }
 
-  name_prefix = "${var.name_prefix}-logstash-role-"
-
-  assume_role_policy = <<END_POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
+  name_prefix        = "${var.name_prefix}-logstash-role-"
+  assume_role_policy = "${data.aws_iam_policy_document.logstash-role.json}"
 }
-END_POLICY
+
+data "aws_iam_policy_document" "logstash-role" {
+  statement = {
+    sid    = ""
+    effect = "Allow"
+
+    principal {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+
+    action = ["sts:AssumeRole"]
+  }
 }

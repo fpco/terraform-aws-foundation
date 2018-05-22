@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "dnscontroller" {
 
     actions = [
       "route53:ListHostedZones",
-      "route53:ListResourceRecordSets"
+      "route53:ListResourceRecordSets",
     ]
 
     resources = ["*"]

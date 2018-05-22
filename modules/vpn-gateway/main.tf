@@ -34,6 +34,7 @@ resource "aws_instance" "vpn-gateway" {
   subnet_id                   = "${var.vpc_subnet_id}"
   vpc_security_group_ids      = ["${aws_security_group.vpn-gateway.id}"]
   associate_public_ip_address = true
+	iam_instance_profile        = ""
 
   connection {
     type        = "ssh"

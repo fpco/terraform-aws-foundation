@@ -7,4 +7,3 @@ output "role_arn" {
   value       = "${aws_iam_role.dnscontroller.arn}"
   description = "ARN of the new role with route53 permissions."
 }
-

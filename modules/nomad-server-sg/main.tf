@@ -27,13 +27,14 @@ variable "description" {
 # nomad ports 4646 (http)/4647 (rpc), open to both workers and servers/leaders
 # including 4646 here might lead it issues with it also being in the agent module
 resource "aws_security_group_rule" "nomad_http_rpc_tcp" {
-  type              = "ingress"
-  description       = "${var.description} RPC and HTTP ports (TCP)"
-  from_port         = "4646"
-  to_port           = "4647"
-  protocol          = "tcp"
-  cidr_blocks       = ["${distinct(concat(var.server_cidr_blocks,
+  type        = "ingress"
+  description = "${var.description} RPC and HTTP ports (TCP)"
+  from_port   = "4646"
+  to_port     = "4647"
+  protocol    = "tcp"
+  cidr_blocks = ["${distinct(concat(var.server_cidr_blocks,
                                           var.worker_cidr_blocks))}"]
+
   security_group_id = "${var.security_group_id}"
 }
 

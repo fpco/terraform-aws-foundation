@@ -116,12 +116,13 @@ output "init_snippet" {
 }
 
 output "gitlab_config" {
-  value       = {
+  value = {
     external_url          = "https://${var.gitlab_name}.${var.gitlab_domain}"
     registry_external_url = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
     ssh_port              = "${var.gitlab_ssh_port}"
     http_port             = "${var.gitlab_http_port}"
     https_port            = "${var.gitlab_https_port}"
   }
+
   description = "connection details about gitlab"
 }

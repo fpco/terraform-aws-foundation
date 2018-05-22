@@ -33,6 +33,11 @@ variable "key_file" {
   default     = "~/.ssh/id_rsa"
 }
 
+variable "is_govcloud" {
+  description = "If this is running on GovCloud or not"
+  default     = false
+}
+
 module "vpc" {
   source              = "../../modules/vpc-scenario-1"
   azs                 = ["${var.az}"]
@@ -46,7 +51,7 @@ module "snasg" {
   source             = "../../modules/single-node-asg"
   name               = "test"
   name_suffix        = "nexus-asg"
-  ami                = "ami-cd0f5cb6"
+  ami                = "${module.ubuntu-ami.id}"
   instance_type      = "t2.micro"
   region             = "${var.region}"
   az                 = "${var.az}"
@@ -64,6 +69,12 @@ END_INIT
   init_suffix = <<END_INIT
 ${module.init-nexus.init_snippet}
 END_INIT
+}
+
+module "ubuntu-ami" {
+  source      = "../../modules/ami-ubuntu"
+  release     = "16.04"
+  is_govcloud = "${var.is_govcloud}"
 }
 
 module "init-nexus" {

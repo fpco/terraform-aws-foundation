@@ -46,7 +46,7 @@ destroy:
 	@terraform destroy -force
 
 ## rm -rf everything
-clean: destroy
+clean:
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
 	@rm -rf id_rsa id_rsa.pub
 	@rm -rf tf.out terraform.tfvars

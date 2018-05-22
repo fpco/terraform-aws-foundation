@@ -50,45 +50,15 @@ resource "aws_dynamodb_table" "credstash-db" {
 ## Writer Policy
 
 resource "aws_iam_policy" "writer-policy" {
-  count = "${var.create_writer_policy ? 1 : 0}"
-  name  = "${var.db_table_name}-writer"
-
-  policy = <<END_POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "dynamodb:PutItem"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
-    }
-  ]
-}
-END_POLICY
+  count  = "${var.create_writer_policy ? 1 : 0}"
+  name   = "${var.db_table_name}-writer"
+  policy = "${data.aws_iam_policy_document.writer-policy.json}"
 }
 
 ## Reader Policy
 
 resource "aws_iam_policy" "reader-policy" {
-  count = "${var.create_reader_policy ? 1 : 0}"
-  name  = "${var.db_table_name}-reader"
-
-  policy = <<END_POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:Query",
-        "dynamodb:Scan"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}"
-    }
-  ]
-}
-END_POLICY
+  count  = "${var.create_reader_policy ? 1 : 0}"
+  name   = "${var.db_table_name}-reader"
+  policy = "${data.aws_iam_policy_document.reader-policy.json}"
 }

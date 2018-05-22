@@ -30,6 +30,7 @@
 variable "name" {
   default     = "snap-ebs"
   description = "name IAM resources, should match service name"
+  type        = "string"
 }
 
 resource "aws_iam_user" "snap-ebs" {
