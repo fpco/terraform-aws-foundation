@@ -115,7 +115,7 @@ clean: destroy
 	@rm -rf id_rsa id_rsa.pub ssh_config
 	@rm -rf tf.out terraform.tfvars
 	@echo "You need to manually delete your certificate from AWS and then delete following files:"
-	@echo "'cert-csr.json' 'ca-csr.json' 'ca.csr' 'upload-gen-cert.json' 'upload-gen-cert.sh''gitlab.csr' '*.pem'
+	@echo "'cert-csr.json' 'ca-csr.json' 'ca.csr' 'upload-gen-cert.json' 'upload-gen-cert.sh''gitlab.csr' '*.pem'"
 
 ## Show help screen.
 help:
