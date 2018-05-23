@@ -106,20 +106,12 @@ resource "aws_elb" "gitlab" {
   security_groups = ["${aws_security_group.gitlab-elb.id}"]
 
   listener {
-<<<<<<< HEAD
-    instance_port      = 8022
-    instance_protocol  = "tcp"
-    lb_port            = 22
-    lb_protocol        = "tcp"
-    ssl_certificate_id = "${var.ssl_arn}"
-=======
     instance_port     = 8022
     instance_protocol = "tcp"
     lb_port           = 22
     lb_protocol       = "tcp"
 
     #ssl_certificate_id = "${var.ssl_arn}"
->>>>>>> Fixed ssl certificate error in elb
   }
 
   listener {
