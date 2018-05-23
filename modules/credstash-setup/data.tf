@@ -14,7 +14,7 @@ data "template_file" "credstash-install-snippet" {
   template = <<END_TEMPLATE
 { apt-get update;
   apt-get install -y build-essential libssl-dev libffi-dev python-dev python-pip;
-  pip install --upgrade pip;
+  pip install --upgrade pip==9.0.3;
   pip install credstash; }
 END_TEMPLATE
 }
