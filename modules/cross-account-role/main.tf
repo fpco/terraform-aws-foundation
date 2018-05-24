@@ -9,15 +9,18 @@
 variable "aws_cloud" {
   description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
   default     = "aws"
+  type        = "string"
 }
 
 variable "trust_account_ids" {
   description = "List of other accounts to trust to assume the role"
   default     = []
+  type        = "list"
 }
 
 variable "name" {
   description = "Name to give the roll"
+  type        = "string"
 }
 
 output "arn" {
