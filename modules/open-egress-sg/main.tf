@@ -9,16 +9,19 @@
 
 variable "security_group_id" {
   description = "security group to attach the egress rule to"
+  type        = "string"
 }
 
 variable "cidr_blocks" {
   description = "Allow egress to these CIDR blocks"
   default     = ["0.0.0.0/0"]
+  type        = "list"
 }
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "OPEN egress, all ports, all protocols"
+  type        = "string"
 }
 
 # unrestricted outbound (egress)
