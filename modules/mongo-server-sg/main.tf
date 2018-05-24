@@ -8,6 +8,7 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
+  type        = "string"
 }
 
 variable "cidr_blocks" {
@@ -18,6 +19,7 @@ variable "cidr_blocks" {
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, mongod"
+  type        = "string"
 }
 
 # Security group for mongod servers
