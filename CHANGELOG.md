@@ -1,3 +1,46 @@
+# v0.7.4
+
+### Summary:
+
+* Refine test suite and get CI build green
+* Improve type checking in module variables
+* Demo how to validate S3 policies with new env and test suite
+* Various module bugfixes
+
+### Examples
+
+* `s3-full-access-policy`: add env and initial test suite - [#122][122]
+* `vpc-scenario-2`: refactor hardcoded AZ list, use locals - [#134][132]
+
+### Modules
+
+* `prometheus-server`: sync with changes to variables/modules - [#107][107]
+* `credstash-setup`: pip 10 is a failure, use pip 9.x for now - [#145][145]
+* `init-snippet-install-awscli`: pip 10 is a failure, use pip 9.x for now - [#145][145]
+* `bind-server`: allow `db_records_folder` variable to be empty - [#135][135]
+* add type definitions to all variables in all modules - [#108][108]
+
+### Packer
+
+* `kubespray`: parametize docker tag - [#123][123]
+
+### Tests
+
+* add `Makefile` to install tools and init Terraform
+* use `tflint` 0.6.0 to resolve [#107][107]
+* drop `vpc-legacy` module from the test suite
+* enable tfinit for [#104][104], disable `undeclared-variables` for [#141][141]
+
+[122]: https://github.com/fpco/terraform-aws-foundation/issues/122
+[132]: https://github.com/fpco/terraform-aws-foundation/issues/132
+[107]: https://github.com/fpco/terraform-aws-foundation/issues/107
+[145]: https://github.com/fpco/terraform-aws-foundation/pull/145
+[108]: https://github.com/fpco/terraform-aws-foundation/issues/108
+[135]: https://github.com/fpco/terraform-aws-foundation/issues/135
+[123]: https://github.com/fpco/terraform-aws-foundation/issues/123
+[141]: https://github.com/fpco/terraform-aws-foundation/issues/141
+
+
 # v0.7.3
 
 ### Examples
