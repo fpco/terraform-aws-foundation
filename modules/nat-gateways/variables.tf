@@ -1,13 +1,16 @@
 variable "vpc_id" {
   description = "VPC ID where route tables will be placed in"
+  type        = "string"
 }
 
 variable "name_prefix" {
   description = "Project name. It will be prepended to route tables."
+  type        = "string"
 }
 
 variable "nat_count" {
   description = "How many NAT gateways to setup"
+  type        = "string"
 }
 
 variable "public_subnet_ids" {
@@ -23,4 +26,5 @@ variable "private_subnet_ids" {
 variable "extra_tags" {
   default     = {}
   description = "Any extra tags to assign to route tables"
+  type        = "map"
 }
