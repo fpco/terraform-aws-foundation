@@ -34,6 +34,12 @@ variable "static_routes" {
   type        = "list"
 }
 
+variable "connection_type" {
+  description = "The type of VPN connection on AWS, leave this alone"
+  default     = "ipsec.1"
+  type        = "string"
+}
+
 variable "extra_tags" {
   description = "Extra tags to append to various AWS resources"
   default     = {}
@@ -55,7 +61,7 @@ resource "aws_customer_gateway" "main" {
 resource "aws_vpn_connection" "main" {
   vpn_gateway_id      = "${aws_vpn_gateway.main.id}"
   customer_gateway_id = "${aws_customer_gateway.main.id}"
-  type                = "ipsec.1"
+  type                = "${var.connection_type}"
   static_routes_only  = true
   tags                = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }
