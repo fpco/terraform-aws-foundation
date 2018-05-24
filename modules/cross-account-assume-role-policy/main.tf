@@ -13,30 +13,36 @@
 variable "aws_cloud" {
   description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
   default     = "aws"
+  type        = "string"
 }
 
 variable "policy_name" {
   description = "Name of the policy."
+  type        = "string"
 }
 
 variable "account_ids" {
   description = "List of accounts in which the role specified by 'role_name' can be assumed.  Only for use in combination with 'role_name'."
   default     = []
+  type        = "list"
 }
 
 variable "role_name" {
   description = "The role that can be assumed in the accounts given in 'account_ids'.  Only for use in combination with 'account_ids'."
   default     = ""
+  type        = "string"
 }
 
 variable "account_id" {
   description = "The account that can assume the roles specified by 'role_names'.  Only for use in combination with 'role_names'."
   default     = ""
+  type        = "string"
 }
 
 variable "role_names" {
   description = "List of roles that can be assumed in the account specified in 'account_id'.  Only for use in combination with 'account_id'."
   default     = []
+  type        = "list"
 }
 
 output "arn" {
