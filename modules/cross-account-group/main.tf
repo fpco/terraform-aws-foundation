@@ -8,14 +8,17 @@
 variable "aws_cloud" {
   description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
   default     = "aws"
+  type        = "string"
 }
 
 variable "name" {
   description = "name of the group"
+  type        = "string"
 }
 
 variable "mfa_policy_arn" {
   description = "ARN of the self-managed MFA policy"
+  type        = "string"
 }
 
 variable "account_ids" {
@@ -27,6 +30,7 @@ variable "account_ids" {
 variable "role_name" {
   description = "name of the ... role, OK to leave this as default"
   default     = "power-user"
+  type        = "string"
 }
 
 variable "users" {
