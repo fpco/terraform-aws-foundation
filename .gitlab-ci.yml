@@ -4,4 +4,4 @@ lint:
   script:
     -  scripts/ci/tfinit.sh
     -  scripts/ci/tflint.sh
-#   -  scripts/ci/undeclared-variables.sh
+    -  scripts/ci/undeclared-variables.sh
