@@ -1,28 +1,39 @@
-variable "name_prefix" {}
+variable "name_prefix" {
+  description = "phrase to use when naming resources on AWS"
+  type        = "string"
+}
 
-variable "ami" {}
+variable "ami" {
+  description = "ID to the AWS machine image (AMI) used to create EC2 instances"
+  type        = "string"
+}
 
 variable "instance_type" {
   default = "t2.micro"
+  type        = "string"
 }
 
 variable "min_server_count" {
   description = "Minimum number of EC2 instances running Kibana"
   default     = 1
+  type        = "string"
 }
 
 variable "max_server_count" {
   description = "Maximum number of EC2 instances running Kibana"
   default     = 1
+  type        = "string"
 }
 
 variable "desired_server_count" {
   description = "Desired number of EC2 instances running Kibana"
   default     = 1
+  type        = "string"
 }
 
 variable "vpc_id" {
   description = "VPC id where Kibana servers should be deployed in"
+  type        = "string"
 }
 
 variable "private_subnet_ids" {
@@ -38,23 +49,28 @@ variable "public_subnet_ids" {
 
 variable "elasticsearch_url" {
   description = "Elasticsearch endpoint URL"
+  type        = "string"
 }
 
 variable "key_name" {
   description = "SSH key name to use for connecting to all nodes"
+  type        = "string"
 }
 
 variable "extra_sg_ids" {
   default     = []
   description = "Extra Security Group IDs that will be added to all instances running Kibana. This is a way to add extra services, SSH access for instance."
+  type        = "list"
 }
 
 variable "credstash_install_snippet" {
   description = "Ubuntu bash script snippet for installing credstash and its dependencies"
+  type        = "string"
 }
 
 variable "credstash_get_cmd" {
   description = "Credstash get command with region and table values set."
+  type        = "string"
 }
 
 variable "alb" {
@@ -80,4 +96,5 @@ DOC
 
 variable "kibana_version" {
   description = "Which version of Kibana to install"
+  type        = "string"
 }
