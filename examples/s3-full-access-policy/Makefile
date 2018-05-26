@@ -33,7 +33,7 @@ test:
 
 # clean up terrform and any other files
 clean:
-	@terraform destroy
+	@terraform destroy -auto-approve
 	@rm -f tf.out
 	@rm -f terraform.tfvars
 	@rm -f terraform.*.backup
