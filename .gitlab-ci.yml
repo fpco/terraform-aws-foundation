@@ -8,4 +8,6 @@ lint:
 
 test:
   script:
-    - script/ci/tftest.sh
+    - script/ci/examples/tfbuild.sh
+    - script/ci/examples/tftest.sh
+    - script/ci/examples/tfclean.sh
