@@ -6,6 +6,7 @@
  *
  * * `apt-get update`
  * * install `python-pip` with apt
+ * * upgrade/set the pip version to 9.0.3 since 10 breaks things
  * * install `elasticsearch-curator` with `pip`
  * * add a user `curator`
  * * make the `/var/log/curator/` directory, owned by the `curator` user
@@ -18,12 +19,19 @@ data "template_file" "curator-setup" {
   template = "${file("${path.module}/snippet.tpl.sh")}"
 
   vars {
+    index_retention_unit   = "${var.index_retention_unit}"
     index_retention_period = "${var.index_retention_period}"
     extra_curator_actions  = "${var.extra_curator_actions}"
     elasticsearch_host     = "${var.elasticsearch_host}"
     elasticsearch_port     = "${var.elasticsearch_port}"
     master_only            = true
   }
+}
+
+variable  "index_retention_unit" {
+  default     = "days"
+  description = "Units (seconds, minutes, hours, days, etc.) corresponding to index retention period."
+  # See https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filtertype_age.html for options
 }
 
 variable "index_retention_period" {
