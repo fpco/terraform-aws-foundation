@@ -2,6 +2,7 @@
 
 apt-get update
 apt-get install python-pip
+pip install --upgrade pip==9.0.3
 pip install elasticsearch-curator
 useradd -r curator
 mkdir /var/log/curator/
@@ -55,7 +56,7 @@ actions:
       source: name
       direction: older
       timestring: '%Y.%m.%d'
-      unit: days
+      unit: ${index_retention_unit}
       unit_count: ${index_retention_period}
       exclude:
 ${extra_curator_actions}
