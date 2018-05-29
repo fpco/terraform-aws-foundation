@@ -2,6 +2,7 @@
 
 apt-get update
 apt-get install python-pip
+pip install --upgrade pip==9.0.3
 pip install elasticsearch-curator
 useradd -r curator
 mkdir /var/log/curator/
