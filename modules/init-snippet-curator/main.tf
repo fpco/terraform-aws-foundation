@@ -22,7 +22,7 @@ data "template_file" "curator-setup" {
     extra_curator_actions  = "${var.extra_curator_actions}"
     elasticsearch_host     = "${var.elasticsearch_host}"
     elasticsearch_port     = "${var.elasticsearch_port}"
-    master_only            = true
+    master_only            = "${var.master_only}"
   }
 }
 
@@ -47,7 +47,7 @@ variable "elasticsearch_port" {
 }
 
 variable "master_only" {
-  default     = true
+  default     = "True"
   description = "If installed on master eligible nodes, will only run if current node is an elected master"
 }
 
