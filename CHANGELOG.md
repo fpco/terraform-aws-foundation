@@ -1,3 +1,25 @@
+# v0.7.5
+
+### Summary:
+
+* enhancements to various modules
+* move `terraform-vpc` to examples and update packer build
+
+### Modules
+
+* `r53-subdomain`: added zone name outputs
+* `single-node-asg`: drop az from the EBS volume name (it was redundant)
+* `aws-ipsec-vpn`: add support for govcloud and FIPS endpoints
+* `init-snippet-curator`:
+  * bugfix for `master_only`
+  * parametize index retention units
+  * pin pip at 9.x
+
+### Examples
+
+* move `terraform-vpc` to `examples`
+
+
 # v0.7.4
 
 ### Summary:
