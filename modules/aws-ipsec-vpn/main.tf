@@ -67,7 +67,7 @@ resource "aws_vpn_gateway" "main" {
 resource "aws_customer_gateway" "main" {
   ip_address = "${var.remote_device_ip}"
   bgp_asn    = "${var.bgp_asn}"
-  type       = "${var.connection_type}"
+  type       = "ipsec.1"
   tags       = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
 }
 
