@@ -4,14 +4,6 @@ resource "aws_elb" "kube-controllers" {
   security_groups = ["${var.lb_security_group_ids}"]
   internal        = "${var.private_load_balancer}"
 
-  #listener {
-  #  instance_port = 6443
-  #  instance_protocol = "https"
-  #  lb_port = 8080
-  #  lb_protocol = "http"
-  #  #ssl_certificate_id = "${data.aws_acm_certificate.kube-cert.arn}"
-  #}
-
   listener {
     instance_port     = 6443
     instance_protocol = "tcp"
