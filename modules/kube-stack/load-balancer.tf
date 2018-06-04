@@ -33,3 +33,8 @@ resource "aws_elb" "kube-controllers" {
     Name = "${var.name_prefix}-kube-api"
   }
 }
+
+resource "aws_autoscaling_attachment" "controllers" {
+  autoscaling_group_name = "${module.controller-asg.id}"
+  elb                    = "${aws_elb.kube-controllers.id}"
+}
