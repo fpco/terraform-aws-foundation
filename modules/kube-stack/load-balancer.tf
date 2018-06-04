@@ -10,6 +10,7 @@ resource "aws_elb" "kube-controllers" {
     lb_port           = 443
     lb_protocol       = "tcp"
   }
+
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 3
@@ -17,10 +18,12 @@ resource "aws_elb" "kube-controllers" {
     target              = "TCP:6443"
     interval            = 20
   }
+
   cross_zone_load_balancing   = false
   idle_timeout                = 60
   connection_draining         = true
   connection_draining_timeout = 60
+
   tags {
     Name = "${var.name_prefix}-kube-api"
   }
