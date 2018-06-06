@@ -13,10 +13,11 @@ resource "aws_elb" "kube-controllers" {
   #}
 
   listener {
-    instance_port     = 6443
-    instance_protocol = "tcp"
-    lb_port           = 443
-    lb_protocol       = "tcp"
+    instance_port      = 6443
+    instance_protocol  = "tcp"
+    lb_port            = 443
+    lb_protocol        = "ssl"
+    ssl_certificate_id = "${var.lb_ssl_certificate_id}"
   }
   health_check {
     healthy_threshold   = 2
