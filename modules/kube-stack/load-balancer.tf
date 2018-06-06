@@ -5,10 +5,11 @@ resource "aws_elb" "kube-controllers" {
   internal        = "${var.private_load_balancer}"
 
   listener {
-    instance_port     = 6443
-    instance_protocol = "tcp"
-    lb_port           = 443
-    lb_protocol       = "tcp"
+    instance_port      = 6443
+    instance_protocol  = "tcp"
+    lb_port            = 443
+    lb_protocol        = "ssl"
+    ssl_certificate_id = "${var.lb_ssl_certificate_id}"
   }
 
   health_check {

@@ -26,6 +26,11 @@ variable "lb_security_group_ids" {
   type        = "list"
 }
 
+variable "lb_ssl_certificate_id" {
+  description = "ID of ACM SSL certificate for use by the SSL load balancer. Must be created separately."
+  type        = "string"
+}
+
 variable "private_load_balancer" {
   description = "boolean that makes to the load-balancer's (ELB's) `internal` attribute"
   default     = "true"
