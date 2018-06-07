@@ -454,6 +454,7 @@ module "kube-stack" {
   controller_subnet_ids         = ""
   key_name                      = ""
   lb_security_group_ids         = []
+  lb_ssl_certificate_id         = ""
   lb_subnet_ids                 = ""
   worker_ami                    = ""
   worker_iam_profile            = ""
