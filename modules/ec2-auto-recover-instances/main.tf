@@ -54,7 +54,7 @@
 # EC2 instances to create. This lets the module create N instances across M subnets
 # (interleave), or N instances across N subnets.
 data "template_file" "cnt" {
-  template = "$${ip_count ? ip_count : subnet_count}"
+  template = "$${ip_count > 0 ? ip_count : subnet_count}"
 
   vars {
     ip_count     = "${length(var.private_ips)}"
