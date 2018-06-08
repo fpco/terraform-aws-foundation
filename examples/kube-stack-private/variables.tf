@@ -1,5 +1,5 @@
 variable "region" {
-  default     = "us-west-2"
+  default     = "us-gov-west-1"
   description = "AWS region this env is deployed to"
 }
 
@@ -61,14 +61,14 @@ variable "extra_tags" {
 # to lookup AMIs (but not actually used ATM)
 variable "canonical_account_id" {
   description = "AWS  account it for Canonical, used to lookup Ubuntu AMIs"
-  default     = "099720109477"
+  default     = "513442679011"
 
   # for GovCloud, change to "513442679011"
 }
 
 variable "coreos_account_id" {
   description = "AWS account it for CoreOS, used to lookup CoreOS AMIs"
-  default     = "595879546273"
+  default     = "190570271432"
 
   # for GovCloud, change to "190570271432"
 }
