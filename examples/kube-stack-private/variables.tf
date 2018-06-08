@@ -72,3 +72,8 @@ variable "coreos_account_id" {
 
   # for GovCloud, change to "190570271432"
 }
+
+variable "lb_ssl_certificate_id" {
+  description = "TLS certificate ID from AWS ACM to be used for the TCP load balancer"
+  type        = "string"
+}

@@ -23,6 +23,7 @@ module "kube-cluster" {
   controller_subnet_ids  = ["${module.vpc.private_subnet_ids}"]
   worker_ami             = "${var.coreos_stable_ami_id}"
   worker_subnet_ids      = ["${module.vpc.private_subnet_ids}"]
+  lb_ssl_certificate_id  = "${var.lb_ssl_certificate_id}"
 
   controller_security_group_ids = [
     "${module.kube-controller-sg.id}",
