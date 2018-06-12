@@ -11,10 +11,6 @@ render-tls-configs:
 render-tfvars:
 	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
 
-## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
-render-ssh-config:
-	@. ./vars.env && envsubst <ssh_config.tpl > ssh_config
-
 ## Use ssh-keygen to generate a keypair for SSH
 generate-ssh-key:
 	@ssh-keygen -q -N "" -b 4096 -C "test" -f ./id_rsa
@@ -22,7 +18,6 @@ generate-ssh-key:
 ## write out a tfvars file for a test deploy
 generate-tfvars:
 	@echo "ssh_pubkey = \"./id_rsa.pub\"" >> terraform.tfvars
-	 
 	
 ## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
 generate-tls-certs:
@@ -41,12 +36,11 @@ install-cfssl:
 ## Use AWS cli tools to upload the SSL cert to AWS
 upload-tls-certs:
 	@. ./vars.env && envsubst < upload-gen-cert.tpl > upload-gen-cert.sh
-	@chmod +x ./upload-gen-cert.sh
+	@. ./vars.env && envsubst < delete-gen-cert.tpl > delete-gen-cert.sh
+	@chmod +x ./upload-gen-cert.sh ./delete-gen-cert.sh
 	@./upload-gen-cert.sh
-	@echo "manually copy the ssl_arn found in the file upload-gen-cert.json and assign it to" 
-	@echo "the variable 'ssl_arn' in the file 'terraform-tfvars.tpl' then uncomment the line"
-	@echo "Alternatively follow the instructions in the Readme"
-
+	@echo "ssl_arn = " `cat  upload-gen-cert-arn.txt` >> terraform.tfvars
+	
 ## Use Terraform to create the VPC and core network resources in a specific order
 network:
 	@terraform init
@@ -66,9 +60,14 @@ plan:
 apply:
 	@terraform apply tf.out
 
+## Generate the ssh_congig both for Git operations and instance maintenance
+render-ssh-config:
+	@. ./vars.env && envsubst <ssh_config.tpl > ssh_config
+	@echo `aws ec2 describe-instances --filters "Name=tag:Name,Values=at-test-gitlab-server-eu-central-1a" --region=eu-central-1 | jl _.Reservations[0].Instances[0].PublicIpAddress | tr -d '"'` >> ssh_config
+
 ## use ops cli tool to lookup the public IP of the gitlab instance
-get-ip:
-	@ops aws ec2 asg ips -r $$(terraform output region) $$(terraform output gitlab_asg_name)
+##get-ip:
+##	@ops aws ec2 asg ips -r $$(terraform output region) $$(terraform output gitlab_asg_name)
 
 ## SSH to the gitlab server and use parted and similar tools to setup a partition and filesystem on the EBS volume (run only once per volume)
 init-ebs-volume:
@@ -114,8 +113,8 @@ clean: destroy
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
 	@rm -rf id_rsa id_rsa.pub ssh_config
 	@rm -rf tf.out terraform.tfvars
-	@echo "You need to manually delete your certificate from AWS and then delete following files:"
-	@echo "'cert-csr.json' 'ca-csr.json' 'ca.csr' 'upload-gen-cert.json' 'upload-gen-cert.sh''gitlab.csr' '*.pem'"
+	@./delete-gen-cert.sh
+	@rm cert-csr.json ca.csr upload-gen-cert-arn.txt upload-gen-cert.sh delete-gen-cert.sh gitlab.csr *.pem
 
 ## Show help screen.
 help:

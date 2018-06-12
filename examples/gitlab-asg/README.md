@@ -1,45 +1,45 @@
-## Gitlab on AWS ASG w/ Terraform
+# Gitlab on AWS Single Instance Auto-scaling Groupd using Terraform
 
-### What is this
+## Overview
 
-Describe this setup of gitlab:
+### Current Version
+Running this example creates a running instance of Gitlab with the following characteristics:
 
-* runs a single EC2 instance on AWS
-* the EC2 instance is in an auto-scaling group, so AWS will re-create the node if it fails in specific ways
-* a persistent EBS volume is mounted to the instance and all gitlab data is written to the volume - data is retained when the node is replaced
-* use docker to run gitlab "all-in-one" (redis/postgres/prometheus/gitlab/etc)
-* install the gitlab runner via apt
-* setup and leverage the docker registry
-* include SSL
-* integrate with SSH
-* integrate with Route53 for DNS
-* keep it simple, but provide a lot of HA
+* Gitlab is running on a single EC2 instance on AWS in an auto-scaling group, so AWS will re-create the node if it fails in specific ways
+* The Gitlab runner is installed on the instance via apt
+* A Docker registry is also setup
+* SSL certificates are used
+* Integrated with SSH
+* Integrated with Route53 for DNS
 
+### Future additions
+* A persistent EBS volume is mounted to the instance and all gitlab data is stored on that volume - data is retained when the node is replaced
+* Add SMTP server for password notifications
+* Instead of an ELB we use a fixed IP
 
-## The Gitlab Demo
+This Terraform environment also serves as a great demo of Gitlab's features and the basics of CI/CD. 
 
-This Terraform environment also serves as a great demo of gitlab's features and the basics of CI/CD. This next section will step through the Gitlab Demo.
+### Requirements
+- Terraform 0.11.7
+- A recent version of `jl` which can be downloaded from [here](https://github.com/chrisdone/jl/releases). Be sure to put the binary in `/usr/local/bin` and name it `jl`
+- `cfssl` and `cfssljson` You can download it for Linux using the `make install-cfssl` below. If you already have it installed or installed it via `brew` on your Mac, skip that make step and run the following commands in the code directory:
+```
+ln -s /usr/local/bin/cfssl .
+ln -s /usr/local/bin/cfssljson .
+```
+
+## Deploying the Example
 
 ### Define your Deployment
-
 First, edit `vars.env` and review/update the variables defined there-in.
 
-
 ### Initial Deploy
-
-Then, we run some make targets:
-
-*Note:*
-After the `make upload-tls-certs` step you can either manually copy the `ssl-arn` as instructed, or download the `jl` command from [here](https://github.com/chrisdone/jl/releases) and then run the following command in your terminal:
-```
-echo "ssl_arn = " `jl 'get "CertificateArn"' upload-gen-cert.json` >> terraform.tfvars
-```
-
+Then, from the top-level code directory, run the following make targets:
 ```
 ᐅ make render-tls-configs
 ᐅ make render-tfvars
 ᐅ make generate-ssh-key
-ᐅ make install-cfssl
+ᐅ make install-cfssl      # see caveat above under requirements
 ᐅ make generate-tls-certs
 ᐅ make upload-tls-certs
 ᐅ make generate-tfvars
@@ -48,24 +48,28 @@ echo "ssl_arn = " `jl 'get "CertificateArn"' upload-gen-cert.json` >> terraform.
 ᐅ make apply
 ᐅ make render-ssh-config
 ```
-#### SSH Config
-
 Add the hosts entry for SSH found in the `ssh_config` file to `~/.ssh/config`.
 
+## Using Gitlab
+Once deployed you can test the deployment and play around with Gitlab.
+
 ### Initial Setup
-
-Then, you will want to do the following:
-
-* open the URL to the new gitlab instance in your browser
-* setup a password in the TOFU ("trust on first" use workflow)
+First you need to secure the installation:
+* Open the URL to the new gitlab instance in your browser
+* Setup a password in the TOFU ("trust on first-use" workflow)
     * go to the gitlab URL with your browser
-* login as `root` and that password you just set
-* go to the admin area, then "settings" -> "runners"
-* copy the Runner Registration Token shown on the runners page
-* run `make register-gitlab-runner`, you should see something like the output below. use `http://localhost` as the "gitlab-ci coortinator URL", paste the registration token copied from the runners page, and run the `docker` executor with a default image you are happy with (we use `alpine` in this example here).
+    * enter your password
+* Login as `root` and use the password you just set
 
-#### example runner registration
+### Register a Runner
+* Go to the *Admin area* (look for the wrench on the top menu), then *Overview -> Runners*
+* Copy the Runner registration token shown on the Runners page
+* In the terminal, run `make register-gitlab-runner`. You should see something like the output below. Use the responses in that output, with teh following caveats:
+    * Use `http://localhost` as the "gitlab-ci coortinator URL", 
+    * Paste the registration token copied in previous step
+    * Run the `docker` executor with a default image you are happy with (we use `alpine` in this example here).
 
+#### Example Runner Registration
 ```
 Running in system-mode.                            
                                                    
@@ -87,49 +91,4 @@ docker
 Please enter the default Docker image (e.g. ruby:2.1):
 alpine:3.7
 Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
-```
-
-#### Create a new user for yourself
-
-* "regular" user (not admin)
-* check/enable "can create groups"
-
-#### Login as the new user
-
-* generate an SSH keypair
-* add the public key to your gitlab user profile
-
-#### Setup New Groups
-
-* create a new group `ops`
-* create a new project `default-build-image`
-* create a new group `web`
-* add a file to the project, commit to `master`
-* confirm the clone URLs look correct
-* test the repo, clone it to your localhost over SSH and then HTTPS
-
-
-
-### Integrated Docker Image Registry
-
-#### Docker login:
-
-```
-ᐅ docker login registry.dev-sandbox.fpcomplete.com
-Username: root
-Password: 
-Email: 
-WARNING: login credentials saved in /home/user/.docker/config.json
-Login Succeeded
-```
-
-Tag & push an image:
-
-```
-ᐅ docker tag 3c82203aab43 registry.dev-sandbox.fpcomplete.com/root/my-awesome-project:foobar
-ᐅ docker push registry.dev-sandbox.fpcomplete.com/root/my-awesome-project:foobar
-The push refers to a repository [registry.dev-sandbox.fpcomplete.com/root/my-awesome-project] (len: 1)
-3c82203aab43: Pushed 
-b2189dc83d7f: Pushed 
-foobar: digest: sha256:3e8bfefbc2da87ef3b459db4c5edb4fb87410c5a4d8d411b98d086b009f380db size: 2152
 ```
