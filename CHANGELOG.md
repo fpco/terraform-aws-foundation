@@ -1,6 +1,30 @@
+# v0.7.6
+
+### Summary
+
+* enhancements to various modules
+
+### Modules
+
+* `ec2-auto-recover-instance`: fixup interpolation
+* `kube-stack`: updates for ELB
+
+
+# v0.7.5.1
+
+### Summary
+
+* quick bugfix release
+
+### Modules
+
+* `vpc-scenario-2`: drop redundant azs
+* `aws-ipsec-vpn`: connection type is hardcoded to 'ipsec.1'
+
+
 # v0.7.5
 
-### Summary:
+### Summary
 
 * enhancements to various modules
 * move `terraform-vpc` to examples and update packer build
@@ -22,7 +46,7 @@
 
 # v0.7.4
 
-### Summary:
+### Summary
 
 * Refine test suite and get CI build green
 * Improve type checking in module variables
