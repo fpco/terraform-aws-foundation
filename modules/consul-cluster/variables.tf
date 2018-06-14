@@ -45,11 +45,6 @@ variable "min_nodes" {
   description = "The minimum number of nodes in each group"
 }
 
-variable "desired_capacity" {
-  default     = 7
-  description = "The desired number of nodes in each group"
-}
-
 variable "cidr_minions_a" {
   default     = "10.100.7.0/24"
   description = "The CIDR block for subnet a"

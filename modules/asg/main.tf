@@ -25,7 +25,6 @@
 # Auto-Scaling Group
 resource "aws_autoscaling_group" "cluster" {
   availability_zones        = ["${var.azs}"]
-  desired_capacity          = "${var.desired_capacity}"
   force_delete              = true
   health_check_grace_period = 300
   health_check_type         = "EC2"
@@ -35,6 +34,7 @@ resource "aws_autoscaling_group" "cluster" {
   min_size                  = "${var.min_nodes}"
   name                      = "${var.name_prefix}-${var.name_suffix}"
   placement_group           = "${var.placement_group}"
+  termination_policies      = ["${var.termination_policies}"]
 
   lifecycle {
     create_before_destroy = true

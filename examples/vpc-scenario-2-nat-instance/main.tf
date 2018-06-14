@@ -235,7 +235,6 @@ module "web" {
   name_suffix        = "webapp-server"
   elb_names          = ["${aws_elb.web.name}"]
   instance_type      = "t2.nano"
-  desired_capacity   = "${length(module.public-subnets.ids)}"
   max_nodes          = "${length(module.public-subnets.ids)}"
   min_nodes          = "${length(module.public-subnets.ids)}"
   public_ip          = false

@@ -1,3 +1,19 @@
+# v0.8.0
+
+### Summary
+
+* breaking changes to modules that use ASG and previously had `desired_capacity`,
+  this parameter is dropped to ensure scaling policies are ok.
+
+### Modules
+
+* `asg`: remove `desired_capacity` input
+* `asg`: add `termination_policies` input
+* `consul-cluster`: remove `desired_capacity` input
+* `consul-leaders`: remove `desired_capacity` input
+* `kube-stack`: remove `controller_desired_capacity`  and `worker_desired_capacity` inputs
+
+
 # v0.7.6
 
 ### Summary

@@ -40,7 +40,6 @@ module "server" {
   public_ip        = "${var.public_ip}"
   key_name         = "${var.key_name}"
   elb_names        = ["${var.load_balancers}"]
-  desired_capacity = 1
   max_nodes        = 1
   min_nodes        = 1
   root_volume_type = "${var.root_volume_type}"

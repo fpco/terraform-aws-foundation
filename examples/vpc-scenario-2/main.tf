@@ -158,7 +158,6 @@ module "web" {
   name_prefix      = "${var.name}-web"
   elb_names        = ["${aws_elb.web.name}"]
   instance_type    = "t2.nano"
-  desired_capacity = "${length(module.vpc.public_subnet_ids)}"
   max_nodes        = "${length(module.vpc.public_subnet_ids)}"
   min_nodes        = "${length(module.vpc.public_subnet_ids)}"
   public_ip        = false

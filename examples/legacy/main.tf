@@ -14,7 +14,6 @@ module "cleaders" {
   name                      = "${var.name}"
   max_nodes                 = 5
   min_nodes                 = 3
-  desired_capacity          = 3
   key_name                  = "${aws_key_pair.tests.key_name}"
   access_key                = "${var.access_key}"
   secret_key                = "${var.secret_key}"
@@ -125,7 +124,6 @@ module "cworkers-a" {
   name                       = "${var.name}"
   max_nodes                  = 5
   min_nodes                  = 3
-  desired_capacity           = 3
   key_name                   = "${aws_key_pair.tests.key_name}"
   access_key                 = "${var.access_key}"
   secret_key                 = "${var.secret_key}"

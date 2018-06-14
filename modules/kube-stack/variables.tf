@@ -62,12 +62,6 @@ variable "controller_subnet_ids" {
   type        = "list"
 }
 
-variable "controller_desired_capacity" {
-  description = ""
-  default     = "3"
-  type        = "string"
-}
-
 variable "controller_max_nodes" {
   description = ""
   default     = "5"
@@ -76,7 +70,7 @@ variable "controller_max_nodes" {
 
 variable "controller_min_nodes" {
   description = "minimum number of nodes in controller ASG"
-  default     = "2"
+  default     = "3"
   type        = "string"
 }
 
@@ -127,12 +121,6 @@ variable "worker_subnet_ids" {
   type        = "list"
 }
 
-variable "worker_desired_capacity" {
-  description = ""
-  default     = "2"
-  type        = "string"
-}
-
 variable "worker_max_nodes" {
   description = ""
   default     = "4"
@@ -141,7 +129,7 @@ variable "worker_max_nodes" {
 
 variable "worker_min_nodes" {
   description = "minimum number of nodes in worker ASG"
-  default     = "0"
+  default     = "2"
   type        = "string"
 }
 
