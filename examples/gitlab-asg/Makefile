@@ -7,17 +7,9 @@ render-tls-configs:
 	@. ./vars.env && envsubst <ca-csr.tpl > ca-csr.json
 	@. ./vars.env && envsubst <cert-csr.tpl > cert-csr.json
 
-## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
-render-tfvars:
-	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
-
-## Use ssh-keygen to generate a keypair for SSH
+# Use ssh-keygen to generate a keypair for SSH
 generate-ssh-key:
 	@ssh-keygen -q -N "" -b 4096 -C "test" -f ./id_rsa
-
-## write out a tfvars file for a test deploy
-generate-tfvars:
-	@echo "ssh_pubkey = \"./id_rsa.pub\"" >> terraform.tfvars
 	
 ## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
 generate-tls-certs:
@@ -39,6 +31,12 @@ upload-tls-certs:
 	@. ./vars.env && envsubst < delete-gen-cert.tpl > delete-gen-cert.sh
 	@chmod +x ./upload-gen-cert.sh ./delete-gen-cert.sh
 	@./upload-gen-cert.sh
+
+## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
+## Add ssh key and ssl arn at the same time
+render-tfvars:
+	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
+	@echo "ssh_pubkey = \"./id_rsa.pub\"" >> terraform.tfvars
 	@echo "ssl_arn = " `cat  upload-gen-cert-arn.txt` >> terraform.tfvars
 	
 ## Use Terraform to create the VPC and core network resources in a specific order
@@ -114,7 +112,7 @@ clean: destroy
 	@rm -rf id_rsa id_rsa.pub ssh_config
 	@rm -rf tf.out terraform.tfvars
 	@./delete-gen-cert.sh
-	@rm cert-csr.json ca.csr upload-gen-cert-arn.txt upload-gen-cert.sh delete-gen-cert.sh gitlab.csr *.pem
+	@rm ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt upload-gen-cert.sh delete-gen-cert.sh gitlab.csr *.pem
 
 ## Show help screen.
 help:

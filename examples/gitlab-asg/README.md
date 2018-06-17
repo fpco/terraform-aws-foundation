@@ -37,12 +37,11 @@ First, edit `vars.env` and review/update the variables defined there-in.
 Then, from the top-level code directory, run the following make targets:
 ```
 ᐅ make render-tls-configs
-ᐅ make render-tfvars
 ᐅ make generate-ssh-key
 ᐅ make install-cfssl      # see caveat above under requirements
 ᐅ make generate-tls-certs
 ᐅ make upload-tls-certs
-ᐅ make generate-tfvars
+ᐅ make render-tfvars
 ᐅ make network
 ᐅ make plan
 ᐅ make apply
