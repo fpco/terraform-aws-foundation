@@ -11,9 +11,9 @@ Running this example creates a running instance of Gitlab with the following cha
 * SSL certificates are used
 * Integrated with SSH
 * Integrated with Route53 for DNS
+* A persistent EBS volume is mounted to the instance and all gitlab data is stored on that volume - data is retained when the node is replaced
 
 ### Future additions
-* A persistent EBS volume is mounted to the instance and all gitlab data is stored on that volume - data is retained when the node is replaced
 * Add SMTP server for password notifications
 * Instead of an ELB we use a fixed IP
 
@@ -35,7 +35,8 @@ First, edit `vars.env` and review/update the variables defined there-in.
 
 ### Initial Deploy
 Then, from the top-level code directory, run the following make targets:
-```
+
+```bash
 ᐅ make render-tls-configs
 ᐅ make generate-ssh-key
 ᐅ make install-cfssl      # see caveat above under requirements
@@ -51,6 +52,17 @@ Add the hosts entry for SSH found in the `ssh_config` file to `~/.ssh/config`.
 
 ## Using Gitlab
 Once deployed you can test the deployment and play around with Gitlab.
+
+### Create EBS volume
+In order for the repository data not to be lost, you need to create an external EBS volume and mount it to the `gitlab` instance.
+
+The commands to do that are:
+
+```bash
+ᐅ make init-ebs-volume
+```
+
+Once created you need to also add the volume to the `/etc/fstab` so it automatically mounts on reboot. After mounting the first time, modify the default repository location in the gitlab configuration, according to [these instructions][1].
 
 ### Initial Setup
 First you need to secure the installation:
@@ -69,7 +81,7 @@ First you need to secure the installation:
     * Run the `docker` executor with a default image you are happy with (we use `alpine` in this example here).
 
 #### Example Runner Registration
-```
+```bash
 Running in system-mode.                            
                                                    
 Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
@@ -91,3 +103,5 @@ Please enter the default Docker image (e.g. ruby:2.1):
 alpine:3.7
 Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
 ```
+
+[1]:https://docs.gitlab.com/ee/administration/repository_storage_paths.html

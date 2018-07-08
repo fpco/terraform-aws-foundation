@@ -67,6 +67,21 @@ render-ssh-config:
 ##get-ip:
 ##	@ops aws ec2 asg ips -r $$(terraform output region) $$(terraform output gitlab_asg_name)
 
+## SSH to the gitlab server and use parted and similar tools to setup a partition and filesystem on the EBS volume (run only once per volume)
+init-ebs-volume:
+	@ssh data-ops-gitlab "sudo parted --script /dev/xvdf -- mklabel msdos && \
+	 sudo parted --script /dev/xvdf -- mkpart primary 0 -1                && \
+	 sudo mkfs -t ext4 -F /dev/xvdf1                                      && \
+	 sudo e2label /dev/xvdf1 gitlab"
+
+## SSH to the gitlab server and create/activate a swap file for the server
+create-activate-swap:
+	@ssh data-ops-gitlab "sudo dd if=/dev/zero of=/var/swap.file bs=1M count=2048 && sudo mkswap /var/swap.file && sudo chmod 600 /var/swap.file && sudo swapon /var/swap.file"
+
+## SSH to the gitlab server and halt the host so it is terminated
+terminate-gitlab-server:
+	@ssh data-ops-gitlab "sudo halt"
+
 ## SSH to the gitlab server and register the CI runner with the server
 register-gitlab-runner:
 	@ssh data-ops-gitlab "sudo gitlab-runner register"
