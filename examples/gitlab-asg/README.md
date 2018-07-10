@@ -54,15 +54,18 @@ Add the hosts entry for SSH found in the `ssh_config` file to `~/.ssh/config`.
 Once deployed you can test the deployment and play around with Gitlab.
 
 ### Create EBS volume
-In order for the repository data not to be lost, you need to create an external EBS volume and mount it to the `gitlab` instance.
-
-The commands to do that are:
+In order for the repository data not to be lost, you need to create an external EBS volume and mount it to the `gitlab` instance. This requires some manual setup the very first time to make it available for use. The commands to do that are excuted by this step:
 
 ```bash
 ᐅ make init-ebs-volume
 ```
 
-Once created you need to also add the volume to the `/etc/fstab` so it automatically mounts on reboot. After mounting the first time, modify the default repository location in the gitlab configuration, according to [these instructions][1].
+After running the above step to initialize the EBS, terminate the instance with the following command:
+
+```bash
+ᐅ make terminate-gitlab-server
+```
+The autoscaling group will bring up a new instance that will be running gitlab once it is done initializing. Once you set up Gitlab as below, modify the default repository location in the gitlab configuration, according to [these instructions][1].
 
 ### Initial Setup
 First you need to secure the installation:
