@@ -347,7 +347,8 @@ module "init-snippet-exec" {
 module "init-snippet-gitlab-docker" {
   source = "../modules/init-snippet-gitlab-docker"
 
-  gitlab_domain = ""
+  gitlab_domain        = ""
+  registry_bucket_name = ""
 }
 
 module "init-snippet-hostname" {

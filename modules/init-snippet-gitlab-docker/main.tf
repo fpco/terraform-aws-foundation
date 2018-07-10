@@ -21,6 +21,17 @@ variable "log_prefix" {
   description = "string to prefix log messages with"
 }
 
+variable "registry_bucket_name" {
+  description = "the name of the S3 bucket to write docker images to"
+  type        = "string"
+}
+
+variable "registry_bucket_region" {
+  description = "the region of the S3 bucket to write docker images to"
+  default     = "us-east-1"
+  type        = "string"
+}
+
 variable "gitlab_domain" {
   description = "The example.com in gitlab.example.com"
   type        = "string"
@@ -75,14 +86,16 @@ variable "gitlab_data_path" {
 # work with SSL and the AWS ELB
 data "template_file" "omnibus_config" {
   template = <<EOC
-external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; registry_nginx['listen_port']=$${http_port}; registry_nginx['listen_https'] = false; registry_nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; nginx['listen_port']=$${http_port}; nginx['listen_https'] = false; nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'};
+external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; registry_nginx['listen_port']=$${http_port}; registry_nginx['listen_https'] = false; registry_nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; nginx['listen_port']=$${http_port}; nginx['listen_https'] = false; nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; registry['storage']={'s3' => {'bucket' => '$${registry_bucket_name}', 'region' => '$${registry_bucket_region}' }};
 EOC
 
   vars = {
-    gitlab_url   = "https://${var.gitlab_name}.${var.gitlab_domain}"
-    registry_url = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
-    ssh_port     = "${var.gitlab_ssh_port}"
-    http_port    = "${var.gitlab_http_port}"
+    gitlab_url             = "https://${var.gitlab_name}.${var.gitlab_domain}"
+    registry_url           = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
+    registry_bucket_region = "${var.registry_bucket_region}"
+    registry_bucket_name   = "${var.registry_bucket_name}"
+    ssh_port               = "${var.gitlab_ssh_port}"
+    http_port              = "${var.gitlab_http_port}"
   }
 }
 
@@ -117,11 +130,13 @@ output "init_snippet" {
 
 output "gitlab_config" {
   value = {
-    external_url          = "https://${var.gitlab_name}.${var.gitlab_domain}"
-    registry_external_url = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
-    ssh_port              = "${var.gitlab_ssh_port}"
-    http_port             = "${var.gitlab_http_port}"
-    https_port            = "${var.gitlab_https_port}"
+    external_url           = "https://${var.gitlab_name}.${var.gitlab_domain}"
+    registry_external_url  = "https://${var.gitlab_registry_name}.${var.gitlab_domain}"
+    registry_bucket_region = "${var.registry_bucket_region}"
+    registry_bucket_name   = "${var.registry_bucket_name}"
+    ssh_port               = "${var.gitlab_ssh_port}"
+    http_port              = "${var.gitlab_http_port}"
+    https_port             = "${var.gitlab_https_port}"
   }
 
   description = "connection details about gitlab"
