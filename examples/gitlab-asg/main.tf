@@ -316,6 +316,11 @@ output "gitlab_asg_name" {
   description = "name of the Gitlab autoscaling group"
 }
 
+output "gitlab_server_name" {
+  value       = "${var.name}-gitlab-server-${element(data.aws_availability_zones.available.names, 0)}"
+  description = "name of the Gitlab server instance"
+}
+
 output "gitlab_url" {
   value       = "${aws_route53_record.gitlab.name}"
   description = "URL to gitlab"

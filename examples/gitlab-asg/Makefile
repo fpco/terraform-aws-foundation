@@ -58,10 +58,13 @@ plan:
 apply:
 	@terraform apply tf.out
 
-## Generate the ssh_congig both for Git operations and instance maintenance
+## Generate the ssh_config both for Git operations and instance maintenance
 render-ssh-config:
-	@. ./vars.env && envsubst <ssh_config.tpl > ssh_config
-	@echo `aws ec2 describe-instances --filters "Name=tag:Name,Values=at-test-gitlab-server-eu-central-1a" --region=eu-central-1 | jl _.Reservations[0].Instances[0].PublicIpAddress | tr -d '"'` >> ssh_config
+	@. ./vars.env && \
+	 export SERVER_NAME=$$(terraform output gitlab_server_name) && \
+	 export SERVER_IP=$$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$${SERVER_NAME}" --region="$${REGION}" | \
+	                     jl '_.Reservations[0].Instances[0].PublicIpAddress' | tr -d '"') && \
+	 envsubst <ssh_config.tpl >ssh_config
 
 ## use ops cli tool to lookup the public IP of the gitlab instance
 ##get-ip:

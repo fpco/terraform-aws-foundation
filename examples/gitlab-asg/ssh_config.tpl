@@ -4,4 +4,4 @@ Host ${GITLAB_NAME}.${DNS_ZONE_NAME}
 Host data-ops-gitlab
     identityfile ${PWD}/id_rsa
     user ubuntu
-    hostname 
+    hostname ${SERVER_IP}
