@@ -8,7 +8,7 @@ maintaining stability, and does not forget how to support your legacy apps.
 
 ## Project Goals
 
-This project aims to be..
+This project aims to be…
 
 * an extensible framework for the ops developer under (multiple dimensions
   of) pressure
