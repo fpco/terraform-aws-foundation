@@ -4,46 +4,6 @@
  *
  */
 
-variable "extra_tags" {
-  description = "Extra tags that will be added to aws_subnet resources"
-  default     = {}
-}
-
-variable "name" {
-  description = "name of the project, use as prefix to names of resources created"
-  default     = "test-project"
-}
-
-variable "region" {
-  description = "Region where the project will be deployed"
-  default     = "us-east-2"
-}
-
-variable "vpc_cidr" {
-  description = "Top-level CIDR for the whole VPC network space"
-  default     = "10.23.0.0/16"
-}
-
-variable "ssh_pubkey" {
-  description = "File path to SSH public key"
-  default     = "./id_rsa.pub"
-}
-
-variable "ssh_key" {
-  description = "File path to SSH public key"
-  default     = "./id_rsa"
-}
-
-variable "public_subnet_cidrs" {
-  default     = ["10.23.11.0/24", "10.23.12.0/24", "10.23.13.0/24"]
-  description = "A list of public subnet CIDRs to deploy inside the VPC"
-}
-
-variable "private_subnet_cidrs" {
-  default     = ["10.23.21.0/24", "10.23.22.0/24", "10.23.23.0/24"]
-  description = "A list of private subnet CIDRs to deploy inside the VPC"
-}
-
 provider "aws" {
   region = "${var.region}"
 }
@@ -63,6 +23,9 @@ module "vpc" {
 
   public_subnet_cidrs  = ["${var.public_subnet_cidrs}"]
   private_subnet_cidrs = ["${var.private_subnet_cidrs}"]
+
+  vpn_static_routes = ["${var.vpn_static_routes}"]
+  vpn_remote_ip     = "${var.vpn_remote_ip}"
 }
 
 module "ubuntu-xenial-ami" {
@@ -86,10 +49,10 @@ module "elb-sg" {
 # security group rule for elb open inbound http
 module "elb-http-rule" {
   source            = "../../modules/single-port-sg"
-	port              = 80
-	cidr_blocks       = ["0.0.0.0/0"]
+  port              = 80
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${module.elb-sg.id}"
-	description       = "open HTTP on the ELB to public access"
+  description       = "open HTTP on the ELB to public access"
 }
 
 # security group rule for elb open egress (outbound from nodes)
@@ -152,17 +115,17 @@ resource "aws_elb" "web" {
 }
 
 module "web" {
-  source           = "../../modules/asg"
-  ami              = "${module.ubuntu-xenial-ami.id}"
-  azs              = "${local.azs}"
-  name_prefix      = "${var.name}-web"
-  elb_names        = ["${aws_elb.web.name}"]
-  instance_type    = "t2.nano"
-  max_nodes        = "${length(module.vpc.public_subnet_ids)}"
-  min_nodes        = "${length(module.vpc.public_subnet_ids)}"
-  public_ip        = false
-  key_name         = "${aws_key_pair.main.key_name}"
-  subnet_ids       = ["${module.vpc.private_subnet_ids}"]
+  source        = "../../modules/asg"
+  ami           = "${module.ubuntu-xenial-ami.id}"
+  azs           = "${local.azs}"
+  name_prefix   = "${var.name}-web"
+  elb_names     = ["${aws_elb.web.name}"]
+  instance_type = "t2.nano"
+  max_nodes     = "${length(module.vpc.public_subnet_ids)}"
+  min_nodes     = "${length(module.vpc.public_subnet_ids)}"
+  public_ip     = false
+  key_name      = "${aws_key_pair.main.key_name}"
+  subnet_ids    = ["${module.vpc.private_subnet_ids}"]
 
   security_group_ids = ["${module.web-sg.id}"]
 
