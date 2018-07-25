@@ -53,8 +53,7 @@ Then, from the top-level code directory, run the following make targets:
 ᐅ make apply
 ᐅ make render-ssh-config
 ```
-Add the host entries for SSH found in the `ssh_config` file to `~/.ssh/config`.
-You may wish to test it locally first with `ssh -F ssh_config data-ops-gitlab`. Subsequent steps below use `ssh` to access that host.
+This will generate a local SSH configuration file containing public and private host entries for the gitlab server. You may test it using `ssh -F ssh_config data-ops-gitlab uptime`. Subsequent steps below use `ssh` to access that host.
 
 ## Using Gitlab
 Once deployed you can test the deployment and play around with Gitlab.
