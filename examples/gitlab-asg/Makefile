@@ -9,7 +9,7 @@ render-tls-configs:
 
 # Use ssh-keygen to generate a keypair for SSH
 generate-ssh-key:
-	@ssh-keygen -q -N "" -b 4096 -C "test" -f ./id_rsa
+	@ssh-keygen -q -N "" -b 4096 -C "test" -f id_rsa
 	
 ## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
 generate-tls-certs:
@@ -20,23 +20,23 @@ generate-tls-certs:
 
 ## use curl to download and install the cfssl executable
 install-cfssl:
-	@curl -s -L -o ./cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
-	@curl -s -L -o ./cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
-	@chmod +x ./cfssl ./cfssljson
+	@curl -s -L -o cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+	@curl -s -L -o cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+	@chmod +x cfssl cfssljson
 	@./cfssl version
 
 ## Use AWS cli tools to upload the SSL cert to AWS
 upload-tls-certs:
 	@. ./vars.env && envsubst < upload-gen-cert.tpl > upload-gen-cert.sh
 	@. ./vars.env && envsubst < delete-gen-cert.tpl > delete-gen-cert.sh
-	@chmod +x ./upload-gen-cert.sh ./delete-gen-cert.sh
+	@chmod +x upload-gen-cert.sh delete-gen-cert.sh
 	@./upload-gen-cert.sh
 
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 ## Add ssh key and ssl arn at the same time
 render-tfvars:
 	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
-	@echo "ssh_pubkey = \"./id_rsa.pub\"" >> terraform.tfvars
+	@echo "ssh_pubkey = \"id_rsa.pub\"" >> terraform.tfvars
 	@echo "ssl_arn = " `cat  upload-gen-cert-arn.txt` >> terraform.tfvars
 	
 ## Use Terraform to create the VPC and core network resources in a specific order
