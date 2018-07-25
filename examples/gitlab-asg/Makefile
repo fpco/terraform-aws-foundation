@@ -65,8 +65,7 @@ apply:
 render-ssh-config:
 	@. ./vars.env && \
 	 export SERVER_NAME=$$(terraform output gitlab_server_name) && \
-	 export SERVER_IP=$$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$${SERVER_NAME}" --region="$${REGION}" | \
-	                     jl '_.Reservations[0].Instances[0].PublicIpAddress' | tr -d '"') && \
+	 export SERVER_IP=$$(./server-ip.sh $$SERVER_NAME $$REGION) && \
 	 envsubst <ssh_config.tpl >ssh_config
 
 ## use ops cli tool to lookup the public IP of the gitlab instance
