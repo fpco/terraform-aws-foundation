@@ -2,6 +2,8 @@
 
 .DEFAULT_GOAL = help
 
+PATH:=${PWD}/bin:${PATH}
+
 ## Use envsubst and vars.env to render the json config files for cfssl
 render-tls-configs:
 	@. ./vars.env && envsubst <ca-csr.tpl > ca-csr.json
@@ -13,17 +15,18 @@ generate-ssh-key:
 	
 ## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
 generate-tls-certs:
-	@./cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
-	@./cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=cert-config.json -profile=gitlab cert-csr.json | cfssljson -bare gitlab
+	@cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+	@cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=cert-config.json -profile=gitlab cert-csr.json | cfssljson -bare gitlab
 	@ls -Alh
 	@echo "ca-key.pem is the file to keep very safe"
 
 ## use curl to download and install the cfssl executable
 install-cfssl:
-	@curl -s -L -o cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
-	@curl -s -L -o cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
-	@chmod +x cfssl cfssljson
-	@./cfssl version
+	@mkdir -p bin
+	@curl -s -L -o bin/cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+	@curl -s -L -o bin/cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+	@chmod +x bin/cfssl bin/cfssljson
+	@cfssl version
 
 ## Use AWS cli tools to upload the SSL cert to AWS
 upload-tls-certs:
@@ -100,6 +103,7 @@ clean: destroy
 	@rm -rf tf.out terraform.tfvars
 	@./delete-gen-cert.sh
 	@rm ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt upload-gen-cert.sh delete-gen-cert.sh gitlab.csr *.pem
+	@rm -rf bin
 
 ## Show help screen.
 help:
