@@ -21,17 +21,23 @@ This Terraform environment also serves as a great demo of Gitlab's features and 
 
 ### Requirements
 - Terraform 0.11.7
-- A recent version of `jl` which can be downloaded from [here](https://github.com/chrisdone/jl/releases). Be sure to put the binary in `/usr/local/bin` and name it `jl`
-- `cfssl` and `cfssljson` You can download it for Linux using the `make install-cfssl` below. If you already have it installed or installed it via `brew` on your Mac, skip that make step and run the following commands in the code directory:
+- A recent version of `jl` which can be downloaded from [here](https://github.com/chrisdone/jl/releases). Be sure to put the binary somewhere on your path (eg in `/usr/local/bin`) and name it `jl`.
+- `cfssl` and `cfssljson`. You can download them for Linux using the `make install-cfssl` below or install from a system package (`cfssl` on most systems, including brew on Mac, but `golang-cfssl` on Ubuntu/Debian). If you already have them installed, skip that make step and run the following commands in the code directory:
+```bash
+ln -s $(which cfssl{,json}) .
 ```
-ln -s /usr/local/bin/cfssl .
-ln -s /usr/local/bin/cfssljson .
-```
+* `envsubst` which is part of `gettext`. This already installed on most Linux systems, but if not, install the appropriate system package (`gettext` on most systems, including brew on Mac, but `gettext-base` on Debian/Ubuntu).
 
 ## Deploying the Example
 
 ### Define your Deployment
 First, edit `vars.env` and review/update the variables defined there-in.
+In particular, set:
+
+* `DNS_ZONE_NAME` to the one associated with your AWS account
+* `REGION` to one that has some resources available to you
+* `REGISTRY_S3_BUCKET_NAME` to something unique
+* `ENVIONMENT_NAME` to something unique
 
 ### Initial Deploy
 Then, from the top-level code directory, run the following make targets:
@@ -48,7 +54,8 @@ Then, from the top-level code directory, run the following make targets:
 ᐅ make apply
 ᐅ make render-ssh-config
 ```
-Add the hosts entry for SSH found in the `ssh_config` file to `~/.ssh/config`.
+Add the host entries for SSH found in the `ssh_config` file to `~/.ssh/config`.
+You may wish to test it locally first with `ssh -F ssh_config data-ops-gitlab`. Subsequent steps below use `ssh` to access that host.
 
 ## Using Gitlab
 Once deployed you can test the deployment and play around with Gitlab.
@@ -65,11 +72,13 @@ After running the above step to initialize the EBS, terminate the instance with 
 ```bash
 ᐅ make terminate-gitlab-server
 ```
-The autoscaling group will bring up a new instance that will be running gitlab once it is done initializing. Once you set up Gitlab as below, modify the default repository location in the gitlab configuration, according to [these instructions][1].
+The autoscaling group will bring up a new instance that will be running gitlab once it is done initializing. This instance will have a different IP address, so you'll need to re-run `make render-ssh-config`. However, you'll need to wait a couple of minutes for the old instance to terminate and the new one to be provisioned. You can check progress in the EC2 console if you're impatient.
 
 ### Initial Setup
 First you need to secure the installation:
 * Open the URL to the new gitlab instance in your browser
+  (equivalent to `https://$GITLAB_NAME.$DNS_ZONE_NAME/`).  
+  Note that `https` is a requirement.
 * Setup a password in the TOFU ("trust on first-use" workflow)
     * go to the gitlab URL with your browser
     * enter your password
@@ -78,13 +87,13 @@ First you need to secure the installation:
 ### Register a Runner
 * Go to the *Admin area* (look for the wrench on the top menu), then *Overview -> Runners*
 * Copy the Runner registration token shown on the Runners page
-* In the terminal, run `make register-gitlab-runner`. You should see something like the output below. Use the responses in that output, with teh following caveats:
-    * Use `http://localhost` as the "gitlab-ci coortinator URL", 
+* In the terminal, run `make register-gitlab-runner`. You should see something like the output below. Use the responses in that output, with the following caveats:
+    * Use `http://localhost` as the _gitlab-ci coordinator URL_
     * Paste the registration token copied in previous step
     * Run the `docker` executor with a default image you are happy with (we use `alpine` in this example here).
 
 #### Example Runner Registration
-```bash
+```
 Running in system-mode.                            
                                                    
 Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
@@ -107,4 +116,6 @@ alpine:3.7
 Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
 ```
 
-[1]:https://docs.gitlab.com/ee/administration/repository_storage_paths.html
+## Take down the installation when finished
+
+`make clean` will remove everything both locally and in AWS.
