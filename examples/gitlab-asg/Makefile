@@ -86,7 +86,7 @@ create-activate-swap:
 
 ## SSH to the gitlab server and halt the host so it is terminated
 terminate-gitlab-server:
-	@ssh data-ops-gitlab "sudo halt"
+	@ssh data-ops-gitlab "sudo halt & exit"
 
 ## SSH to the gitlab server and register the CI runner with the server
 register-gitlab-runner:
