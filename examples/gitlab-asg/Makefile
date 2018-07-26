@@ -38,10 +38,10 @@ upload-tls-certs:
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 ## Add ssh key and ssl arn at the same time
 render-tfvars:
-	@. ./vars.env && envsubst <terraform-tfvars.tpl > terraform.tfvars
-	@echo "ssh_pubkey = \"id_rsa.pub\"" >> terraform.tfvars
-	@echo "ssl_arn = " `cat  upload-gen-cert-arn.txt` >> terraform.tfvars
-	
+	@. ./vars.env && \
+	 export SSL_ARN=$$(cat upload-gen-cert-arn.txt) && \
+	 envsubst <terraform-tfvars.tpl >terraform.tfvars
+
 ## Use Terraform to create the VPC and core network resources in a specific order
 network:
 	@terraform init
