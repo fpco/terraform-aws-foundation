@@ -1,6 +1,6 @@
 Host ${GITLAB_NAME}.${DNS_ZONE_NAME}
     user git
-Host data-ops-gitlab
+Host gitlab-server-sysadmin
     user ubuntu
     hostname ${SERVER_IP}
 Host *
