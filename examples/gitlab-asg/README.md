@@ -42,11 +42,11 @@ First, copy `vars.mk.sample` to `vars.mk` and review/update the variables define
 Then, from the top-level code directory, run the following make targets:
 
 ```bash
-ᐅ make render-tls-configs
-ᐅ make generate-ssh-key
 ᐅ make install-cfssl      # see caveat above under requirements
+ᐅ make render-tls-configs
 ᐅ make generate-tls-certs
 ᐅ make upload-tls-certs
+ᐅ make generate-ssh-key
 ᐅ make render-tfvars
 ᐅ make network
 ᐅ make plan

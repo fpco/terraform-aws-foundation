@@ -1,10 +1,34 @@
-.PHONY: shell render-tls-configs generate-ssh-key generate-tls-certs install-cfssl upload-tls-cert delete-tls-cert render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
+.PHONY: all shell render-tls-configs generate-ssh-key generate-tls-certs install-cfssl upload-tls-cert delete-tls-cert render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
 
 .DEFAULT_GOAL = help
 
 include vars.mk
 
 PATH:=${PWD}/bin:${PATH}
+
+GNUMAKEFLAGS := --no-print-directory
+
+## Do everything
+all:
+#	Use recursive makes instead of dependencies, to show progress
+#	If something breaks, we can see which target it was in
+	$(MAKE) install-cfssl
+	$(MAKE) render-tls-configs
+	$(MAKE) generate-tls-certs
+	$(MAKE) upload-tls-cert
+	$(MAKE) generate-ssh-key
+	$(MAKE) render-tfvars
+	$(MAKE) network
+	$(MAKE) plan
+	$(MAKE) apply
+	$(MAKE) render-ssh-config
+	@echo "Waiting for instance to initialize..."
+	sleep 240
+	$(MAKE) init-ebs-volume
+	$(MAKE) terminate-gitlab-server
+	@echo "Waiting for instance to reinitialize..."
+	sleep 240
+	$(MAKE) render-ssh-config
 
 ## Run an interactive shell with all environment variables defined
 shell:
