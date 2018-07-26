@@ -1,4 +1,4 @@
-.PHONY: render-tls-configs render-tfvars render-ssh-config generate-ssh-key generate-tfvars generate-tls-certs upload-tls install-cfssl network plan apply test destroy
+.PHONY: all render-tls-configs generate-ssh-key generate-tls-certs install-cfssl upload-tls-cert delete-tls-cert render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
 
 .DEFAULT_GOAL = help
 
