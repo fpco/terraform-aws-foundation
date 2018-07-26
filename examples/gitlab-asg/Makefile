@@ -1,13 +1,19 @@
-.PHONY: all render-tls-configs generate-ssh-key generate-tls-certs install-cfssl upload-tls-cert delete-tls-cert render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
+.PHONY: shell render-tls-configs generate-ssh-key generate-tls-certs install-cfssl upload-tls-cert delete-tls-cert render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
 
 .DEFAULT_GOAL = help
 
+include vars.mk
+
 PATH:=${PWD}/bin:${PATH}
 
-## Use envsubst and vars.env to render the json config files for cfssl
+## Run an interactive shell with all environment variables defined
+shell:
+	@bash
+
+## Use envsubst to render the json config files for cfssl
 render-tls-configs:
-	@. ./vars.env && envsubst <ca-csr.tpl > ca-csr.json
-	@. ./vars.env && envsubst <cert-csr.tpl > cert-csr.json
+	@envsubst <ca-csr.tpl > ca-csr.json
+	@envsubst <cert-csr.tpl > cert-csr.json
 
 # Use ssh-keygen to generate a keypair for SSH
 generate-ssh-key:
@@ -30,17 +36,16 @@ install-cfssl:
 
 ## Use AWS cli tools to upload the SSL cert to AWS
 upload-tls-cert:
-	@. ./vars.env && ./upload-gen-cert.sh $$REGION
+	@./upload-gen-cert.sh ${REGION}
 
 ## Use AWS cli tools to remove the SSL certs from AWS
 delete-tls-cert:
-	@. ./vars.env && ./delete-gen-cert.sh $$REGION
+	@./delete-gen-cert.sh ${REGION}
 
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 ## Add ssh key and ssl arn at the same time
 render-tfvars:
-	@. ./vars.env && \
-	 export SSL_ARN=$$(cat upload-gen-cert-arn.txt) && \
+	@export SSL_ARN=$$(cat upload-gen-cert-arn.txt) && \
 	 envsubst <terraform-tfvars.tpl >terraform.tfvars
 
 ## Use Terraform to create the VPC and core network resources in a specific order
@@ -64,8 +69,7 @@ apply:
 
 ## Generate the ssh_config both for Git operations and instance maintenance
 render-ssh-config:
-	@. ./vars.env && \
-	 export SERVER_NAME=$$(terraform output gitlab_server_name) && \
+	@export SERVER_NAME=$$(terraform output gitlab_server_name) && \
 	 export SERVER_IP=$$(./server-ip.sh $$SERVER_NAME $$REGION) && \
 	 envsubst <ssh_config.tpl >ssh_config
 
