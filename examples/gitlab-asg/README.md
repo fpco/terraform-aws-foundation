@@ -31,8 +31,7 @@ ln -s $(which cfssl{,json}) .
 ## Deploying the Example
 
 ### Define your Deployment
-First, edit `vars.env` and review/update the variables defined there-in.
-In particular, set:
+First, copy `vars.env.sample` to `vars.env` and review/update the variables defined there-in. In particular, set:
 
 * `DNS_ZONE_NAME` to the one associated with your AWS account
 * `REGION` to one that has some resources available to you
