@@ -29,11 +29,12 @@ install-cfssl:
 	@cfssl version
 
 ## Use AWS cli tools to upload the SSL cert to AWS
-upload-tls-certs:
-	@. ./vars.env && envsubst < upload-gen-cert.tpl > upload-gen-cert.sh
-	@. ./vars.env && envsubst < delete-gen-cert.tpl > delete-gen-cert.sh
-	@chmod +x upload-gen-cert.sh delete-gen-cert.sh
-	@./upload-gen-cert.sh
+upload-tls-cert:
+	@. ./vars.env && ./upload-gen-cert.sh $$REGION
+
+## Use AWS cli tools to remove the SSL certs from AWS
+delete-tls-cert:
+	@. ./vars.env && ./delete-gen-cert.sh $$REGION
 
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 ## Add ssh key and ssl arn at the same time
@@ -96,12 +97,11 @@ destroy:
 	@terraform destroy -force
 
 ## rm -rf everything
-clean: destroy
+clean: destroy delete-tls-cert
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
-	@rm -rf id_rsa id_rsa.pub ssh_config
 	@rm -rf tf.out terraform.tfvars
-	@./delete-gen-cert.sh
-	@rm ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt upload-gen-cert.sh delete-gen-cert.sh gitlab.csr *.pem
+	@rm -rf id_rsa id_rsa.pub ssh_config
+	@rm -rf ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt gitlab.csr *.pem
 	@rm -rf bin
 
 ## Show help screen.
