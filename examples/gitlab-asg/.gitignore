@@ -1,0 +1,7 @@
+/cert-csr.json
+/cert.json
+/ca-csr.json
+/ssh_config
+/upload-gen-cert.sh
+/upload-gen-cert-arn.txt
+/delete-gen-cert.sh
