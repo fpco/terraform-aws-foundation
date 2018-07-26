@@ -8,6 +8,11 @@ output "private_subnet_ids" {
   description = "List of private subnet ids. None created if list is empty."
 }
 
+output "public_cidr_blocks" {
+  value       = ["${module.public-subnets.cidr_blocks}"]
+  description = "List of private subnet CIDR blocks"
+}
+
 output "public_subnet_ids" {
   value       = ["${module.public-subnets.ids}"]
   description = "List of public subnet ids"
