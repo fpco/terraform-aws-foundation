@@ -5,3 +5,5 @@ Host data-ops-gitlab
     hostname ${SERVER_IP}
 Host *
     identityfile ${PWD}/id_rsa
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
