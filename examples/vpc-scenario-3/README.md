@@ -1,26 +1,42 @@
 # Example to test the VPC Scenario 3 Module
-
 ## Environment creation and deployment
 
-This module creates a VPC with both public and private subnets spanning one or
-more availability zones, an internet gateway for the public subnets and a
-hardware VPN gateway for the private subnets.
+This module creates a VPC with both public and private-vpn subnets spanning one or
+more availability zones, a hardware VPN gateway for the private subnets.
 
+This example the operator have in place the following networking components:
+
+-  A Public subnet spanning one or more availability zones
+-  A Private subnet spanning one or more availability zones that route the tunnel to connect with a customer VPN
+- A virtual private gateway to enable communication with your own network over an IPsec VPN tunnel.
+- Instances in the private subnet with IPv4 addresses which enables the instances to communicate with each other and other instances in the VPC.
+- The main route table associated with the private (VPN-only subnet). The route table contains an entry that enables instances in the subnet to communicate with other instances in the VPC, and an entry that enables instances in the subnet to communicate directly with your network.
+
+The VPN connection consists of a virtual private gateway located on the Amazon side of the VPN connection and a customer gateway located on your side of the VPN connection.
+
+<p align="center">
+  <img width="460" height="300" src="https://github.com/fpco/terraform-aws-foundation/blob/vpc-scenario-3/examples/vpc-scenario-3/VPC-3.png">
+</p>
+
+(Move this items to Github issues)
+This items are part of the public Nat gateway that should added:
+
+- [ ] Instances in the public subnet with Elastic IP addresses, which are public IPv4 addresses that enable them to be reached from the Internet.
+- [ ] A Public subnet spanning one or more availability zones with a public gateway that assign a public ip to extend the network into the cloud and associates with a route table that has a route to an Internet gateway.
+- [ ] A custom route table associated with the public subnet. This route table contains an entry that enables instances in the subnet to communicate with other instances in the VPC, and an entry that enables instances in the subnet to communicate directly with the Internet.
+- [ ] Add instances in the public subnet
+- [ ] Generate a SG to allow connection from a remote network described in [VPC-scenario-3](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenario3.html)
 
 To use this example set up AWS credentials and then run the commands in the
 following order:
 
 Note that, when using this module and deploying the VPC for the first time,
-Terraform needs the user to add the VPC, Subnets, and then Route Tables. For
-example, use targets to apply these updates sequentially:
+Terraform needs the user to add the VPC, Subnets, and then Route Tables. For example, use targets to apply these updates sequentially:
 
 ```
 make ssh-key
 make init
-make plan-subnets
-make apply
-make plan-gateways
-make apply
+make subnets
 make plan
 make apply
 ```
@@ -47,7 +63,7 @@ make clean
 ## Notes
 
 * This example was last tested with `Terraform v0.11.7`
-* This example assumes AWS credentials setup with access to the **us-east-2** region.
+* This example assumes AWS credentials setup with access to the **eu-central-1** region.
 * This example when deploying the VPC for the first time, Terraform needs the user to add the VPC, Subnets, and then Route Tables.
 
 

@@ -21,19 +21,18 @@ init:
 	@terraform get
 	@terraform init
 
+## use 'terraform plan' to 'target' the vpc module
+vpc:
+	@terraform plan -out tf.out -target=module.vpc.module.vpc
+	@terraform apply tf.out
+
 ## use 'terraform plan' to 'target' the public/private subnets in the vpc module
-plan-subnets:
+subnets:
 	@terraform plan \
 		-target="module.vpc.module.public-subnets" \
 		-target="module.vpc.module.private-subnets" \
 		-out=tf.out
-
-## use 'terraform plan' to 'target' the public and NAT gateways in the vpc module
-plan-gateways:
-	@terraform plan \
-		-target="module.vpc.module.public-gateway" \
-		-target="module.vpc.module.nat-gateway" \
-		-out=tf.out
+	@terraform apply tf.out
 
 ## terraform plan (makes everything)
 plan:
