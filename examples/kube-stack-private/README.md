@@ -32,7 +32,9 @@ source /usr/local/bin/virtualenvwrapper.sh
 To create an environment use the command `mkvirtualenv myenv`. To stop working on that environment issue the command `deactivate`. Then to work on that environment again, issue the command `workon myenv`. 
 
 #### Create the cluster using FPCO Terraform modules
-First, review the variables defined in `variables.tf`. You can change their values by adding corresponding values in `vars.env` and `terraform-tfvars.tpl` as per the 3 examples currently in `vars.env`. Be sure to review the current values as well. In particular it is likely necessary that you choose a new value for the CoreOS AMI by choosing an HVM AMI for your particular region from the list for the stable channel found [here][4] or [here][5]. The version currently there is likely out of date.
+First, copy `vars.env.sample` to `vars.env` and edit the values. In particular it is likely necessary that you set a new value for the CoreOS AMI by choosing an HVM AMI for your particular region from the list for the stable channel found [here][4] or [here][5]. The version currently in `vars.env.sample` is likely out of date.
+
+Then review other variables defined in `variables.tf`. You can change their values by adding corresponding values in `vars.env` and `terraform-tfvars.tpl` similar to the examples already in `vars.env.sample`.
 
 Once you've set up your variables, run these `make` targets:
 
