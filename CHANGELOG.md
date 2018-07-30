@@ -4,6 +4,7 @@
 
 * breaking changes to modules that use ASG and previously had `desired_capacity`,
   this parameter is dropped to ensure scaling policies are ok.
+* [overhaul `gitlab-asg` example][pr-164]
 
 ### Modules
 
@@ -12,6 +13,13 @@
 * `consul-cluster`: remove `desired_capacity` input
 * `consul-leaders`: remove `desired_capacity` input
 * `kube-stack`: remove `controller_desired_capacity`  and `worker_desired_capacity` inputs
+* `kube-controller-asg`: add new module
+
+### Examples
+
+* refactor the workflow in the `gitlab-asg` example, adding support for TLS and much more
+
+[pr-164]: https://github.com/fpco/terraform-aws-foundation/pull/164
 
 
 # v0.7.6
