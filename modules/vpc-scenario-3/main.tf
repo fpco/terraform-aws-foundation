@@ -79,6 +79,12 @@ resource "aws_route_table" "private-vpn" {
   vpc_id           = "${module.vpc.vpc_id}"
   propagating_vgws = ["${module.vpn.vpn_gw_id}"]
 
+  #Added route for external private gateway.
+  route {
+    cidr_block     = "0.0.0.0/0"
+    gateway_id = "${module.vpn.aws_vpn_gateway_id}"
+  }
+
   tags = "${merge(map("Name", "${var.name_prefix}-private-vpn-${format("%02d", count.index)}"), "${var.extra_tags}")}"
 }
 
@@ -97,3 +103,4 @@ module "vpn" {
   remote_device_ip = "${var.vpn_remote_ip}"
   static_routes    = ["${var.vpn_static_routes}"]
 }
+
