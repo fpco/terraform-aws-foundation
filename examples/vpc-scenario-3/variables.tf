@@ -10,7 +10,7 @@ variable "name" {
 
 variable "region" {
   description = "Region where the project will be deployed"
-  default     = "us-west-2"
+  default     = "eu-central-1"
 }
 
 variable "vpc_cidr" {
@@ -39,11 +39,11 @@ variable "private_subnet_cidrs" {
 }
 
 variable "vpn_remote_ip" {
-  default     = "209.212.20.5"
+  default     = "185.232.22.85"
   description = "IP address of the remote VPN for AWS to associate with"
 }
 
 variable "vpn_static_routes" {
-  default     = ["10.0.0.0/0"]
+  default     = ["0.0.0.0/0"]
   description = "list of static routes to use with AWS customer gateway (VPN)"
 }
