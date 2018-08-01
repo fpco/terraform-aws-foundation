@@ -8,6 +8,11 @@ output "customer_gw_id" {
   description = "ID of the AWS Customer Gateway (client-side)"
 }
 
+output "aws_vpn_gateway_id" {
+  value       = "${aws_vpn_gateway.main.id}"
+  description = "ID of the AWS Virtualt Private Gateway"
+}
+
 output "customer_gw_ip" {
   value       = "${aws_customer_gateway.main.ip_address}"
   description = "IP address of the AWS Customer Gateway (client-side)"
