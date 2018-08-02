@@ -195,3 +195,7 @@ resource "aws_instance" "client-machine" {
   }
 }
 
+output "openvpn-public-eip" {
+  value = "${aws_instance.vpn-machine.public_ip}"
+  description = "OpenVPN Public IP"
+}
