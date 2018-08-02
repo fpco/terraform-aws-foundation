@@ -143,6 +143,9 @@ module "init-install-ops" {
 module "init-gitlab-docker" {
   source        = "../../modules/init-snippet-gitlab-docker"
   gitlab_domain = "${var.dns_zone_name}"
+  gitlab_name   = "${var.gitlab_name}"
+  gitlab_registry_name   = "${var.gitlab_registry_name}"
+  config_elb    = "${var.config_elb}"
 
   # write docker images to this S3 bucket (created separate from this env)
   registry_bucket_name   = "${var.registry_bucket_name}"

@@ -45,7 +45,11 @@ variable "registry_bucket_name" {
   type        = "string"
 }
 
-variable "encrypt_email" {
-  description = "email for Let's Encrypt notifications"
-  default = "atrauring@fpcomplete.com"
+variable "config_elb" {
+  default     = false
+  description = "variable to determine how to set up gitlab configuration. Setting to false uses the EIP version of module tuned to ELB"
 }
+#variable "encrypt_email" {
+#  description = "email for Let's Encrypt notifications"
+#  default = "atrauring@fpcomplete.com"
+#}
