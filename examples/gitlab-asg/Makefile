@@ -12,10 +12,10 @@ GNUMAKEFLAGS := --no-print-directory
 all:
 #	Use recursive makes instead of dependencies, to show progress
 #	If something breaks, we can see which target it was in
-	$(MAKE) install-cfssl
-	$(MAKE) render-tls-configs
-	$(MAKE) generate-tls-certs
-	$(MAKE) upload-tls-cert
+#	$(MAKE) install-cfssl
+#	$(MAKE) render-tls-configs
+#	$(MAKE) generate-tls-certs
+#	$(MAKE) upload-tls-cert
 	$(MAKE) generate-ssh-key
 	$(MAKE) render-tfvars
 	$(MAKE) network
@@ -69,8 +69,8 @@ delete-tls-cert:
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 ## Add ssh key and ssl arn at the same time
 render-tfvars:
-	@export SSL_ARN=$$(cat upload-gen-cert-arn.txt) && \
-	 envsubst <terraform-tfvars.tpl >terraform.tfvars
+##	@export SSL_ARN=$$(cat upload-gen-cert-arn.txt) &&
+	envsubst <terraform-tfvars.tpl >terraform.tfvars
 
 ## Use Terraform to create the VPC and core network resources in a specific order
 network:
@@ -93,8 +93,8 @@ apply:
 
 ## Generate the ssh_config both for Git operations and instance maintenance
 render-ssh-config:
-	@export SERVER_NAME=$$(terraform output gitlab_server_name) && \
-	 export SERVER_IP=$$(./server-ip.sh $$SERVER_NAME $$REGION) && \
+	@export SERVER_NAME=$$(terraform output gitlab_url) && \
+	 export SERVER_IP=$$(terraform output gitlab_server_ip) && \
 	 envsubst <ssh_config.tpl >ssh_config
 
 ## use ops cli tool to lookup the public IP of the gitlab instance
@@ -125,11 +125,11 @@ destroy:
 	@terraform destroy -force
 
 ## rm -rf everything
-clean: destroy delete-tls-cert
+clean: destroy ## delete-tls-cert
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
 	@rm -rf tf.out terraform.tfvars
 	@rm -rf id_rsa id_rsa.pub ssh_config
-	@rm -rf ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt gitlab.csr *.pem
+##	@rm -rf ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt gitlab.csr *.pem
 	@rm -rf bin
 
 ## Show help screen.

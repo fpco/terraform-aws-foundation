@@ -8,7 +8,7 @@ Running this example creates a running instance of Gitlab with the following cha
 * Gitlab is running on a single EC2 instance on AWS in an auto-scaling group, so AWS will re-create the node if it fails in specific ways
 * The Gitlab runner is installed on the instance via apt
 * A Docker registry is also setup
-* SSL certificates are used
+* SSL certificates are created using Let's Encrypt
 * Integrated with SSH
 * Integrated with Route53 for DNS
 * A persistent EBS volume is mounted to the instance and all gitlab data is stored on that volume - data is retained when the node is replaced
@@ -22,10 +22,12 @@ This Terraform environment also serves as a great demo of Gitlab's features and 
 ### Requirements
 - Terraform 0.11.7
 - A recent version of `jl` which can be downloaded from [here](https://github.com/chrisdone/jl/releases). Be sure to put the binary somewhere on your path (eg in `/usr/local/bin`) and name it `jl`.
+<!---
 - `cfssl` and `cfssljson`. You can download them for Linux using the `make install-cfssl` below or install from a system package (`cfssl` on most systems, including brew on Mac, but `golang-cfssl` on Ubuntu/Debian). If you already have them installed, skip that make step and run the following commands in the code directory:
 ```bash
 ln -s $(which cfssl{,json}) .
 ```
+-->
 * `envsubst` which is part of `gettext`. This already installed on most Linux systems, but if not, install the appropriate system package (`gettext` on most systems, including brew on Mac, but `gettext-base` on Debian/Ubuntu).
 
 ## Deploying the Example
@@ -35,17 +37,21 @@ First, copy `vars.mk.sample` to `vars.mk` and review/update the variables define
 
 * `DNS_ZONE_NAME` to the one associated with your AWS account
 * `REGION` to one that has some resources available to you
+* `ENCRYPT_EMAIL` to the email you want Let's Encrypt notifications to be sent to
+<!---
 * `REGISTRY_S3_BUCKET_NAME` to something unique
 * `ENVIONMENT_NAME` to something unique
+-->
 
 ### Initial Deploy
 Then, from the top-level code directory, run the following make targets:
-
-```bash
-ᐅ make install-cfssl      # see caveat above under requirements
+<!---
+ᐅ make install-cfssl      # see caveat above under requirements 
 ᐅ make render-tls-configs
 ᐅ make generate-tls-certs
 ᐅ make upload-tls-certs
+-->
+```bash
 ᐅ make generate-ssh-key
 ᐅ make render-tfvars
 ᐅ make network

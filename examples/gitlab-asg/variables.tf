@@ -44,3 +44,8 @@ variable "registry_bucket_name" {
   description = "The name of the S3 bucket to write docker images to"
   type        = "string"
 }
+
+variable "encrypt_email" {
+  description = "email for Let's Encrypt notifications"
+  default = "atrauring@fpcomplete.com"
+}
