@@ -91,6 +91,29 @@ module "vpc-open-egress" {
   security_group_id = "${module.vpc-sg.id}"
 }
 
+module "openvpn-web-sg" {
+  source      = "../../../modules/security-group-base"
+  description = "Openvpn web security group"
+  name        = "${var.name}-openvpn-web-sg"
+  vpc_id      = "${module.vpc.vpc_id}"
+}
+
+module "https-rule" {
+  source            = "../../../modules/single-port-sg"
+  port              = 443
+  description       = "allow ingress, HTTPS (443)"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${module.openvpn-web-sg.id}"
+}
+
+module "openvpn-rule" {
+  source            = "../../../modules/single-port-sg"
+  port              = 943
+  description       = "allow ingress, HTTP (943) openvpn server"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${module.openvpn-web-sg.id}"
+}
+
 module "vpc-public-gateway" {
   source            = "../../../modules/route-public"
   vpc_id            = "${module.vpc.vpc_id}"
@@ -140,7 +163,7 @@ resource "aws_instance" "vpn-machine" {
   }
 
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.vpc-sg.id}"]
+  vpc_security_group_ids      = ["${module.vpc-sg.id}","${module.openvpn-web-sg.id}"]
   subnet_id                   = "${element(module.vpc-public-subnets.ids, count.index)}"
 
   tags {
@@ -148,27 +171,20 @@ resource "aws_instance" "vpn-machine" {
   }
 
   provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get install -y strongswan",
+      "sudo curl -s -L -o /sbin/ipsec.sh  https://docs.openvpn.net/wp-content/uploads/ipsec.sh",
+      "sudo chmod +x /sbin/ipsec.sh",
+      "sudo /usr/local/openvpn_as/bin/ovpn-init tool --force --batch"
+      #"echo -e 'openvpn\nopenvpn' | sudo passwd openvpn"
+    ]
+
     connection {
       type        = "ssh"
       user        = "openvpnas"
       private_key = "${file(var.ssh_key)}"
     }
   }
-
-  user_data = <<END_INIT
-#!/bin/bash
-
-apt-get install -y strongswan-starter
-
-curl -s -L -o /sbin/ipsec.sh  https://docs.openvpn.net/wp-content/uploads/ipsec.sh
-chmod +x /sbin/ipsec.sh
-
-/usr/local/openvpn_as/bin/ovpn-init tool --force --batch
-
-echo -e "openvpn\nopenvpn" | passwd openvpn
-echo "Installation complte" > /tmp/openvpn-tf.log
-
-END_INIT
 
 }
 
