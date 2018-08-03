@@ -16,7 +16,11 @@ check-plan-file:
 ssh-key:
 	@ssh-keygen -q -N "" -b 4096 -C "SSH key for vpc-scenario-3 example" -f ./id_rsa
 
-## Runs terraform get and terraform init for env
+## Create ssh key for openvpn server
+ssh-key-remote-vpc:
+	@cd remote-environment/ && make ssh-key
+
+## Runs terraform get and terraform init for the remote vpc weher the VPN installed
 init-remote-vpc:
 	@cd remote-environment/ && make init && make subnets
 	@cd remote-environment/ && make plan && make apply
@@ -47,17 +51,22 @@ plan:
 apply: check-plan-file
 	@terraform apply tf.out
 
+# Setup IPSec in the openvpn server
 setup-ipsec:
-	@terraform destroy \
-		-target="module.vpc.module.vpn.aws_vpn_connection.main"
-	@terraform plan  \
-		-target="module.vpc.module.vpn" \
-	  -out=tf.out
-	@terraform apply tf.out
+	#@terraform destroy \
+	#	-target="module.vpc.module.vpn.aws_vpn_connection.main"
+	#@terraform plan  \
+	#	-target="module.vpc.module.vpn" \
+	#  -out=tf.out
+	#@terraform apply tf.out
 	@scripts/set-ipsec-configurations.sh
 	@scripts/upload-ipsec-configs.sh
+	@scripts/restart-ipsec-service.sh
 	@rm remote-environment/ipsec*
-	@echo "Download openvpn client config from this URL https://$(terraform output -state="remote-environment/terraform.tfstate" openvpn-public-eip)"
+	@echo "Download openvpn client config from this URL https://$$(terraform output -state='remote-environment/terraform.tfstate' openvpn-public-eip):943"
+
+restart-ipsec:
+	@scripts/restart-ipsec-service.sh
 
 ## use curl to hit the ELB to confirm the VPC came online ok
 test:
