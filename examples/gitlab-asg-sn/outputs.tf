@@ -21,11 +21,6 @@ output "gitlab_server_ip" {
   description = "EIP address of gitlab server"
 }
 
-#output "gitlab_server_name" {
-#  value       = "${var.name}-gitlab-server-${element(data.aws_availability_zones.available.names, 0)}"
-#  description = "name of the Gitlab server instance"
-#}
-
 output "registry_url" {
   value       = "${aws_route53_record.registry.name}"
   description = "URL to docker image registry"
