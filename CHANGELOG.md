@@ -5,6 +5,7 @@
 * breaking changes to modules that use ASG and previously had `desired_capacity`,
   this parameter is dropped to ensure scaling policies are ok.
 * [overhaul `gitlab-asg` example][pr-164]
+* [duplicate `gitlab-asg` example to `gitlab-simple-ha` and `gitlab-ha`][pr-167]
 
 ### Modules
 
@@ -18,8 +19,12 @@
 ### Examples
 
 * refactor the workflow in the `gitlab-asg` example, adding support for TLS and much more
+* rename `gitlab-asg` example --> `gitlab-simple-ha`
+* duplicate `gitlab-simple-ha` as `gitlab-ha`, both can now get updates independent
+  of one another
 
 [pr-164]: https://github.com/fpco/terraform-aws-foundation/pull/164
+[pr-167]: https://github.com/fpco/terraform-aws-foundation/pull/167
 
 
 # v0.7.6
