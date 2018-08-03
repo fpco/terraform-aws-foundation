@@ -1,4 +1,4 @@
-Host ${GITLAB_NAME}.${DNS_ZONE_NAME}
+Host ${GITLAB_URL}
     user git
 Host gitlab-server-sysadmin
     user ubuntu
