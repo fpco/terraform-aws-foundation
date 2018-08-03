@@ -14,3 +14,4 @@ site
 cfssl
 cfssljson
 id_rsa*
+*.orig
