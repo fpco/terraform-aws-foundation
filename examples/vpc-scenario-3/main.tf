@@ -38,6 +38,19 @@ resource "aws_key_pair" "main" {
   public_key = "${file(var.ssh_pubkey)}"
 }
 
+# SSH Security group
+module "private-ssh-sg" {
+  source      = "../../modules/security-group-base"
+  description = "Allow Private ssh access in ${var.name}"
+  name        = "${var.name}-private-ssh"
+  vpc_id      = "${module.vpc.vpc_id}"
+}
+
+module "ssh-rule" {
+  source              = "../../modules/ssh-sg"
+  security_group_id   = "${module.private-ssh-sg.id}"
+}
+
 # Security group for the elastic load balancer
 module "elb-sg" {
   source      = "../../modules/security-group-base"
@@ -127,7 +140,7 @@ module "web" {
   key_name      = "${aws_key_pair.main.key_name}"
   subnet_ids    = ["${module.vpc.private_subnet_ids}"]
 
-  security_group_ids = ["${module.web-sg.id}"]
+  security_group_ids = ["${module.web-sg.id}","${module.private-ssh-sg.id}"]
 
   root_volume_type = "gp2"
   root_volume_size = "8"
