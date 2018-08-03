@@ -148,51 +148,28 @@ resource "aws_instance" "vpn-machine" {
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "echo 'success!'",
-      "lsb_release -a",
-    ]
-
     connection {
       type        = "ssh"
       user        = "openvpnas"
       private_key = "${file(var.ssh_key)}"
     }
   }
-}
 
-resource "aws_instance" "client-machine" {
-  ami               = "${module.ubuntu-xenial-ami.id}"
-  count             = "1"
-  key_name          = "${aws_key_pair.main.key_name}"
-  instance_type     = "t2.nano"
-  availability_zone = "${var.aws_availability_zones}"
+  user_data = <<END_INIT
+#!/bin/bash
 
-  root_block_device {
-    volume_type = "gp2"
-    volume_size = "8"
-  }
+apt-get install -y strongswan-starter
 
-  associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.vpc-sg.id}"]
-  subnet_id                   = "${element(module.vpc-public-subnets.ids, count.index)}"
+curl -s -L -o /sbin/ipsec.sh  https://docs.openvpn.net/wp-content/uploads/ipsec.sh
+chmod +x /sbin/ipsec.sh
 
-  tags {
-    Name = "${var.name}-client-machine-${count.index}"
-  }
+/usr/local/openvpn_as/bin/ovpn-init tool --force --batch
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo 'success!'",
-      "lsb_release -a",
-    ]
+echo -e "openvpn\nopenvpn" | passwd openvpn
+echo "Installation complte" > /tmp/openvpn-tf.log
 
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = "${file(var.ssh_key)}"
-    }
-  }
+END_INIT
+
 }
 
 output "openvpn-public-eip" {
