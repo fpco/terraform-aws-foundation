@@ -6,8 +6,8 @@ more availability zones, a hardware VPN gateway for the private subnets.
 
 This example the operator have in place the following networking components:
 
--  A Public subnet spanning one or more availability zones
--  A Private subnet spanning one or more availability zones that route the tunnel to connect with a customer VPN
+- A Public subnet spanning one or more availability zones
+- A Private subnet spanning one or more availability zones that route the tunnel to connect with a customer VPN
 - A virtual private gateway to enable communication with your own network over an IPsec VPN tunnel.
 - Instances in the private subnet with IPv4 addresses which enables the instances to communicate with each other and other instances in the VPC.
 - The main route table associated with the private (VPN-only subnet). The route table contains an entry that enables instances in the subnet to communicate with other instances in the VPC, and an entry that enables instances in the subnet to communicate directly with your network.
@@ -18,7 +18,6 @@ The VPN connection consists of a virtual private gateway located on the Amazon s
   <img width="460" height="300" src="https://github.com/fpco/terraform-aws-foundation/blob/vpc-scenario-3/examples/vpc-scenario-3/VPC-3.png">
 </p>
 
-(Move this items to Github issues)
 This items are part of the public Nat gateway that should added:
 
 - [ ] Instances in the public subnet with Elastic IP addresses, which are public IPv4 addresses that enable them to be reached from the Internet.
@@ -35,15 +34,29 @@ Terraform needs the user to add the VPC, Subnets, and then Route Tables. For exa
 
 ```
 make ssh-key
+make ssh-key-remote-vpc
+make init-remote-vpc
+```
+
+Replace `vpn_remote_ip` in the variables.tf file for openvpn-prublic-eip output vaule, this will setup the virtual gateway connection.
+
+```
 make init
 make subnets
 make plan
 make apply
+make setup-ipsec
 ```
+
+Once the previous targets finished, login web server using the default user and password `openvpn` the URL is similiar should be in this format HTTPS://<openvpn-prublic-eip>:943/admin and follow the next steps to allow connections using the public ip:
+
+- Click in *Nework Setting* and replace the private IP by the public
+- Click in *VPN Settings* and add vpc_cidr_block (10.24.0.0/16)
+- Restar ipsec service `make restar-ipsec`
 
 ## Testing
 
-Get the public IP address of the newly created ec2 web instance with the AWS console.
+Downloand openvpn client in your local machine from the server https://<openvpn-prublic-eip>:943/ or from the openvpn.net, use the deafult user/password and the openvpn-prublic-eip to connect to the vpn.
 
 SSH into the machine with the command:
 

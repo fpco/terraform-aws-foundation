@@ -172,7 +172,8 @@ resource "aws_instance" "vpn-machine" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get install -y strongswan",
+      "sudo apt-get update",
+      "sudo apt-get install -yq strongswan",
       "sudo curl -s -L -o /sbin/ipsec.sh  https://docs.openvpn.net/wp-content/uploads/ipsec.sh",
       "sudo chmod +x /sbin/ipsec.sh",
       "sudo /usr/local/openvpn_as/bin/ovpn-init tool --force --batch"
