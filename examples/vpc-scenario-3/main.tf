@@ -46,9 +46,15 @@ module "private-ssh-sg" {
   vpc_id      = "${module.vpc.vpc_id}"
 }
 
-module "ssh-rule" {
+module "ssh-ingress-rule" {
   source              = "../../modules/ssh-sg"
   security_group_id   = "${module.private-ssh-sg.id}"
+}
+
+# open egress for web instances (outbound from nodes)
+module "ssh-egress-rule" {
+  source            = "../../modules/open-egress-sg"
+  security_group_id = "${module.private-ssh-sg.id}"
 }
 
 # Security group for the elastic load balancer
