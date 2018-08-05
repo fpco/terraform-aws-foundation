@@ -91,10 +91,10 @@ module "vpc-open-egress" {
   security_group_id = "${module.vpc-sg.id}"
 }
 
-module "openvpn-web-sg" {
+module "openvpn-sg" {
   source      = "../../../modules/security-group-base"
-  description = "Openvpn web security group"
-  name        = "${var.name}-openvpn-web-sg"
+  description = "Openvpn security group"
+  name        = "${var.name}-openvpn-sg"
   vpc_id      = "${module.vpc.vpc_id}"
 }
 
@@ -103,17 +103,30 @@ module "https-rule" {
   port              = 443
   description       = "allow ingress, HTTPS (443)"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${module.openvpn-web-sg.id}"
+  security_group_id = "${module.openvpn-sg.id}"
 }
 
-module "openvpn-rule" {
+module "openvpn-web-rule" {
   source            = "../../../modules/single-port-sg"
   port              = 943
   description       = "allow ingress, HTTP (943) openvpn server"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${module.openvpn-web-sg.id}"
+  security_group_id = "${module.openvpn-sg.id}"
 }
 
+module "openvpn-rule" {
+  source            = "../../../modules/single-port-sg"
+  port              = 1194
+  protocol          = "udp"
+  description       = "allow ingress, HTTP (943) openvpn server"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${module.openvpn-sg.id}"
+}
+
+module "openvpn-egress" {
+  source = "../../../modules/open-egress-sg"
+  security_group_id = "${module.openvpn-sg.id}"
+}
 module "vpc-public-gateway" {
   source            = "../../../modules/route-public"
   vpc_id            = "${module.vpc.vpc_id}"
@@ -149,6 +162,10 @@ resource "aws_key_pair" "main" {
   public_key = "${file(var.ssh_pubkey)}"
 }
 
+data "template_file" "openvpn-setup" {
+  template = "${file("${path.module}/init-script.sh")}"
+}
+
 resource "aws_instance" "vpn-machine" {
   # setup openvpn ami
   ami               = "${data.aws_ami.openvpn-ami.id}"
@@ -163,23 +180,16 @@ resource "aws_instance" "vpn-machine" {
   }
 
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.vpc-sg.id}","${module.openvpn-web-sg.id}"]
+  vpc_security_group_ids      = ["${module.vpc-sg.id}","${module.openvpn-sg.id}"]
   subnet_id                   = "${element(module.vpc-public-subnets.ids, count.index)}"
 
   tags {
     Name = "${var.name}-vpn-server-${count.index}"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get update",
-      "sudo apt-get install -yq strongswan",
-      "sudo curl -s -L -o /sbin/ipsec.sh  https://docs.openvpn.net/wp-content/uploads/ipsec.sh",
-      "sudo chmod +x /sbin/ipsec.sh",
-      "sudo /usr/local/openvpn_as/bin/ovpn-init tool --force --batch"
-      #"echo -e 'openvpn\nopenvpn' | sudo passwd openvpn"
-    ]
+  user_data     = "${data.template_file.openvpn-setup.rendered}"
 
+  provisioner "remote-exec" {
     connection {
       type        = "ssh"
       user        = "openvpnas"
