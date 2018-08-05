@@ -1,4 +1,4 @@
-.PHONY: all shell render-tls-configs generate-ssh-key generate-tls-certs install-cfssl upload-tls-cert delete-tls-cert render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
+.PHONY: all shell generate-ssh-key render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
 
 .DEFAULT_GOAL = help
 
@@ -12,10 +12,6 @@ GNUMAKEFLAGS := --no-print-directory
 all:
 #	Use recursive makes instead of dependencies, to show progress
 #	If something breaks, we can see which target it was in
-	$(MAKE) install-cfssl
-	$(MAKE) render-tls-configs
-	$(MAKE) generate-tls-certs
-	$(MAKE) upload-tls-cert
 	$(MAKE) generate-ssh-key
 	$(MAKE) render-tfvars
 	$(MAKE) network
@@ -43,33 +39,9 @@ render-tls-configs:
 generate-ssh-key:
 	@ssh-keygen -q -N "" -b 4096 -C "test" -f id_rsa
 	
-## Use cfssl to generate a CA and self-signed server SSL certificate for AWS ELB
-generate-tls-certs:
-	@cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
-	@cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=cert-config.json -profile=gitlab cert-csr.json | cfssljson -bare gitlab
-	@ls -Alh
-	@echo "ca-key.pem is the file to keep very safe"
-
-## use curl to download and install the cfssl executable
-install-cfssl:
-	@mkdir -p bin
-	@curl -s -L -o bin/cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
-	@curl -s -L -o bin/cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
-	@chmod +x bin/cfssl bin/cfssljson
-	@cfssl version
-
-## Use AWS cli tools to upload the SSL cert to AWS
-upload-tls-cert:
-	@./upload-gen-cert.sh ${REGION}
-
-## Use AWS cli tools to remove the SSL certs from AWS
-delete-tls-cert:
-	@./delete-gen-cert.sh ${REGION}
-
 ## Use envsubst and project.env to render terraform-tfvars.tpl into terraform.tfvars
 ## Add ssh key and ssl arn at the same time
 render-tfvars:
-	@export SSL_ARN=$$(cat upload-gen-cert-arn.txt) && \
 	 envsubst <terraform-tfvars.tpl >terraform.tfvars
 
 ## Use Terraform to create the VPC and core network resources in a specific order
@@ -97,10 +69,6 @@ render-ssh-config:
 	 export SERVER_IP=$$(./server-ip.sh $$SERVER_NAME $$REGION) && \
 	 envsubst <ssh_config.tpl >ssh_config
 
-## use ops cli tool to lookup the public IP of the gitlab instance
-##get-ip:
-##	@ops aws ec2 asg ips -r $$(terraform output region) $$(terraform output gitlab_asg_name)
-
 ## SSH to the gitlab server and use parted and similar tools to setup a partition and filesystem on the EBS volume (run only once per volume)
 init-ebs-volume:
 	@ssh -F ssh_config gitlab-server-sysadmin "sudo parted --script /dev/xvdf -- mklabel msdos && \
@@ -125,7 +93,7 @@ destroy:
 	@terraform destroy -force
 
 ## rm -rf everything
-clean: destroy delete-tls-cert
+clean: destroy
 	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
 	@rm -rf tf.out terraform.tfvars
 	@rm -rf id_rsa id_rsa.pub ssh_config
