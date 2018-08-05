@@ -20,62 +20,26 @@
  * 
  */
 
-variable "name" {
-  default = "gitlab-asg-test"
-}
-
-variable "region" {
-  default = "us-east-1"
-}
-
-variable "ssh_pubkey" {
-  default     = "./id_rsa.pub"
-  description = "The path to the SSH pub key to use"
-}
-
-variable "dns_zone_name" {
-  description = "The name of the DNS zone on Route53 (example.com), to create records in for gitlab"
-  type        = "string"
-}
-
-variable "ssl_arn" {
-  description = "The ARN of the SSL cert, see 'make upload-tls-certs'"
-  type        = "string"
-}
-
-variable "gitlab_name" {
-  description = "To generate the DNS record for gitlab, prefix the zone"
-  default     = "gitlab"
-  type        = "string"
-}
-
-variable "gitlab_registry_name" {
-  description = "To generate the DNS record for the docker registry, prefix the zone"
-  default     = "registry"
-  type        = "string"
-}
-
-variable "root_volume_size" {
-  default     = "30"
-  description = "GB of root data volume for the instance, make it larger than usual for docker builds"
-}
-
-variable "registry_bucket_name" {
-  description = "The name of the S3 bucket to write docker images to"
-  type        = "string"
-}
-
 provider "aws" {
   region = "${var.region}"
 }
 
 data "aws_availability_zones" "available" {}
 
+data "aws_route53_zone" "zone" {
+  name = "${var.dns_zone_name}."
+  private_zone = false
+}
+
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
   release = "16.04"
 }
 
+resource "aws_acm_certificate" "cert" {
+  domain_name = "*.${var.dns_zone_name}"
+  validation_method = "DNS"
+}
 resource "aws_key_pair" "main" {
   key_name   = "${var.name}"
   public_key = "${file(var.ssh_pubkey)}"
@@ -100,6 +64,18 @@ resource "aws_iam_role_policy_attachment" "s3-full-access-attachment" {
   policy_arn = "${module.docker-registry-s3-full-access.arn}"
 }
 
+resource "aws_route53_record" "cert_validation" {
+  name = "${aws_acm_certificate.cert.domain_validation_options.0.resource_record_name}"
+  type = "${aws_acm_certificate.cert.domain_validation_options.0.resource_record_type}"
+  zone_id = "${data.aws_route53_zone.zone.id}"
+  records = ["${aws_acm_certificate.cert.domain_validation_options.0.resource_record_value}"]
+  ttl = 60
+}
+
+resource "aws_acm_certificate_validation" "cert" {
+  certificate_arn = "${aws_acm_certificate.cert.arn}"
+  validation_record_fqdns = ["${aws_route53_record.cert_validation.fqdn}"]
+}
 resource "aws_elb" "gitlab" {
   name            = "${var.name}"
   subnets         = ["${module.vpc.public_subnet_ids[0]}"]
@@ -117,7 +93,7 @@ resource "aws_elb" "gitlab" {
     instance_protocol  = "http"
     lb_port            = 443
     lb_protocol        = "https"
-    ssl_certificate_id = "${var.ssl_arn}"
+    ssl_certificate_id = "${aws_acm_certificate_validation.cert.certificate_arn}"
   }
 
   health_check {
@@ -283,60 +259,18 @@ module "open-egress-rule" {
 ##################
 ## DNS setup
 
-data "aws_route53_zone" "selected" {
-  name = "${var.dns_zone_name}"
-}
-
 resource "aws_route53_record" "gitlab" {
-  zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "${var.gitlab_name}.${data.aws_route53_zone.selected.name}"
+  zone_id = "${data.aws_route53_zone.zone.zone_id}"
+  name    = "${var.gitlab_name}.${data.aws_route53_zone.zone.name}"
   type    = "CNAME"
   ttl     = "300"
   records = ["${aws_elb.gitlab.dns_name}"]
 }
 
 resource "aws_route53_record" "registry" {
-  zone_id = "${data.aws_route53_zone.selected.zone_id}"
-  name    = "${var.gitlab_registry_name}.${data.aws_route53_zone.selected.name}"
+  zone_id = "${data.aws_route53_zone.zone.zone_id}"
+  name    = "${var.gitlab_registry_name}.${data.aws_route53_zone.zone.name}"
   type    = "CNAME"
   ttl     = "300"
   records = ["${aws_elb.gitlab.dns_name}"]
-}
-
-##################
-## Outputs
-
-output "region" {
-  value       = "${var.region}"
-  description = "region deployed to"
-}
-
-output "gitlab_asg_name" {
-  value       = "${var.name}-gitlab-asg-${element(data.aws_availability_zones.available.names, 0)}"
-  description = "name of the Gitlab autoscaling group"
-}
-
-output "gitlab_server_name" {
-  value       = "${var.name}-gitlab-server-${element(data.aws_availability_zones.available.names, 0)}"
-  description = "name of the Gitlab server instance"
-}
-
-output "gitlab_url" {
-  value       = "${aws_route53_record.gitlab.name}"
-  description = "URL to gitlab"
-}
-
-output "registry_url" {
-  value       = "${aws_route53_record.registry.name}"
-  description = "URL to docker image registry"
-}
-
-// URL to S3 bucket where Docker images are stored
-output "registry_bucket_url" {
-  value = "${module.docker-registry-s3-storage.url}"
-}
-
-// Name of the S3 bucket where Docker images are stored
-output "registry_bucket_name" {
-  value = "${module.docker-registry-s3-storage.bucket_id}"
 }
