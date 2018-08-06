@@ -29,8 +29,7 @@ This items are part of the public Nat gateway that should added:
 To use this example set up AWS credentials and then run the commands in the
 following order:
 
-Note that, when using this module and deploying the VPC for the first time,
-Terraform needs the user to add the VPC, Subnets, and then Route Tables. For example, use targets to apply these updates sequentially:
+Note that, when using this module and deploying the VPC for the first time, Terraform needs the user to add the VPC, Subnets, and then Route Tables. For example, use targets to apply these updates sequentially:
 
 ```
 make ssh-key
@@ -39,7 +38,12 @@ make init-remote-vpc
 ```
 
 Replace `vpn_remote_ip` in the variables.tf file for openvpn-prublic-eip output vaule, this will setup the virtual gateway connection.
+Once the init-remote-vpc finished, login to openvpn web server using the default user and password `openvpn` the URL should be similar to this sample HTTPS://<openvpn-prublic-eip>:943/admin and follow the next steps to allow connections using the public ip:
 
+- Click in *Nework Setting* and replace the private IP by the public
+- Click in *VPN Settings* and add vpc_cidr_block (10.24.0.0/16); turn off  *Internet traffic routed through the VPN*
+
+Setup the scenario 3
 ```
 make init
 make subnets
@@ -48,15 +52,9 @@ make apply
 make setup-ipsec
 ```
 
-Once the previous targets finished, login web server using the default user and password `openvpn` the URL is similiar should be in this format HTTPS://<openvpn-prublic-eip>:943/admin and follow the next steps to allow connections using the public ip:
-
-- Click in *Nework Setting* and replace the private IP by the public
-- Click in *VPN Settings* and add vpc_cidr_block (10.24.0.0/16)
-- Restar ipsec service `make restar-ipsec`
-
 ## Testing
 
-Downloand openvpn client in your local machine from the server https://<openvpn-prublic-eip>:943/ or from the openvpn.net, use the deafult user/password and the openvpn-prublic-eip to connect to the vpn.
+Downloand openvpn client from the server https://<openvpn-prublic-eip>:943/ or from openvpn.net, use the deafult user/password and the openvpn-prublic-eip to connect.
 
 SSH into the machine with the command:
 
