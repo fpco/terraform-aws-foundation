@@ -39,7 +39,7 @@ variable "private_subnet_cidrs" {
 }
 
 variable "vpn_remote_ip" {
-  default     = "185.232.22.85"
+  default     = "change-me"
   description = "IP address of the remote VPN for AWS to associate with"
 }
 
