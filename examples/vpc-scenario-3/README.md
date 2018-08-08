@@ -18,14 +18,6 @@ The VPN connection consists of a virtual private gateway located on the Amazon s
   <img width="460" height="300" src="https://github.com/fpco/terraform-aws-foundation/blob/vpc-scenario-3/examples/vpc-scenario-3/VPC-3.png">
 </p>
 
-This items are part of the public Nat gateway that should added:
-
-- [ ] Instances in the public subnet with Elastic IP addresses, which are public IPv4 addresses that enable them to be reached from the Internet.
-- [ ] A Public subnet spanning one or more availability zones with a public gateway that assign a public ip to extend the network into the cloud and associates with a route table that has a route to an Internet gateway.
-- [ ] A custom route table associated with the public subnet. This route table contains an entry that enables instances in the subnet to communicate with other instances in the VPC, and an entry that enables instances in the subnet to communicate directly with the Internet.
-- [ ] Add instances in the public subnet
-- [ ] Generate a SG to allow connection from a remote network described in [VPC-scenario-3](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Scenario3.html)
-
 To use this example set up AWS credentials and then run the commands in the
 following order:
 
