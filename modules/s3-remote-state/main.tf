@@ -4,8 +4,9 @@
  * This module creates a private S3 bucket and IAM policy to access that bucket.
  * The bucket can be used as a remote storage bucket for `terraform`, `kops`, or
  * similar tools.
- * 
+ *
  */
+
 variable "bucket_name" {
   description = "the name to give the bucket"
 }
@@ -20,14 +21,23 @@ variable "versioning" {
   description = "enables versioning for objects in the S3 bucket"
 }
 
+variable "region" {
+  default     = ""
+  description = "Region where the S3 bucket will be created"
+  type        = "string"
+}
+
 variable "aws_cloud" {
   description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
   default     = "aws"
 }
 
+data "aws_region" "current" {}
+
 resource "aws_s3_bucket" "remote-state" {
   bucket = "${var.bucket_name}"
   acl    = "private"
+  region = "${var.region == "" ? data.aws_region.current.name : var.region}"
 
   versioning {
     enabled = "${var.versioning}"

@@ -50,6 +50,7 @@ Create a `terraform.tfvars`, for example:
 ```hcl
 principals="<arn of principal>"
 bucket_name="fpco-tf-remote-state-test"
+region="us-east-1"
 ```
 
 Now it's time to create  the `IAM` policies and `S3` bucket using Terraform.
