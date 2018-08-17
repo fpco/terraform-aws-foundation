@@ -260,7 +260,7 @@ module "elk-stack" {
   credstash_put_cmd           = ""
   credstash_reader_policy_arn = ""
   elasticsearch_dns_name      = ""
-  elasticsearch_internal_alb  = ""
+  elasticsearch_internal_alb  = {}
   kibana_alb                  = ""
   logstash_dns_name           = ""
   private_subnet_ids          = []
