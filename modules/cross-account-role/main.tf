@@ -6,12 +6,6 @@
  *
  */
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "trust_account_ids" {
   description = "List of other accounts to trust to assume the role"
   default     = []
@@ -33,6 +27,8 @@ output "name" {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_partition" "current" {}
+
 data "aws_iam_policy_document" "assume-role" {
   statement {
     effect  = "Allow"
@@ -46,7 +42,7 @@ data "aws_iam_policy_document" "assume-role" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${formatlist("arn:${var.aws_cloud}:iam::%s:root",var.trust_account_ids)}"]
+      identifiers = ["${formatlist("arn:${data.aws_partition.current.partition}:iam::%s:root",var.trust_account_ids)}"]
     }
   }
 }

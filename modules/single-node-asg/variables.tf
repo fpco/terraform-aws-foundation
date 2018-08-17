@@ -115,9 +115,3 @@ variable "load_balancers" {
   description = "The list of load balancers names to pass to the ASG module"
   type        = "list"
 }
-
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}

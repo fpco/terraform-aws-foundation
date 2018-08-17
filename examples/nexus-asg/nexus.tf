@@ -33,11 +33,6 @@ variable "key_file" {
   default     = "~/.ssh/id_rsa"
 }
 
-variable "is_govcloud" {
-  description = "If this is running on GovCloud or not"
-  default     = false
-}
-
 module "vpc" {
   source              = "../../modules/vpc-scenario-1"
   azs                 = ["${var.az}"]
@@ -74,7 +69,6 @@ END_INIT
 module "ubuntu-ami" {
   source      = "../../modules/ami-ubuntu"
   release     = "16.04"
-  is_govcloud = "${var.is_govcloud}"
 }
 
 module "init-nexus" {

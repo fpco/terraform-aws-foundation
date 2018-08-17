@@ -1,9 +1,3 @@
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "create_groups" {
   description = "Set to 0 to disable creating the 'admin', 'power-user', and 'setup-mfa' groups.  This should be done for accounts that users do not sign into directly (only delegated access)."
   default     = 1

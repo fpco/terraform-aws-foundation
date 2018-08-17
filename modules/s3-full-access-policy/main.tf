@@ -11,11 +11,6 @@ variable "bucket_names" {
   type        = "list"
 }
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-}
-
 output "id" {
   value       = "${aws_iam_policy.s3-full-access.id}"
   description = "`id` exported from `aws_iam_policy`"
@@ -31,6 +26,8 @@ output "name" {
   description = "`name` exported from `aws_iam_policy`"
 }
 
+data "aws_partition" "current" {}
+
 data "aws_iam_policy_document" "s3-full-access" {
   statement {
     effect = "Allow"
@@ -41,7 +38,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       "s3:ListBucketMultipartUploads",
     ]
 
-    resources = ["${formatlist("arn:${var.aws_cloud}:s3:::%s",var.bucket_names)}"]
+    resources = ["${formatlist("arn:${data.aws_partition.current.partition}:s3:::%s",var.bucket_names)}"]
   }
 
   statement {
@@ -57,7 +54,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       "s3:AbortMultipartUpload",
     ]
 
-    resources = ["${formatlist("arn:${var.aws_cloud}:s3:::%s/*",var.bucket_names)}"]
+    resources = ["${formatlist("arn:${data.aws_partition.current.partition}:s3:::%s/*",var.bucket_names)}"]
   }
 }
 

@@ -4,12 +4,6 @@ variable "name_prefix" {
   type        = "string"
 }
 
-variable "is_govcloud" {
-  description = "Boolean, if this is running on GovCloud or not"
-  default     = "false"
-  type        = "string"
-}
-
 variable "vpc_id" {
   description = "VPC ID for the ELK stack"
   type        = "string"

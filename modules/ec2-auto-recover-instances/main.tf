@@ -108,6 +108,9 @@ resource "aws_instance" "auto-recover" {
 # Current AWS region
 data "aws_region" "current" {}
 
+# Lookup the current AWS partition
+data "aws_partition" "current" {}
+
 # Cloudwatch alarm that recovers the instance after two minutes of system status
 # check failure
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
@@ -126,5 +129,5 @@ resource "aws_cloudwatch_metric_alarm" "auto-recover" {
   statistic         = "${var.statistic}"
   threshold         = "${var.threshold}"
   alarm_description = "${var.alarm_description}"
-  alarm_actions     = ["${compact(concat(list("arn:${var.aws_cloud}:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
+  alarm_actions     = ["${compact(concat(list("arn:${data.aws_partition.current.partition}:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
 }
