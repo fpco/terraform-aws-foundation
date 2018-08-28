@@ -4,6 +4,10 @@
 #   }
 # }
 
+# variable "region" {
+#   default = "us-east-1"
+# }
+
 variable "subdomain" {
   description = "Subdomain to create the `kops` cluster under."
   type = "string"
@@ -65,25 +69,16 @@ resource "aws_s3_bucket" "kops_state_bucket" {
   bucket = "${var.kops_state_bucket_prefix}.${module.subdomain.zone_name}"
   acl = "public-read"
   force_destroy = true
-
-  # provisioner "local-exec" {
-  #   command = "kops create cluster
-  #     --name='${module.subdomain.zone_name}'
-  #     --state='s3://${aws_s3_bucket.kops_state_bucket.id}'
-  #     --cloud='aws'
-  #     --zones='us-east-1c'
-  #     --target='terraform'"
-  # }
 }
 
-# module "vpc" {
-#   source = "../../modules/vpc-scenario-1"
-#   name_prefix = "${var.vpc_name}"
-#   region = "${data.aws_region.current.name}"
-#   cidr = "${var.vpc_cidr}"
-#   azs = ["${data.aws_availability_zones.available.names[0]}"]
-#   public_subnet_cidrs = "${var.public_subnet_cidrs}"
-# }
+module "vpc" {
+  source = "../../modules/vpc-scenario-1"
+  name_prefix = "${var.vpc_name}"
+  region = "${data.aws_region.current.name}"
+  cidr = "${var.vpc_cidr}"
+  azs = ["${data.aws_availability_zones.available.names[0]}"]
+  public_subnet_cidrs = "${var.public_subnet_cidrs}"
+}
 
 output "subdomain_zone_id" {
   value = "${module.subdomain.zone_id}"
@@ -109,6 +104,6 @@ output "availability_zone" {
   value = "${data.aws_availability_zones.available.names[0]}"
 }
 
-# output "vpc_id" {
-#   value = "${module.vpc.vpc_id}"
-# }
+output "vpc_id" {
+  value = "${module.vpc.vpc_id}"
+}

@@ -27,26 +27,26 @@ plan-apply: init plan apply
 
 ## Generate terraform plan using `kops`
 generate-kops-plan: init plan apply
-	@export AWS_AVAILABILITY_ZONE=$(terraform output -json | jq '.availability_zone.value' | tr -d '"')
-	@export KOPS_STATE_STORE=s3://$(terraform output -json | jq '.state_bucket_id.value' | tr -d '"')
-	@export KOPS_CLUSTER_NAME=$(terraform output -json | jq '.subdomain_zone_name.value' | tr -d '"')
-	@export KOPS_AWS_VPC=$(terraform output -json | jq '.vpc_id.value' | tr -d '"')
+	@export AWS_AVAILABILITY_ZONE="$(terraform output -json | jq '.availability_zone.value' | tr -d '\"')"
+	@export KOPS_STATE_STORE="s3://$(terraform output -json | jq '.state_bucket_id.value' | tr -d '\"')"
+	@export KOPS_CLUSTER_NAME="$(terraform output -json | jq '.subdomain_zone_name.value' | tr -d '\"')"
+	@export KOPS_AWS_VPC="$(terraform output -json | jq '.vpc_id.value' | tr -d '\"')"
 	@echo "Done exporting..."
 	@echo "VPC ID:" ${KOPS_AWS_VPC}
 	@echo "Press ENTER to continue"
 	@read _input
+	@echo ${KOPS_CLUSTER_NAME} ${AWS_AVAILABILITY_ZONE} ${KOPS_STATE_STORE} ${KOPS_AWS_VPC}
 	@kops create cluster \
 		--name=${KOPS_CLUSTER_NAME} \
-		--cloud=aws \
 		--zones=${AWS_AVAILABILITY_ZONE} \
+		--state ${KOPS_STATE_STORE} \
 		--master-size="t2.micro" \
 		--node-size="t2.micro" \
-		--node-count=2 \
-		--vpc="vpc-b61951d3" \
-		--target=terraform \
-		${KOPS_CLUSTER_NAME}
+		--node-count 2 \
+		--vpc ${KOPS_AWS_VPC} \
+		--target=terraform
 
-##
+##  aws-env -p fpco-dev-sandbox-admin -- kops create cluster --name="kops-kube-vpc.dev-sandbox.fpcomplete.com" --zones="us-east-2a" --state "s3://state.kops-kube-vpc.dev-sandbox.fpcomplete.com" --master-size "t2.micro" --node-size "t2.micro" --node-count 2 --vpc "vpc-002bf949cefa58fb5" --target terraform
 
 ## clean up terrform and any other files; delete `kops` cluster
 clean:
