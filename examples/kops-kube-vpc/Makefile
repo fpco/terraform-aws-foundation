@@ -2,6 +2,12 @@
 STALE_PLAN_FILE := `find "tf.out" -mmin -3 | grep -q tf.out`
 SHELL := /bin/bash
 
+AWS_AVAILABILITY_ZONE := `terraform output -json | jq '.availability_zone.value' | tr -d '"'`
+KOPS_STATE_BUCKET := `terraform output -json | jq '.state_bucket_id.value' | tr -d '"'`
+KOPS_CLUSTER_NAME := `terraform output -json | jq '.subdomain_zone_name.value' | tr -d '"'`
+KOPS_CLUSTER_ZONE := `terraform output -json | jq '.subdomain_zone_id.value' | tr -d '"'`
+KOPS_AWS_VPC := `terraform output -json | jq '.vpc_id.value' | tr -d '"'`
+
 ## Check if tf.out is stale (Older than 2 minutes)
 check-plan-file:
 	@if ! ${STALE_PLAN_FILE} ; then \
@@ -22,36 +28,38 @@ plan:
 apply: check-plan-file
 	@terraform apply tf.out
 
-## Plan the plan and apply it
-plan-apply: init plan apply
+## Prepare the environment with a subdomain and vpc for kops
+prepare-environment: plan apply
 
 ## Generate terraform plan using `kops`
-generate-kops-plan: init plan apply
-	@export AWS_AVAILABILITY_ZONE="$(terraform output -json | jq '.availability_zone.value' | tr -d '\"')"
-	@export KOPS_STATE_STORE="s3://$(terraform output -json | jq '.state_bucket_id.value' | tr -d '\"')"
-	@export KOPS_CLUSTER_NAME="$(terraform output -json | jq '.subdomain_zone_name.value' | tr -d '\"')"
-	@export KOPS_AWS_VPC="$(terraform output -json | jq '.vpc_id.value' | tr -d '\"')"
-	@echo "Done exporting..."
-	@echo "VPC ID:" ${KOPS_AWS_VPC}
-	@echo "Press ENTER to continue"
+generate-kops-plan:
+	@echo "name:" ${KOPS_CLUSTER_NAME} "| zone:" ${AWS_AVAILABILITY_ZONE} "| state_store:" "s3://${KOPS_STATE_BUCKET}" "| vpc:" ${KOPS_AWS_VPC}
+	@echo "Verify, then press ENTER to continue..."
 	@read _input
-	@echo ${KOPS_CLUSTER_NAME} ${AWS_AVAILABILITY_ZONE} ${KOPS_STATE_STORE} ${KOPS_AWS_VPC}
 	@kops create cluster \
 		--name=${KOPS_CLUSTER_NAME} \
+		--dns-zone=${KOPS_CLUSTER_ZONE} \
 		--zones=${AWS_AVAILABILITY_ZONE} \
-		--state ${KOPS_STATE_STORE} \
 		--master-size="t2.micro" \
 		--node-size="t2.micro" \
 		--node-count 2 \
 		--vpc ${KOPS_AWS_VPC} \
+		--state "s3://${KOPS_STATE_BUCKET}" \
 		--target=terraform
 
-##  aws-env -p fpco-dev-sandbox-admin -- kops create cluster --name="kops-kube-vpc.dev-sandbox.fpcomplete.com" --zones="us-east-2a" --state "s3://state.kops-kube-vpc.dev-sandbox.fpcomplete.com" --master-size "t2.micro" --node-size "t2.micro" --node-count 2 --vpc "vpc-002bf949cefa58fb5" --target terraform
+edit-kops-plan:
+	@kops edit cluster \
+		--name=${KOPS_CLUSTER_NAME} \
+		--state "s3://${KOPS_STATE_BUCKET}"
 
-## clean up terrform and any other files; delete `kops` cluster
+apply-kops-plan:
+	@pushd out/terraform && terraform apply && popd;
+
+## Clean up terrform and other files; also delete the `kops` cluster
 clean:
-	@kops delete cluster --yes --name=${KOPS_CLUSTER_NAME}
+	@pushd out/terraform && terraform destroy && popd;
 	@terraform destroy
+	@kops delete cluster --yes --name=${KOPS_CLUSTER_NAME}
 	@rm tf.out terraform.*.backup terraform.tfstate
 	@rm -r ./out
 
