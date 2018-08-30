@@ -57,9 +57,11 @@ apply-kops-plan:
 
 ## Clean up terrform and other files; also delete the `kops` cluster
 clean:
+	@kops delete cluster \
+		--name=${KOPS_CLUSTER_NAME} \
+		--state "s3://${KOPS_STATE_BUCKET}"
 	@pushd out/terraform && terraform destroy && popd;
 	@terraform destroy
-	@kops delete cluster --yes --name=${KOPS_CLUSTER_NAME}
 	@rm tf.out terraform.*.backup terraform.tfstate
 	@rm -r ./out
 
