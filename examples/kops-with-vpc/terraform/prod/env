@@ -1,0 +1,4 @@
+export ENVIRONMENT=prod
+export CLUSTER_NAME=mykube-$ENVIRONMENT.dev-sandbox.fpcomplete.com
+export TF_VAR_kubernetes_cluster_name=$CLUSTER_NAME
+export TF_VAR_cluster_admin_keyname=$CLUSTER_NAME-admin
