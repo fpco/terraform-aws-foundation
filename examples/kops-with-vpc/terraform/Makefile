@@ -50,11 +50,14 @@ plan:
 apply: check-plan-file
 	@terraform apply tf.out
 
+plan-destroy:
+	@terraform plan -destroy -out=tf.out
+
 ## Cleans current dir from uneeded files
 clean:
 	@rm -f tf.out
-	@rm -f terraform.tfvars
 	@rm -f terraform.*.backup
+	@rm -f ../**/*.pem*
 
 ## Generate new ssh keypair.
 generate-ssh-keypair: require-TF_VAR_cluster_admin_keyname
@@ -62,7 +65,11 @@ generate-ssh-keypair: require-TF_VAR_cluster_admin_keyname
 
 ## Import keypair into aws
 import-ssh-keypair: require-CLUSTER_NAME
-	@aws ec2 import-key-pair --key-name ${TF_VAR_cluster_admin_keyname} --region us-east-1 --public-key-material "`cat ${TF_VAR_cluster_admin_keyname}.pem.pub)`"
+	@aws ec2 import-key-pair --key-name ${TF_VAR_cluster_admin_keyname} --region ${TF_VAR_aws_region} --public-key-material "`cat ${TF_VAR_cluster_admin_keyname}.pem.pub)`"
+
+## Delete keypair from AWS
+delete-ssh-keypair: require-TF_VAR_cluster_admin_keyname
+	@aws ec2 delete-key-pair --key-name ${TF_VAR_cluster_admin_keyname} --region ${TF_VAR_aws_region}
 
 ## Saves admin keys to password store
 save-ssh-keys: require-CLUSTER_NAME require-PASSWORD_STORE_DIR

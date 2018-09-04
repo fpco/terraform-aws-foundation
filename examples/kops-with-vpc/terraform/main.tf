@@ -1,14 +1,14 @@
 terraform {
   backend "s3" {
-    bucket  = "terraform-remote-state"
-    key     = "fpco/mykube-prod/terraform.tfstate-v4"  /* SUPER IMPORTANT TO CHANGE THIS TO A NEW PATH LIKE -v3 or similar */
-    region  = "us-east-1"  /* Cannot contain variables */
+    bucket = "dev-sandbox-tfstate"
+    key = "kops-vpc/terraform.tfstate"
+    region = "us-east-1"
     encrypt = true
   }
   required_version = ">= 0.11.0"
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = "${var.aws_region}"
   version = "1.6.0"
 }

@@ -17,9 +17,13 @@ fetch-keys: require-ENVIRONMENT require-CLUSTER_NAME
 	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.gpg > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem
 	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.pub.gpg > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem.pub
 
-## Create s3 bucket for new cluster
+## Create s3 bucket for kops state
 create-s3-bucket: require-ENVIRONMENT require-CLUSTER_NAME
 	@aws s3 mb s3://${CLUSTER_NAME}
+
+## Delete s3 bucket for kops state
+delete-s3-bucket: require-ENVIRONMENT require-CLUSTER_NAME
+	@aws s3 rb s3://${CLUSTER_NAME}
 
 ## Create cluster with kops. Needs CLUSTER_NAME defined.
 kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID require-VPC_CIDR require-SSH_PUBLIC_KEY require-NODE_COUNT require-NODE_SIZE require-NODE_VOLUME_SIZE require-KUBERNETES_VERSION require-KOPS_MASTER_ZONES
@@ -72,7 +76,7 @@ generate-ssh-keypair: require-ENVIRONMENT require-CLUSTER_NAME
 
 ## Import keypair into aws
 import-ssh-keypair: require-ENVIRONMENT require-CLUSTER_NAME
-	@aws ec2 import-key-pair --key-name ${CLUSTER_NAME}-admin --region us-east-1 --public-key-material "`cat ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pub)`"
+	@aws ec2 import-key-pair --key-name ${CLUSTER_NAME}-admin --region ${AWS_REGION} --public-key-material "`cat ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pub)`"
 
 ## Fetch kubeconfig.yaml
 fetch-kubeconfig: require-ENVIRONMENT require-CLUSTER_NAME
