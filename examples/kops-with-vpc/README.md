@@ -69,7 +69,7 @@ make kops-edit-cluster
 ...here is a table of variable names between the `terraform` output and `kops` configuration that should match after editing the `kops` configuration.
 
 | Terraform output   | Kops configuration |
-+-----------------------------------------+
+-------------------------------------------
 | `vpc_id`           | `networkID`        |
 | `vpc_cidr_block`   | `networkCIDR`      |
 | `cidr_blocks`      | `subnets`[.cidr]   |
