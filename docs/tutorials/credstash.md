@@ -10,7 +10,7 @@ In order to start using `credstash`, KMS Master Key and DynamoDB table need to
 be created. Also, to get access to secrets in the store with credstash, IAM
 roles and policies ought to be used.
 
-[credstash-setup](https://github.com/fpco/fpco-terraform-aws/tree/master/tf-modules/credstash-setup) is
+[credstash-setup](https://github.com/fpco/terraform-aws-foundation/tree/master/modules/credstash-setup) is
 the module that can take care of the whole setup and need to be applied only
 once. This module creates resources in the current region:
 
@@ -39,7 +39,7 @@ terraform {
   }
 }
 module "credstash" {
-  source               = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-setup"
+  source               = "fpco/foundation/aws//modules/credstash-setup"
   create_reader_policy = true # can be ommitted if secrets are writeonly from within EC2
   create_writer_policy = true # can be ommitted if secrets are readonly from within EC2
 }
@@ -97,7 +97,7 @@ level of access to KMS Key it would be really bad to use them in EC2 bootstrap
 scripts. In order to narrow down permissions to `credstash-store` DynamoDB table
 and restrict usage patterns to KMS Master
 Key
-[credstash-grant](https://github.com/fpco/fpco-terraform-aws/tree/master/tf-modules/credstash-grant) terrform
+[credstash-grant](https://github.com/fpco/terraform-aws-foundation/tree/master/modules/credstash-grant) terrform
 module should be used.
 
 `credstash-grant` module requires an IAM Role(s) ARN and Name as its input,
@@ -146,7 +146,7 @@ data "terraform_remote_state" "credstash" {
   }
 }
 module "credstash-grant" {
-  source            = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-grant"
+  source            = "fpco/foundation/aws//modules/credstash-grant"
   kms_key_arn       = "${data.terraform_remote_state.credstash.kms_key_arn}"
   reader_policy_arn = "${data.terraform_remote_state.credstash.reader_policy_arn}"
   roles_count       = 1
@@ -359,7 +359,7 @@ resource "aws_iam_role" "server-role" {
   ...
 }
 module "server-grant" {
-  source            = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-grant"
+  source            = "fpco/foundation/aws//modules/credstash-grant"
   kms_key_arn       = "${data.terraform_remote_state.credstash.kms_key_arn}"
   reader_policy_arn = "${data.terraform_remote_state.credstash.reader_policy_arn}"
   reader_context    = "env=server"
@@ -374,7 +374,7 @@ resource "aws_iam_role" "client-role" {
   ...
 }
 module "client-grant" {
-  source            = "github.com/fpco/fpco-terraform-aws//tf-modules/credstash-grant"
+  source            = "fpco/foundation/aws//modules/credstash-grant"
   kms_key_arn       = "${data.terraform_remote_state.credstash.kms_key_arn}"
   reader_policy_arn = "${data.terraform_remote_state.credstash.reader_policy_arn}"
   reader_context    = "env=client"

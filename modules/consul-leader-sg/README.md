@@ -11,14 +11,14 @@ cross-WAN leader communication.
 ```
 # Security Group for nomad workers
 module "leaders-sg" {
-  source      = "../tf-modules/security-group-base"
+  source      = "../modules/security-group-base"
   name        = "${var.name}-leaders"
   description = "security group for consul leader instances in the private subnet"
   vpc_id      = "${module.vpc.vpc_id}"
 }
 
 module "leaders-consul-leader-rules" {
-  source            = "../tf-modules/consul-leader-sg"
+  source            = "../modules/consul-leader-sg"
   cidr_blocks       = ["${var.vpc_cidr}"]
   security_group_id = "${module.leaders-sg.id}"
 }
@@ -26,7 +26,7 @@ module "leaders-consul-leader-rules" {
 ...
 
 module "my-cluster" {
-  source             = "../tf-modules/asg"
+  source             = "../modules/asg"
   ...
   security_group_ids = ["${module.leaders-sg.id}"]
 }
