@@ -196,7 +196,7 @@ module "init-gitlab-docker" {
 }
 
 module "init-gitlab-runner" {
-  source = "../../tf-modules/init-snippet-exec"
+  source = "../../modules/init-snippet-exec"
 
   init = <<END_INIT
 mkdir /etc/gitlab-runner

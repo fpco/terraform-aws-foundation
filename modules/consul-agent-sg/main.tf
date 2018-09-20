@@ -11,14 +11,14 @@
  * ```
  * # Security Group for nomad workers
  * module "workers-sg" {
- *   source      = "../tf-modules/security-group-base"
+ *   source      = "../modules/security-group-base"
  *   name        = "${var.name}-workers"
  *   description = "security group for worker instances in the private subnet"
  *   vpc_id      = "${module.vpc.vpc_id}"
  * }
  *
  * module "workers-consul-agent-rule" {
- *   source            = "../tf-modules/consul-agent-sg"
+ *   source            = "../modules/consul-agent-sg"
  *   cidr_blocks       = ["${var.vpc_cidr}"]
  *   security_group_id = "${module.workers-sg.id}"
  * }
@@ -26,7 +26,7 @@
  * ...
  * 
  * module "my-cluster" {
- *   source             = "../tf-modules/asg"
+ *   source             = "../modules/asg"
  *   ...
  *   security_group_ids = ["${module.workers-sg.id}"]
  * }
