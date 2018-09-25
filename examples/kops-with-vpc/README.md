@@ -1,5 +1,7 @@
 # Example to test the Kops workflow with an existing VPC on AWS
 
+**Motivation:** To make it easier to deploy a `kubernetes` cluster into an existing infrastructure, as against having `kops` manage it. Especially, in cases where the infrastructure needs to be shared for other applications.
+
 ## Summary
 
 We first use `terraform` to create:
@@ -19,13 +21,15 @@ We then use `kops` to create the kubernetes cluster in this existing VPC, where 
 ...and modifies the tags on existing subnets to make things easier for discovery within the kubernetes cluster
 
 ## Environment creation and deployment
-`NOTE`: For usage with `aws-env` have each command below execute in the form `aws-env -p <your-profile> -- <the-command>`.
+`NOTES`:
+  - For usage with `aws-env` have each command below execute in the form `aws-env -p <your-profile> -- <the-command>`.
+  - The word `template` in the snippets below refers to your target environment. As an example, `template/env` is provided under the respective directories for reference. Feel free to make directories named after your target environment like `production`, `staging`, etc. in both `terraform` and `kubernetes` sub-directories to support multiple target environments.
 
 ### Part 1: Terraform
 
 ```
 pushd terraform
-source prod/env
+source template/env
 ```
 
 1. Create the VPC
@@ -56,11 +60,11 @@ make apply
 popd; pushd kubernetes
 ```
 
-0. Using an editor, manually update the `prod/env` file with values from the `vpc_id` and the `vpc_cidr_block` output from Terraform, and then proceed...
+0. Using an editor, manually update the `template/env` file with values from the `vpc_id` and the `vpc_cidr_block` output from Terraform, and then proceed...
 
 ```
-source prod/env
-cp ../terraform/*.pem* prod/    # copy the SSH Keypair
+source template/env
+cp ../terraform/*.pem* template/    # copy the SSH Keypair
 ```
 
 1. Create the cluster configuration
