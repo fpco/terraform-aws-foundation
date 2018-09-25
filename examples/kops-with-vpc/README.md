@@ -73,12 +73,12 @@ make kops-edit-cluster
 ```
 ...here is a table of variable names between the `terraform` output and `kops` configuration that should match after editing the `kops` configuration. We only need to consider `cidr_blocks` and `subnet_ids` for manually updating, since `kops-create-cluster` in the `make` file takes both `vpc_id` and `vpc_cidr_block` through the `env` file updated in step `0`.
 
-| Terraform output   | Kops configuration |
--------------------------------------------
-| `vpc_id`           | `networkID`        | # these two
-| `vpc_cidr_block`   | `networkCIDR`      | # won't need to be updated manually
-| `cidr_blocks`      | `subnets`[.cidr]   |
-| `subnet_ids`       | ...to be added to the kops configuration under each `subnet` as key `id` |
+|Terraform output|Kops configuration|
+|----------------|------------------|
+|`vpc_id`|`networkID`|
+|`vpc_cidr_block`|`networkCIDR`|
+|`cidr_blocks`|`subnets[.cidr]`|
+|`subnet_ids`|...to be added to the kops configuration under each `subnet` as key `id`|
 
 For example, if we have a `terraform` output like:
 ```
