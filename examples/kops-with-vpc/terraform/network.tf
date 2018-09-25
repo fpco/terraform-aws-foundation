@@ -9,7 +9,7 @@ module "vpc" {
 
 module "public-subnets" {
   source      = "../../../modules/subnets"
-  azs         = "${var.aws_availability_zones}"
+  azs         = ["${split(",", var.aws_availability_zones)}"]
   vpc_id      = "${module.vpc.vpc_id}"
   name_prefix = "${var.name}-kube-public"
   cidr_blocks = "${var.public_subnet_cidrs}"

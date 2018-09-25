@@ -39,7 +39,6 @@ source template/env
 
 ```
 make generate-ssh-keypair
-make import-ssh-keypair
 make init
 make init-plan
 make apply
@@ -162,11 +161,7 @@ popd; pushd terraform
 make plan-destroy
 make apply
 ```
-3. Delete the previously imported SSH Keypair (if necessary)
-```
-make delete-ssh-keypair
-```
-4. Delete stale files in the project directory
+3. Delete stale files in the project directory
 ```
 make clean
 ```

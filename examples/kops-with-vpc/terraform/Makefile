@@ -40,6 +40,8 @@ init-plan: require-ENVIRONMENT require-CLUSTER_NAME
 	@terraform plan \
 		-target="module.vpc" \
 		-target="module.public-subnets" \
+		-target="aws_key_pair.kops-with-vpc" \
+		-target="aws_s3_bucket.kops-state-bucket" \
 		-out=tf.out
 
 ## terraform plan (makes everything)
@@ -62,14 +64,6 @@ clean:
 ## Generate new ssh keypair.
 generate-ssh-keypair: require-TF_VAR_cluster_admin_keyname
 	@ssh-keygen -t rsa -b 4096 -f ${TF_VAR_cluster_admin_keyname}.pem -C ${TF_VAR_cluster_admin_keyname}
-
-## Import keypair into aws
-import-ssh-keypair: require-CLUSTER_NAME
-	@aws ec2 import-key-pair --key-name ${TF_VAR_cluster_admin_keyname} --region ${TF_VAR_aws_region} --public-key-material "`cat ${TF_VAR_cluster_admin_keyname}.pem.pub)`"
-
-## Delete keypair from AWS
-delete-ssh-keypair: require-TF_VAR_cluster_admin_keyname
-	@aws ec2 delete-key-pair --key-name ${TF_VAR_cluster_admin_keyname} --region ${TF_VAR_aws_region}
 
 ## Saves admin keys to password store
 save-ssh-keys: require-CLUSTER_NAME require-PASSWORD_STORE_DIR

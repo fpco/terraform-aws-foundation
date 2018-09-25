@@ -2,7 +2,9 @@ export ENVIRONMENT=template
 
 export CLUSTER_NAME=$ENVIRONMENT.kops-vpc.dev-sandbox.fpcomplete.com
 
+export TF_VAR_name=$ENVIRONMENT
 export TF_VAR_aws_region=us-east-2
+export TF_VAR_aws_availability_zones="us-east-2a,us-east-2b,us-east-2c"
 
 export TF_VAR_kubernetes_cluster_name=$CLUSTER_NAME
 export TF_VAR_cluster_admin_keyname=$CLUSTER_NAME-admin

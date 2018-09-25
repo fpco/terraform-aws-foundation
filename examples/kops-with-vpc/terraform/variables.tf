@@ -3,12 +3,10 @@ variable "aws_region" {
 }
 
 variable "name" {
-  default     = "prod"
   description = "name of this deployment, the VPC and all resources therein"
 }
 
 variable "aws_availability_zones" {
-  default     = ["us-east-2a", "us-east-2b", "us-east-2c"]
   description = "List of availability zones to use. Should match number of CIDR blocks"
 }
 
