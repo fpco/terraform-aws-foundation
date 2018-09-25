@@ -8,13 +8,14 @@ export KOPS_MASTER_COUNT=1
 export KOPS_MASTER_SIZE=t2.small
 export KOPS_MASTER_VOLUME_SIZE=30
 export KOPS_MASTER_ZONES="us-east-2b"
+export KOPS_ZONES="us-east-2a,us-east-2b,us-east-2c"
 
 export NODE_COUNT=2
 export NODE_SIZE=t2.micro
 export NODE_VOLUME_SIZE=30
 
-export VPC_ID=vpc-052d9010da3a58ae5
-export VPC_CIDR=10.120.0.0/16
+export VPC_ID=vpc-BLAH
+export VPC_CIDR=10.120.0.0/99
 
 export SSH_PUBLIC_KEY=$CLUSTER_NAME-admin.pem.pub
 

@@ -13,8 +13,9 @@ We then use `kops` to create the kubernetes cluster in this existing VPC, where 
 3. EBS volumes
 4. IAM instance profiles, role policies
 5. Keypairs for every kubernetes component
-6. Files and secrets required to configu kubernetes clusters
+6. Files and secrets required to configure kubernetes clusters
 7. Security groups
+
 ...and modifies the tags on existing subnets to make things easier for discovery within the kubernetes cluster
 
 ## Environment creation and deployment
@@ -53,9 +54,13 @@ make apply
 
 ```
 popd; pushd kubernetes
+```
+
+0. Using an editor, manually update the `prod/env` file with values from the `vpc_id` and the `vpc_cidr_block` output from Terraform, and then proceed...
+
+```
 source prod/env
 cp ../terraform/*.pem* prod/    # copy the SSH Keypair
-make create-s3-bucket           # create the S3 bucket for `kops` state
 ```
 
 1. Create the cluster configuration
@@ -66,12 +71,12 @@ make kops-create-cluster
 ```
 make kops-edit-cluster
 ```
-...here is a table of variable names between the `terraform` output and `kops` configuration that should match after editing the `kops` configuration.
+...here is a table of variable names between the `terraform` output and `kops` configuration that should match after editing the `kops` configuration. We only need to consider `cidr_blocks` and `subnet_ids` for manually updating, since `kops-create-cluster` in the `make` file takes both `vpc_id` and `vpc_cidr_block` through the `env` file updated in step `0`.
 
 | Terraform output   | Kops configuration |
 -------------------------------------------
-| `vpc_id`           | `networkID`        |
-| `vpc_cidr_block`   | `networkCIDR`      |
+| `vpc_id`           | `networkID`        | # these two
+| `vpc_cidr_block`   | `networkCIDR`      | # won't need to be updated manually
 | `cidr_blocks`      | `subnets`[.cidr]   |
 | `subnet_ids`       | ...to be added to the kops configuration under each `subnet` as key `id` |
 
@@ -146,7 +151,6 @@ KUBECONFIG=~/.kube/$ENVIRONMENT.kops-vpc.yaml kubectl get nodes --show-labels
 1. Delete the `kops` cluster and its state bucket
 ```
 make OPTS=--yes kops-delete-cluster
-make delete-s3-bucket
 ```
 2. Destroy the `terraform`-created VPC, subnets and NAT gateway
 ```
@@ -169,7 +173,8 @@ make clean
 * `aws provider`: `v1.6.0`
 * `kops`: `v1.10.0 (git-8b52ea6d1)`
 * `aws`: `aws-cli/1.15.69 Python/3.6.5 Linux/4.15.0-33-generic botocore/1.10.68`
-* `kubectl`: ```
+* `kubectl`:
+```
 Client Version: version.Info{
   Major:"1",
   Minor:"11",

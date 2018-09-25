@@ -1,6 +1,5 @@
 .PHONY: kops-create-cluster kops-edit-cluster kops-update-cluster \
-	kops-validate-cluster create-s3-bucket generate-ssh-keypair fetch-keys \
-	kops-rolling-update
+	kops-validate-cluster fetch-keys kops-rolling-update
 
 .DEFAULT_GOAL = help
 
@@ -17,16 +16,8 @@ fetch-keys: require-ENVIRONMENT require-CLUSTER_NAME
 	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.gpg > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem
 	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.pub.gpg > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem.pub
 
-## Create s3 bucket for kops state
-create-s3-bucket: require-ENVIRONMENT require-CLUSTER_NAME
-	@aws s3 mb s3://${CLUSTER_NAME}
-
-## Delete s3 bucket for kops state
-delete-s3-bucket: require-ENVIRONMENT require-CLUSTER_NAME
-	@aws s3 rb s3://${CLUSTER_NAME}
-
 ## Create cluster with kops. Needs CLUSTER_NAME defined.
-kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID require-VPC_CIDR require-SSH_PUBLIC_KEY require-NODE_COUNT require-NODE_SIZE require-NODE_VOLUME_SIZE require-KUBERNETES_VERSION require-KOPS_MASTER_ZONES
+kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID require-VPC_CIDR require-SSH_PUBLIC_KEY require-NODE_COUNT require-NODE_SIZE require-NODE_VOLUME_SIZE require-KUBERNETES_VERSION require-KOPS_MASTER_ZONES require-KOPS_ZONES
 	@kops create cluster \
 		--cloud=aws \
 		--kubernetes-version=${KUBERNETES_VERSION} \
@@ -35,12 +26,12 @@ kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID req
 		--master-count=${KOPS_MASTER_COUNT} \
 		--master-size=${KOPS_MASTER_SIZE} \
 		--master-volume-size=${KOPS_MASTER_VOLUME_SIZE} \
-		--master-zones=${KOPS_MASTER_ZONES} \
+		--master-zones="${KOPS_MASTER_ZONES}" \
 		--network-cidr=${VPC_CIDR} \
 		--node-count=${NODE_COUNT} \
 		--node-size=${NODE_SIZE} \
 		--ssh-public-key=${ENVIRONMENT}/${SSH_PUBLIC_KEY} \
-		--zones=us-east-2a,us-east-2b,us-east-2c \
+		--zones="${KOPS_ZONES}" \
 		--vpc=${VPC_ID} \
 		--node-volume-size=${NODE_VOLUME_SIZE} \
 		--state=s3://${CLUSTER_NAME} \
@@ -68,19 +59,16 @@ kops-validate-cluster: require-ENVIRONMENT require-CLUSTER_NAME
 
 ## Kops rolling update. OPTS=--force
 kops-rolling-update: require-ENVIRONMENT require-CLUSTER_NAME
-	@kops rolling-update cluster --state s3://${CLUSTER_NAME} --yes ${OPTS}
-
-## Generate new ssh keypair.
-generate-ssh-keypair: require-ENVIRONMENT require-CLUSTER_NAME
-	@ssh-keygen -t rsa -b 4096 -f ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem -C "$$CLUSTER_NAME admin"
-
-## Import keypair into aws
-import-ssh-keypair: require-ENVIRONMENT require-CLUSTER_NAME
-	@aws ec2 import-key-pair --key-name ${CLUSTER_NAME}-admin --region ${AWS_REGION} --public-key-material "`cat ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pub)`"
+	@kops rolling-update cluster --state s3://${CLUSTER_NAME} ${OPTS}
 
 ## Fetch kubeconfig.yaml
 fetch-kubeconfig: require-ENVIRONMENT require-CLUSTER_NAME
 	@KUBECONFIG=${ENVIRONMENT}/kubeconfig.yaml kops export kubecfg --name ${CLUSTER_NAME} --state s3://${CLUSTER_NAME}
+
+## Fetch private/public ssh keys from pw store
+fetch-keys: require-ENVIRONMENT require-CLUSTER_NAME
+	@pass clusters/${CLUSTER_NAME}/keys/admin.pem > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem
+	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.pub > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem.pub
 
 ## Show help screen.
 help:

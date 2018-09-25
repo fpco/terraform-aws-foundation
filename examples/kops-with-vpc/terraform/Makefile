@@ -57,7 +57,7 @@ plan-destroy:
 clean:
 	@rm -f tf.out
 	@rm -f terraform.*.backup
-	@rm -f ../**/*.pem*
+	@rm -rf ../**/*.pem*
 
 ## Generate new ssh keypair.
 generate-ssh-keypair: require-TF_VAR_cluster_admin_keyname
