@@ -57,19 +57,31 @@ variable "writer_context" {
   type        = "string"
 }
 
+variable "aws_profile" {
+  default     = ""
+  description = "name of the AWS profile to reference when calling our script, optional"
+  type        = "string"
+}
+
+locals {
+  NO_PROFILE  = ""
+  AWS_PROFILE = "AWS_PROFILE=${var.aws_profile}"
+  auth        = "${var.aws_profile == "" ? local.NO_PROFILE : local.AWS_PROFILE}"
+}
+
 resource "aws_iam_role_policy_attachment" "credstash-reader-policy-attachment" {
   count      = "${var.reader_policy_arn == "" ? 0 : var.roles_count}"
   role       = "${var.roles_names[count.index]}"
   policy_arn = "${var.reader_policy_arn}"
 
   provisioner "local-exec" {
-    command = "${path.module}/grant.sh create reader ${var.reader_context == "" ? "" : "--context ${join(",", split(" ", var.reader_context))}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
+    command = "${local.auth} ${path.module}/grant.sh create reader ${var.reader_context == "" ? "" : "--context ${join(",", split(" ", var.reader_context))}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
   }
 
   provisioner "local-exec" {
     when       = "destroy"
     on_failure = "continue"
-    command    = "${path.module}/grant.sh revoke ${var.kms_key_arn} ${var.roles_arns[count.index]}"
+    command    = "${local.auth} ${path.module}/grant.sh revoke ${var.kms_key_arn} ${var.roles_arns[count.index]}"
   }
 }
 
@@ -79,12 +91,12 @@ resource "aws_iam_role_policy_attachment" "credstash-writer-policy-attachment" {
   policy_arn = "${var.writer_policy_arn}"
 
   provisioner "local-exec" {
-    command = "${path.module}/grant.sh create writer ${var.writer_context == "" ? "" : "--context ${join(",", split(" ", var.writer_context))}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
+    command = "${local.auth} ${path.module}/grant.sh create writer ${var.writer_context == "" ? "" : "--context ${join(",", split(" ", var.writer_context))}"} ${var.kms_key_arn} ${var.roles_arns[count.index]}"
   }
 
   provisioner "local-exec" {
     when       = "destroy"
     on_failure = "continue"
-    command    = "${path.module}/grant.sh revoke ${var.kms_key_arn} ${var.roles_arns[count.index]}"
+    command    = "${local.auth} ${path.module}/grant.sh revoke ${var.kms_key_arn} ${var.roles_arns[count.index]}"
   }
 }
