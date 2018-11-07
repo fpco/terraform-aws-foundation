@@ -23,7 +23,7 @@ We then use `kops` to create the kubernetes cluster in this existing VPC, where 
 ## Environment creation and deployment
 `NOTES`:
   - For usage with `aws-env` have each command below execute in the form `aws-env -p <your-profile> -- <the-command>`.
-  - The word `template` in the snippets below refers to your target environment. As an example, `template/env` is provided under the respective directories for reference. Feel free to make directories named after your target environment like `production`, `staging`, etc. in both `terraform` and `kubernetes` sub-directories to support multiple target environments.
+  - The word `template` in the snippets below refers to your target environment. As an example, `template/env` is provided under the respective directories for reference. Users *should* copy the template to their own environment name and then modify it, rather than use it as it is.
 
 ### Part 1: Terraform
 

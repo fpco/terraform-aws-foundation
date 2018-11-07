@@ -29,3 +29,7 @@ output "vpc_cidr_block" {
 output "vpc_dhcp_options_id" {
   value = "${module.vpc.dhcp_options_id}"
 }
+
+output "kops_state_bucket" {
+  value = "${module.kops-state-bucket.url}"
+}

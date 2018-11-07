@@ -1,4 +1,4 @@
-export ENVIRONMENT=template
+export ENVIRONMENT=<<<SETME>>>
 
 export CLUSTER_NAME=$ENVIRONMENT.kops-vpc.dev-sandbox.fpcomplete.com
 

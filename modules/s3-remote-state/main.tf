@@ -32,12 +32,10 @@ variable "aws_cloud" {
   default     = "aws"
 }
 
-data "aws_region" "current" {}
-
 resource "aws_s3_bucket" "remote-state" {
   bucket = "${var.bucket_name}"
   acl    = "private"
-  region = "${var.region == "" ? data.aws_region.current.name : var.region}"
+  region = "${var.region}"
 
   versioning {
     enabled = "${var.versioning}"
