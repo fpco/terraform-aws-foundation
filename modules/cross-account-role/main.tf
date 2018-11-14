@@ -13,7 +13,7 @@ variable "trust_account_ids" {
 }
 
 variable "name" {
-  description = "Name to give the roll"
+  description = "Name to give the role"
   type        = "string"
 }
 
