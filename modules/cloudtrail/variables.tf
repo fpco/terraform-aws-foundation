@@ -3,12 +3,6 @@ variable "name_prefix" {
   type        = "string"
 }
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "kms_key_id" {
   description = "KMS key ARN for encryption of logs"
   default     = ""

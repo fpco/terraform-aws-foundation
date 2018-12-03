@@ -3,12 +3,6 @@ variable "ami" {
   type        = "string"
 }
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "instance_type" {
   description = "Type of instance to run the DNS servers"
   default     = "t2.nano"

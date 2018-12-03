@@ -6,7 +6,7 @@
  *
  * ```
  * module "ubuntu-xenial-ami" {
- *   source  = "../../tf-modules/ami-ubuntu"
+ *   source  = "../../modules/ami-ubuntu"
  * }
  * ```
  *
@@ -14,7 +14,7 @@
  *
  * ```
  * module "ubuntu-trusty-ami" {
- *   source  = "../../tf-modules/ami-ubuntu"
+ *   source  = "../../modules/ami-ubuntu"
  *   release = "14.04"
  * }
  * ```
@@ -70,11 +70,7 @@ variable "release" {
   type        = "string"
 }
 
-variable "is_govcloud" {
-  default     = false
-  description = "boolean, switch between Canonical's account ARN in `aws_ami.owners`"
-  type        = "string"
-}
+data "aws_partition" "current" {}
 
 data "aws_ami" "ubuntu" {
   most_recent = "${var.most_recent}"
@@ -89,7 +85,7 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["${var.is_govcloud == "true" ? "513442679011" : "099720109477"}"] # Canonical
+  owners = ["${data.aws_partition.current.partition == "aws-us-gov" ? "513442679011" : "099720109477"}"] # Canonical
 }
 
 output "id" {

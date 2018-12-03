@@ -32,7 +32,9 @@ source /usr/local/bin/virtualenvwrapper.sh
 To create an environment use the command `mkvirtualenv myenv`. To stop working on that environment issue the command `deactivate`. Then to work on that environment again, issue the command `workon myenv`. 
 
 #### Create the cluster using FPCO Terraform modules
-First, review the variables defined in `variables.tf`. You can change their values by adding corresponding values in `vars.env` and `terraform-tfvars.tpl` as per the 3 examples currently in `vars.env`. Be sure to review the current values as well. In particular it is likely necessary that you choose a new value for the CoreOS AMI by choosing an HVM AMI for your particular region from the list for the stable channel found [here][4] or [here][5]. The version currently there is likely out of date.
+First, copy `vars.env.sample` to `vars.env` and edit the values. In particular it is likely necessary that you set a new value for the CoreOS AMI by choosing an HVM AMI for your particular region from the list for the stable channel found [here][4] or [here][5]. The version currently in `vars.env.sample` is likely out of date.
+
+Then review other variables defined in `variables.tf`. You can change their values by adding corresponding values in `vars.env` and `terraform-tfvars.tpl` similar to the examples already in `vars.env.sample`.
 
 Once you've set up your variables, run these `make` targets:
 
@@ -68,7 +70,7 @@ Be sure to substitute the IP address for the bastion host. If you aren't sure wh
 
 You are now ready to use Kubespray to install Kubernetes in the cluster you just created. To do so, take the following steps:
 1. Create a virtual environment within which you will work while deploying Kubespray:
-`bash
+```bash
 mkvirtualenv kubespray
 ```
 2. Use `pip` to install the following Python packages: `boto3`,`os`,`json`,`argparse`,`netaddr`
@@ -78,16 +80,16 @@ mkvirtualenv kubespray
 ```bash
 cp -R inventory/sample/ inventory/mycluster
 ```
-5. One set of parameters we need to create, is an inventory of how the different EC2 instances are allocated for different purposes in the Kubernetes cluster. The Terraform setup has added tags to each instance to define its role in the cluster. We will use a Python script to dynamically create the inventory list (to read more about this, see [here][8]. Copy the `kubespray-aws-inventory.py` Python script into the directory you just created:
+5. One set of parameters we need to create, is an inventory of how the different EC2 instances are allocated for different purposes in the Kubernetes cluster. The Terraform setup has added tags to each instance to define its role in the cluster. We will use a Python script to dynamically create the inventory list (to read more about this, see [here][8]. Link the `kubespray-aws-inventory.py` Python script into the directory you just created:
 ```bash
-cp contrib/aws_inventory/kubespray-aws-inventory.py inventory/mycluster/
+ln -s ../../contrib/aws_inventory/kubespray-aws-inventory.py inventory/mycluster/
 ```
 6. **It is important to note the following regarding the use of the above script:** if, using this example, you deploy more than one cluster in one region, the Python inventory script is not capable of differentiating between the two.
 7. To test that you properly set things up in the previous step run the following command. It should print out your inventory in the terminal, listing all the nodes along with what role(s) they have in the cluster: `etcd`,`master` and/or `node`
 ```bash
 python inventory/mycluster/kubespray-aws-inventory.py --list
 ```
-8. Next you need to set some parameters in the file `inventory/mycluster/group.vars/all.yml`. Uncomment these variables and/or set the values as directed below. Note that these variables are scattered throughout the file so you have to look for them. Note as well you should review the entire file since there may be other variables you might like to change:
+8. Next you need to set some parameters in the file `inventory/mycluster/group_vars/all.yml`. Uncomment these variables and/or set the values as directed below. Note that these variables are scattered throughout the file so you have to look for them. Note as well you should review the entire file since there may be other variables you might like to change:
 ```
 bootstrap_os: coreos
 apiserver_loadbalancer_domain_name: "<see note below on how to find elb name which should put here between quotes>"
@@ -124,11 +126,11 @@ kubectl_localhost: true
 ```
 12. We are now ready to run the ansible playbooks. You need to add the `-b` flag so scripts can take on `sudo` privileges:
 ```bash
-ansible-playbook -b -i inventory/atcluster/kubespray-aws-inventory.py  cluster.yml
+ansible-playbook -b -i inventory/mycluster/kubespray-aws-inventory.py  cluster.yml
 ```
 13. Once Kubespray is finished you need to copy the generated `kubectl` configuration to a convenient location:
 ```bash
-cp inventory/atcluster/artifacts/admin.conf ~/.kube
+cp inventory/mycluster/artifacts/admin.conf ~/.kube
 ```
 14. You should edit the `admin.conf` you copied and substitute the DNS name you found previously for the ELB for the IP address of the `cluster` `server`. In addition change the port from `6443` to `443`. It should look something like this:
 ```

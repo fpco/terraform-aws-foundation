@@ -1,9 +1,3 @@
-variable "is_govcloud" {
-  description = "Boolean, is it running on GovCloud"
-  default     = false
-  type        = "string"
-}
-
 variable "name_prefix" {
   default = "dev"
   type        = "string"

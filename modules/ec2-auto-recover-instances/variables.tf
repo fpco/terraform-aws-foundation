@@ -3,12 +3,6 @@ variable "ami" {
   type        = "string"
 }
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "extra_tags" {
   description = "map of tags to append to the Name tag, added to the instance"
   default     = {}

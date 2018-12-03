@@ -33,7 +33,8 @@ configuration whenever it changes.
     
     # The DNS servers
     module "dns" {
-      source = "../../vendor/fpco-terraform-aws/tf-modules/dnsmasq-server"
+      source = "fpco/foundation/aws//modules/dnsmasq-server"
+
       name_prefix         = "${var.name}"
       dnsmasq_conf        = "${data.template_file.dnsmasq_conf.rendered}"
       ami                 = "${data.aws_ami.ubuntu-xenial.id}"

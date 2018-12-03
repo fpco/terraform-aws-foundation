@@ -22,7 +22,7 @@ NOTE: need to update for template_file data type
 ```
 # provisioning for worker cluster
 module "worker-init" {
-    source = "../tf-modules/consul-agent-generic-init"
+    source = "../modules/consul-agent-generic-init"
     datacenter = "${var.datacenter}"
     service = "worker"
     consul_secret_key = "${var.consul_secret_key}"

@@ -9,7 +9,7 @@
  * * `aws_vpn_connection`
  * * `aws_vpn_connection_route`
  *
- * See the [`vpc-scenario-4` module](https://github.com/fpco/fpco-terraform-aws/tree/master/tf-modules/vpc-scenario-4)
+ * See the [`vpc-scenario-4` module](https://github.com/fpco/terraform-aws-foundation/tree/master/modules/vpc-scenario-4)
  * in this repo for an example that uses this module.
  *
  */

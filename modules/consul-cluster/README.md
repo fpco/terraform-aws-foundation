@@ -23,7 +23,7 @@ NOTES:
 ```
 # cluster of "workers", built on a cluster of consul agents
 module "cworkers-a" {
-    source = "../tf-modules/consul-cluster"
+    source = "../modules/consul-cluster"
     ami = "${var.ami}"
     name = "${var.name}"
     max_nodes = 5

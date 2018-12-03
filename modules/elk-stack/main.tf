@@ -18,7 +18,6 @@
 module "ubuntu-ami" {
   source      = "../ami-ubuntu"
   release     = "16.04"
-  is_govcloud = "${var.is_govcloud}"
 }
 
 data "aws_vpc" "current" {
@@ -49,7 +48,6 @@ resource "aws_security_group" "ssh" {
 module "elasticsearch" {
   source = "../elasticsearch"
 
-  is_govcloud                 = "${var.is_govcloud}"
   name_prefix                 = "${var.name_prefix}"
   vpc_id                      = "${var.vpc_id}"
   key_name                    = "${var.ssh_key_name}"

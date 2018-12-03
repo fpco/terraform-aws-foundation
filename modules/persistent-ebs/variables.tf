@@ -55,9 +55,3 @@ variable "extra_tags" {
   description = "Map with extra tags to be applied to all ebs volumes"
   type        = "map"
 }
-
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}

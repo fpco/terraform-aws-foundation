@@ -7,6 +7,8 @@
 
 data "aws_region" "current" {}
 
+data "aws_partition" "current" {}
+
 resource "aws_cloudwatch_metric_alarm" "auto-recover" {
   count               = "${length(compact(var.ec2_instance_ids))}"
   alarm_name          = "${format(var.name_format, var.name_prefix, count.index + 1)}"
@@ -23,5 +25,5 @@ resource "aws_cloudwatch_metric_alarm" "auto-recover" {
   statistic         = "Minimum"
   threshold         = "0"
   alarm_description = "Auto-recover the instance if the system status check fails for two minutes"
-  alarm_actions     = ["${compact(concat(list("arn:${var.aws_cloud}:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
+  alarm_actions     = ["${compact(concat(list("arn:${data.aws_partition.current.partition}:automate:${data.aws_region.current.name}:ec2:recover"), "${var.alarm_actions}"))}"]
 }

@@ -1,9 +1,3 @@
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "create_kms_key" {
   default     = true
   description = "Should the Master key be created"

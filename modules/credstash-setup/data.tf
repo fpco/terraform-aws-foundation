@@ -2,6 +2,8 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "aws_partition" "current" {}
+
 data "template_file" "credstash-get-cmd" {
   template = "env credstash -r ${data.aws_region.current.name} -t ${var.db_table_name} get"
 }
@@ -26,7 +28,7 @@ data "aws_iam_policy_document" "writer-policy" {
     actions = ["dynamodb:PutItem"]
 
     resources = [
-      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
+      "arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
     ]
   }
 }
@@ -43,7 +45,7 @@ data "aws_iam_policy_document" "reader-policy" {
     ]
 
     resources = [
-      "arn:${var.aws_cloud}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
+      "arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.db_table_name}",
     ]
   }
 }

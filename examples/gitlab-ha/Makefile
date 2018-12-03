@@ -28,7 +28,7 @@ all:
 
 ## Run an interactive shell with all environment variables defined
 shell:
-	@bash
+	@exec $${SHELL}
 
 ## Use envsubst to render the json config files for cfssl
 render-tls-configs:

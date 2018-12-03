@@ -5,7 +5,7 @@ release of ubuntu. Use it like:
 
 ```
 module "ubuntu-xenial-ami" {
-  source  = "../../tf-modules/ami-ubuntu"
+  source  = "../../modules/ami-ubuntu"
 }
 ```
 
@@ -13,7 +13,7 @@ Or for Trusty:
 
 ```
 module "ubuntu-trusty-ami" {
-  source  = "../../tf-modules/ami-ubuntu"
+  source  = "../../modules/ami-ubuntu"
   release = "14.04"
 }
 ```

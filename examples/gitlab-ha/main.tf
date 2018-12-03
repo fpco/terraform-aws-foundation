@@ -47,14 +47,14 @@ resource "aws_key_pair" "main" {
 
 # S3 bucket for the Docker Registry (running in gitlab) to store Docker Images
 module "docker-registry-s3-storage" {
-  source      = "../../tf-modules/s3-remote-state"
+  source      = "../../modules/s3-remote-state"
   bucket_name = "${var.registry_bucket_name}"
   versioning  = "false"
   principals  = []
 }
 
 module "docker-registry-s3-full-access" {
-  source       = "../../tf-modules/s3-full-access-policy"
+  source       = "../../modules/s3-full-access-policy"
   name         = "${var.name}-docker-registry-s3-full-access"
   bucket_names = ["${module.docker-registry-s3-storage.bucket_id}"]
 }
@@ -196,7 +196,7 @@ module "init-gitlab-docker" {
 }
 
 module "init-gitlab-runner" {
-  source = "../../tf-modules/init-snippet-exec"
+  source = "../../modules/init-snippet-exec"
 
   init = <<END_INIT
 mkdir /etc/gitlab-runner
