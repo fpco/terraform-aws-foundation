@@ -23,13 +23,13 @@ We then use `kops` to create the kubernetes cluster in this existing VPC, where 
 ## Environment creation and deployment
 `NOTES`:
   - For usage with `aws-env` have each command below execute in the form `aws-env -p <your-profile> -- <the-command>`.
-  - The word `template` in the snippets below refers to your target environment. As an example, `template/env` is provided under the respective directories for reference. Users *should* copy the template to their own environment name and then modify it, rather than use it as it is.
+  - The word `test` in the snippets below refers to your target environment. As an example, the `template/` environment is provided under the respective directories for reference. Users *should* copy the template to their own environment name and then modify it, rather than use it as it is. For example, by executing `cp -r template test` and the setting the `$ENVIRONMENT` in `test/env`.
 
 ### Part 1: Terraform
 
 ```
 pushd terraform
-source template/env
+source test/env
 ```
 
 1. Create the VPC
@@ -53,28 +53,63 @@ make plan
 make apply
 ```
 
-### Part 2: Kubernetes (Kops)
+### Part 2: Copy relevant values over to the Kubernetes' side
+```
+popd
+cp -r kubernetes/template kubernetes/$ENVIRONMENT
+make copy-keys                       # Copy generated .pem files
+make copy OUT=region AS=REGION       # Copy terraform output to kube(kops) environment: `$ENVIRONMENT/env`
+make copy OUT=vpc_id AS=VPC_ID       # Check `make help` for more details
+make copy OUT=vpc_cidr AS=VPC_CIDR
+make copy OUT=subnet_ids AS=KOPS_SUBNET_IDS
+make copy OUT=subnet_cidrs AS=KOPS_SUBNET_CIDRS
+make copy OUT=subnet_azs AS=KOPS_ZONES
+make copy OUT=name_prefix AS=ENVIRONMENT
+make copy OUT=kubernetes_cluster_name AS=CLUSTER_NAME
+make copy OUT=kops_state_bucket AS=KOPS_BUCKET
+```
+
+### Part 3: Kubernetes (Kops)
 
 ```
-popd; pushd kubernetes
+pushd kubernetes
 ```
 
-0. Using an editor, manually update the `template/env` file with values from the `vpc_id` and the `vpc_cidr_block` output from Terraform, and then proceed...
-
+0. Source the environment
 ```
-source template/env
-cp ../terraform/*.pem* template/    # copy the SSH Keypair
+source test/env
 ```
 
 1. Create the cluster configuration
 ```
 make kops-create-cluster
 ```
-2. Edit the cluster configuration to help `kops` use the existing VPC and its subnets.
+2. Use `kops get cluster -o json`, `jq` and `kops replace -f` to update the cluster, like so
+```
+kops get cluster -o json | jq \
+--arg azs $KOPS_ZONES \
+--arg ids $KOPS_SUBNET_IDS \
+--arg cidrs $KOPS_SUBNET_CIDRS \
+'setpath(
+  ["spec", "subnets"];
+  (reduce (range($azs | split(",") | length)) as $ix (
+    [];
+    [ .[], {
+      id: ($ids | split(",") | .[$ix]),
+      zone: ($azs | split(",") | .[$ix]),
+      name: ($azs | split(",") | .[$ix]),
+      cidr: ($cidrs | split(",") | .[$ix]),
+      type: "Public" }
+    ]
+  )))' > _kops_replace.json         # Generate the replacement file (piping into stdin with `-` did not work :)
+kops replace -f _kops_replace.json  # Replace the existing cluster
+rm _kops_replace.json               # Clean up the generated temporary file
+```
+3. Confirm that the cluster configuration uses the existing VPC and its subnets.
 ```
 make kops-edit-cluster
 ```
-...here is a table of variable names between the `terraform` output and `kops` configuration that should match after editing the `kops` configuration. We only need to consider `cidr_blocks` and `subnet_ids` for manually updating, since `kops-create-cluster` in the `make` file takes both `vpc_id` and `vpc_cidr_block` through the `env` file updated in step `0`.
+...here is a table of variable names between the `terraform` output and `kops` configuration that should match in the `kops` configuration. We only need to consider `cidr_blocks` and `subnet_ids`, since `kops-create-cluster` in the `make` file takes both `vpc_id` and `vpc_cidr_block` through the `env` file updated in part `2`.
 
 |Terraform output|Kops configuration|
 |----------------|------------------|
@@ -85,25 +120,25 @@ make kops-edit-cluster
 
 For example, if we have a `terraform` output like:
 ```
-azs = [
-  us-east-2a,
-  us-east-2b,
-  us-east-2c
-]
 vpc_id = vpc-blah
-vpc_cidr_block = 10.10.0.0/16
-cidr_blocks = [
- 10.10.1.0/24,
- 10.10.2.0/24,
- 10.10.3.0/24
-]
+vpc_cidr = 10.10.0.0/16
 subnet_ids = [
   subnet-blah1,
   subnet-blah2,
   subnet-blah3
 ]
+subnet_azs = [
+  us-east-2a,
+  us-east-2b,
+  us-east-2c
+]
+subnet_cidrs = [
+ 10.10.1.0/24,
+ 10.10.2.0/24,
+ 10.10.3.0/24
+]
 ```
-...then, the final `kops` configuration should be edited to look like:
+...then, the final `kops` configuration should look like:
 ```
 networkCIDR: 10.10.0.0/16
 networkID: vpc-blah
@@ -124,8 +159,7 @@ subnets:
   type: Public
   zone: us-east-2c
 ```
-
-3. Update the `kops` cluster configuration with the edited version
+3. Update the `kops` cluster configuration with the replaced version
 ```
 make kops-update-cluster
 ```
@@ -161,10 +195,14 @@ popd; pushd terraform
 make plan-destroy
 make apply
 ```
-3. Delete stale files in the project directory
+3. Delete stale files using the main Makefile
 ```
-make clean
+popd; make clean
 ```
+-----
+
+Have fun!
+
 
 ## Notes
 

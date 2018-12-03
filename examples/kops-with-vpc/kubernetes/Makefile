@@ -1,20 +1,19 @@
-.PHONY: kops-create-cluster kops-edit-cluster kops-update-cluster \
-	kops-validate-cluster fetch-keys kops-rolling-update
+.PHONY: \
+	kops-create-cluster \
+	kops-edit-cluster \
+	kops-update-cluster \
+	kops-validate-cluster \
+	kops-rolling-update \
+	clean
 
 .DEFAULT_GOAL = help
 
-export PASSWORD_STORE_DIR ?= ${PWD}/../password-store
-
+## Make sure we have the required variable set in the environment
 require-%:
 	@ if [ "${${*}}" = "" ]; then \
 		echo "ERROR: Environment variable not set: \"$*\""; \
 		exit 1; \
 	fi
-
-## Fetch private/public ssh keys from pw store
-fetch-keys: require-ENVIRONMENT require-CLUSTER_NAME
-	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.gpg > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem
-	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.pub.gpg > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem.pub
 
 ## Create cluster with kops. Needs CLUSTER_NAME defined.
 kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID require-VPC_CIDR require-SSH_PUBLIC_KEY require-NODE_COUNT require-NODE_SIZE require-NODE_VOLUME_SIZE require-KUBERNETES_VERSION require-KOPS_MASTER_ZONES require-KOPS_ZONES
@@ -65,10 +64,10 @@ kops-rolling-update: require-ENVIRONMENT require-CLUSTER_NAME
 fetch-kubeconfig: require-ENVIRONMENT require-CLUSTER_NAME
 	@KUBECONFIG=${ENVIRONMENT}/kubeconfig.yaml kops export kubecfg --name ${CLUSTER_NAME} --state s3://${CLUSTER_NAME}
 
-## Fetch private/public ssh keys from pw store
-fetch-keys: require-ENVIRONMENT require-CLUSTER_NAME
-	@pass clusters/${CLUSTER_NAME}/keys/admin.pem > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem
-	@pass clusters/${CLUSTER_NAME}/keys/admin.pem.pub > ${ENVIRONMENT}/${CLUSTER_NAME}-admin.pem.pub
+## Clean up stale files
+clean:
+	@rm ${ENVIRONMENT}/kubeconfig.yaml
+	@rm ${ENVIRONMENT}/*.pem*
 
 ## Show help screen.
 help:
