@@ -16,7 +16,7 @@ require-%:
 	fi
 
 ## Create cluster with kops. Needs CLUSTER_NAME defined.
-kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID require-VPC_CIDR require-SSH_PUBLIC_KEY require-NODE_COUNT require-NODE_SIZE require-NODE_VOLUME_SIZE require-KUBERNETES_VERSION require-KOPS_MASTER_ZONES require-KOPS_ZONES
+kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID require-VPC_CIDR require-SSH_PUBLIC_KEY require-KOPS_NODE_COUNT require-KOPS_NODE_SIZE require-KOPS_NODE_VOLUME_SIZE require-KUBERNETES_VERSION require-KOPS_MASTER_ZONES require-KOPS_ZONES
 	@kops create cluster \
 		--cloud=aws \
 		--kubernetes-version=${KUBERNETES_VERSION} \
@@ -27,12 +27,12 @@ kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID req
 		--master-volume-size=${KOPS_MASTER_VOLUME_SIZE} \
 		--master-zones="${KOPS_MASTER_ZONES}" \
 		--network-cidr=${VPC_CIDR} \
-		--node-count=${NODE_COUNT} \
-		--node-size=${NODE_SIZE} \
+		--node-count=${KOPS_NODE_COUNT} \
+		--node-size=${KOPS_NODE_SIZE} \
 		--ssh-public-key=${ENVIRONMENT}/${SSH_PUBLIC_KEY} \
 		--zones="${KOPS_ZONES}" \
 		--vpc=${VPC_ID} \
-		--node-volume-size=${NODE_VOLUME_SIZE} \
+		--node-volume-size=${KOPS_NODE_VOLUME_SIZE} \
 		--state=s3://${CLUSTER_NAME} \
 		--name=${CLUSTER_NAME}
 
@@ -66,8 +66,8 @@ fetch-kubeconfig: require-ENVIRONMENT require-CLUSTER_NAME
 
 ## Clean up stale files
 clean:
-	@rm ${ENVIRONMENT}/kubeconfig.yaml
-	@rm ${ENVIRONMENT}/*.pem*
+	@rm -f ${ENVIRONMENT}/kubeconfig*
+	@rm -f ${ENVIRONMENT}/*.pem*
 
 ## Show help screen.
 help:

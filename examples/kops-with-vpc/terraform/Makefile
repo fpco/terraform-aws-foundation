@@ -63,7 +63,7 @@ plan-destroy:
 
 ## Clean up [tf.out, terraform backups, .pem files]
 clean:
-	@rm tf.out terraform.*.backup *.pem*
+	@rm -f tf.out terraform.*.backup *.pem*
 
 ## Show help.
 help:

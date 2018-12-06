@@ -1,6 +1,7 @@
 .PHONY: \
 	require-% \
 	copy-keys \
+	copy-vars \
 	copy
 
 .DEFAULT_GOAL = help
@@ -20,13 +21,24 @@ copy-keys:
 copy:
 	@cd terraform; sed -i "/export ${AS}/c\export ${AS}=$$(terraform output ${OUT} | tr -d '\n')" ../kubernetes/${ENVIRONMENT}/env; cd ..;
 
+copy-vars:
+	$(MAKE) -s copy OUT=region AS=REGION
+	$(MAKE) -s copy OUT=vpc_id AS=VPC_ID
+	$(MAKE) -s copy OUT=vpc_cidr AS=VPC_CIDR
+	$(MAKE) -s copy OUT=subnet_ids AS=KOPS_SUBNET_IDS
+	$(MAKE) -s copy OUT=subnet_cidrs AS=KOPS_SUBNET_CIDRS
+	$(MAKE) -s copy OUT=subnet_azs AS=KOPS_ZONES
+	$(MAKE) -s copy OUT=name_prefix AS=ENVIRONMENT
+	$(MAKE) -s copy OUT=kubernetes_cluster_name AS=CLUSTER_NAME
+	$(MAKE) -s copy OUT=kops_state_bucket AS=KOPS_BUCKET
+
 ## Run the clean target in the terraform directory
 clean-terraform:
-	@$(MAKE) -C terraform clean
+	$(MAKE) -s -C terraform clean
 
 ## Run the clean target in the kubernetes directory
 clean-kubernetes:
-	@$(MAKE) -C kubernetes clean
+	$(MAKE) -s -C kubernetes clean
 
 ## Run the clean target on subdirectories
 clean: clean-terraform clean-kubernetes

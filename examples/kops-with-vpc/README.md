@@ -57,16 +57,8 @@ make apply
 ```
 popd
 cp -r kubernetes/template kubernetes/$ENVIRONMENT
-make copy-keys                       # Copy generated .pem files
-make copy OUT=region AS=REGION       # Copy terraform output to kube(kops) environment: `$ENVIRONMENT/env`
-make copy OUT=vpc_id AS=VPC_ID       # Check `make help` for more details
-make copy OUT=vpc_cidr AS=VPC_CIDR
-make copy OUT=subnet_ids AS=KOPS_SUBNET_IDS
-make copy OUT=subnet_cidrs AS=KOPS_SUBNET_CIDRS
-make copy OUT=subnet_azs AS=KOPS_ZONES
-make copy OUT=name_prefix AS=ENVIRONMENT
-make copy OUT=kubernetes_cluster_name AS=CLUSTER_NAME
-make copy OUT=kops_state_bucket AS=KOPS_BUCKET
+make copy-keys       # Copy generated .pem files
+make copy-vars       # Copy terraform output to kube(kops) environment: `$ENVIRONMENT/env`
 ```
 
 ### Part 3: Kubernetes (Kops)

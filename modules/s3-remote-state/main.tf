@@ -32,8 +32,6 @@ variable "force_destroy" {
   default     = false
 }
 
-data "aws_region" "current" {}
-
 resource "aws_s3_bucket" "remote-state" {
   bucket = "${var.bucket_name}"
   acl    = "private"
