@@ -17,29 +17,53 @@ variable "cidr_blocks" {
   type        = "list"
 }
 
-variable "port" {
-  description = "The port to open"
-  type        = "string"
-}
-
-variable "protocol" {
-  description = "The protocol, specify either `tcp` or `udp`"
-  default     = "tcp"
-  type        = "string"
-}
-
 variable "description" {
   description = "Use this string to add a description for the SG rule"
   type        = "string"
 }
 
-# add an ingress rule
-resource "aws_security_group_rule" "ingress" {
+variable "port" {
+  description = "The port to open"
+  type        = "string"
+}
+
+variable "tcp" {
+  description = "true/false to enables the tcp ingress"
+  default     = "true"
+  type        = "string"
+}
+
+variable "udp" {
+  description = "true/false to enables the udp ingress"
+  default     = "false"
+  type        = "string"
+}
+
+locals {
+  tcp = "${var.tcp ? 1 : 0}"
+  udp = "${var.udp ? 1 : 0}"
+}
+
+# ingress rule for tcp, if enabled
+resource "aws_security_group_rule" "tcp-ingress" {
+  count             = "${local.tcp}"
   type              = "ingress"
-  description       = "${var.description}"
+  description       = "${var.description} (tcp)"
   from_port         = "${var.port}"
   to_port           = "${var.port}"
-  protocol          = "${var.protocol}"
+  protocol          = "tcp"
+  cidr_blocks       = ["${var.cidr_blocks}"]
+  security_group_id = "${var.security_group_id}"
+}
+
+# ingress rule for udp, if enabled
+resource "aws_security_group_rule" "udp-ingress" {
+  count             = "${local.udp}"
+  type              = "ingress"
+  description       = "${var.description} (udp)"
+  from_port         = "${var.port}"
+  to_port           = "${var.port}"
+  protocol          = "udp"
   cidr_blocks       = ["${var.cidr_blocks}"]
   security_group_id = "${var.security_group_id}"
 }
