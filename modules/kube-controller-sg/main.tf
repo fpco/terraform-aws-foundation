@@ -8,7 +8,6 @@ module "kube-controller-sg" {
 module "api-rule" {
   source            = "../single-port-sg"
   port              = "${var.api_port}"
-  protocol          = "tcp"
   description       = "Allow access to the kuberenets api"
   cidr_blocks       = ["${var.cidr_blocks_api}"]
   security_group_id = "${module.kube-controller-sg.id}"
