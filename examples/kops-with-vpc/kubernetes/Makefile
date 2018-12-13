@@ -1,6 +1,7 @@
 .PHONY: \
 	kops-create-cluster \
 	kops-edit-cluster \
+	kops-replace-subnets \
 	kops-update-cluster \
 	kops-validate-cluster \
 	kops-rolling-update \
@@ -35,6 +36,14 @@ kops-create-cluster: require-ENVIRONMENT require-CLUSTER_NAME require-VPC_ID req
 		--node-volume-size=${KOPS_NODE_VOLUME_SIZE} \
 		--state=s3://${CLUSTER_NAME} \
 		--name=${CLUSTER_NAME}
+
+## Replace subnets in cluster with ones in ENV
+kops-replace-subnets: require-KOPS_ZONES require-KOPS_SUBNET_IDS require-KOPS_SUBNET_CIDRS
+	@kops get cluster -o json | jq \
+		--arg azs $$KOPS_ZONES \
+		--arg ids $$KOPS_SUBNET_IDS \
+		--arg cidrs $$KOPS_SUBNET_CIDRS \
+		'setpath(["spec", "subnets"]; (reduce (range($$azs | split(",") | length)) as $$ix ([]; [ .[], {id: ($$ids | split(",") | .[$$ix]), zone: ($$azs | split(",") | .[$$ix]), name: ($$azs | split(",") | .[$$ix]), cidr: ($$cidrs | split(",") | .[$$ix]), type: "Public" }])))' | kops replace -f -
 
 ## Edit cluster info. Opens in default editor.
 kops-edit-cluster: require-ENVIRONMENT require-CLUSTER_NAME

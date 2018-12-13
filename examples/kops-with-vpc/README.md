@@ -76,26 +76,9 @@ source test/env
 ```
 make kops-create-cluster
 ```
-2. Use `kops get cluster -o json`, `jq` and `kops replace -f` to update the cluster, like so
+2. Replace the subnets in the cluster configuration with the ones in the environment, made with Terraform
 ```
-kops get cluster -o json | jq \
---arg azs $KOPS_ZONES \
---arg ids $KOPS_SUBNET_IDS \
---arg cidrs $KOPS_SUBNET_CIDRS \
-'setpath(
-  ["spec", "subnets"];
-  (reduce (range($azs | split(",") | length)) as $ix (
-    [];
-    [ .[], {
-      id: ($ids | split(",") | .[$ix]),
-      zone: ($azs | split(",") | .[$ix]),
-      name: ($azs | split(",") | .[$ix]),
-      cidr: ($cidrs | split(",") | .[$ix]),
-      type: "Public" }
-    ]
-  )))' > _kops_replace.json         # Generate the replacement file (piping into stdin with `-` did not work :)
-kops replace -f _kops_replace.json  # Replace the existing cluster
-rm _kops_replace.json               # Clean up the generated temporary file
+make kops-replace-subnets
 ```
 3. Confirm that the cluster configuration uses the existing VPC and its subnets.
 ```
