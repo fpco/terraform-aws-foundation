@@ -1,0 +1,30 @@
+export ENVIRONMENT=<<<SETME>>>
+
+export CLUSTER_NAME=<<<SETME>>>like:$ENVIRONMENT.kops-vpc.dev-sandbox.fpcomplete.com
+
+export REGION=<<<SETME>>>
+
+export VPC_ID=<<<SETME>>>
+export VPC_CIDR=<<<SETME>>>
+
+export KOPS_BUCKET=<<<SETME>>>
+export KOPS_STATE_STORE=s3://"$KOPS_BUCKET"
+
+export KOPS_ZONES=<<<SETME>>>
+export KOPS_MASTER_ZONES="$REGION"a
+
+export KOPS_SUBNET_IDS=<<<SETME>>>
+export KOPS_SUBNET_CIDRS=<<<SETME>>>
+
+export KOPS_MASTER_COUNT=1
+export KOPS_MASTER_SIZE=t2.small
+export KOPS_MASTER_VOLUME_SIZE=30
+
+export KOPS_NODE_COUNT=2
+export KOPS_NODE_SIZE=t2.micro
+export KOPS_NODE_VOLUME_SIZE=30
+
+export SSH_PUBLIC_KEY=$CLUSTER_NAME-admin.pem.pub
+
+export KUBECONFIG=$HOME/.kube/$ENVIRONMENT.kops-vpc.yaml
+export KUBERNETES_VERSION=1.8.15

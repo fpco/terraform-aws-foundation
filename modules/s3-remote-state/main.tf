@@ -27,12 +27,16 @@ variable "region" {
   type        = "string"
 }
 
-data "aws_region" "current" {}
+variable "force_destroy" {
+  description = "Whether to allow a forceful destruction of this bucket"
+  default     = false
+}
 
 resource "aws_s3_bucket" "remote-state" {
   bucket = "${var.bucket_name}"
   acl    = "private"
-  region = "${var.region == "" ? data.aws_region.current.name : var.region}"
+  region = "${var.region}"
+  force_destroy = "${var.force_destroy}"
 
   versioning {
     enabled = "${var.versioning}"
