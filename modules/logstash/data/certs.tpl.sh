@@ -5,7 +5,7 @@ set -xe
 LOGSTASH_CLIENT_NAME="logstash-client"
 
 if [ -z "${depot_path}" ]; then
-  DEPOT_PATH=$$(mktemp -d)
+  DEPOT_PATH=$(mktemp -d)
 else
   DEPOT_PATH="${depot_path}"
 fi
