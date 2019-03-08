@@ -1,18 +1,22 @@
 variable "count" {
  default = 1
- }
+}
+
 variable "region" {
  description = "AWS region for hosting our your network"
  default = "ap-south-1"
 }
-variable "public_key_path" {
- description = "Enter the path to the SSH Public Key to add to AWS."
- default = "/path_to_keyfile/keypair_name.pem"
+
+variable "ssh_pubkey" {
+  description = "File path to SSH public key"
+  default     = "./id_rsa.pub"
 }
-variable "key_name" {
- description = "Key name for SSHing into EC2"
- default = "kaypair_name"
+
+variable "ssh_key" {
+  description = "File path to SSH private key"
+  default     = "./id_rsa"
 }
+
 variable "amis" {
  description = "Base AMI to launch the instances"
  default = {
