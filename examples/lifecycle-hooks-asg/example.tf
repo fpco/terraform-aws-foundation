@@ -4,15 +4,32 @@ provider "aws" {
 
 data "aws_availability_zones" "all" {}
 
+resource "aws_key_pair" "sibi_fpco_key" {
+  key_name   = "sibi_asg_key"
+  public_key = "${file("id_rsa.pub")}"
+}
+
 # Creating EC2 instance
 resource "aws_instance" "web" {
   ami                    = "ami-2757f631"
   count                  = "${var.count}"
   instance_type          = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.instance.id}"]
-
+  key_name               = "${aws_key_pair.sibi_fpco_key.key_name}"
   tags {
     Name = "hello-world-web"
+  }
+}
+
+# Creating an Monitor EC2 instance
+resource "aws_instance" "monitor" {
+  ami                    = "ami-2757f631"
+  count                  = "${var.count}"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = ["${aws_security_group.instance.id}"]
+  key_name               = "${aws_key_pair.sibi_fpco_key.key_name}"
+  tags {
+    Name = "monitor-ec2"
   }
 }
 
@@ -33,11 +50,6 @@ resource "aws_security_group" "instance" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_key_pair" "sibi_fpco_key" {
-  key_name   = "sibi_asg_key"
-  public_key = "${file("id_rsa.pub")}"
 }
 
 ## Creating Launch Configuration
