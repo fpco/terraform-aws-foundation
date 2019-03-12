@@ -1,5 +1,9 @@
 #cloud-config
 write_files:
+  - path: "/index.html"
+    permissions: "0644"
+    owner: "root"
+    content: "hello world"
   - path: "/etc/systemd/system/lifecycled.service"
     permissions: "0644"
     owner: "root"
@@ -16,7 +20,7 @@ write_files:
       TimeoutStopSec=5m
 
       Environment="AWS_REGION=${region}"
-      ExecStart=/usr/local/bin/lifecycled --spot --sns-topic=${lifecycle_topic} --cloudwatch-group=${log_group_name} --handler=/usr/local/scripts/lifecycle-handler.sh --json --debug
+      ExecStart=/usr/local/bin/lifecycled --sns-topic=${lifecycle_topic} --cloudwatch-group=${log_group_name} --handler=/usr/local/scripts/lifecycle-handler.sh --json --debug
 
       [Install]
       WantedBy=multi-user.target
@@ -39,3 +43,7 @@ runcmd:
     echo "lifecycled ${artifact_etag} installed"
   - |
     systemctl enable lifecycled.service --now
+  - |
+    wget https://www.busybox.net/downloads/binaries/1.28.1-defconfig-multiarch/busybox-x86_64
+    chmod +x busybox-x86_64
+    nohup ./busybox-x86_64 httpd -f -p 3000 &
