@@ -1,4 +1,4 @@
-# Example to test the VPC Scenario 1 Module
+# Example to test basic ASG integration with lifecycle hooks
 
 ## Environment creation and deployment
 
@@ -28,6 +28,16 @@ SSH into the machine with the command:
 ssh -i id_rsa ubuntu@<vpc-ip-address>
 ```
 
+You can see in the machine that `lifecycled` daemon would be
+running. You can check the status of the service using
+
+```
+systemctl status lifecycled.service
+```
+
+You can also see that the logs from the lifecycled would be continously
+pushed to the Amazon's CloudWatch logs.
+
 ## Destruction
 
 To destroy the test environment run the following commands:
@@ -38,5 +48,5 @@ make clean
 ```
 
 ## Notes
-- This example was last tested with `Terraform v0.11.6`
+- This example was last tested with `Terraform v0.11.11`
 - This example assumes AWS credentials setup with access to the **us-east-2** region.
