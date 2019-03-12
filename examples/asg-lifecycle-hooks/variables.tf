@@ -5,7 +5,7 @@ variable "extra_tags" {
 
 variable "name_prefix" {
   description = "Prefix used for resource names."
-  default = "asg-lc"
+  default     = "asg-lc"
 }
 
 variable "name" {
@@ -36,6 +36,10 @@ variable "ssh_key" {
 variable "public_subnet_cidrs" {
   default     = ["10.23.11.0/24", "10.23.12.0/24", "10.23.13.0/24"]
   description = "A list of public subnet CIDRs to deploy inside the VPC"
+}
+
+variable "lifecycled_binary_path" {
+  description = "Path to lifecycled binary"
 }
 
 variable "tags" {
