@@ -42,7 +42,7 @@ resource "aws_launch_configuration" "main" {
   instance_type        = "${var.instance_type}"
   key_name             = "${var.instance_key}"
   iam_instance_profile = "${aws_iam_instance_profile.ec2.name}"
-  security_groups      = ["${aws_security_group.main.id}"]
+  security_groups      = ["${aws_security_group.main.id}", "${var.elb_sg_id}"]
 
   user_data = "${data.template_file.main.rendered}"
 
@@ -54,21 +54,23 @@ resource "aws_launch_configuration" "main" {
 resource "aws_autoscaling_group" "main" {
   name                 = "${var.name_prefix}-${aws_launch_configuration.main.name}"
   launch_configuration = "${aws_launch_configuration.main.id}"
+  availability_zones   = ["${var.azs}"]
+  load_balancers       = ["${var.elb_names}"]
   vpc_zone_identifier  = ["${var.subnet_ids}"]
 
-  min_size         = "0"
+  min_size         = "1"
   desired_capacity = "${var.instance_count}"
-  max_size         = "1"
+  max_size         = "4"
 
   lifecycle {
     create_before_destroy = true
   }
 
   initial_lifecycle_hook {
-    name                 = "${var.name_prefix}-lifecycle"
-    default_result       = "CONTINUE"
-    heartbeat_timeout    = 60
-    lifecycle_transition = "autoscaling:EC2_INSTANCE_TERMINATING"
+    name                    = "${var.name_prefix}-lifecycle"
+    default_result          = "CONTINUE"
+    heartbeat_timeout       = 60
+    lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
     notification_target_arn = "${aws_sns_topic.main.arn}"
     role_arn                = "${aws_iam_role.lifecycle_hook.arn}"
   }
