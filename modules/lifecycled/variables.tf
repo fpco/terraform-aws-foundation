@@ -7,7 +7,6 @@ variable "name_prefix" {
 
 variable "binary_path" {
   description = "Path to a linux binary of lifecycled which will be installed on the instance."
-  default     = "../lifecycled-linux-amd64"
 }
 
 variable "instance_key" {
@@ -19,8 +18,23 @@ variable "vpc_id" {
   description = "ID of the VPC for the subnets."
 }
 
+variable "elb_sg_id" {
+  description = "ID of the VPC for the subnets."
+}
+
 variable "subnet_ids" {
   description = "IDs of subnets where the instances will be provisioned."
+  type        = "list"
+}
+
+variable "elb_names" {
+  default     = []
+  description = "list of load balancers to associate with the ASG (by name)"
+  type        = "list"
+}
+
+variable "azs" {
+  description = "list of availability zones to associate with the ASG"
   type        = "list"
 }
 
