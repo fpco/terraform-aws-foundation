@@ -1,5 +1,5 @@
 /**
- * ## Example to test the VPC Scenario 1 Module
+ * ## Example to demonstrate basic ASG integration with lifecycle hooks
  */
 provider "aws" {
   region = "${var.region}"
