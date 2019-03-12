@@ -1,7 +1,5 @@
 /**
  * ## Example to test the VPC Scenario 1 Module
- *
- *
  */
 provider "aws" {
   region = "${var.region}"
@@ -23,9 +21,30 @@ module "vpc" {
   public_subnet_cidrs = ["${var.public_subnet_cidrs}"]
 }
 
-module "ubuntu-xenial-ami" {
-  source  = "../../modules/ami-ubuntu"
-  release = "14.04"
+# Use the latest Amazon Linux 2 AMI
+data "aws_ami" "linux2" {
+  owners      = ["amazon"]
+  most_recent = true
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami*gp2"]
+  }
 }
 
 resource "aws_key_pair" "main" {
@@ -101,25 +120,25 @@ resource "aws_elb" "web" {
   subnets = ["${module.vpc.public_subnet_ids}"]
 }
 
-module "web" {
-  source        = "../../modules/asg"
-  ami           = "${module.ubuntu-xenial-ami.id}"
-  azs           = "${local.azs}"
-  name_prefix   = "${var.name}-web"
-  elb_names     = ["${aws_elb.web.name}"]
-  instance_type = "t2.nano"
-  max_nodes     = "${length(module.vpc.public_subnet_ids)}"
-  min_nodes     = "${length(module.vpc.public_subnet_ids)}"
-  public_ip     = false
-  key_name      = "${aws_key_pair.main.key_name}"
-  subnet_ids    = ["${module.vpc.public_subnet_ids}"]
+module "lifecycle-eg" {
+  source         = "../../modules/lifecycled"
+  azs            = "${local.azs}"
+  elb_names      = ["${aws_elb.web.name}"]
+  name_prefix    = "lifecycled-eg"
+  vpc_id         = "${module.vpc.vpc_id}"
+  subnet_ids     = ["${module.vpc.public_subnet_ids}"]
+  elb_sg_id      = "${module.elb-sg.id}"
+  instance_ami   = "${data.aws_ami.linux2.id}"
+  instance_count = "2"
+  instance_type  = "t2.nano"
+  instance_key   = "${aws_key_pair.main.key_name}"
 
-  security_group_ids = ["${module.elb-sg.id}"]
+  binary_path = "/home/sibi/github/lifecycled/build/lifecycled-linux-amd64"
 
-  root_volume_type = "gp2"
-  root_volume_size = "8"
-
-  user_data = "${file("template/user_data.sh")}"
+  tags = {
+    environment = "dev"
+    terraform   = "True"
+  }
 }
 
 locals {
