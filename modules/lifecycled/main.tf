@@ -12,7 +12,6 @@ data "template_file" "main" {
   vars {
     region          = "${data.aws_region.current.name}"
     stack_name      = "${var.name_prefix}-asg"
-    log_group_name  = "${aws_cloudwatch_log_group.main.name}"
     lifecycle_topic = "${aws_sns_topic.main.arn}"
   }
 }
@@ -81,26 +80,8 @@ resource "aws_security_group_rule" "ssh_ingress" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-# Create log group where we can write the daemon logs.
-resource "aws_cloudwatch_log_group" "main" {
-  name = "${var.name_prefix}-daemon"
-}
-
 # Instance profile for the autoscaling group.
 data "aws_iam_policy_document" "permissions" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-
-    resources = [
-      "${aws_cloudwatch_log_group.main.arn}",
-    ]
-  }
-
   statement {
     effect = "Allow"
 
