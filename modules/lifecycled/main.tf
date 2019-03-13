@@ -5,22 +5,6 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-# Create an S3 bucket for uploading the artifact (pre-prefixed with the account ID to avoid conflicting bucket names)
-resource "aws_s3_bucket" "artifact" {
-  bucket = "${data.aws_caller_identity.current.account_id}-${var.name_prefix}-artifact"
-  acl    = "private"
-
-  tags = "${merge(var.tags, map("Name", "${data.aws_caller_identity.current.account_id}-${var.name_prefix}-artifact"))}"
-}
-
-# Upload the lifecycled artifact
-resource "aws_s3_bucket_object" "artifact" {
-  bucket = "${aws_s3_bucket.artifact.id}"
-  key    = "lifecycled-linux-amd64"
-  source = "${var.binary_path}"
-  etag   = "${md5(file("${var.binary_path}"))}"
-}
-
 # Cloud init script for the autoscaling group
 data "template_file" "main" {
   template = "${file("${path.module}/cloud-config.yml")}"
@@ -30,9 +14,6 @@ data "template_file" "main" {
     stack_name      = "${var.name_prefix}-asg"
     log_group_name  = "${aws_cloudwatch_log_group.main.name}"
     lifecycle_topic = "${aws_sns_topic.main.arn}"
-    artifact_bucket = "${aws_s3_bucket.artifact.id}"
-    artifact_key    = "${aws_s3_bucket_object.artifact.id}"
-    artifact_etag   = "${aws_s3_bucket_object.artifact.etag}"
   }
 }
 
@@ -153,19 +134,6 @@ data "aws_iam_policy_document" "permissions" {
     ]
 
     resources = ["arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lifecycled-*"]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "s3:*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.artifact.arn}/*",
-      "${aws_s3_bucket.artifact.arn}",
-    ]
   }
 
   statement {
