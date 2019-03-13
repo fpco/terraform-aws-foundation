@@ -133,8 +133,6 @@ module "lifecycle-eg" {
   instance_type  = "t2.nano"
   instance_key   = "${aws_key_pair.main.key_name}"
 
-  binary_path = "${var.lifecycled_binary_path}"
-
   tags = {
     environment = "dev"
     terraform   = "True"

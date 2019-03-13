@@ -5,10 +5,6 @@ variable "name_prefix" {
   description = "Prefix used for resource names."
 }
 
-variable "binary_path" {
-  description = "Path to a linux binary of lifecycled which will be installed on the instance."
-}
-
 variable "instance_key" {
   description = "Name of an EC2 key pair which will be allowed to SSH to the instance."
   default     = ""

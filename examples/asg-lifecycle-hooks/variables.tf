@@ -38,10 +38,6 @@ variable "public_subnet_cidrs" {
   description = "A list of public subnet CIDRs to deploy inside the VPC"
 }
 
-variable "lifecycled_binary_path" {
-  description = "Path to lifecycled binary"
-}
-
 variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
   type        = "map"
