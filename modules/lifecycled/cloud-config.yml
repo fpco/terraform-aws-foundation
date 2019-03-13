@@ -37,10 +37,11 @@ write_files:
       echo "goodbye from the handler"
 runcmd:
   - |
-    aws s3 cp s3://${artifact_bucket}/${artifact_key} /usr/local/bin/lifecycled
+    wget https://github.com/buildkite/lifecycled/releases/download/v3.0.2/lifecycled-linux-amd64
+    cp ./lifecycled-linux-amd64 /usr/local/bin/lifecycled
     chmod +x /usr/local/bin/lifecycled
     chown root:root /usr/local/bin/lifecycled
-    echo "lifecycled ${artifact_etag} installed"
+    echo "lifecycled installed"
   - |
     systemctl enable lifecycled.service --now
   - |
