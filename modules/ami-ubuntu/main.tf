@@ -54,6 +54,7 @@ variable "most_recent" {
 
 variable "name_map" {
   default = {
+    "18.04" = "bionic"
     "17.10" = "artful"
     "17.04" = "zesty"
     "16.04" = "xenial"
