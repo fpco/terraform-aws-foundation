@@ -20,7 +20,7 @@ write_files:
       TimeoutStopSec=5m
 
       Environment="AWS_REGION=${region}"
-      ExecStart=/usr/local/bin/lifecycled --sns-topic=${lifecycle_topic} --cloudwatch-group=${log_group_name} --handler=/usr/local/scripts/lifecycle-handler.sh --json --debug
+      ExecStart=/usr/local/bin/lifecycled --no-spot --sns-topic=${lifecycle_topic} --handler=/usr/local/scripts/lifecycle-handler.sh --json
 
       [Install]
       WantedBy=multi-user.target
