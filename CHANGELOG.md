@@ -1,3 +1,17 @@
+# v0.8.2 (Unreleased)
+
+### Summary
+
+* Minor updates
+
+### Modules
+
+* `ami-ubuntu`: Add `bionic` (`18.04`) to the list of LTS AMIs
+
+### Examples
+
+N/A.
+
 # v0.8.1
 
 ### Summary
