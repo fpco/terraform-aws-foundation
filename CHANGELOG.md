@@ -1,3 +1,18 @@
+# v0.8.1
+
+### Summary
+
+* Two minor updates
+
+### Modules
+
+* `credstash-grant`: add support for the AWS_PROFILE envvar
+
+### Examples
+
+* `gitlab-ha`: Update `Makefile` to respect the user's preferred shell when
+  spawing an interactive shell.
+
 # v0.8.0
 
 ### Summary
