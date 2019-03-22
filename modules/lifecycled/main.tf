@@ -138,7 +138,7 @@ data "aws_iam_policy_document" "permissions" {
       "ec2:DescribeInstances"
     ]
 
-    resources = ["*"]
+    resources = ["${var.elb_arn}"]
   }
 }
 
