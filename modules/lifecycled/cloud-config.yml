@@ -33,7 +33,7 @@ write_files:
       set -euo pipefail
 
       EC2_INSTANCE_ID="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`"
-      aws elb deregister-instances-from-load-balancer --load-balancer-name ${elb_arn} --instances $EC2_INSTANCE_ID --region ${region}
+      aws elb deregister-instances-from-load-balancer --load-balancer-name ${elb_name} --instances $EC2_INSTANCE_ID --region ${region}
       echo "hello from the handler"
       wget http://18.222.32.132:3000
       sleep 120
