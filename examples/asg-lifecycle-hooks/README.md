@@ -25,7 +25,7 @@ Get the public IP address of the newly created ec2 web instance with the AWS con
 SSH into the machine with the command:
 
 ```
-ssh -i id_rsa ubuntu@<vpc-ip-address>
+ssh -i id_rsa ec2-user@<ec2-ip-address>
 ```
 
 You can see in the machine that `lifecycled` daemon would be
@@ -35,8 +35,27 @@ running. You can check the status of the service using
 systemctl status lifecycled.service
 ```
 
-You can also see that the logs from the lifecycled would be continously
-pushed to the Amazon's CloudWatch logs.
+
+## Test the Notification
+
+To generate a notification for a launch event, update the Auto Scaling group by increasing the desired capacity of the Auto Scaling group by 1. You receive a notification within a few minutes after instance launch.
+
+To change the desired capacity using the console
+
+    Open the Amazon EC2 console at https://console.aws.amazon.com/ec2/.
+
+    On the navigation pane, under Auto Scaling, choose Auto Scaling Groups.
+
+    Select your Auto Scaling group.
+
+    On the Details tab, choose Edit.
+
+    For Desired, decrease the current value by 1.
+
+    Choose Save.
+
+    After a few minutes, you'll see that the lifecycle-handler.sh script will be executed and it's side effect operation will be performed.
+
 
 ## Destruction
 
