@@ -18,6 +18,10 @@ variable "elb_sg_id" {
   description = "ID of the VPC for the subnets."
 }
 
+variable "elb_arn" {
+  description = "ARN for the elb"
+}
+
 variable "subnet_ids" {
   description = "IDs of subnets where the instances will be provisioned."
   type        = "list"

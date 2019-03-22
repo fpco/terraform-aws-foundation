@@ -28,11 +28,14 @@ write_files:
     permissions: "0744"
     owner: "root"
     content: |
-      #! /usr/bin/bash
+     #! /usr/bin/bash
 
       set -euo pipefail
 
+      EC2_INSTANCE_ID="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`"
+      aws elb deregister-instances-from-load-balancer --load-balancer-name ${elb_arn} --instances $EC2_INSTANCE_ID --region ${region}
       echo "hello from the handler"
+      wget http://18.222.32.132:3000
       sleep 120
       echo "goodbye from the handler"
 runcmd:
@@ -48,3 +51,4 @@ runcmd:
     wget https://www.busybox.net/downloads/binaries/1.28.1-defconfig-multiarch/busybox-x86_64
     chmod +x busybox-x86_64
     nohup ./busybox-x86_64 httpd -f -p 3000 &
+    wget http://18.222.32.132:3000

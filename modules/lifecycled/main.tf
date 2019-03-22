@@ -13,6 +13,7 @@ data "template_file" "main" {
     region          = "${data.aws_region.current.name}"
     stack_name      = "${var.name_prefix}-asg"
     lifecycle_topic = "${aws_sns_topic.main.arn}"
+    elb_arn         = "${var.elb_arn}"
   }
 }
 
@@ -123,6 +124,18 @@ data "aws_iam_policy_document" "permissions" {
     actions = [
       "autoscaling:RecordLifecycleActionHeartbeat",
       "autoscaling:CompleteLifecycleAction",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+      "ec2:DescribeClassicLinkInstances",
+      "ec2:DescribeInstances"
     ]
 
     resources = ["*"]

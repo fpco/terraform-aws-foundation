@@ -124,6 +124,7 @@ module "lifecycle-eg" {
   source         = "../../modules/lifecycled"
   azs            = "${local.azs}"
   elb_names      = ["${aws_elb.web.name}"]
+  elb_arn        = "${aws_elb.web.arn}"
   name_prefix    = "lifecycled-eg"
   vpc_id         = "${module.vpc.vpc_id}"
   subnet_ids     = ["${module.vpc.public_subnet_ids}"]
