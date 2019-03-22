@@ -13,7 +13,7 @@ data "template_file" "main" {
     region          = "${data.aws_region.current.name}"
     stack_name      = "${var.name_prefix}-asg"
     lifecycle_topic = "${aws_sns_topic.main.arn}"
-    elb_arn         = "${var.elb_arn}"
+    elb_name         = "${var.elb_names[0]}"
   }
 }
 
