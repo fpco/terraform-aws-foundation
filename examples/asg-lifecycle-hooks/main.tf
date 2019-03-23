@@ -7,6 +7,20 @@ provider "aws" {
 
 data "aws_availability_zones" "available" {}
 
+data "aws_region" "current" {}
+
+# Cloud init script for the autoscaling group
+data "template_file" "main" {
+  template = "${file("${path.module}/cloud-config.yml")}"
+
+  vars {
+    region          = "${data.aws_region.current.name}"
+    stack_name      = "${var.lifecycle_name_prefix}-asg"
+    lifecycle_topic = "${aws_sns_topic.main.arn}"
+    elb_name        = "${aws_elb.web.name}"
+  }
+}
+
 module "vpc" {
   source      = "../../modules/vpc-scenario-1"
   name_prefix = "${var.name}"
@@ -120,12 +134,17 @@ resource "aws_elb" "web" {
   subnets = ["${module.vpc.public_subnet_ids}"]
 }
 
+# SNS topic for the lifecycle hook
+resource "aws_sns_topic" "main" {
+  name = "${var.name_prefix}-lifecycle"
+}
+
 module "lifecycle-eg" {
   source         = "../../modules/lifecycled"
   azs            = "${local.azs}"
   elb_names      = ["${aws_elb.web.name}"]
   elb_arn        = "${aws_elb.web.arn}"
-  name_prefix    = "lifecycled-eg"
+  name_prefix    = "${var.lifecycle_name_prefix}"
   vpc_id         = "${module.vpc.vpc_id}"
   subnet_ids     = ["${module.vpc.public_subnet_ids}"]
   elb_sg_id      = "${module.elb-sg.id}"
@@ -133,6 +152,8 @@ module "lifecycle-eg" {
   instance_count = "2"
   instance_type  = "t2.nano"
   instance_key   = "${aws_key_pair.main.key_name}"
+  asg_template_file = "${data.template_file.main.rendered}"
+  sns_topic_arn = "${aws_sns_topic.main.arn}"
 
   tags = {
     environment = "dev"

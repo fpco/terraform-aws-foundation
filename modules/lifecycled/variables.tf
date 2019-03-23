@@ -10,6 +10,15 @@ variable "instance_key" {
   default     = ""
 }
 
+variable "asg_template_file" {
+  description = "Cloud init script for the autoscaling group"
+}
+
+variable "sns_topic_arn" {
+  description = "ARN for the SNS topic"
+}
+
+
 variable "vpc_id" {
   description = "ID of the VPC for the subnets."
 }

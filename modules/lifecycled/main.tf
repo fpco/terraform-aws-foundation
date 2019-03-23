@@ -5,18 +5,6 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-# Cloud init script for the autoscaling group
-data "template_file" "main" {
-  template = "${file("${path.module}/cloud-config.yml")}"
-
-  vars {
-    region          = "${data.aws_region.current.name}"
-    stack_name      = "${var.name_prefix}-asg"
-    lifecycle_topic = "${aws_sns_topic.main.arn}"
-    elb_name         = "${var.elb_names[0]}"
-  }
-}
-
 resource "aws_launch_configuration" "main" {
   name_prefix          = "${var.name_prefix}"
   image_id             = "${var.instance_ami}"
@@ -25,7 +13,7 @@ resource "aws_launch_configuration" "main" {
   iam_instance_profile = "${aws_iam_instance_profile.ec2.name}"
   security_groups      = ["${aws_security_group.main.id}", "${var.elb_sg_id}"]
 
-  user_data = "${data.template_file.main.rendered}"
+  user_data = "${var.asg_template_file}"
 
   lifecycle {
     create_before_destroy = true
@@ -52,7 +40,7 @@ resource "aws_autoscaling_group" "main" {
     default_result          = "CONTINUE"
     heartbeat_timeout       = 60
     lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
-    notification_target_arn = "${aws_sns_topic.main.arn}"
+    notification_target_arn = "${var.sns_topic_arn}"
     role_arn                = "${aws_iam_role.lifecycle_hook.arn}"
   }
 }
@@ -104,7 +92,7 @@ data "aws_iam_policy_document" "permissions" {
     ]
 
     resources = [
-      "${aws_sns_topic.main.arn}",
+      "${var.sns_topic_arn}",
     ]
   }
 
@@ -170,11 +158,6 @@ data "aws_iam_policy_document" "ec2_assume" {
   }
 }
 
-# SNS topic for the lifecycle hook
-resource "aws_sns_topic" "main" {
-  name = "${var.name_prefix}-lifecycle"
-}
-
 # Execution role and policies for the lifecycle hook
 resource "aws_iam_role" "lifecycle_hook" {
   name               = "${var.name_prefix}-lifecycle-role"
@@ -204,7 +187,7 @@ data "aws_iam_policy_document" "asg_permissions" {
     effect = "Allow"
 
     resources = [
-      "${aws_sns_topic.main.arn}",
+      "${var.sns_topic_arn}",
     ]
 
     actions = [
