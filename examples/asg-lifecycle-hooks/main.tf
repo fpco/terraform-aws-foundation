@@ -9,6 +9,8 @@ data "aws_availability_zones" "available" {}
 
 data "aws_region" "current" {}
 
+data "aws_caller_identity" "current" {}
+
 # Cloud init script for the autoscaling group
 data "template_file" "main" {
   template = "${file("${path.module}/cloud-config.yml")}"
@@ -139,25 +141,173 @@ resource "aws_sns_topic" "main" {
   name = "${var.name_prefix}-lifecycle"
 }
 
-module "lifecycle-eg" {
-  source         = "../../modules/lifecycled"
+module "asg-lifecycle" {
+  source = "../../modules/asg-lifecycle"
+  name_prefix    = "${var.lifecycle_name_prefix}"
   azs            = "${local.azs}"
   elb_names      = ["${aws_elb.web.name}"]
-  elb_arn        = "${aws_elb.web.arn}"
-  name_prefix    = "${var.lifecycle_name_prefix}"
-  vpc_id         = "${module.vpc.vpc_id}"
   subnet_ids     = ["${module.vpc.public_subnet_ids}"]
-  elb_sg_id      = "${module.elb-sg.id}"
-  instance_ami   = "${data.aws_ami.linux2.id}"
   instance_count = "2"
+  instance_ami   = "${data.aws_ami.linux2.id}"
   instance_type  = "t2.nano"
   instance_key   = "${aws_key_pair.main.key_name}"
+  elb_sg_id      = "${module.elb-sg.id}"
   asg_template_file = "${data.template_file.main.rendered}"
   sns_topic_arn = "${aws_sns_topic.main.arn}"
+  vpc_id         = "${module.vpc.vpc_id}"
+  elb_arn        = "${aws_elb.web.arn}"
+  aws_role_arn = "${aws_iam_role.lifecycle_hook.arn}"
+  aws_instance_ec2_name = "${aws_iam_instance_profile.ec2.name}"
+  aws_sg_id = "${aws_security_group.main.id}"
+}
 
-  tags = {
-    environment = "dev"
-    terraform   = "True"
+resource "aws_security_group" "main" {
+  name        = "${var.lifecycle_name_prefix}-sg"
+  description = "Allow access to lifecycled instances"
+  vpc_id      = "${module.vpc.vpc_id}"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Allow SSH ingress if a EC2 key pair is specified.
+resource "aws_security_group_rule" "ssh_ingress" {
+  security_group_id = "${aws_security_group.main.id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+# Instance profile for the autoscaling group.
+data "aws_iam_policy_document" "permissions" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:DescribeLogStreams",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sns:Subscribe",
+      "sns:Unsubscribe",
+    ]
+
+    resources = [
+      "${aws_sns_topic.main.arn}"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sqs:*",
+    ]
+
+    resources = ["arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lifecycled-*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:RecordLifecycleActionHeartbeat",
+      "autoscaling:CompleteLifecycleAction",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+      "ec2:DescribeClassicLinkInstances",
+      "ec2:DescribeInstances"
+    ]
+
+    resources = ["${aws_elb.web.arn}"]
+  }
+}
+
+resource "aws_iam_instance_profile" "ec2" {
+  name = "${var.lifecycle_name_prefix}-ec2-instance-profile"
+  role = "${aws_iam_role.ec2.name}"
+}
+
+resource "aws_iam_role" "ec2" {
+  name               = "${var.lifecycle_name_prefix}-ec2-role"
+  assume_role_policy = "${data.aws_iam_policy_document.ec2_assume.json}"
+}
+
+resource "aws_iam_role_policy" "ec2" {
+  name   = "${var.name_prefix}-ec2-permissions"
+  role   = "${aws_iam_role.ec2.id}"
+  policy = "${data.aws_iam_policy_document.permissions.json}"
+}
+
+data "aws_iam_policy_document" "ec2_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+# Execution role and policies for the lifecycle hook
+resource "aws_iam_role" "lifecycle_hook" {
+  name               = "${var.lifecycle_name_prefix}-lifecycle-role"
+  assume_role_policy = "${data.aws_iam_policy_document.asg_assume.json}"
+}
+
+resource "aws_iam_role_policy" "lifecycle_hook" {
+  name   = "${var.lifecycle_name_prefix}-lifecycle-asg-permissions"
+  role   = "${aws_iam_role.lifecycle_hook.id}"
+  policy = "${data.aws_iam_policy_document.asg_permissions.json}"
+}
+
+data "aws_iam_policy_document" "asg_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["autoscaling.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "asg_permissions" {
+  statement {
+    effect = "Allow"
+
+    resources = [
+      "${aws_sns_topic.main.arn}",
+    ]
+
+    actions = [
+      "sns:Publish",
+    ]
   }
 }
 
