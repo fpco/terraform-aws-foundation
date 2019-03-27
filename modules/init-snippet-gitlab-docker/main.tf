@@ -83,6 +83,14 @@ variable "backup_bucket" {
   description = "S3 backup bucket"
 }
 
+variable "aws_access_key" {
+  description = "AWS access key"
+}
+
+variable "aws_secret_key" {
+  description = "AWS secret key"
+}
+
 variable "config_elb" {
   default     = true
   description = "variable to determine how to set up gitlab configuration. The default uses the original version of module tuned to ELB"
@@ -96,7 +104,7 @@ variable "config_elb" {
 data "template_file" "omnibus_config_elb" {
   count = "${var.config_elb}"
   template = <<EOC
-external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; registry_nginx['listen_port']=$${http_port}; registry_nginx['listen_https'] = false; registry_nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; nginx['listen_port']=$${http_port}; nginx['listen_https'] = false; nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; registry['storage']={'s3' => {'bucket' => '$${registry_bucket_name}', 'region' => '$${registry_bucket_region}' }}; gitlab_rails['backup_upload_connection'] = { 'provider' => 'AWS','region' => '$${registry_bucket_region}'}; gitlab_rails['backup_upload_remote_directory'] = '$${backup_bucket}';
+external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; registry_nginx['listen_port']=$${http_port}; registry_nginx['listen_https'] = false; registry_nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; nginx['listen_port']=$${http_port}; nginx['listen_https'] = false; nginx['proxy_set_headers'] = {'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on'}; registry['storage']={'s3' => {'bucket' => '$${registry_bucket_name}', 'region' => '$${registry_bucket_region}' }}; gitlab_rails['backup_upload_connection'] = { 'provider' => 'AWS','region' => '$${registry_bucket_region}','aws_access_key_id' => '$${aws_access_key}', 'aws_secret_access_key' => '$${aws_secret_key}}; gitlab_rails['backup_upload_remote_directory'] = '$${backup_bucket}';
 EOC
 
   vars = {
@@ -107,6 +115,8 @@ EOC
     ssh_port               = "${var.gitlab_ssh_port}"
     http_port              = "${var.gitlab_http_port}"
     backup_bucket          = "${var.backup_bucket}"
+    aws_access_key         = "${var.aws_access_key}"
+    aws_secret_key         = "${var.aws_secret_key}"
   }
 }
 ## The second is opinionated, in that it's setting up SSL, nginx and the registry to
@@ -114,7 +124,7 @@ EOC
 data "template_file" "omnibus_config_eip" {
   count = "${1 - var.config_elb}"
   template = <<EOC
-external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; nginx['redirect_http_to_https'] = true; registry['storage']={'s3' => {'bucket' => '$${registry_bucket_name}', 'region' => '$${registry_bucket_region}' }}; gitlab_rails['backup_upload_connection'] = { 'provider' => 'AWS', 'region' => '$${registry_bucket_region}'}; gitlab_rails['backup_upload_remote_directory'] = '$${backup_bucket}';
+external_url '$${gitlab_url}'; registry_external_url '$${registry_url}'; nginx['redirect_http_to_https'] = true; registry['storage']={'s3' => {'bucket' => '$${registry_bucket_name}', 'region' => '$${registry_bucket_region}' }}; gitlab_rails['backup_upload_connection'] = { 'provider' => 'AWS', 'region' => '$${registry_bucket_region}','aws_access_key_id' => '$${aws_access_key}', 'aws_secret_access_key' => '$${aws_secret_key}}; gitlab_rails['backup_upload_remote_directory'] = '$${backup_bucket}';
 EOC
 
   vars = {
@@ -124,7 +134,9 @@ EOC
     registry_bucket_name   = "${var.registry_bucket_name}"
     ssh_port               = "${var.gitlab_ssh_port}"
     http_port              = "${var.gitlab_http_port}"
-    backup_bucket          = "${var.gitlab_s3_backup_bucket}"
+    backup_bucket          = "${var.backup_bucket}"
+    aws_access_key         = "${var.aws_access_key}"
+    aws_secret_key         = "${var.aws_secret_key}"
   }
 }
 
@@ -135,7 +147,7 @@ data "template_file" "init_snippet" {
 ${var.init_prefix}
 cmd="#!/bin/sh
 docker run --detach \
-  --name gitlab
+  --name gitlab \
   --restart always \
   --hostname ${var.gitlab_name}.${var.gitlab_domain} \
   --publish ${var.gitlab_https_port}:443 \
