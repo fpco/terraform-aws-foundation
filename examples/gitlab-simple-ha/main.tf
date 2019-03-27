@@ -9,9 +9,13 @@
  */
 
 provider "aws" {
-  region = "${var.region}"
+  region  = "${var.region}"
+  version = "2.3.0"
 }
 
+provider "template" {
+  version = "1.0.0"
+}
 data "aws_availability_zones" "available" {}
 
 module "ubuntu-xenial-ami" {
@@ -41,6 +45,25 @@ module "docker-registry-s3-full-access" {
 resource "aws_iam_role_policy_attachment" "s3-full-access-attachment" {
   role       = "${module.gitlab-asg.asg_iam_role_name}"
   policy_arn = "${module.docker-registry-s3-full-access.arn}"
+}
+
+# S3 bucket for the gitlab backups and attach to the main role
+module "gitlab-s3-backups-bucket" {
+  source      = "../../modules/s3-remote-state"
+  bucket_name = "${var.gitlab_backup_bucket_name}"
+  versioning  = "false"
+  principals  = []
+}
+
+module "gitlab-s3-backups-full-access" {
+  source       = "../../modules/s3-full-access-policy"
+  name         = "${var.name}-gitlab-s3-backups-full-access"
+  bucket_names = ["${module.gitlab-s3-backups-bucket.bucket_id}"]
+}
+
+resource "aws_iam_role_policy_attachment" "gitlab-s3-backups-full-access-attachment" {
+  role       = "${module.gitlab-asg.asg_iam_role_name}"
+  policy_arn = "${module.gitlab-s3-backups-full-access.arn}"
 }
 
 resource "aws_eip" "gitlab" {
@@ -76,6 +99,7 @@ module "gitlab-asg" {
 
   security_group_ids    = ["${aws_security_group.gitlab.id}"]
   root_volume_size      = "${var.root_volume_size}"
+  data_volume_size      = "${var.gitlab_data_volume_size}"
   data_volume_encrypted = false
 
   init_prefix = <<END_INIT
@@ -85,10 +109,6 @@ ${module.init-install-ops.init_snippet}
 END_INIT
 
   init_suffix = <<END_INIT
-aws ec2 associate-address --allocation-id=${aws_eip.gitlab.id} --instance-id=$$(ec2metadata --instance-id) --allow-reassociation --region=${var.region}
-
-mkdir -p /gitlab
-
 # NOTE: check if there is another way to make sure that the volume hasn't an extension
 # check that the volume is formated to prevent erase
 ebs=$(file -s /dev/xvdf)
@@ -98,7 +118,22 @@ if [ "$ebs" == "/dev/xvdf: data" ]; then
   cp /etc/fstab /etc/fstab.orig
   echo "LABEL=gitlab    UUID=$(blkid -o value /dev/xvdf |head -1)  /gitlab  ext4   defaults,nofail     0 2" >> /etc/fstab
 fi
+
+mkdir -p /gitlab
 mount /dev/xvdf /gitlab
+
+# Create and upload the gitlab backup
+cat << EOF >/etc/cron.daily/gitlab-backup
+#!/bin/bash
+
+# Generate the backup
+docker exec -t gitlab gitlab-rake gitlab:backup:create
+
+# Upload secrets file in base64
+secrets_backup="gitlab-secrets-$(date +"%Y_%m_%d_%H_%M")"
+cat /gitlab/config/gitlab-secrets.json |base64 > /tmp/$secrets_backup
+aws s3 cp /tmp/$secrets_backup s3://$${var.gitlab_backup_bucket_name}/secrets/$secrets_backup
+EOF
 
 
 apt-get install -y docker docker.io
@@ -125,7 +160,9 @@ module "init-gitlab-docker" {
   # write docker images to this S3 bucket (created separate from this env)
   registry_bucket_name   = "${var.registry_bucket_name}"
   registry_bucket_region = "${var.region}"
-  backup_bucket          = "${var.backup_bucket}"
+  backup_bucket          = "${var.gitlab_backup_bucket_name}"
+  aws_access_key         = "${var.gitlab_s3_aws_access_key}"
+  aws_secret_key         = "${var.gitlab_s3_aws_secret_key}"
 }
 
 module "init-gitlab-runner" {

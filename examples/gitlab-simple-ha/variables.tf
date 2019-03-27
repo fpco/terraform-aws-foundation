@@ -45,6 +45,21 @@ variable "gitlab_backup_bucket_name" {
   type        = "string"
 }
 
+variable "gitlab_data_volume_size" {
+  description = "GB of EBS data volume for the instance to mount gitlab"
+  default     = "20"
+}
+
+variable "gitlab_s3_aws_access_key" {
+  description = "AWS access key to get access to buckup s3"
+  default     = ""
+}
+
+variable "gitlab_s3_aws_secret_key" {
+  description = "AWS secret key to get access to buckup s3"
+  default     = ""
+}
+
 variable "config_elb" {
   default     = false
   description = "variable to determine how to set up gitlab configuration. Setting to false uses the EIP version of module tuned to ELB"
