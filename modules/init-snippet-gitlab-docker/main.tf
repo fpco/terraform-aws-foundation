@@ -79,7 +79,7 @@ variable "gitlab_data_path" {
   description = "path for gitlab data"
 }
 
-variable "gitlab_s3_backup_bucket" {
+variable "backup_bucket" {
   description = "S3 backup bucket"
 }
 
@@ -106,7 +106,7 @@ EOC
     registry_bucket_name   = "${var.registry_bucket_name}"
     ssh_port               = "${var.gitlab_ssh_port}"
     http_port              = "${var.gitlab_http_port}"
-    backup_bucket          = "${var.gitlab_s3_backup_bucket}"
+    backup_bucket          = "${var.backup_bucket}"
   }
 }
 ## The second is opinionated, in that it's setting up SSL, nginx and the registry to
@@ -135,6 +135,7 @@ data "template_file" "init_snippet" {
 ${var.init_prefix}
 cmd="#!/bin/sh
 docker run --detach \
+  --name gitlab
   --restart always \
   --hostname ${var.gitlab_name}.${var.gitlab_domain} \
   --publish ${var.gitlab_https_port}:443 \
