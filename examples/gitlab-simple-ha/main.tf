@@ -86,11 +86,20 @@ END_INIT
 
   init_suffix = <<END_INIT
 aws ec2 associate-address --allocation-id=${aws_eip.gitlab.id} --instance-id=$$(ec2metadata --instance-id) --allow-reassociation --region=${var.region}
-mkdir -p /gitlab
-mount /dev/xvdf1 /gitlab
 
-cp /etc/fstab /etc/fstab.orig
-echo "LABEL=gitlab            /gitlab  ext4   defaults,nofail     0 2" >> /etc/fstab
+mkdir -p /gitlab
+
+# NOTE: check if there is another way to make sure that the volume hasn't an extension
+# check that the volume is formated to prevent erase
+ebs=$(file -s /dev/xvdf)
+if [ "$ebs" == "/dev/xvdf: data" ]; then
+  mkfs -t ext4 /dev/xvdf
+
+  cp /etc/fstab /etc/fstab.orig
+  echo "LABEL=gitlab    UUID=$(blkid -o value /dev/xvdf |head -1)  /gitlab  ext4   defaults,nofail     0 2" >> /etc/fstab
+fi
+mount /dev/xvdf /gitlab
+
 
 apt-get install -y docker docker.io
 ${module.init-gitlab-docker.init_snippet}
