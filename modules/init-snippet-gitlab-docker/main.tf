@@ -81,14 +81,17 @@ variable "gitlab_data_path" {
 
 variable "backup_bucket" {
   description = "S3 backup bucket"
+  default     = "gitlab_backup"
 }
 
 variable "aws_access_key" {
   description = "AWS access key"
+  default     = ""
 }
 
 variable "aws_secret_key" {
   description = "AWS secret key"
+  default     = ""
 }
 
 variable "config_elb" {
