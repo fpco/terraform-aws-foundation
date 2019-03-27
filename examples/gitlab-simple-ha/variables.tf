@@ -40,6 +40,11 @@ variable "registry_bucket_name" {
   type        = "string"
 }
 
+variable "gitlab_backup_bucket_name" {
+  description = "The name of the S3 bucket to write the backups"
+  type        = "string"
+}
+
 variable "config_elb" {
   default     = false
   description = "variable to determine how to set up gitlab configuration. Setting to false uses the EIP version of module tuned to ELB"

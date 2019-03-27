@@ -125,6 +125,7 @@ module "init-gitlab-docker" {
   # write docker images to this S3 bucket (created separate from this env)
   registry_bucket_name   = "${var.registry_bucket_name}"
   registry_bucket_region = "${var.region}"
+  backup_bucket          = "${var.backup_bucket}"
 }
 
 module "init-gitlab-runner" {
