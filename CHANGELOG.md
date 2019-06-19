@@ -1,16 +1,28 @@
-# v0.8.2 (Unreleased)
+# (Unreleased)
 
 ### Summary
 
-* Minor updates
+### Modules
+
+### Examples
+
+
+# v0.8.2
+
+### Summary
+
+* Some minor module updates, a couple of new modules, and a couple of new examples
+* New contributing guide and issue templates
 
 ### Modules
 
 * `ami-ubuntu`: Add `bionic` (`18.04`) to the list of LTS AMIs
+* `credstash-grant-reader` and `credstash-grant-writer`: Add new modules using AWS resources instead of bash scripts
 
 ### Examples
 
-N/A.
+* `kops-with-vpc`: add new example, kops in a vpc made by terraform (#177)
+* `lifecycle-hooks`: add new example, with lifecycle hooks for ASGs
 
 # v0.8.1
 
