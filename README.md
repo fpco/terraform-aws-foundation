@@ -58,3 +58,9 @@ As the collection of modules is composable into an endless array of possibilitie
 there is no explicit requirement to use all of these tools, you can just as easily
 use the IAM management modules and nothing else, or build a more complete stack
 with these modules.
+
+
+## Contributing, Issues, and Feature Requests
+
+Please see [CONTRIBUTING.md](https://github.com/fpco/terraform-aws-foundation/blob/master/CONTRIBUTING.md) for 
+more information.
