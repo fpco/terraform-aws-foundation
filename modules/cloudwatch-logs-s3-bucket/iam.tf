@@ -27,16 +27,17 @@ data "aws_iam_policy_document" "cloudwatch-logs-writer-trust" {
 resource "aws_iam_role" "cloudwatch-logs-writer" {
   name               = "cloudwatch_logs_writer"
   path               = "/"
-  assume_role_policy = "${data.aws_iam_policy_document.cloudwatch-logs-writer-trust.json}"
+  assume_role_policy = data.aws_iam_policy_document.cloudwatch-logs-writer-trust.json
 }
 
 resource "aws_iam_role_policy" "cloudwatch-logs-writer" {
   name   = "cloudwach_logs_writer_policy"
-  role   = "${aws_iam_role.cloudwatch-logs-writer.id}"
-  policy = "${data.aws_iam_policy_document.cloudwatch-logs-writer.json}"
+  role   = aws_iam_role.cloudwatch-logs-writer.id
+  policy = data.aws_iam_policy_document.cloudwatch-logs-writer.json
 }
 
 resource "aws_iam_instance_profile" "cloudwatch-logs-writer" {
   name = "cloudwatch_logs_writer"
-  role = "${aws_iam_role.cloudwatch-logs-writer.name}"
+  role = aws_iam_role.cloudwatch-logs-writer.name
 }
+

@@ -7,7 +7,7 @@
 
 resource "aws_key_pair" "vpn-gateway" {
   key_name   = "${var.name_prefix}-vpn-gateway-key"
-  public_key = "${var.public_key}"
+  public_key = var.public_key
 }
 
 data "aws_ami" "ubuntu" {
@@ -27,19 +27,20 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "vpn-gateway" {
-  ami                         = "${data.aws_ami.ubuntu.id}"
-  instance_type               = "${var.instance_type}"
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = var.instance_type
   source_dest_check           = false
-  key_name                    = "${aws_key_pair.vpn-gateway.key_name}"
-  subnet_id                   = "${var.vpc_subnet_id}"
-  vpc_security_group_ids      = ["${aws_security_group.vpn-gateway.id}"]
+  key_name                    = aws_key_pair.vpn-gateway.key_name
+  subnet_id                   = var.vpc_subnet_id
+  vpc_security_group_ids      = [aws_security_group.vpn-gateway.id]
   associate_public_ip_address = true
-	iam_instance_profile        = ""
+  iam_instance_profile        = ""
 
   connection {
+    host        = coalesce(self.public_ip, self.private_ip)
     type        = "ssh"
     user        = "ubuntu"
-    private_key = "${var.private_key}"
+    private_key = var.private_key
   }
 
   provisioner "file" {
@@ -72,11 +73,11 @@ resource "aws_instance" "vpn-gateway" {
 
 resource "aws_security_group" "vpn-gateway" {
   name        = "vpn-gateway-sg"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
   description = "Security group for vpn gateway (Allow ALL from VPC CIDR)"
 
   ingress {
-    cidr_blocks = ["${var.vpc_cidr}"]
+    cidr_blocks = [var.vpc_cidr]
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -106,13 +107,14 @@ resource "aws_security_group" "vpn-gateway" {
 
 ## Create a route for all traffic to private IP range to be handled by vpn-gateway.
 resource "aws_route" "vpc-vpn-route" {
-  route_table_id         = "${var.vpc_route_table_id}"
-  destination_cidr_block = "${var.vpn_cidr}"
-  instance_id            = "${aws_instance.vpn-gateway.id}"
+  route_table_id         = var.vpc_route_table_id
+  destination_cidr_block = var.vpn_cidr
+  instance_id            = aws_instance.vpn-gateway.id
 }
 
 ## Associate Private Hosted Zone with current VPC.
 resource "aws_route53_zone_association" "main" {
-  zone_id = "${var.route53_zone_id}"
-  vpc_id  = "${var.vpc_id}"
+  zone_id = var.route53_zone_id
+  vpc_id  = var.vpc_id
 }
+

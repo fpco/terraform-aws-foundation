@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "cloudwatch-logs-bucket" {
 
     principals {
       type        = "AWS"
-      identifiers = "${var.principals}"
+      identifiers = var.principals
     }
   }
 }
@@ -15,7 +15,13 @@ data "aws_iam_policy_document" "cloudwatch-logs-bucket" {
 resource "aws_s3_bucket" "cloudwatch-logs" {
   bucket = "${var.name_prefix}-cloudwatch-logs"
   acl    = "private"
-  policy = "${length(var.principals) == 0 ? "" : data.aws_iam_policy_document.cloudwatch-logs-writer.json}"
+  policy = length(var.principals) == 0 ? "" : data.aws_iam_policy_document.cloudwatch-logs-writer.json
 
-  tags = "${merge(map("Name","${var.name_prefix}-cloudwatch-logs"), "${var.extra_tags}")}"
+  tags = merge(
+    {
+      "Name" = "${var.name_prefix}-cloudwatch-logs"
+    },
+    var.extra_tags,
+  )
 }
+

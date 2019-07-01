@@ -91,52 +91,64 @@ output "asg_name" {
 # variables for this test environment
 variable "name" {
   description = "The name of the environment to deploy to (beta/prod/etc)"
+  type = string
 }
 
 variable "key_name" {
   default     = ""
   description = "The name of the (AWS) SSH key to associate with the instance"
+  type = string
 }
 
 variable "key_file" {
   description = "The path to the SSH private key to provide connection info as output"
+  type = string
 }
 
 variable "ssh_pubkey" {
   default     = ""
   description = "The public key for SSH"
+  type = string
 }
 
 variable "region" {
   description = "The AWS region to deploy to"
   default     = ""
+  type = string
 }
 
 variable "az" {
   description = "The AWS Availability Zone (AZ) to create the instance in"
+  type = string
 }
 
 variable "instance_type" {
   default     = "t2.micro"
   description = "The type of AWS instance (size)"
+  type = string
 }
 
 variable "account_arn" {
   description = "The AWS account number, for IAM role assigned to the instance created"
+  type = string
 }
 
 variable "data_volume_snapshot_id" {
   default = ""
+  type = string
 }
 
 variable "access_key" {
   default = ""
+  type = string
 }
 
 variable "secret_key" {
   default = ""
+  type = string
 }
 
 variable "token" {
   default = ""
+  type = string
 }

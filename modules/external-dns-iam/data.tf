@@ -38,7 +38,8 @@ data "aws_iam_policy_document" "assume" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${var.kube_cluster_nodes_arn}"]
+      identifiers = [var.kube_cluster_nodes_arn]
     }
   }
 }
+

@@ -1,10 +1,10 @@
 resource "aws_route53_zone" "leaders" {
   name   = "consul-${var.name}.leaders"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 }
 
 resource "aws_route53_record" "leaders" {
-  zone_id = "${aws_route53_zone.leaders.zone_id}"
+  zone_id = aws_route53_zone.leaders.zone_id
   name    = "consul-${var.name}.leaders"
   type    = "A"
   ttl     = "300"
@@ -34,3 +34,4 @@ resource "aws_route53_record" "leaders" {
     "${var.cidr_prefix_c}.15",
   ]
 }
+

@@ -1,16 +1,20 @@
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
 
-data "aws_region" "current" {}
+data "aws_region" "current" {
+}
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+}
 
 resource "aws_iam_policy" "ebs-volume-policy" {
-  count  = "${var.volume_count}"
+  count  = var.volume_count
   name   = "${var.name_prefix}-ebs-volume-${count.index + 1}"
-  policy = "${data.aws_iam_policy_document.ebs-volume-policy.json}"
+  policy = data.aws_iam_policy_document.ebs-volume-policy[count.index].json
 }
 
 data "aws_iam_policy_document" "ebs-volume-policy" {
+  count = var.volume_count
   statement {
     effect = "Allow"
 
@@ -25,3 +29,4 @@ data "aws_iam_policy_document" "ebs-volume-policy" {
     ]
   }
 }
+

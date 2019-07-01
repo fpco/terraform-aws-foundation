@@ -9,43 +9,49 @@
  */
 
 resource "aws_ebs_volume" "main" {
-  availability_zone = "${var.az}"
-  size              = "${var.size}"
-  type              = "${var.volume_type}"
-  encrypted         = "${var.encrypted}"
-  kms_key_id        = "${var.kms_key_id}"
-  snapshot_id       = "${var.snapshot_id}"
+  availability_zone = var.az
+  size              = var.size
+  type              = var.volume_type
+  encrypted         = var.encrypted
+  kms_key_id        = var.kms_key_id
+  snapshot_id       = var.snapshot_id
 
   # merge Name w/ extra_tags
-  tags = "${merge(map("Name", "${var.name_prefix}-${var.az}"), "${var.extra_tags}")}"
+  tags = merge(
+    {
+      "Name" = "${var.name_prefix}-${var.az}"
+    },
+    var.extra_tags,
+  )
 }
 
 output "iam_profile_id" {
-  value       = "${aws_iam_instance_profile.attach_ebs.id}"
+  value       = aws_iam_instance_profile.attach_ebs.id
   description = "`id` exported from the `aws_iam_instance_profile`"
 }
 
 output "iam_profile_arn" {
-  value       = "${aws_iam_instance_profile.attach_ebs.arn}"
+  value       = aws_iam_instance_profile.attach_ebs.arn
   description = "`arn` exported from the `aws_iam_instance_profile`"
 }
 
 output "iam_profile_policy_document" {
-  value       = "${aws_iam_role_policy.attach_ebs.policy}"
+  value       = aws_iam_role_policy.attach_ebs.policy
   description = "`policy` exported from the `aws_iam_role_policy`"
 }
 
 output "iam_role_arn" {
-  value       = "${aws_iam_role.attach_ebs.arn}"
+  value       = aws_iam_role.attach_ebs.arn
   description = "`arn` exported from the `aws_iam_role`"
 }
 
 output "iam_role_name" {
-  value       = "${aws_iam_role.attach_ebs.name}"
+  value       = aws_iam_role.attach_ebs.name
   description = "`name` exported from the `aws_iam_role`"
 }
 
 output "volume_id" {
-  value       = "${aws_ebs_volume.main.id}"
+  value       = aws_ebs_volume.main.id
   description = "`id` exported from the `aws_ebs_volume`"
 }
+

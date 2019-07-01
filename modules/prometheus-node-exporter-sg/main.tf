@@ -6,12 +6,12 @@
  */
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
-  type        = "string"
+  type        = string
 }
 
 variable "cidr_blocks" {
   description = "The list of CIDR IP blocks allowed to access the node exporter port"
-  type        = "list"
+  type        = list(string)
 }
 
 # Security group ingress rule for the node exporter
@@ -20,6 +20,7 @@ resource "aws_security_group_rule" "node_exporter_tcp" {
   from_port         = "9100"
   to_port           = "9100"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
+

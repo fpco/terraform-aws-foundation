@@ -1,3 +1,4 @@
 output "id" {
-  value = "${module.kube-load-balancer-sg.id}"
+  value = module.kube-load-balancer-sg.id
 }
+

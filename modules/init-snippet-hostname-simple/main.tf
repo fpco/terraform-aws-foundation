@@ -12,34 +12,39 @@
 variable "init_prefix" {
   default     = ""
   description = "initial init (shellcode) to prefix this snippet with"
+  type = string
 }
 
 variable "init_suffix" {
   default     = ""
   description = "init (shellcode) to append to the end of this snippet"
+  type = string
 }
 
 variable "hostname_prefix" {
   description = "role, name, or term to use as a prefix to the AWS-style hostname"
+  type = string
 }
 
 variable "log_prefix" {
   default     = "OPS:"
   description = "string to prefix log messages with"
+  type = string
 }
 
 # render init script for a cluster using our generic template
 data "template_file" "init_snippet" {
-  template = "${file("${path.module}/snippet.tpl")}"
+  template = file("${path.module}/snippet.tpl")
 
-  vars {
-    hostname_prefix = "${var.hostname_prefix}"
-    init_prefix     = "${var.init_prefix}"
-    init_suffix     = "${var.init_suffix}"
-    log_prefix      = "${var.log_prefix}"
+  vars = {
+    hostname_prefix = var.hostname_prefix
+    init_prefix     = var.init_prefix
+    init_suffix     = var.init_suffix
+    log_prefix      = var.log_prefix
   }
 }
 
 output "init_snippet" {
-  value = "${data.template_file.init_snippet.rendered}"
+  value = data.template_file.init_snippet.rendered
 }
+

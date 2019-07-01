@@ -1,8 +1,8 @@
 resource "aws_elb" "kube-controllers" {
   name            = "${var.name_prefix}-kube-api"
-  subnets         = ["${var.lb_subnet_ids}"]
-  security_groups = ["${var.lb_security_group_ids}"]
-  internal        = "${var.private_load_balancer}"
+  subnets         = var.lb_subnet_ids
+  security_groups = var.lb_security_group_ids
+  internal        = var.private_load_balancer
 
   listener {
     instance_port     = 6443
@@ -24,12 +24,13 @@ resource "aws_elb" "kube-controllers" {
   connection_draining         = true
   connection_draining_timeout = 60
 
-  tags {
+  tags = {
     Name = "${var.name_prefix}-kube-api"
   }
 }
 
 resource "aws_autoscaling_attachment" "controllers" {
-  autoscaling_group_name = "${module.controller-asg.id}"
-  elb                    = "${aws_elb.kube-controllers.id}"
+  autoscaling_group_name = module.controller-asg.id
+  elb                    = aws_elb.kube-controllers.id
 }
+

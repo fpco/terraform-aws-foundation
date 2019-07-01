@@ -10,51 +10,59 @@
 variable "bootstrap_pillar_file" {
   default     = "/srv/pillar/bootstrap.sls"
   description = "path, to the 'bootstrap' pillar file"
+  type = string
 }
 
 variable "consul_addr" {
   default     = "127.0.0.1:8500"
   description = "Address to consul, in the form host:port"
+  type = string
 }
 
 variable "consul_client_token" {
   description = "Client token for services on the node, connecting to consul as a client"
+  type = string
 }
 
 variable "init_prefix" {
   default     = ""
   description = "initial init (shellcode) to prefix this snippet with"
+  type = string
 }
 
 variable "init_suffix" {
   default     = ""
   description = "init (shellcode) to append to the end of this snippet"
+  type = string
 }
 
 variable "log_level" {
   default     = "info"
   description = "default log level verbosity for apps that support it"
+  type = string
 }
 
 variable "log_prefix" {
   default     = "OPS: "
   description = "string to prefix log messages with"
+  type = string
 }
 
 data "template_file" "init_snippet" {
-  template = "${file("${path.module}/snippet.tpl")}"
+  template = file("${path.module}/snippet.tpl")
 
-  vars {
-    bootstrap_pillar_file = "${var.bootstrap_pillar_file}"
-    consul_addr           = "${var.consul_addr}"
-    consul_client_token   = "${var.consul_client_token}"
-    init_prefix           = "${var.init_prefix}"
-    init_suffix           = "${var.init_suffix}"
-    log_prefix            = "${var.log_prefix}"
-    log_level             = "${var.log_level}"
+  vars = {
+    bootstrap_pillar_file = var.bootstrap_pillar_file
+    consul_addr           = var.consul_addr
+    consul_client_token   = var.consul_client_token
+    init_prefix           = var.init_prefix
+    init_suffix           = var.init_suffix
+    log_prefix            = var.log_prefix
+    log_level             = var.log_level
   }
 }
 
 output "init_snippet" {
-  value = "${data.template_file.init_snippet.rendered}"
+  value = data.template_file.init_snippet.rendered
 }
+

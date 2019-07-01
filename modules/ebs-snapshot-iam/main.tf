@@ -30,16 +30,16 @@
 variable "name" {
   default     = "snap-ebs"
   description = "name IAM resources, should match service name"
-  type        = "string"
+  type        = string
 }
 
 resource "aws_iam_user" "snap-ebs" {
-  name = "${var.name}"
+  name = var.name
 }
 
 resource "aws_iam_user_policy" "snap-ebs" {
-  name = "${var.name}"
-  user = "${aws_iam_user.snap-ebs.name}"
+  name = var.name
+  user = aws_iam_user.snap-ebs.name
 
   policy = <<EOF
 {
@@ -64,9 +64,11 @@ resource "aws_iam_user_policy" "snap-ebs" {
   ]
 }
 EOF
+
 }
 
 output "user_arn" {
-  value       = "${aws_iam_user.snap-ebs.arn}"
+  value = aws_iam_user.snap-ebs.arn
   description = "ARN of the IAM user created for the EBS snapshots service"
 }
+

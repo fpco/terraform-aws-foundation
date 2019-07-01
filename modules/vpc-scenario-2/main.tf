@@ -26,63 +26,49 @@
 
 module "vpc" {
   source               = "../vpc"
-  region               = "${var.region}"
-  cidr                 = "${var.cidr}"
-  name_prefix          = "${var.name_prefix}"
-  enable_dns_hostnames = "${var.enable_dns_hostnames}"
-  enable_dns_support   = "${var.enable_dns_support}"
-  dns_servers          = ["${var.dns_servers}"]
-  extra_tags           = "${merge(
-	  "${var.extra_tags}",
-	  "${var.vpc_extra_tags}",
-	)}"
+  region               = var.region
+  cidr                 = var.cidr
+  name_prefix          = var.name_prefix
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
+  dns_servers          = var.dns_servers
+  extra_tags           = merge(var.extra_tags, var.vpc_extra_tags)
 }
 
 module "public-subnets" {
   source      = "../subnets"
-  azs         = "${var.azs}"
-  vpc_id      = "${module.vpc.vpc_id}"
+  azs         = var.azs
+  vpc_id      = module.vpc.vpc_id
   name_prefix = "${var.name_prefix}-public"
-  cidr_blocks = "${var.public_subnet_cidrs}"
-  extra_tags  = "${merge(
-	  "${var.extra_tags}",
-	  "${var.public_subnet_extra_tags}",
-	)}"
+  cidr_blocks = var.public_subnet_cidrs
+  extra_tags  = merge(var.extra_tags, var.public_subnet_extra_tags)
 }
 
 module "public-gateway" {
   source            = "../route-public"
-  vpc_id            = "${module.vpc.vpc_id}"
+  vpc_id            = module.vpc.vpc_id
   name_prefix       = "${var.name_prefix}-public"
-  public_subnet_ids = ["${module.public-subnets.ids}"]
-  extra_tags  = "${merge(
-	  "${var.extra_tags}",
-	  "${var.public_gateway_extra_tags}",
-	)}"
+  public_subnet_ids = module.public-subnets.ids
+  extra_tags        = merge(var.extra_tags, var.public_gateway_extra_tags)
 }
 
 module "private-subnets" {
   source      = "../subnets"
-  azs         = "${var.azs}"
-  vpc_id      = "${module.vpc.vpc_id}"
+  azs         = var.azs
+  vpc_id      = module.vpc.vpc_id
   name_prefix = "${var.name_prefix}-private"
-  cidr_blocks = "${var.private_subnet_cidrs}"
+  cidr_blocks = var.private_subnet_cidrs
   public      = false
-  extra_tags  = "${merge(
-	  "${var.extra_tags}",
-	  "${var.private_subnet_extra_tags}",
-	)}"
+  extra_tags  = merge(var.extra_tags, var.private_subnet_extra_tags)
 }
 
 module "nat-gateway" {
   source             = "../nat-gateways"
-  vpc_id             = "${module.vpc.vpc_id}"
-  name_prefix        = "${var.name_prefix}"
-  nat_count          = "${length(var.public_subnet_cidrs)}"
-  public_subnet_ids  = ["${module.public-subnets.ids}"]
-  private_subnet_ids = ["${module.private-subnets.ids}"]
-  extra_tags         = "${merge(
-	  "${var.extra_tags}",
-	  "${var.nat_gateway_extra_tags}",
-	)}"
+  vpc_id             = module.vpc.vpc_id
+  name_prefix        = var.name_prefix
+  nat_count          = length(var.public_subnet_cidrs)
+  public_subnet_ids  = module.public-subnets.ids
+  private_subnet_ids = module.private-subnets.ids
+  extra_tags         = merge(var.extra_tags, var.nat_gateway_extra_tags)
 }
+

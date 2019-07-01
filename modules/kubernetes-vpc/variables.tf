@@ -1,21 +1,31 @@
-variable "project" {}
+variable "project" {
+  type = string
+}
 
-variable "env" {}
+variable "env" {
+  type = string
+}
 
-variable "region" {}
+variable "region" {
+  type = string
+}
 
 variable "cidr" {
   description = "CIDR range of VPC. eg: 172.16.0.0/16"
+  type = string
 }
 
 variable "public_subnets" {
-  type        = "list"
+  type        = list(string)
   description = "A list of public subnet cidrs to deploy inside the VPC."
 }
 
 variable "azs" {
-  type        = "list"
+  type        = list(string)
   description = "A list of Availaiblity zones in the region"
 }
 
-variable "kube_fqdn" {}
+variable "kube_fqdn" {
+  type = string
+}
+

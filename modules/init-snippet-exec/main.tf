@@ -9,17 +9,19 @@
 
 variable "init" {
   description = "init shellcode for this snippet"
+  type = string
 }
 
 data "template_file" "init_snippet" {
-  template = "${file("${path.module}/snippet.tpl")}"
+  template = file("${path.module}/snippet.tpl")
 
-  vars {
-    init = "${var.init}"
+  vars = {
+    init = var.init
   }
 }
 
 output "init_snippet" {
-  value       = "${data.template_file.init_snippet.rendered}"
+  value       = data.template_file.init_snippet.rendered
   description = "Rendered 'init snippet' from the template file"
 }
+

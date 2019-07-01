@@ -18,14 +18,14 @@ data "aws_iam_policy_document" "admin-with-mfa" {
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values   = ["true"]
+      values   = [true]
     }
   }
 }
 
 resource "aws_iam_policy" "admin-with-mfa" {
   name   = "full-administrator-access-with-mfa"
-  policy = "${data.aws_iam_policy_document.admin-with-mfa.json}"
+  policy = data.aws_iam_policy_document.admin-with-mfa.json
 }
 
 # Has full access to everything, including IAM management.  Does NOT require MFA.
@@ -45,18 +45,16 @@ data "aws_iam_policy_document" "admin-no-mfa" {
 
 resource "aws_iam_policy" "admin-no-mfa" {
   name   = "full-administrator-access-no-mfa"
-  policy = "${data.aws_iam_policy_document.admin-no-mfa.json}"
+  policy = data.aws_iam_policy_document.admin-no-mfa.json
 }
 
 module "assume-admin-role-policy" {
   source      = "../cross-account-assume-role-policy"
   policy_name = "assume-control-accounts-admin-role"
-  role_name   = "${module.admin-role.name}"
+  role_name   = module.admin-role.name
 
-  account_ids = [
-    "${data.aws_caller_identity.current.account_id}",
-    "${var.admin_control_account_ids}",
-  ]
+  account_ids = concat([data.aws_caller_identity.current.account_id],
+    var.admin_control_account_ids)
 }
 
 # Has full access to AWS, _except_ for IAM management. Requires MFA.
@@ -74,7 +72,7 @@ data "aws_iam_policy_document" "power-user-with-mfa" {
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values   = ["true"]
+      values   = [true]
     }
   }
 
@@ -94,14 +92,14 @@ data "aws_iam_policy_document" "power-user-with-mfa" {
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values   = ["true"]
+      values   = [true]
     }
   }
 }
 
 resource "aws_iam_policy" "power-user-with-mfa" {
   name   = "power-user-access-with-mfa"
-  policy = "${data.aws_iam_policy_document.power-user-with-mfa.json}"
+  policy = data.aws_iam_policy_document.power-user-with-mfa.json
 }
 
 # Has full access to AWS, _except_ for IAM management. Does NOT require MFA.
@@ -134,18 +132,16 @@ data "aws_iam_policy_document" "power-user-no-mfa" {
 
 resource "aws_iam_policy" "power-user-no-mfa" {
   name   = "power-user-access-no-mfa"
-  policy = "${data.aws_iam_policy_document.power-user-no-mfa.json}"
+  policy = data.aws_iam_policy_document.power-user-no-mfa.json
 }
 
 module "assume-power-user-role-policy" {
   source      = "../cross-account-assume-role-policy"
   policy_name = "assume-control-accounts-power-user-role"
-  role_name   = "${module.power-user-role.name}"
+  role_name   = module.power-user-role.name
 
-  account_ids = [
-    "${data.aws_caller_identity.current.account_id}",
-    "${var.power_user_control_account_ids}",
-  ]
+  account_ids = concat([data.aws_caller_identity.current.account_id],
+    var.power_user_control_account_ids)
 }
 
 # Only allows a user to set up their MFA device (and does not require
@@ -199,7 +195,7 @@ data "aws_iam_policy_document" "setup-mfa" {
 
 resource "aws_iam_policy" "setup-mfa" {
   name   = "setup-mfa-device"
-  policy = "${data.aws_iam_policy_document.setup-mfa.json}"
+  policy = data.aws_iam_policy_document.setup-mfa.json
 }
 
 # Allow a user to change their password, manage their access keys, and resync their MFA device (but not change it).
@@ -219,7 +215,7 @@ data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values   = ["true"]
+      values   = [true]
     }
   }
 
@@ -239,7 +235,7 @@ data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values   = ["true"]
+      values   = [true]
     }
   }
 
@@ -253,7 +249,6 @@ data "aws_iam_policy_document" "manage-own-credentials-with-mfa" {
 
 resource "aws_iam_policy" "manage-own-credentials-with-mfa" {
   name   = "manage-own-credentials-with-mfa"
-  policy = "${data.aws_iam_policy_document.manage-own-credentials-with-mfa.json}"
+  policy = data.aws_iam_policy_document.manage-own-credentials-with-mfa.json
 }
-
 

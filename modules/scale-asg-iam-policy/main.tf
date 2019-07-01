@@ -6,13 +6,13 @@
  */
 variable "name" {
   description = "name for resources"
-  type        = "string"
+  type        = string
 }
 
 resource "aws_iam_policy" "main" {
   name        = "${var.name}-scale-all-asgs"
   description = "allows users to scale up/down any ASGs in the account"
-  policy      = "${data.aws_iam_policy_document.policy.json}"
+  policy      = data.aws_iam_policy_document.policy.json
 }
 
 data "aws_iam_policy_document" "policy" {
@@ -29,13 +29,14 @@ data "aws_iam_policy_document" "policy" {
 }
 
 output "id" {
-  value = "${aws_iam_policy.main.id}"
+  value = aws_iam_policy.main.id
 }
 
 output "arn" {
-  value = "${aws_iam_policy.main.arn}"
+  value = aws_iam_policy.main.arn
 }
 
 output "name" {
-  value = "${aws_iam_policy.main.name}"
+  value = aws_iam_policy.main.name
 }
+

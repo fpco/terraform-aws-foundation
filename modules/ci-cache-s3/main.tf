@@ -12,8 +12,8 @@ resource "aws_iam_user" "cache-s3-user" {
 }
 
 resource "aws_iam_access_key" "cache-s3-user-access-key" {
-  user    = "${aws_iam_user.cache-s3-user.name}"
-  pgp_key = "${var.pgp_key}"
+  user    = aws_iam_user.cache-s3-user.name
+  pgp_key = var.pgp_key
 }
 
 resource "aws_s3_bucket" "bucket" {
@@ -23,10 +23,10 @@ resource "aws_s3_bucket" "bucket" {
   lifecycle_rule {
     id      = "cache"
     prefix  = "cache-s3/"
-    enabled = "${var.cache_days == 0 ? false : true}"
+    enabled = var.cache_days == 0 ? false : true
 
     expiration {
-      days = "${var.cache_days}"
+      days = var.cache_days
     }
   }
 }
@@ -34,24 +34,24 @@ resource "aws_s3_bucket" "bucket" {
 module "s3-full-access" {
   source       = "../s3-full-access-policy"
   name         = "${var.prefix}ci-cache-s3-access"
-  bucket_names = ["${aws_s3_bucket.bucket.id}"]
+  bucket_names = [aws_s3_bucket.bucket.id]
 }
 
 resource "aws_iam_user_policy_attachment" "s3-full-access-attachment" {
-  user       = "${aws_iam_user.cache-s3-user.name}"
-  policy_arn = "${module.s3-full-access.arn}"
+  user       = aws_iam_user.cache-s3-user.name
+  policy_arn = module.s3-full-access.arn
 }
 
 resource "aws_iam_user_policy_attachment" "s3-grant-public-read" {
-  count      = "${var.user_grants_public ? 1 : 0}"
-  user       = "${aws_iam_user.cache-s3-user.name}"
-  policy_arn = "${element(aws_iam_policy.s3-grant-public-read.*.arn, 0)}"
+  count      = var.user_grants_public ? 1 : 0
+  user       = aws_iam_user.cache-s3-user.name
+  policy_arn = element(aws_iam_policy.s3-grant-public-read.*.arn, 0)
 }
 
 resource "aws_iam_policy" "s3-grant-public-read" {
-  count  = "${var.user_grants_public ? 1 : 0}"
+  count  = var.user_grants_public ? 1 : 0
   name   = "${var.prefix}ci-cache-s3-grant-public-read"
-  policy = "${data.aws_iam_policy_document.s3-grant-public-read.json}"
+  policy = data.aws_iam_policy_document.s3-grant-public-read.json
 }
 
 data "aws_iam_policy_document" "s3-grant-public-read" {
@@ -71,3 +71,4 @@ data "aws_iam_policy_document" "s3-grant-public-read" {
     resources = ["arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"]
   }
 }
+

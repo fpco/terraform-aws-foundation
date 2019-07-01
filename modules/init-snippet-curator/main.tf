@@ -15,50 +15,56 @@
  */
 
 data "template_file" "curator-setup" {
-  template = "${file("${path.module}/snippet.tpl.sh")}"
+  template = file("${path.module}/snippet.tpl.sh")
 
-  vars {
-    index_retention_unit   = "${var.index_retention_unit}"
-    index_retention_period = "${var.index_retention_period}"
-    extra_curator_actions  = "${var.extra_curator_actions}"
-    elasticsearch_host     = "${var.elasticsearch_host}"
-    elasticsearch_port     = "${var.elasticsearch_port}"
-    master_only            = "${var.master_only}"
+  vars = {
+    index_retention_unit   = var.index_retention_unit
+    index_retention_period = var.index_retention_period
+    extra_curator_actions  = var.extra_curator_actions
+    elasticsearch_host     = var.elasticsearch_host
+    elasticsearch_port     = var.elasticsearch_port
+    master_only            = var.master_only
   }
 }
 
-variable  "index_retention_unit" {
+variable "index_retention_unit" {
   default     = "days"
   description = "Units (seconds, minutes, hours, days, etc.) corresponding to index retention period."
-  type        = "string"
+  type        = string
   # See https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filtertype_age.html for options
 }
 
 variable "index_retention_period" {
   default     = 60
   description = "Age of Elasticsearch indices in days before they will be considered old and be pruned by the curator. Set to 0 in order to disable."
+  type        = number
 }
 
 variable "extra_curator_actions" {
   default     = ""
   description = "YAML formatted dictionary of actions, as described in documentation, but started at index '2', since action number '1' is the one that purges old indices."
+  type        = string
 }
 
 variable "elasticsearch_host" {
   default     = "localhost"
   description = "Hostname for Elasticsearch API"
+  type        = string
 }
 
 variable "elasticsearch_port" {
   default     = 9200
   description = "Port number for Elasticsearch API"
+  type        = number
 }
 
 variable "master_only" {
-  default     = "True"
+  default     = true
   description = "If installed on master eligible nodes, will only run if current node is an elected master"
+  type        = bool
 }
 
 output "init_snippet" {
-  value = "${data.template_file.curator-setup.rendered}"
+  value = data.template_file.curator-setup.rendered
 }
+

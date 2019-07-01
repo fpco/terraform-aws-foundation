@@ -8,11 +8,11 @@
  *
  */
 
-
 #----------------------------------------------------------------------
 # Data sources
 #----------------------------------------------------------------------
 
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
 
 # see the other .tf files for all the details..
