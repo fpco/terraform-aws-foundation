@@ -9,10 +9,11 @@
  */
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+}
 
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
@@ -20,14 +21,14 @@ module "ubuntu-xenial-ami" {
 }
 
 resource "aws_key_pair" "main" {
-  key_name   = "${var.name}"
-  public_key = "${file(var.ssh_pubkey)}"
+  key_name   = var.name
+  public_key = file(var.ssh_pubkey)
 }
 
 # S3 bucket for the Docker Registry (running in gitlab) to store Docker Images
 module "docker-registry-s3-storage" {
   source      = "../../modules/s3-remote-state"
-  bucket_name = "${var.registry_bucket_name}"
+  bucket_name = var.registry_bucket_name
   versioning  = "false"
   principals  = []
 }
@@ -35,12 +36,12 @@ module "docker-registry-s3-storage" {
 module "docker-registry-s3-full-access" {
   source       = "../../modules/s3-full-access-policy"
   name         = "${var.name}-docker-registry-s3-full-access"
-  bucket_names = ["${module.docker-registry-s3-storage.bucket_id}"]
+  bucket_names = [module.docker-registry-s3-storage.bucket_id]
 }
 
 resource "aws_iam_role_policy_attachment" "s3-full-access-attachment" {
-  role       = "${module.gitlab-asg.asg_iam_role_name}"
-  policy_arn = "${module.docker-registry-s3-full-access.arn}"
+  role       = module.gitlab-asg.asg_iam_role_name
+  policy_arn = module.docker-registry-s3-full-access.arn
 }
 
 resource "aws_eip" "gitlab" {
@@ -48,7 +49,7 @@ resource "aws_eip" "gitlab" {
 }
 
 resource "aws_iam_role_policy" "associate_eip" {
-  role = "${module.gitlab-asg.asg_iam_role_name}"
+  role = module.gitlab-asg.asg_iam_role_name
 
   policy = <<POLICY
 {
@@ -62,20 +63,22 @@ resource "aws_iam_role_policy" "associate_eip" {
     ]
 }
 POLICY
+
 }
 
 module "gitlab-asg" {
-  source        = "../../modules/single-node-asg"
-  name_prefix   = "${var.name}"
-  name_suffix   = "gitlab-server"
-  region        = "${var.region}"
-  key_name      = "${aws_key_pair.main.key_name}"
-  ami           = "${module.ubuntu-xenial-ami.id}"
-  instance_type = "t2.medium"
-  subnet_id     = "${module.vpc.public_subnet_ids[0]}"
+  source = "../../modules/single-node-asg"
 
-  security_group_ids    = ["${aws_security_group.gitlab.id}"]
-  root_volume_size      = "${var.root_volume_size}"
+  name_prefix   = var.name
+  name_suffix   = "gitlab-server"
+  region        = var.region
+  key_name      = aws_key_pair.main.key_name
+  ami           = module.ubuntu-xenial-ami.id
+  instance_type = "t2.medium"
+  subnet_id     = module.vpc.public_subnet_ids[0]
+
+  security_group_ids    = [aws_security_group.gitlab.id]
+  root_volume_size      = var.root_volume_size
   data_volume_encrypted = false
 
   init_prefix = <<END_INIT
@@ -84,8 +87,9 @@ ${module.init-install-awscli.init_snippet}
 ${module.init-install-ops.init_snippet}
 END_INIT
 
-  init_suffix = <<END_INIT
-aws ec2 associate-address --allocation-id=${aws_eip.gitlab.id} --instance-id=$$(ec2metadata --instance-id) --allow-reassociation --region=${var.region}
+
+init_suffix = <<END_INIT
+aws ec2 associate-address --allocation-id=${aws_eip.gitlab.id} --instance-id=$(ec2metadata --instance-id) --allow-reassociation --region=${var.region}
 mkdir -p /gitlab
 mount /dev/xvdf1 /gitlab
 
@@ -96,6 +100,7 @@ apt-get install -y docker docker.io
 ${module.init-gitlab-docker.init_snippet}
 ${module.init-gitlab-runner.init_snippet}
 END_INIT
+
 }
 
 module "init-install-awscli" {
@@ -107,15 +112,16 @@ module "init-install-ops" {
 }
 
 module "init-gitlab-docker" {
-  source        = "../../modules/init-snippet-gitlab-docker"
-  gitlab_domain = "${var.dns_zone_name}"
-  gitlab_name   = "${var.gitlab_name}"
-  gitlab_registry_name   = "${var.gitlab_registry_name}"
-  config_elb    = "${var.config_elb}"
+  source = "../../modules/init-snippet-gitlab-docker"
+
+  config_elb           = var.config_elb
+  gitlab_domain        = var.dns_zone_name
+  gitlab_name          = var.gitlab_name
+  gitlab_registry_name = var.gitlab_registry_name
 
   # write docker images to this S3 bucket (created separate from this env)
-  registry_bucket_name   = "${var.registry_bucket_name}"
-  registry_bucket_region = "${var.region}"
+  registry_bucket_name   = var.registry_bucket_name
+  registry_bucket_region = var.region
 }
 
 module "init-gitlab-runner" {
@@ -131,23 +137,23 @@ END_INIT
 
 module "vpc" {
   source              = "../../modules/vpc-scenario-1"
-  azs                 = ["${slice(data.aws_availability_zones.available.names, 0, 1)}"]
-  name_prefix         = "${var.name}"
+  azs                 = slice(data.aws_availability_zones.available.names, 0, 1)
+  name_prefix         = var.name
   cidr                = "192.168.0.0/16"
   public_subnet_cidrs = ["192.168.0.0/16"]
-  region              = "${var.region}"
+  region              = var.region
 }
 
 resource "aws_security_group" "gitlab" {
   name        = "gitlab-asg"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
   description = "Security group for the single-node autoscaling group"
 }
 
 module "ssh-rule" {
   source            = "../../modules/ssh-sg"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.gitlab.id}"
+  security_group_id = aws_security_group.gitlab.id
 }
 
 module "http-rule" {
@@ -155,7 +161,7 @@ module "http-rule" {
   port              = 80
   description       = "Allow ingress for HTTP, port 80 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.gitlab.id}"
+  security_group_id = aws_security_group.gitlab.id
 }
 
 module "https-rule" {
@@ -163,7 +169,7 @@ module "https-rule" {
   port              = 443
   description       = "Allow ingress for HTTPS, port 443 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.gitlab.id}"
+  security_group_id = aws_security_group.gitlab.id
 }
 
 module "gitlab-ssh-rule" {
@@ -171,34 +177,34 @@ module "gitlab-ssh-rule" {
   port              = 8022
   description       = "Allow ingress for Git over SSH, port 8022 (TCP)"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.gitlab.id}"
+  security_group_id = aws_security_group.gitlab.id
 }
 
 module "open-egress-rule" {
   source            = "../../modules/open-egress-sg"
-  security_group_id = "${aws_security_group.gitlab.id}"
+  security_group_id = aws_security_group.gitlab.id
 }
 
 ##################
 ## DNS setup
 
 data "aws_route53_zone" "selected" {
-  name = "${var.dns_zone_name}"
+  name = var.dns_zone_name
 }
 
 resource "aws_route53_record" "gitlab" {
-  zone_id = "${data.aws_route53_zone.selected.zone_id}"
+  zone_id = data.aws_route53_zone.selected.zone_id
   name    = "${var.gitlab_name}.${data.aws_route53_zone.selected.name}"
   type    = "A"
   ttl     = "300"
-  records = ["${aws_eip.gitlab.public_ip}"]
+  records = [aws_eip.gitlab.public_ip]
 }
 
 resource "aws_route53_record" "registry" {
-  zone_id = "${data.aws_route53_zone.selected.zone_id}"
+  zone_id = data.aws_route53_zone.selected.zone_id
   name    = "${var.gitlab_registry_name}.${data.aws_route53_zone.selected.name}"
   type    = "A"
   ttl     = "300"
-  records = ["${aws_eip.gitlab.public_ip}"]
+  records = [aws_eip.gitlab.public_ip]
 }
 

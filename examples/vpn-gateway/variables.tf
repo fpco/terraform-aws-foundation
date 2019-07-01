@@ -1,14 +1,5 @@
-# AWS Provider
-variable "access_key" {}
-
-variable "secret_key" {}
-
 variable "region" {
   default = "us-east-2"
-}
-
-variable "token" {
-  default = ""
 }
 
 # VPC
@@ -19,6 +10,7 @@ variable "name_prefix" {
 
 variable "vpc_azs" {
   description = "A list of availability zones to deploy subnets in"
+  type = list(string)
 }
 
 variable "vpc_cidr" {
@@ -27,6 +19,7 @@ variable "vpc_cidr" {
 
 variable "vpc_public_subnet_cidrs" {
   description = "The CIDR ranges for the VPC's public subnets"
+  type = list(string)
 }
 
 variable "pub_key_file" {
@@ -59,3 +52,4 @@ variable "vpn_username" {
 variable "vpn_password" {
   description = "VPN password."
 }
+

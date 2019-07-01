@@ -47,3 +47,4 @@ variable "vpn_static_routes" {
   default     = ["0.0.0.0/0"]
   description = "list of static routes to use with AWS customer gateway (VPN)"
 }
+

@@ -28,32 +28,25 @@ variable "key_name" {
   description = "The keypair used to ssh into the asg intances"
 }
 
-variable "key_file" {
-  description = "The secret key file to use"
-  default     = "~/.ssh/id_rsa"
-}
-
 module "vpc" {
   source              = "../../modules/vpc-scenario-1"
-  azs                 = ["${var.az}"]
+  azs                 = [var.az]
   name_prefix         = "nexus-single-node-asg"
   cidr                = "192.168.0.0/16"
   public_subnet_cidrs = ["192.168.0.0/16"]
-  region              = "${var.region}"
+  region              = var.region
 }
 
 module "snasg" {
   source             = "../../modules/single-node-asg"
-  name               = "test"
+  name_prefix        = "test"
   name_suffix        = "nexus-asg"
-  ami                = "${module.ubuntu-ami.id}"
+  ami                = module.ubuntu-ami.id
   instance_type      = "t2.micro"
-  region             = "${var.region}"
-  az                 = "${var.az}"
-  key_file           = "${var.key_file}"
-  key_name           = "${var.key_name}"
-  subnet_id          = "${module.vpc.public_subnet_ids[0]}"
-  security_group_ids = ["${aws_security_group.nexus-asg.id}"]
+  region             = var.region
+  key_name           = var.key_name
+  subnet_id          = module.vpc.public_subnet_ids[0]
+  security_group_ids = [aws_security_group.nexus-asg.id]
 
   init_prefix = <<END_INIT
 apt-get update
@@ -61,14 +54,16 @@ ${module.init-install-awscli.init_snippet}
 ${module.init-install-ops.init_snippet}
 END_INIT
 
+
   init_suffix = <<END_INIT
 ${module.init-nexus.init_snippet}
 END_INIT
+
 }
 
 module "ubuntu-ami" {
-  source      = "../../modules/ami-ubuntu"
-  release     = "16.04"
+  source  = "../../modules/ami-ubuntu"
+  release = "16.04"
 }
 
 module "init-nexus" {
@@ -85,23 +80,23 @@ module "init-install-ops" {
 
 resource "aws_security_group" "nexus-asg" {
   name        = "nexus-asg"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
   description = "Security group for the single-node autoscaling group"
-
+  
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  
   ingress {
     from_port   = 8081
     to_port     = 8081
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  
   egress {
     from_port   = 0
     to_port     = 0

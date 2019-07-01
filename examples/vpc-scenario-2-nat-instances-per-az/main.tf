@@ -41,74 +41,77 @@ variable "private_subnet_cidrs" {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+}
 
 module "vpc" {
   source      = "../../modules/vpc"
-  region      = "${var.region}"
-  cidr        = "${var.vpc_cidr_block}"
-  name_prefix = "${var.name}"
+  region      = var.region
+  cidr        = var.vpc_cidr_block
+  name_prefix = var.name
 }
 
 module "public-subnets" {
   source      = "../../modules/subnets"
-  azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
-  vpc_id      = "${module.vpc.vpc_id}"
+  azs         = slice(data.aws_availability_zones.available.names, 0, 3)
+  vpc_id      = module.vpc.vpc_id
   name_prefix = "${var.name}-public"
-  cidr_blocks = "${var.public_subnet_cidrs}"
+  cidr_blocks = var.public_subnet_cidrs
 }
 
 module "public-gateway" {
   source            = "../../modules/route-public"
-  vpc_id            = "${module.vpc.vpc_id}"
+  vpc_id            = module.vpc.vpc_id
   name_prefix       = "${var.name}-public"
-  public_subnet_ids = ["${module.public-subnets.ids}"]
+  public_subnet_ids = module.public-subnets.ids
 }
 
 module "private-subnets" {
   source      = "../../modules/subnets"
-  azs         = ["${slice(data.aws_availability_zones.available.names, 0, 3)}"]
-  vpc_id      = "${module.vpc.vpc_id}"
+  azs         = slice(data.aws_availability_zones.available.names, 0, 3)
+  vpc_id      = module.vpc.vpc_id
   name_prefix = "${var.name}-private"
-  cidr_blocks = "${var.private_subnet_cidrs}"
+  cidr_blocks = var.private_subnet_cidrs
   public      = false
 }
 
 module "nat-instances" {
   source      = "../../modules/ec2-nat-instances"
-  name_prefix = "${var.name}"
-  key_name    = "${aws_key_pair.main.key_name}"
+  name_prefix = var.name
+  key_name    = aws_key_pair.main.key_name
 
   # list of subnets to deploy NAT instances into
-  public_subnet_ids = ["${module.public-subnets.ids}"]
+  public_subnet_ids = module.public-subnets.ids
 
   # the one instance can route for any private subnet
-  private_subnet_cidrs = ["${module.private-subnets.cidr_blocks}"]
-  security_group_ids   = ["${aws_security_group.nat_instance.id}"]
+  private_subnet_cidrs = module.private-subnets.cidr_blocks
+  security_group_ids   = [aws_security_group.nat_instance.id]
 }
 
 # route tables for the private subnets, hook up the NAT instances
 resource "aws_route_table" "private_subnets" {
-  count  = "${length(var.private_subnet_cidrs)}"
-  vpc_id = "${module.vpc.vpc_id}"
-  tags   = "${map("Name", "${var.name}-private-subnet-${count.index + 1}")}"
+  count  = length(var.private_subnet_cidrs)
+  vpc_id = module.vpc.vpc_id
+  tags = {
+    "Name" = "${var.name}-private-subnet-${count.index + 1}"
+  }
 }
 
 # associate subnets to routing table
 resource "aws_route_table_association" "private_subnets" {
-  count          = "${length(var.private_subnet_cidrs)}"
-  subnet_id      = "${module.private-subnets.ids[count.index]}"
-  route_table_id = "${aws_route_table.private_subnets.*.id[count.index]}"
+  count          = length(var.private_subnet_cidrs)
+  subnet_id      = module.private-subnets.ids[count.index]
+  route_table_id = aws_route_table.private_subnets[count.index].id
 }
 
 # network route for private subnets ---> NAT for 0.0.0.0/0
 resource "aws_route" "nat" {
-  count                  = "${length(var.private_subnet_cidrs)}"
-  instance_id            = "${module.nat-instances.instance_ids[count.index]}"
-  route_table_id         = "${aws_route_table.private_subnets.*.id[count.index]}"
+  count                  = length(var.private_subnet_cidrs)
+  instance_id            = module.nat-instances.instance_ids[count.index]
+  route_table_id         = aws_route_table.private_subnets[count.index].id
   destination_cidr_block = "0.0.0.0/0"
 }
 
@@ -116,33 +119,33 @@ resource "aws_route" "nat" {
 resource "aws_security_group" "nat_instance" {
   name        = "${var.name}-nat-instance"
   description = "Allow HTTP/HTTPS thru the NAT"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 }
 
 module "nat-http-rule" {
   source            = "../../modules/single-port-sg"
   port              = 80
   description       = "allow ingress, HTTP (80) for NAT"
-  cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
-  security_group_id = "${aws_security_group.nat_instance.id}"
+  cidr_blocks       = module.private-subnets.cidr_blocks
+  security_group_id = aws_security_group.nat_instance.id
 }
 
 module "nat-https-rule" {
   source            = "../../modules/single-port-sg"
   port              = 443
   description       = "allow ingress, HTTPS (443) for NAT"
-  cidr_blocks       = ["${module.private-subnets.cidr_blocks}"]
-  security_group_id = "${aws_security_group.nat_instance.id}"
+  cidr_blocks       = module.private-subnets.cidr_blocks
+  security_group_id = aws_security_group.nat_instance.id
 }
 
 module "nat-public-ssh-rule" {
   source            = "../../modules/ssh-sg"
-  security_group_id = "${aws_security_group.nat_instance.id}"
+  security_group_id = aws_security_group.nat_instance.id
 }
 
 module "nat-instance-open-egress-rule" {
   source            = "../../modules/open-egress-sg"
-  security_group_id = "${aws_security_group.nat_instance.id}"
+  security_group_id = aws_security_group.nat_instance.id
 }
 
 module "ubuntu-xenial-ami" {
@@ -151,15 +154,15 @@ module "ubuntu-xenial-ami" {
 }
 
 resource "aws_key_pair" "main" {
-  key_name   = "${var.name}"
-  public_key = "${file(var.ssh_pubkey)}"
+  key_name   = var.name
+  public_key = file(var.ssh_pubkey)
 }
 
 # Security Group for ELB, gets public access
 resource "aws_security_group" "public_elb" {
   name        = "${var.name}-public-elb"
   description = "Allow public access to ELB"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 }
 
 module "elb-http-rule" {
@@ -167,38 +170,38 @@ module "elb-http-rule" {
   port              = 80
   description       = "allow ingress, HTTP (80) into ELB"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${aws_security_group.public_elb.id}"
+  security_group_id = aws_security_group.public_elb.id
 }
 
 module "elb-open-egress-rule" {
   source            = "../../modules/open-egress-sg"
-  security_group_id = "${aws_security_group.public_elb.id}"
+  security_group_id = aws_security_group.public_elb.id
 }
 
 # Security Group for webapp ASG, only accessible from ELB
 resource "aws_security_group" "web_service" {
   name        = "${var.name}-web-service"
   description = "security group for web-service instances in the private subnet"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 }
 
 module "web-service-http-rule" {
   source            = "../../modules/single-port-sg"
   port              = 3000
   description       = "allow ingress, HTTP port 3000 for the web app service"
-  cidr_blocks       = ["${module.public-subnets.cidr_blocks}"]
-  security_group_id = "${aws_security_group.web_service.id}"
+  cidr_blocks       = module.public-subnets.cidr_blocks
+  security_group_id = aws_security_group.web_service.id
 }
 
 module "web-service-vpc-ssh-rule" {
   source            = "../../modules/ssh-sg"
-  cidr_blocks       = ["${var.vpc_cidr_block}"]
-  security_group_id = "${aws_security_group.web_service.id}"
+  cidr_blocks       = [var.vpc_cidr_block]
+  security_group_id = aws_security_group.web_service.id
 }
 
 module "web-service-open-egress-rule" {
   source            = "../../modules/open-egress-sg"
-  security_group_id = "${aws_security_group.web_service.id}"
+  security_group_id = aws_security_group.web_service.id
 }
 
 resource "aws_elb" "web" {
@@ -224,26 +227,34 @@ resource "aws_elb" "web" {
   }
 
   # Ensure we allow incoming traffic to the ELB, HTTP/S
-  security_groups = ["${aws_security_group.public_elb.id}"]
+  security_groups = [aws_security_group.public_elb.id]
 
   # ELBs in the public subnets, separate from the web ASG in private subnets
-  subnets = ["${module.public-subnets.ids}"]
+  # TF-UPGRADE-TODO: In Terraform v0.10 and earlier, it was sometimes necessary to
+  # force an interpolation expression to be interpreted as a list by wrapping it
+  # in an extra set of list brackets. That form was supported for compatibilty in
+  # v0.11, but is no longer supported in Terraform v0.12.
+  #
+  # If the expression in the following list itself returns a list, remove the
+  # brackets to avoid interpretation as a list of lists. If the expression
+  # returns a single list item then leave it as-is and remove this TODO comment.
+  subnets = module.public-subnets.ids
 }
 
 module "web" {
   source             = "../../modules/asg"
-  ami                = "${module.ubuntu-xenial-ami.id}"
-  azs                = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
-  name_prefix        = "${var.name}"
+  ami                = module.ubuntu-xenial-ami.id
+  azs                = slice(data.aws_availability_zones.available.names, 0, 3)
+  name_prefix        = var.name
   name_suffix        = "webapp-server"
-  elb_names          = ["${aws_elb.web.name}"]
+  elb_names          = [aws_elb.web.name]
   instance_type      = "t2.nano"
-  max_nodes          = "${length(module.public-subnets.ids)}"
-  min_nodes          = "${length(module.public-subnets.ids)}"
+  max_nodes          = length(module.public-subnets.ids)
+  min_nodes          = length(module.public-subnets.ids)
   public_ip          = false
-  key_name           = "${aws_key_pair.main.key_name}"
-  subnet_ids         = ["${module.private-subnets.ids}"]
-  security_group_ids = ["${aws_security_group.web_service.id}"]
+  key_name           = aws_key_pair.main.key_name
+  subnet_ids         = module.private-subnets.ids
+  security_group_ids = [aws_security_group.web_service.id]
   root_volume_type   = "gp2"
   root_volume_size   = "8"
 
@@ -272,6 +283,7 @@ docker run                   \
     warp --docroot /var/www/html
 
 END_INIT
+
 }
 
 # Security Group for bastion instance
@@ -312,21 +324,22 @@ END_INIT
 #}
 
 output "elb_dns" {
-  value       = "${aws_elb.web.dns_name}"
+  value = aws_elb.web.dns_name
   description = "make the ELB accessible on the outside"
 }
 
 output "nat_public_ips" {
-  value       = ["${module.nat-instances.public_ips}"]
+  value = module.nat-instances.public_ips
   description = "Public IP of NAT instance"
 }
 
 output "region" {
-  value       = "${var.region}"
+  value = var.region
   description = "region deployed to"
 }
 
 output "web_asg_name" {
-  value       = "${var.name}-web-cluster"
+  value = "${var.name}-web-cluster"
   description = "name of the web service autoscaling group"
 }
+

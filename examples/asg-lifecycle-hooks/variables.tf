@@ -45,6 +45,7 @@ variable "public_subnet_cidrs" {
 
 variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
-  type        = "map"
+  type        = map(string)
   default     = {}
 }
+
