@@ -6,7 +6,7 @@ variable "name" {
 variable "region" {
   default     = "eu-central-1"
   description = "AWS Region where teh project will be deployed"
-  type        = "string"
+  type        = string
 }
 
 variable "ssh_pubkey" {
@@ -37,11 +37,12 @@ variable "public_subnet_cidrs" {
 variable "web_app_name" {
   description = "To generate the DNS record for gitlab, prefix the zone"
   default     = "my-web-app"
-  type        = "string"
+  type        = string
 }
 
 variable "instance_type" {
   description = "EC2 instance type for the web-app host"
-  type        = "string"
+  type        = string
   default     = "t2.micro"
 }
+

@@ -20,7 +20,6 @@ variable "instance_type" {
 
 variable "coreos_stable_ami_id" {
   description = "set a stable coreos ami id from https://goo.gl/wLhUyH"
-
   # for a different regions, change to https://goo.gl/wLhUyH
 }
 
@@ -47,12 +46,12 @@ variable "vpc_cidr" {
 
 variable "public_subnet_cidrs" {
   description = "list of CIDR ranges for the public subnets"
-  default     = ["10.10.10.0/24", "10.10.11.0/24"]           #, "10.120.12.0/24"]
+  default     = ["10.10.10.0/24", "10.10.11.0/24"] #, "10.120.12.0/24"]
 }
 
 variable "private_subnet_cidrs" {
   description = "list of CIDR ranges for the private subnets"
-  default     = ["10.10.20.0/24", "10.10.21.0/24"]            #, "10.120.22.0/24"]
+  default     = ["10.10.20.0/24", "10.10.21.0/24"] #, "10.120.22.0/24"]
 }
 
 variable "extra_tags" {
@@ -63,13 +62,12 @@ variable "extra_tags" {
 variable "canonical_account_id" {
   description = "AWS  account it for Canonical, used to lookup Ubuntu AMIs"
   default     = "099720109477"
-
   # for GovCloud, change to "513442679011"
 }
 
 variable "coreos_account_id" {
   description = "AWS account it for CoreOS, used to lookup CoreOS AMIs"
   default     = "595879546273"
-
   # for GovCloud, change to "190570271432"
 }
+

@@ -45,24 +45,25 @@ variable "private_subnet_cidrs" {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+}
 
 module "vpc" {
   source      = "../../modules/vpc-scenario-2"
-  name_prefix = "${var.name}"
-  region      = "${var.region}"
-  cidr        = "${var.vpc_cidr}"
-  azs         = ["${local.azs}"]
+  name_prefix = var.name
+  region      = var.region
+  cidr        = var.vpc_cidr
+  azs         = local.azs
 
   extra_tags = {
     kali = "ma"
   }
 
-  public_subnet_cidrs  = ["${var.public_subnet_cidrs}"]
-  private_subnet_cidrs = ["${var.private_subnet_cidrs}"]
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
 }
 
 module "ubuntu-xenial-ami" {
@@ -71,8 +72,8 @@ module "ubuntu-xenial-ami" {
 }
 
 resource "aws_key_pair" "main" {
-  key_name   = "${var.name}"
-  public_key = "${file(var.ssh_pubkey)}"
+  key_name   = var.name
+  public_key = file(var.ssh_pubkey)
 }
 
 # Security group for the elastic load balancer
@@ -80,22 +81,22 @@ module "elb-sg" {
   source      = "../../modules/security-group-base"
   description = "Allow public access to ELB in ${var.name}"
   name        = "${var.name}-elb"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 }
 
 # security group rule for elb open inbound http
 module "elb-http-rule" {
   source            = "../../modules/single-port-sg"
-	port              = 80
-	cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = "${module.elb-sg.id}"
-	description       = "open HTTP on the ELB to public access"
+  port              = 80
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = module.elb-sg.id
+  description       = "open HTTP on the ELB to public access"
 }
 
 # security group rule for elb open egress (outbound from nodes)
 module "elb-open-egress-rule" {
   source            = "../../modules/open-egress-sg"
-  security_group_id = "${module.elb-sg.id}"
+  security_group_id = module.elb-sg.id
 }
 
 # Security group for the web instance, only accessible from ELB
@@ -103,7 +104,7 @@ module "web-sg" {
   source      = "../../modules/security-group-base"
   description = "Allow HTTP and SSH to web instance in ${var.name}"
   name        = "${var.name}-web"
-  vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = module.vpc.vpc_id
 }
 
 # allow HTTP from ELB to web instances
@@ -111,8 +112,8 @@ module "web-http-elb-sg-rule" {
   source            = "../../modules/single-port-sg"
   port              = "3000"
   description       = "Allow ELB HTTP to web app on port 3000"
-  cidr_blocks       = ["${module.vpc.public_cidr_blocks}"]
-  security_group_id = "${module.web-sg.id}"
+  cidr_blocks       = module.vpc.public_cidr_blocks
+  security_group_id = module.web-sg.id
 }
 
 # allow SSH from bastion in public subnets to web instances
@@ -125,7 +126,7 @@ module "web-ssh-rule" {
 # open egress for web instances (outbound from nodes)
 module "web-open-egress-sg-rule" {
   source            = "../../modules/open-egress-sg"
-  security_group_id = "${module.web-sg.id}"
+  security_group_id = module.web-sg.id
 }
 
 # Load Balancer
@@ -152,26 +153,28 @@ resource "aws_elb" "web" {
   }
 
   # Ensure we allow incoming traffic to the ELB, HTTP/S
-  security_groups = ["${module.elb-sg.id}"]
+  security_groups = [
+    module.elb-sg.id
+  ]
 
   # ELBs in the public subnets, separate from the web ASG in private subnets
-  subnets = ["${module.vpc.public_subnet_ids}"]
+  subnets = module.vpc.public_subnet_ids
 }
 
 module "web" {
-  source           = "../../modules/asg"
-  ami              = "${module.ubuntu-xenial-ami.id}"
-  azs              = "${local.azs}"
-  name_prefix      = "${var.name}-web"
-  elb_names        = ["${aws_elb.web.name}"]
-  instance_type    = "t2.nano"
-  max_nodes        = "${length(module.vpc.public_subnet_ids)}"
-  min_nodes        = "${length(module.vpc.public_subnet_ids)}"
-  public_ip        = false
-  key_name         = "${aws_key_pair.main.key_name}"
-  subnet_ids       = ["${module.vpc.private_subnet_ids}"]
+  source        = "../../modules/asg"
+  ami           = module.ubuntu-xenial-ami.id
+  azs           = local.azs
+  name_prefix   = "${var.name}-web"
+  elb_names     = [aws_elb.web.name]
+  instance_type = "t2.nano"
+  max_nodes     = length(module.vpc.public_subnet_ids)
+  min_nodes     = length(module.vpc.public_subnet_ids)
+  public_ip     = false
+  key_name      = aws_key_pair.main.key_name
+  subnet_ids    = module.vpc.private_subnet_ids
 
-  security_group_ids = ["${module.web-sg.id}"]
+  security_group_ids = [module.web-sg.id]
 
   root_volume_type = "gp2"
   root_volume_size = "8"
@@ -216,29 +219,33 @@ docker run                   \
     yesodweb/warp            \
     warp --docroot /var/www/html
 END_INIT
+
 }
 
 locals {
-  az_count = "${length(var.public_subnet_cidrs)}"
-  azs      = ["${slice(data.aws_availability_zones.available.names, 0, local.az_count)}"]
+  az_count = length(var.public_subnet_cidrs)
+  azs = slice(
+    data.aws_availability_zones.available.names,
+    0,
+    local.az_count)
 }
 
 output "elb_dns" {
-  value       = "${aws_elb.web.dns_name}"
+  value       = aws_elb.web.dns_name
   description = "URL, where to find the ELB"
 }
 
 output "asg_name" {
-  value       = "${module.web.name}"
+  value       = module.web.name
   description = "Name of the web ASG, for looking up IP addresses"
 }
 
 output "region" {
-  value       = "${var.region}"
+  value       = var.region
   description = "Region we deployed to"
 }
 
 output "bastion_eip" {
-  value       = "${aws_eip.bastion.public_ip}"
+  value       = aws_eip.bastion.public_ip
   description = "EIP of the bastion host"
 }

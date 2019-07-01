@@ -55,7 +55,7 @@ variable "ssh_key" {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 module "ubuntu-xenial-ami" {
@@ -64,129 +64,130 @@ module "ubuntu-xenial-ami" {
 }
 
 resource "aws_key_pair" "main" {
-  key_name   = "${var.name}"
-  public_key = "${file(var.ssh_pubkey)}"
+  key_name   = var.name
+  public_key = file(var.ssh_pubkey)
 }
 
 module "vpc1" {
   source      = "../../modules/vpc"
   name_prefix = "${var.name}-vpc1"
-  region      = "${var.region}"
-  cidr        = "${var.vpc1_cidr}"
+  region      = var.region
+  cidr        = var.vpc1_cidr
 }
 
 module "vpc2" {
   source      = "../../modules/vpc"
   name_prefix = "${var.name}-vpc2"
-  region      = "${var.region}"
-  cidr        = "${var.vpc2_cidr}"
+  region      = var.region
+  cidr        = var.vpc2_cidr
 }
 
 module "vpc1-public-subnets" {
   source      = "../../modules/subnets"
-  azs         = "${var.aws_availability_zones}"
-  vpc_id      = "${module.vpc1.vpc_id}"
+  azs         = var.aws_availability_zones
+  vpc_id      = module.vpc1.vpc_id
   name_prefix = "${var.name}-vpc1-public"
-  cidr_blocks = "${var.vpc1_public_subnet_cidrs}"
-  extra_tags  = "${var.extra_tags}"
+  cidr_blocks = var.vpc1_public_subnet_cidrs
+  extra_tags  = var.extra_tags
 }
 
 module "vpc2-public-subnets" {
   source      = "../../modules/subnets"
-  azs         = "${var.aws_availability_zones}"
-  vpc_id      = "${module.vpc2.vpc_id}"
+  azs         = var.aws_availability_zones
+  vpc_id      = module.vpc2.vpc_id
   name_prefix = "${var.name}-vpc2-public"
-  cidr_blocks = "${var.vpc2_public_subnet_cidrs}"
-  extra_tags  = "${var.extra_tags}"
+  cidr_blocks = var.vpc2_public_subnet_cidrs
+  extra_tags  = var.extra_tags
 }
 
 module "vpc1-sg" {
   source      = "../../modules/security-group-base"
   description = "Test project security group"
   name        = "${var.name}-vpc1-sg"
-  vpc_id      = "${module.vpc1.vpc_id}"
+  vpc_id      = module.vpc1.vpc_id
 }
 
 module "vpc2-sg" {
   source      = "../../modules/security-group-base"
   description = "Test project security group"
   name        = "${var.name}-vpc2-sg"
-  vpc_id      = "${module.vpc2.vpc_id}"
+  vpc_id      = module.vpc2.vpc_id
 }
 
 module "vpc1-open-ssh" {
   source = "../../modules/ssh-sg"
 
   # this is actually used as a name-prefix
-  security_group_id = "${module.vpc1-sg.id}"
+  security_group_id = module.vpc1-sg.id
 }
 
 module "vpc1-open-egress" {
   source = "../../modules/open-egress-sg"
 
   # this is actually used as a name-prefix
-  security_group_id = "${module.vpc1-sg.id}"
+  security_group_id = module.vpc1-sg.id
 }
 
 module "vpc2-open-ssh" {
   source = "../../modules/ssh-sg"
 
   # this is actually used as a name-prefix
-  security_group_id = "${module.vpc2-sg.id}"
+  security_group_id = module.vpc2-sg.id
 }
 
 module "vpc2-open-egress" {
   source = "../../modules/open-egress-sg"
 
   # this is actually used as a name-prefix
-  security_group_id = "${module.vpc2-sg.id}"
+  security_group_id = module.vpc2-sg.id
 }
 
 module "vpc1-public-gateway" {
   source            = "../../modules/route-public"
-  vpc_id            = "${module.vpc1.vpc_id}"
+  vpc_id            = module.vpc1.vpc_id
   name_prefix       = "${var.name}-vpc1-public"
-  extra_tags        = "${var.extra_tags}"
-  public_subnet_ids = ["${concat(module.vpc1-public-subnets.ids)}"]
+  extra_tags        = var.extra_tags
+  public_subnet_ids = concat(module.vpc1-public-subnets.ids)
 }
 
 module "vpc2-public-gateway" {
   source            = "../../modules/route-public"
-  vpc_id            = "${module.vpc2.vpc_id}"
+  vpc_id            = module.vpc2.vpc_id
   name_prefix       = "${var.name}-vpc2-public"
-  extra_tags        = "${var.extra_tags}"
-  public_subnet_ids = ["${concat(module.vpc2-public-subnets.ids)}"]
+  extra_tags        = var.extra_tags
+  public_subnet_ids = concat(module.vpc2-public-subnets.ids)
 }
 
 # Peering connection for vpc1 to vpc2 communication
 resource "aws_vpc_peering_connection" "vpc1-to-vpc2" {
-  peer_vpc_id = "${module.vpc2.vpc_id}"
-  vpc_id      = "${module.vpc1.vpc_id}"
+  peer_vpc_id = module.vpc2.vpc_id
+  vpc_id      = module.vpc1.vpc_id
   auto_accept = true
 
-  tags {
+  tags = {
     Name = "${var.name}-vpc1-to-vpc2"
   }
 }
 
 resource "aws_route" "vpc1-to-vpc2" {
-  route_table_id            = "${module.vpc1-public-gateway.route_table_id}"
-  destination_cidr_block    = "${module.vpc2.vpc_cidr_block}"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.vpc1-to-vpc2.id}"
+  route_table_id            = module.vpc1-public-gateway.route_table_id
+  destination_cidr_block    = module.vpc2.vpc_cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.vpc1-to-vpc2.id
 }
 
 resource "aws_route" "vpc2-to-vpc1" {
-  route_table_id            = "${module.vpc2-public-gateway.route_table_id}"
-  destination_cidr_block    = "${module.vpc1.vpc_cidr_block}"
-  vpc_peering_connection_id = "${aws_vpc_peering_connection.vpc1-to-vpc2.id}"
+  route_table_id            = module.vpc2-public-gateway.route_table_id
+  destination_cidr_block    = module.vpc1.vpc_cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.vpc1-to-vpc2.id
 }
 
 resource "aws_instance" "vpc1-machine" {
-  ami               = "${module.ubuntu-xenial-ami.id}"
+  ami               = module.ubuntu-xenial-ami.id
   count             = "1"
-  key_name          = "${aws_key_pair.main.key_name}"
+  key_name          = aws_key_pair.main.key_name
   instance_type     = "t2.nano"
-  availability_zone = "${element(var.aws_availability_zones, 0)}"
+  availability_zone = element(var.aws_availability_zones, 0)
+  subnet_id         = element(module.vpc1-public-subnets.ids, count.index)
 
   root_block_device {
     volume_type = "gp2"
@@ -194,10 +195,12 @@ resource "aws_instance" "vpc1-machine" {
   }
 
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.vpc1-sg.id}"]
-  subnet_id                   = "${element(module.vpc1-public-subnets.ids, count.index)}"
 
-  tags {
+  vpc_security_group_ids = [
+    module.vpc1-sg.id
+  ]
+
+  tags = {
     Name = "${var.name}-vpc1-machine-${count.index}"
   }
 
@@ -209,19 +212,21 @@ resource "aws_instance" "vpc1-machine" {
     ]
 
     connection {
+      host        = coalesce(self.public_ip, self.private_ip)
       type        = "ssh"
       user        = "ubuntu"
-      private_key = "${file(var.ssh_key)}"
+      private_key = file(var.ssh_key)
     }
   }
 }
 
 resource "aws_instance" "vpc2-machine" {
-  ami               = "${module.ubuntu-xenial-ami.id}"
+  ami               = module.ubuntu-xenial-ami.id
   count             = "1"
-  key_name          = "${aws_key_pair.main.key_name}"
+  key_name          = aws_key_pair.main.key_name
   instance_type     = "t2.nano"
-  availability_zone = "${element(var.aws_availability_zones, 0)}"
+  availability_zone = element(var.aws_availability_zones, 0)
+  subnet_id         = element(module.vpc2-public-subnets.ids, count.index)
 
   root_block_device {
     volume_type = "gp2"
@@ -229,10 +234,12 @@ resource "aws_instance" "vpc2-machine" {
   }
 
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.vpc2-sg.id}"]
-  subnet_id                   = "${element(module.vpc2-public-subnets.ids, count.index)}"
 
-  tags {
+  vpc_security_group_ids = [
+    module.vpc2-sg.id
+  ]
+
+  tags = {
     Name = "${var.name}-vpc2-machine-${count.index}"
   }
 
@@ -244,9 +251,11 @@ resource "aws_instance" "vpc2-machine" {
     ]
 
     connection {
+      host        = coalesce(self.public_ip, self.private_ip)
       type        = "ssh"
       user        = "ubuntu"
-      private_key = "${file(var.ssh_key)}"
+      private_key = file(var.ssh_key)
     }
   }
 }
+

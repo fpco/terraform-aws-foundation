@@ -1,11 +1,11 @@
 variable "name" {
   description = "name of the project, use as prefix to names of resources created"
-  default = "gitlab-asg-test"
+  default     = "gitlab-asg-test"
 }
 
 variable "region" {
   description = "AWS Region where the project will be deployed"
-  default = "us-east-1"
+  default     = "us-east-1"
 }
 
 variable "ssh_pubkey" {
@@ -15,19 +15,19 @@ variable "ssh_pubkey" {
 
 variable "dns_zone_name" {
   description = "The name of the DNS zone on Route53 (example.com), to create records in for gitlab"
-  type        = "string"
+  type        = string
 }
 
 variable "gitlab_name" {
   description = "To generate the DNS record for gitlab, prefix the zone"
   default     = "gitlab"
-  type        = "string"
+  type        = string
 }
 
 variable "gitlab_registry_name" {
   description = "To generate the DNS record for the docker registry, prefix the zone"
   default     = "registry"
-  type        = "string"
+  type        = string
 }
 
 variable "root_volume_size" {
@@ -37,10 +37,11 @@ variable "root_volume_size" {
 
 variable "registry_bucket_name" {
   description = "The name of the S3 bucket to write docker images to"
-  type        = "string"
+  type        = string
 }
 
 variable "config_elb" {
   default     = false
   description = "variable to determine how to set up gitlab configuration. Setting to false uses the EIP version of module tuned to ELB"
 }
+

@@ -1,6 +1,6 @@
 variable "region" {
   description = "The AWS region to deploy to."
-  type = "string"
+  type        = string
 }
 
 variable "wordpress_ami_id" {
@@ -33,13 +33,13 @@ variable "aws_cloud" {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 module "s3-remote-state" {
-  source = "../../modules/s3-remote-state"
-  region = "${var.remote_state_region}"
-  bucket_name = "${var.remote_state_bucket_name}"
+  source      = "../../modules/s3-remote-state"
+  region      = var.remote_state_region
+  bucket_name = var.remote_state_bucket_name
 }
 
 resource "aws_security_group" "wordpress" {
@@ -65,25 +65,26 @@ resource "aws_security_group" "wordpress" {
 }
 
 resource "aws_instance" "wordpress" {
-  ami = "${var.wordpress_ami_id}"
+  ami                         = var.wordpress_ami_id
   associate_public_ip_address = true
-  instance_type = "t2.micro"
-  security_groups = ["${aws_security_group.wordpress.name}"]
-  tags {
+  instance_type               = "t2.micro"
+  security_groups             = [aws_security_group.wordpress.name]
+  tags = {
     Name = "wordpress"
   }
 }
 
 output "region" {
-  value       = "${var.region}"
+  value       = var.region
   description = "AWS region"
 }
 
 output "wordpress_public_ip" {
-  value = "${aws_instance.wordpress.public_ip}"
+  value       = aws_instance.wordpress.public_ip
   description = "Public IP of the created wordpress endpoint"
 }
 
 output "remote_state_principals" {
-  value = "${module.s3-remote-state.principals}"
+  value = module.s3-remote-state.principals
 }
+

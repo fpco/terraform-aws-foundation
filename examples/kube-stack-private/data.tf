@@ -1,8 +1,13 @@
 locals {
-  az_count = "${length(var.public_subnet_cidrs)}"
-  azs      = ["${slice(data.aws_availability_zones.available.names, 0, local.az_count)}"]
+  az_count = length(var.public_subnet_cidrs)
+  azs = slice(
+    data.aws_availability_zones.available.names,
+    0,
+    local.az_count)
 }
-data "aws_availability_zones" "available" {}
+
+data "aws_availability_zones" "available" {
+}
 
 data "aws_ami" "coreos-stable" {
   most_recent = true
@@ -22,7 +27,7 @@ data "aws_ami" "coreos-stable" {
     values = ["x86_64"]
   }
 
-  owners = ["${var.coreos_account_id}"]
+  owners = [var.coreos_account_id]
 }
 
 data "aws_ami" "ubuntu-xenial" {
@@ -38,5 +43,6 @@ data "aws_ami" "ubuntu-xenial" {
     values = ["hvm"]
   }
 
-  owners = ["${var.canonical_account_id}"]
+  owners = [var.canonical_account_id]
 }
+

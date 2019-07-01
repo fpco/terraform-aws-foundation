@@ -30,3 +30,4 @@ variable "extra_tags" {
 variable "cluster_admin_keyname" {
   description = "Admin SSH keyname that was imported to AWS"
 }
+

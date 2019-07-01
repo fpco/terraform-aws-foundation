@@ -4,16 +4,17 @@ output "elb_dns" {
 }
 
 output "elb_name" {
-  value = "${aws_elb.web.name}",
+  value       = aws_elb.web.name
   description = "ELB Name"
 }
 
 output "elb_instances" {
-  value = "${aws_elb.web.instances}",
+  value       = aws_elb.web.instances
   description = "ELB Instances"
 }
 
 output "elb_arn" {
-  value = "${aws_elb.web.arn}",
+  value       = aws_elb.web.arn
   description = "ELB Arn"
 }
+

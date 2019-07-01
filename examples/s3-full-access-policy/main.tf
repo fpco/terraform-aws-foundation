@@ -19,13 +19,13 @@ variable "user_name" {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 module "s3-full-access-policy" {
   source       = "../../modules/s3-full-access-policy"
-  name         = "${var.name}"
-  bucket_names = "${var.bucket_names}"
+  name         = var.name
+  bucket_names = var.bucket_names
 }
 
 # Provides an IAM user which will eventually receive full access.
@@ -36,7 +36,7 @@ resource "aws_iam_user" "s3-full-access-policy-user" {
 # Provides an IAM access key for the full access IAM user.
 # This is a set of credentials that allow API requests to be made as an IAM user.
 resource "aws_iam_access_key" "full-access-user-access-key" {
-  user    = "${aws_iam_user.s3-full-access-policy-user.name}"
+  user = aws_iam_user.s3-full-access-policy-user.name
 }
 
 # Provides an IAM user which will not receive access.
@@ -46,21 +46,22 @@ resource "aws_iam_user" "s3-no-access-policy-user" {
 
 # Provides an IAM access key for the IAM user with no access.
 resource "aws_iam_access_key" "no-access-user-access-key" {
-  user    = "${aws_iam_user.s3-no-access-policy-user.name}"
+  user = aws_iam_user.s3-no-access-policy-user.name
 }
 
 # Attaches a Managed IAM Policy to an IAM user
 resource "aws_iam_user_policy_attachment" "s3-full-access-policy-attachment" {
-  user       = "${aws_iam_user.s3-full-access-policy-user.name}"
-  policy_arn = "${module.s3-full-access-policy.arn}"
+  user       = aws_iam_user.s3-full-access-policy-user.name
+  policy_arn = module.s3-full-access-policy.arn
 }
 
 resource "aws_s3_bucket" "test-bucket" {
-  bucket = "${var.bucket_names[0]}"
-  region = "${var.region}"
+  bucket = var.bucket_names[0]
+  region = var.region
   acl    = "private"
 
-  tags {
+  tags = {
     Name = "Test bucket for s3-full-access-policy module"
   }
 }
+
