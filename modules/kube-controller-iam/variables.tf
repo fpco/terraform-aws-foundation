@@ -1,5 +1,6 @@
 variable "name_prefix" {
   description = "Name to prefix the resources with"
   default     = ""
-  type        = "string"
+  type        = string
 }
+

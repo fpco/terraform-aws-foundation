@@ -8,18 +8,18 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
-  type        = "string"
+  type        = string
 }
 
 variable "cidr_blocks" {
   description = "The list of CIDR IP blocks allowed to access mongod"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, mongod"
-  type        = "string"
+  type        = string
 }
 
 # Security group for mongod servers
@@ -29,8 +29,8 @@ resource "aws_security_group_rule" "mongo_tcp_1" {
   from_port         = "27017"
   to_port           = "27017"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 resource "aws_security_group_rule" "mongo_tcp_2" {
@@ -39,6 +39,7 @@ resource "aws_security_group_rule" "mongo_tcp_2" {
   from_port         = "28017"
   to_port           = "28017"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
+

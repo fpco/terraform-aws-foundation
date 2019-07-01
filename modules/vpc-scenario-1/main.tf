@@ -23,28 +23,29 @@
 
 module "vpc" {
   source               = "../vpc"
-  region               = "${var.region}"
-  cidr                 = "${var.cidr}"
-  name_prefix          = "${var.name_prefix}"
-  enable_dns_hostnames = "${var.enable_dns_hostnames}"
-  enable_dns_support   = "${var.enable_dns_support}"
-  dns_servers          = ["${var.dns_servers}"]
-  extra_tags           = "${var.extra_tags}"
+  region               = var.region
+  cidr                 = var.cidr
+  name_prefix          = var.name_prefix
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
+  dns_servers          = var.dns_servers
+  extra_tags           = var.extra_tags
 }
 
 module "public-subnets" {
   source      = "../subnets"
-  azs         = "${var.azs}"
-  vpc_id      = "${module.vpc.vpc_id}"
+  azs         = var.azs
+  vpc_id      = module.vpc.vpc_id
   name_prefix = "${var.name_prefix}-public"
-  cidr_blocks = ["${var.public_subnet_cidrs}"]
-  extra_tags  = "${var.extra_tags}"
+  cidr_blocks = var.public_subnet_cidrs
+  extra_tags  = var.extra_tags
 }
 
 module "public-gateway" {
   source            = "../route-public"
-  vpc_id            = "${module.vpc.vpc_id}"
+  vpc_id            = module.vpc.vpc_id
   name_prefix       = "${var.name_prefix}-public"
-  extra_tags        = "${var.extra_tags}"
-  public_subnet_ids = ["${module.public-subnets.ids}"]
+  extra_tags        = var.extra_tags
+  public_subnet_ids = module.public-subnets.ids
 }
+

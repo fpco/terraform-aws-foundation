@@ -43,35 +43,36 @@
  *
  */
 resource "aws_elasticache_cluster" "redis" {
-  cluster_id      = "${var.name}"
+  cluster_id      = var.name
   engine          = "redis"
-  engine_version  = "${var.engine_version}"
-  node_type       = "${var.instance_type}"
+  engine_version  = var.engine_version
+  node_type       = var.instance_type
   port            = 6379
   num_cache_nodes = 1
 
   #   parameter_group_name = "default.memcached1.4"
-  subnet_group_name = "${aws_elasticache_subnet_group.redis.name}"
+  subnet_group_name = aws_elasticache_subnet_group.redis.name
 
-  security_group_ids = ["${aws_security_group.redis-internal.id}",
-    "${var.inbound_security_group}",
+  security_group_ids = [
+    aws_security_group.redis-internal.id,
+    var.inbound_security_group,
   ]
 }
 
 resource "aws_elasticache_subnet_group" "redis" {
   name        = "${var.name}-${var.region}"
   description = "Redis on Elasticache for ${var.name}"
-  subnet_ids  = ["${aws_subnet.a.id}", "${aws_subnet.c.id}"]
+  subnet_ids  = [aws_subnet.a.id, aws_subnet.c.id]
 }
 
 # Subnets in each of two AZ in this region (a and c are the only two in all three US regions)
 resource "aws_subnet" "a" {
   availability_zone       = "${var.region}a"
-  cidr_block              = "${var.cidr_a}"
+  cidr_block              = var.cidr_a
   map_public_ip_on_launch = false
-  vpc_id                  = "${var.vpc_id}"
+  vpc_id                  = var.vpc_id
 
-  tags {
+  tags = {
     Name        = "${var.name}-redis-a-${var.region}"
     Description = "Elasticache subnet for ${var.name}"
   }
@@ -79,11 +80,11 @@ resource "aws_subnet" "a" {
 
 resource "aws_subnet" "c" {
   availability_zone       = "${var.region}c"
-  cidr_block              = "${var.cidr_c}"
+  cidr_block              = var.cidr_c
   map_public_ip_on_launch = false
-  vpc_id                  = "${var.vpc_id}"
+  vpc_id                  = var.vpc_id
 
-  tags {
+  tags = {
     Name        = "${var.name}-redis-c-${var.region}"
     Description = "Elasticache subnet for ${var.name}"
   }
@@ -91,21 +92,21 @@ resource "aws_subnet" "c" {
 
 # Routing table association for each minion subnet to the VPC IGW
 resource "aws_route_table_association" "a" {
-  route_table_id = "${var.route_table_id}"
-  subnet_id      = "${aws_subnet.a.id}"
+  route_table_id = var.route_table_id
+  subnet_id      = aws_subnet.a.id
 }
 
 resource "aws_route_table_association" "c" {
-  route_table_id = "${var.route_table_id}"
-  subnet_id      = "${aws_subnet.c.id}"
+  route_table_id = var.route_table_id
+  subnet_id      = aws_subnet.c.id
 }
 
 # Security group to allow communication from the specified networks
 resource "aws_security_group" "redis-internal" {
   name   = "${var.name}-${var.region}-redis-internal"
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
-  tags {
+  tags = {
     Description = "Allow redis to instances in the elasticache subnets for ${var.name}"
   }
 
@@ -113,6 +114,7 @@ resource "aws_security_group" "redis-internal" {
     from_port   = 6379
     to_port     = 6379
     protocol    = "tcp"
-    cidr_blocks = ["${aws_subnet.a.cidr_block}", "${aws_subnet.c.cidr_block}"]
+    cidr_blocks = [aws_subnet.a.cidr_block, aws_subnet.c.cidr_block]
   }
 }
+

@@ -1,69 +1,77 @@
 variable "name_prefix" {
   description = "The name of the environment to deploy to (beta/prod/etc)"
-  type        = "string"
+  type        = string
 }
 
 variable "key_name" {
   description = "The name of the (AWS) SSH key to associate with the instance"
-  type        = "string"
+  type        = string
 }
 
 variable "ami" {
   description = "The base AMI for each AWS instance created"
-  type        = "string"
+  type        = string
 }
 
 variable "instance_type" {
   default     = "t2.micro"
   description = "The type of AWS instance (size)"
+  type        = string
 }
 
 variable "data_volume_size" {
-  default     = "2"
+  default     = 2
   description = "Size (in GB) of EBS volume to use for the EBS volume"
+  type        = number
 }
 
 variable "data_volume_encrypted" {
-  default     = "false"
+  default     = false
   description = "Boolean, whether or not to encrypt the EBS block device"
+  type = bool
 }
 
 variable "data_volume_kms_key_id" {
   default     = ""
   description = "ID of the KMS key to use when encyprting the EBS block device"
+  type = string
 }
 
 variable "data_volume_snapshot_id" {
   default     = ""
   description = "The ID of the snapshot to base the EBS block device on"
+  type = string
 }
 
 variable "init_suffix" {
   default     = ""
   description = "init shell to run after setting VOLUME_ID and REGION exports"
+  type = string
 }
 
 variable "public_ip" {
-  default     = "false"
+  default     = false
   description = "Boolean flag to enable/disable `map_public_ip_on_launch` in the launch configuration"
+  type = bool
 }
 
 variable "subnet_id" {
   description = "The ID of the subnet to use, depends on the availability zone"
-  type        = "string"
+  type        = string
 }
 
 variable "security_group_ids" {
   description = "The list of security groups (by ID) to associate with the ASG"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "region" {
   description = "The AWS region to deploy to"
-  type        = "string"
+  type        = string
 }
 
 variable "load_balancers" {
   default     = []
   description = "The list of load balancers names to pass to the ASG module"
+  type = list(string)
 }

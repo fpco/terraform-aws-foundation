@@ -8,18 +8,18 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
-  type        = "string"
+  type        = string
 }
 
 variable "cidr_blocks" {
   description = "The list of CIDR IP blocks allowed to access the etcd ports"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, etcd server ports 2379 and 2380 (TCP)"
-  type        = "string"
+  type        = string
 }
 
 # Security group for etcd servers
@@ -29,6 +29,7 @@ resource "aws_security_group_rule" "etcd_server_tcp" {
   from_port         = "2379"
   to_port           = "2380"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
+

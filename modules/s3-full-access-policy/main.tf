@@ -4,29 +4,31 @@
  */
 variable "name" {
   description = "the name of the account or deployment to use with this policy"
+  type = string
 }
 
 variable "bucket_names" {
   description = "list of bucket names to grant access to"
-  type        = "list"
+  type        = list(string)
 }
 
 output "id" {
-  value       = "${aws_iam_policy.s3-full-access.id}"
+  value       = aws_iam_policy.s3-full-access.id
   description = "`id` exported from `aws_iam_policy`"
 }
 
 output "arn" {
-  value       = "${aws_iam_policy.s3-full-access.arn}"
+  value       = aws_iam_policy.s3-full-access.arn
   description = "`arn` exported from `aws_iam_policy`"
 }
 
 output "name" {
-  value       = "${aws_iam_policy.s3-full-access.name}"
+  value       = aws_iam_policy.s3-full-access.name
   description = "`name` exported from `aws_iam_policy`"
 }
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+}
 
 data "aws_iam_policy_document" "s3-full-access" {
   statement {
@@ -38,7 +40,10 @@ data "aws_iam_policy_document" "s3-full-access" {
       "s3:ListBucketMultipartUploads",
     ]
 
-    resources = ["${formatlist("arn:${data.aws_partition.current.partition}:s3:::%s",var.bucket_names)}"]
+    resources = formatlist(
+      "arn:${data.aws_partition.current.partition}:s3:::%s",
+      var.bucket_names,
+    )
   }
 
   statement {
@@ -54,11 +59,15 @@ data "aws_iam_policy_document" "s3-full-access" {
       "s3:AbortMultipartUpload",
     ]
 
-    resources = ["${formatlist("arn:${data.aws_partition.current.partition}:s3:::%s/*",var.bucket_names)}"]
+    resources = formatlist(
+      "arn:${data.aws_partition.current.partition}:s3:::%s/*",
+      var.bucket_names,
+    )
   }
 }
 
 resource "aws_iam_policy" "s3-full-access" {
   name   = "${var.name}_s3_bucket_access"
-  policy = "${data.aws_iam_policy_document.s3-full-access.json}"
+  policy = data.aws_iam_policy_document.s3-full-access.json
 }
+

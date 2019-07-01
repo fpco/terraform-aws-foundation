@@ -13,24 +13,24 @@
  */
 
 resource "aws_kms_key" "credstash-key" {
-  count               = "${var.create_kms_key ? 1 : 0}"
+  count               = var.create_kms_key ? 1 : 0
   description         = "Master key used by credstash"
-  enable_key_rotation = "${var.enable_key_rotation}"
+  enable_key_rotation = var.enable_key_rotation
 
   tags = {
-    Name = "${var.kms_key_name}"
+    Name = var.kms_key_name
   }
 }
 
 resource "aws_kms_alias" "credstash-key" {
-  count         = "${var.create_kms_key ? 1 : 0}"
+  count         = var.create_kms_key ? 1 : 0
   name          = "alias/${var.kms_key_name}"
-  target_key_id = "${aws_kms_key.credstash-key.key_id}"
+  target_key_id = aws_kms_key.credstash-key[0].key_id
 }
 
 resource "aws_dynamodb_table" "credstash-db" {
-  count          = "${var.create_db_table ? 1 : 0}"
-  name           = "${var.db_table_name}"
+  count          = var.create_db_table ? 1 : 0
+  name           = var.db_table_name
   read_capacity  = 1
   write_capacity = 1
   hash_key       = "name"
@@ -50,15 +50,16 @@ resource "aws_dynamodb_table" "credstash-db" {
 ## Writer Policy
 
 resource "aws_iam_policy" "writer-policy" {
-  count  = "${var.create_writer_policy ? 1 : 0}"
+  count  = var.create_writer_policy ? 1 : 0
   name   = "${var.db_table_name}-writer"
-  policy = "${data.aws_iam_policy_document.writer-policy.json}"
+  policy = data.aws_iam_policy_document.writer-policy.json
 }
 
 ## Reader Policy
 
 resource "aws_iam_policy" "reader-policy" {
-  count  = "${var.create_reader_policy ? 1 : 0}"
+  count  = var.create_reader_policy ? 1 : 0
   name   = "${var.db_table_name}-reader"
-  policy = "${data.aws_iam_policy_document.reader-policy.json}"
+  policy = data.aws_iam_policy_document.reader-policy.json
 }
+

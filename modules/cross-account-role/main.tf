@@ -10,25 +10,27 @@
 variable "trust_account_ids" {
   description = "List of other accounts to trust to assume the role"
   default     = []
-  type        = "list"
+  type        = list(string)
 }
 
 variable "name" {
   description = "Name to give the role"
-  type        = "string"
+  type        = string
 }
 
 output "arn" {
-  value = "${aws_iam_role.role.arn}"
+  value = aws_iam_role.role.arn
 }
 
 output "name" {
-  value = "${aws_iam_role.role.name}"
+  value = aws_iam_role.role.name
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+}
 
 data "aws_iam_policy_document" "assume-role" {
   statement {
@@ -38,17 +40,21 @@ data "aws_iam_policy_document" "assume-role" {
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values   = ["true"]
+      values   = [true]
     }
 
     principals {
-      type        = "AWS"
-      identifiers = ["${formatlist("arn:${data.aws_partition.current.partition}:iam::%s:root",var.trust_account_ids)}"]
+      type = "AWS"
+      identifiers = formatlist(
+        "arn:${data.aws_partition.current.partition}:iam::%s:root",
+        var.trust_account_ids,
+      )
     }
   }
 }
 
 resource "aws_iam_role" "role" {
-  name               = "${var.name}"
-  assume_role_policy = "${data.aws_iam_policy_document.assume-role.json}"
+  name               = var.name
+  assume_role_policy = data.aws_iam_policy_document.assume-role.json
 }
+

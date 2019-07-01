@@ -1,4 +1,5 @@
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+}
 
 data "aws_ami" "ubuntu-trusty" {
   most_recent = true
@@ -33,3 +34,4 @@ data "aws_ami" "ubuntu-xenial" {
   #          GovCloud        Standard AWS
   owners = ["513442679011", "099720109477"] # Canonical
 }
+

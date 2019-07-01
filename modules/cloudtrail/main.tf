@@ -1,27 +1,39 @@
 resource "aws_cloudtrail" "cloudtrail" {
   name           = "${var.name_prefix}-cloudtrail"
-  s3_bucket_name = "${aws_s3_bucket.cloudtrail.id}"
-  kms_key_id     = "${var.kms_key_id}"
+  s3_bucket_name = aws_s3_bucket.cloudtrail.id
+  kms_key_id     = var.kms_key_id
 
-  include_global_service_events = "${var.include_global_service_events}"
-  enable_logging                = "${var.enable_logging}"
+  include_global_service_events = var.include_global_service_events
+  enable_logging                = var.enable_logging
   is_multi_region_trail         = false
 
-  tags = "${merge(map("Name", "${var.name_prefix}-cloudtrail"), "${var.extra_tags}")}"
+  tags = merge(
+    {
+      "Name" = "${var.name_prefix}-cloudtrail"
+    },
+    var.extra_tags,
+  )
 }
 
 resource "aws_s3_bucket" "cloudtrail" {
   bucket = "${var.name_prefix}-cloudtrail"
-  region = "${data.aws_region.current.name}"
+  region = data.aws_region.current.name
   acl    = "private"
-  policy = "${data.aws_iam_policy_document.cloudtrail-bucket.json}"
+  policy = data.aws_iam_policy_document.cloudtrail-bucket.json
 
-  tags = "${merge(map("Name", "${var.name_prefix}-cloudtrail"), "${var.extra_tags}")}"
+  tags = merge(
+    {
+      "Name" = "${var.name_prefix}-cloudtrail"
+    },
+    var.extra_tags,
+  )
 }
 
-data "aws_region" "current" {}
+data "aws_region" "current" {
+}
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+}
 
 data "aws_iam_policy_document" "cloudtrail-bucket" {
   statement {
@@ -56,3 +68,4 @@ data "aws_iam_policy_document" "cloudtrail-bucket" {
     }
   }
 }
+

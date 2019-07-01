@@ -9,7 +9,7 @@
 resource "aws_iam_role" "cloudwatch_exporter" {
   name               = "${var.name_prefix}-cloudwatch-exporter"
   path               = "/"
-  assume_role_policy = "${data.aws_iam_policy_document.assume.json}"
+  assume_role_policy = data.aws_iam_policy_document.assume.json
 }
 
 resource "aws_iam_policy" "cloudwatch_exporter" {
@@ -17,10 +17,11 @@ resource "aws_iam_policy" "cloudwatch_exporter" {
   path        = "/"
   description = "Allows reading cloud watch metrics."
 
-  policy = "${data.aws_iam_policy_document.cloudwatch_exporter.json}"
+  policy = data.aws_iam_policy_document.cloudwatch_exporter.json
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch_exporter" {
-  role       = "${aws_iam_role.cloudwatch_exporter.name}"
-  policy_arn = "${aws_iam_policy.cloudwatch_exporter.arn}"
+  role       = aws_iam_role.cloudwatch_exporter.name
+  policy_arn = aws_iam_policy.cloudwatch_exporter.arn
 }
+

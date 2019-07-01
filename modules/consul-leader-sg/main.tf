@@ -37,16 +37,18 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
+  type = string
 }
 
 variable "cidr_blocks" {
   description = "The list of CIDR IP blocks allowed to access the consul ports"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, consul leaders"
+  type = string
 }
 
 # Server RPC, used by servers to handle incoming requests from other agents.
@@ -56,8 +58,8 @@ resource "aws_security_group_rule" "server_rpc_tcp" {
   from_port         = "8300"
   to_port           = "8300"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 resource "aws_security_group_rule" "server_rpc_udp" {
@@ -66,8 +68,8 @@ resource "aws_security_group_rule" "server_rpc_udp" {
   from_port         = "8300"
   to_port           = "8300"
   protocol          = "udp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 # Serf LAN, used to handle gossip in the LAN. TCP and UDP.
@@ -77,8 +79,8 @@ resource "aws_security_group_rule" "serf_lan_tcp" {
   from_port         = "8301"
   to_port           = "8301"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 resource "aws_security_group_rule" "serf_lan_udp" {
@@ -87,8 +89,8 @@ resource "aws_security_group_rule" "serf_lan_udp" {
   from_port         = "8301"
   to_port           = "8301"
   protocol          = "udp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 # HTTP API, used by clients to talk to the HTTP API. TCP only.
@@ -98,8 +100,8 @@ resource "aws_security_group_rule" "http_tcp" {
   from_port         = "8500"
   to_port           = "8500"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 # DNS Interface, used to resolve DNS queries. TCP and UDP.
@@ -109,8 +111,8 @@ resource "aws_security_group_rule" "dns_tcp" {
   from_port         = "8600"
   to_port           = "8600"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 resource "aws_security_group_rule" "dns_udp" {
@@ -119,6 +121,7 @@ resource "aws_security_group_rule" "dns_udp" {
   from_port         = "8600"
   to_port           = "8600"
   protocol          = "udp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
+

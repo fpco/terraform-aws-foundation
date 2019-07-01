@@ -7,17 +7,17 @@
  */
 
 data "aws_subnet" "private" {
-  count  = "${length(var.private_subnet_ids)}"
-  id     = "${var.private_subnet_ids[count.index]}"
-  vpc_id = "${var.vpc_id}"
+  count  = length(var.private_subnet_ids)
+  id     = var.private_subnet_ids[count.index]
+  vpc_id = var.vpc_id
 }
 
 resource "aws_alb_target_group" "kibana-https" {
-  count    = "${lookup(var.alb, "deploy_elb", false) ? 0 : 1}"
+  count    = lookup(var.alb, "deploy_elb", false) ? 0 : 1
   name     = "${var.name_prefix}-kibana-https"
   port     = 5602
   protocol = "HTTP"
-  vpc_id   = "${var.vpc_id}"
+  vpc_id   = var.vpc_id
 
   health_check {
     interval = 300
@@ -25,7 +25,6 @@ resource "aws_alb_target_group" "kibana-https" {
     port     = 5602
     matcher  = "401"
   }
-
   # health_check {
   #   interval = 300
   #   protocol = "HTTP"
@@ -37,11 +36,11 @@ resource "aws_alb_target_group" "kibana-https" {
 
 // Target group for redirect to https
 resource "aws_alb_target_group" "kibana-http" {
-  count    = "${lookup(var.alb, "deploy_elb", false) ? 0 : 1}"
+  count    = lookup(var.alb, "deploy_elb", false) ? 0 : 1
   name     = "${var.name_prefix}-kibana-http"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = "${var.vpc_id}"
+  vpc_id   = var.vpc_id
 
   health_check {
     interval = 300
@@ -50,14 +49,14 @@ resource "aws_alb_target_group" "kibana-http" {
 }
 
 data "template_file" "kibana-setup" {
-  template = "${file("${path.module}/data/setup.tpl.sh")}"
+  template = file("${path.module}/data/setup.tpl.sh")
 
-  vars {
-    elasticsearch_url         = "${var.elasticsearch_url}"
-    credstash_install_snippet = "${var.credstash_install_snippet}"
-    credstash_get_cmd         = "${var.credstash_get_cmd}"
+  vars = {
+    elasticsearch_url         = var.elasticsearch_url
+    credstash_install_snippet = var.credstash_install_snippet
+    credstash_get_cmd         = var.credstash_get_cmd
     credstash_context         = "env=${var.name_prefix}"
-    kibana_version            = "${var.kibana_version}"
+    kibana_version            = var.kibana_version
     nginx_username_key        = "${var.name_prefix}-kibana-basic-auth-username"
     nginx_password_key        = "${var.name_prefix}-kibana-basic-auth-password"
   }
@@ -65,27 +64,29 @@ data "template_file" "kibana-setup" {
 
 resource "aws_security_group" "kibana-sg" {
   name        = "${var.name_prefix}-kibana-ec2"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
   description = "Allow inboud HTTP (for HTTPS redirect), Kibana port (5602). Also everything outbound."
 
-  tags {
+  tags = {
     Name = "${var.name_prefix}-kibana-ec2"
   }
 
   # Kibana
   ingress {
-    from_port       = 5602
-    to_port         = 5602
-    protocol        = "tcp"
-    security_groups = ["${var.alb["security_group_id"]}"]
+    from_port = 5602
+    to_port   = 5602
+    protocol  = "tcp"
+
+    security_groups = [var.alb["security_group_id"]]
   }
 
   # Used for proper redirect to https
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = ["${var.alb["security_group_id"]}"]
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    security_groups = [var.alb["security_group_id"]]
   }
 
   egress {
@@ -97,55 +98,57 @@ resource "aws_security_group" "kibana-sg" {
 }
 
 resource "aws_autoscaling_group" "kibana-asg" {
-  count                = "${min(var.max_server_count, 1)}"
-  availability_zones   = ["${data.aws_subnet.private.*.availability_zone}"]
+  count                = min(var.max_server_count, 1)
+  availability_zones   = data.aws_subnet.private.*.availability_zone
   name                 = "${var.name_prefix}-kibana"
-  max_size             = "${var.max_server_count}"
-  min_size             = "${var.min_server_count}"
-  desired_capacity     = "${var.desired_server_count}"
-  launch_configuration = "${aws_launch_configuration.kibana-lc.name}"
+  max_size             = var.max_server_count
+  min_size             = var.min_server_count
+  desired_capacity     = var.desired_server_count
+  launch_configuration = aws_launch_configuration.kibana-lc[0].name
   health_check_type    = "ELB"
-  vpc_zone_identifier  = ["${var.private_subnet_ids}"]
-  load_balancers       = ["${var.alb["name"]}"]
+  vpc_zone_identifier  = var.private_subnet_ids
 
-  tag = [{
+  load_balancers = [var.alb["name"]]
+
+  tag {
     key                 = "Name"
     value               = "${var.name_prefix}-kibana"
     propagate_at_launch = true
-  }]
+  }
 }
 
 resource "aws_launch_configuration" "kibana-lc" {
-  count           = "${min(var.max_server_count, 1)}"
+  count           = min(var.max_server_count, 1)
   name_prefix     = "${var.name_prefix}-kibana-"
-  image_id        = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  key_name        = "${var.key_name}"
-  security_groups = "${concat(list(aws_security_group.kibana-sg.id), var.extra_sg_ids)}"
+  image_id        = var.ami
+  instance_type   = var.instance_type
+  key_name        = var.key_name
+  security_groups = concat([aws_security_group.kibana-sg.id], var.extra_sg_ids)
 
   user_data = <<USER_DATA
 #!/bin/bash
 ${data.template_file.kibana-setup.rendered}
 USER_DATA
 
-  lifecycle = {
+  lifecycle {
     create_before_destroy = true
   }
 }
 
 resource "aws_elb" "kibana-elb" {
-  count           = "${lookup(var.alb, "deploy_elb", false) ? 1 : 0}"
-  name            = "${var.name_prefix}-kibana"
-  subnets         = ["${var.public_subnet_ids}"]
-  security_groups = ["${var.alb["security_group_id"]}"]
-  internal        = "${lookup(var.alb, "deploy_elb_internal", true)}"
+  count   = lookup(var.alb, "deploy_elb", false) ? 1 : 0
+  name    = "${var.name_prefix}-kibana"
+  subnets = var.public_subnet_ids
+
+  security_groups = [var.alb["security_group_id"]]
+  internal        = lookup(var.alb, "deploy_elb_internal", true)
 
   listener {
     instance_port      = 5602
     instance_protocol  = "http"
     lb_port            = 443
     lb_protocol        = "https"
-    ssl_certificate_id = "${var.alb["certificate_arn"]}"
+    ssl_certificate_id = var.alb["certificate_arn"]
   }
 
   listener {
@@ -156,18 +159,20 @@ resource "aws_elb" "kibana-elb" {
   }
 
   # health_check {
-  #   healthy_threshold = 2
+  #   healthy_threshold   = 2
   #   unhealthy_threshold = 5
-  #   timeout = 10
-  #   target = "HTTP:5603/"
-  #   interval = 60
+  #   timeout             = 10
+  #   target              = "HTTP:5603/"
+  #   interval            = 60
   # }
 
-  cross_zone_load_balancing   = "${lookup(var.alb, "deploy_elb_cross_zone", true)}"
-  idle_timeout                = 60
+  cross_zone_load_balancing   = lookup(var.alb, "deploy_elb_cross_zone", true)
   connection_draining         = true
   connection_draining_timeout = 60
-  tags {
+  idle_timeout                = 60
+
+  tags = {
     Name = "${var.name_prefix}-kibana-elb"
   }
 }
+

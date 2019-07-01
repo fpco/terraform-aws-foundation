@@ -25,13 +25,13 @@
 # Auto-Scaling Group
 resource "aws_autoscaling_group" "cluster" {
   name                 = "${var.name_prefix}-${aws_launch_configuration.cluster.name}"
-  launch_configuration = "${aws_launch_configuration.cluster.id}"
-  availability_zones   = ["${var.azs}"]
-  load_balancers       = ["${var.elb_names}"]
-  vpc_zone_identifier  = ["${var.subnet_ids}"]
+  launch_configuration = aws_launch_configuration.cluster.id
+  availability_zones   = var.azs
+  load_balancers       = var.elb_names
+  vpc_zone_identifier  = var.subnet_ids
 
   min_size         = "1"
-  desired_capacity = "${var.instance_count}"
+  desired_capacity = var.instance_count
   max_size         = "4"
 
   lifecycle {
@@ -43,23 +43,24 @@ resource "aws_autoscaling_group" "cluster" {
     default_result          = "CONTINUE"
     heartbeat_timeout       = 60
     lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
-    notification_target_arn = "${var.sns_topic_arn}"
-    role_arn                = "${var.aws_role_arn}"
+    notification_target_arn = var.sns_topic_arn
+    role_arn                = var.aws_role_arn
   }
 }
 
 # Launch Config for the ASG
 resource "aws_launch_configuration" "cluster" {
-  name_prefix          = "${var.name_prefix}"
-  image_id             = "${var.instance_ami}"
-  instance_type        = "${var.instance_type}"
-  key_name             = "${var.instance_key}"
-  iam_instance_profile = "${var.aws_instance_ec2_name}"
-  security_groups      = ["${var.aws_sg_id}", "${var.elb_sg_id}"]
+  name_prefix          = var.name_prefix
+  image_id             = var.instance_ami
+  instance_type        = var.instance_type
+  key_name             = var.instance_key
+  iam_instance_profile = var.aws_instance_ec2_name
+  security_groups      = [var.aws_sg_id, var.elb_sg_id]
 
-  user_data = "${var.asg_template_file}"
+  user_data = var.asg_template_file
 
   lifecycle {
     create_before_destroy = true
   }
 }
+

@@ -11,39 +11,45 @@
 
 variable "name" {
   description = "security group `name`"
-  type        = "string"
+  type        = string
 }
 
 variable "description" {
   description = "security group `description`"
-  type        = "string"
+  type        = string
 }
 
 variable "vpc_id" {
   description = "ID of VPC to associate SG with"
-  type        = "string"
+  type        = string
 }
 
 variable "extra_tags" {
   description = "map of name,value pairs to tag the security group (append to Name tag)"
   default     = {}
-  type        = "map"
+  type        = map(string)
 }
 
 resource "aws_security_group" "main" {
-  name        = "${var.name}"
-  description = "${var.description}"
-  vpc_id      = "${var.vpc_id}"
+  name        = var.name
+  description = var.description
+  vpc_id      = var.vpc_id
 
-  tags = "${merge(map("Name", "${var.name}"), "${var.extra_tags}")}"
+  tags = merge(
+    {
+      "Name" = var.name
+    },
+    var.extra_tags,
+  )
 }
 
 output "id" {
-  value       = "${aws_security_group.main.id}"
+  value       = aws_security_group.main.id
   description = "ID of the Security Group created"
 }
 
 output "name" {
-  value       = "${aws_security_group.main.name}"
+  value       = aws_security_group.main.name
   description = "Name of the Security Group created"
 }
+

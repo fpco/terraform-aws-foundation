@@ -1,15 +1,18 @@
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {
+}
 
-data "aws_region" "current" {}
+data "aws_region" "current" {
+}
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+}
 
 data "template_file" "credstash-get-cmd" {
   template = "env credstash -r ${data.aws_region.current.name} -t ${var.db_table_name} get"
 }
 
 data "template_file" "credstash-put-cmd" {
-  template = "env credstash -r ${data.aws_region.current.name} -t ${var.db_table_name} put -k ${aws_kms_alias.credstash-key.name}"
+  template = "env credstash -r ${data.aws_region.current.name} -t ${var.db_table_name} put -k ${aws_kms_alias.credstash-key[0].name}"
 }
 
 data "template_file" "credstash-install-snippet" {
@@ -19,12 +22,13 @@ data "template_file" "credstash-install-snippet" {
   pip install --upgrade pip==9.0.3;
   pip install credstash; }
 END_TEMPLATE
+
 }
 
 # Writer Policy
 data "aws_iam_policy_document" "writer-policy" {
   statement {
-    effect  = "Allow"
+    effect = "Allow"
     actions = ["dynamodb:PutItem"]
 
     resources = [
@@ -49,3 +53,4 @@ data "aws_iam_policy_document" "reader-policy" {
     ]
   }
 }
+

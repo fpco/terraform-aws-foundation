@@ -10,12 +10,12 @@
 
 variable "security_group_id" {
   description = "security group to attach rules to"
-  type        = "string"
+  type        = string
 }
 
 variable "cidr_blocks" {
   description = "The list of CIDR IP blocks allowed to ping hosts with this security group"
-  type        = "list"
+  type        = list(string)
 }
 
 resource "aws_security_group_rule" "ping_requests" {
@@ -23,8 +23,8 @@ resource "aws_security_group_rule" "ping_requests" {
   from_port         = "8"
   to_port           = "8"
   protocol          = "icmp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
 
 resource "aws_security_group_rule" "ping_response" {
@@ -32,6 +32,7 @@ resource "aws_security_group_rule" "ping_response" {
   from_port         = "0"
   to_port           = "0"
   protocol          = "icmp"
-  cidr_blocks       = ["${var.cidr_blocks}"]
-  security_group_id = "${var.security_group_id}"
+  cidr_blocks       = var.cidr_blocks
+  security_group_id = var.security_group_id
 }
+

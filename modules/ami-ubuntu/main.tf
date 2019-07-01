@@ -49,7 +49,7 @@
 variable "most_recent" {
   default     = true
   description = "boolean, maps to `most_recent` parameter for `aws_ami` data source"
-  type        = "string"
+  type        = string
 }
 
 variable "name_map" {
@@ -62,19 +62,20 @@ variable "name_map" {
   }
 
   description = "map of release numbers to names, including trusty, xenial, zesty, and artful"
-  type        = "map"
+  type        = map(string)
 }
 
 variable "release" {
   default     = "16.04"
   description = "default ubuntu release to target"
-  type        = "string"
+  type        = string
 }
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+}
 
 data "aws_ami" "ubuntu" {
-  most_recent = "${var.most_recent}"
+  most_recent = var.most_recent
 
   filter {
     name   = "name"
@@ -86,10 +87,11 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["${data.aws_partition.current.partition == "aws-us-gov" ? "513442679011" : "099720109477"}"] # Canonical
+  owners = [data.aws_partition.current.partition == "aws-us-gov" ? "513442679011" : "099720109477"] # Canonical
 }
 
 output "id" {
-  value       = "${data.aws_ami.ubuntu.id}"
+  value       = data.aws_ami.ubuntu.id
   description = "ID of the AMI"
 }
+

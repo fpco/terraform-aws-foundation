@@ -9,42 +9,47 @@
 
 variable "bucket_name" {
   description = "the name to give the bucket"
+  type        = string
 }
 
 variable "principals" {
   default     = []
   description = "list of user/role ARNs to get full access to the bucket"
+  type        = list(string)
 }
 
 variable "versioning" {
-  default     = "true"
+  default     = true
   description = "enables versioning for objects in the S3 bucket"
+  type        = bool
 }
 
 variable "region" {
   default     = ""
   description = "Region where the S3 bucket will be created"
-  type        = "string"
+  type        = string
 }
 
 variable "force_destroy" {
   description = "Whether to allow a forceful destruction of this bucket"
   default     = false
+  type        = bool
 }
 
 resource "aws_s3_bucket" "remote-state" {
-  bucket = "${var.bucket_name}"
-  acl    = "private"
-  region = "${var.region}"
-  force_destroy = "${var.force_destroy}"
+  bucket        = var.bucket_name
+  acl           = "private"
+  region        = var.region
+  force_destroy = var.force_destroy
 
   versioning {
-    enabled = "${var.versioning}"
+    enabled = var.versioning
   }
 }
 
 # Lookup the current AWS partition
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+}
 
 data "aws_iam_policy_document" "s3-full-access" {
   statement {
@@ -58,7 +63,7 @@ data "aws_iam_policy_document" "s3-full-access" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${compact(var.principals)}"]
+      identifiers = compact(var.principals)
     }
 
     resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}"]
@@ -70,21 +75,16 @@ data "aws_iam_policy_document" "s3-full-access" {
     # find an authoritative list of valid Actions for a AWS bucket policy,
     # I haven't been able to locate one, and the two commented out are invalid
     actions = [
-      #     "s3:ListObjects",
       "s3:PutObject",
-
       "s3:GetObject",
       "s3:DeleteObject",
-
-      #     "s3:CreateMultipartUpload",
       "s3:ListMultipartUploadParts",
-
       "s3:AbortMultipartUpload",
     ]
 
     principals {
       type        = "AWS"
-      identifiers = ["${compact(var.principals)}"]
+      identifiers = compact(var.principals)
     }
 
     resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}/*"]
@@ -92,8 +92,8 @@ data "aws_iam_policy_document" "s3-full-access" {
 }
 
 resource "aws_s3_bucket_policy" "s3-full-access" {
-  bucket = "${aws_s3_bucket.remote-state.id}"
-  policy = "${data.aws_iam_policy_document.s3-full-access.json}"
+  bucket = aws_s3_bucket.remote-state.id
+  policy = data.aws_iam_policy_document.s3-full-access.json
 }
 
 data "aws_iam_policy_document" "bucket-full-access" {
@@ -126,7 +126,7 @@ data "aws_iam_policy_document" "bucket-full-access" {
 
 resource "aws_iam_policy" "bucket-full-access" {
   name   = "s3-${var.bucket_name}-full-access"
-  policy = "${data.aws_iam_policy_document.bucket-full-access.json}"
+  policy = data.aws_iam_policy_document.bucket-full-access.json
 }
 
 data "aws_iam_policy_document" "bucket-full-access-with-mfa" {
@@ -158,28 +158,28 @@ data "aws_iam_policy_document" "bucket-full-access-with-mfa" {
     condition {
       test     = "Bool"
       variable = "aws:MultiFactorAuthPresent"
-      values   = ["true"]
+      values   = [true]
     }
   }
 }
 
 resource "aws_iam_policy" "bucket-full-access-with-mfa" {
   name   = "s3-${var.bucket_name}-full-access-with-mfa"
-  policy = "${data.aws_iam_policy_document.bucket-full-access-with-mfa.json}"
+  policy = data.aws_iam_policy_document.bucket-full-access-with-mfa.json
 }
 
 output "bucket_arn" {
-  value       = "${aws_s3_bucket.remote-state.arn}"
+  value       = aws_s3_bucket.remote-state.arn
   description = "`arn` exported from `aws_s3_bucket`"
 }
 
 output "bucket_id" {
-  value       = "${aws_s3_bucket.remote-state.id}"
+  value       = aws_s3_bucket.remote-state.id
   description = "`id` exported from `aws_s3_bucket`"
 }
 
 output "region" {
-  value       = "${aws_s3_bucket.remote-state.region}"
+  value       = aws_s3_bucket.remote-state.region
   description = "`region` exported from `aws_s3_bucket`"
 }
 
@@ -189,16 +189,17 @@ output "url" {
 }
 
 output "principals" {
-  value       = "${var.principals}"
+  value       = var.principals
   description = "Export `principals` variable (list of IAM user/role ARNs with access to the bucket)"
 }
 
 output "bucket-full-access-policy-arn" {
-  value       = "${aws_iam_policy.bucket-full-access.arn}"
+  value       = aws_iam_policy.bucket-full-access.arn
   description = "ARN of IAM policy that grants access to the bucket (without requiring MFA)"
 }
 
 output "bucket-full-access-with-mfa-policy-arn" {
-  value       = "${aws_iam_policy.bucket-full-access-with-mfa.arn}"
+  value       = aws_iam_policy.bucket-full-access-with-mfa.arn
   description = "ARN of IAM policy that grants access to the bucket (with MFA required)"
 }
+
