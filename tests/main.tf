@@ -351,6 +351,13 @@ module "init-snippet-gitlab-docker" {
   registry_bucket_name = ""
 }
 
+module "init-snippet-gitlab-docker-compose" {
+  source = "../modules/init-snippet-gitlab-docker-compose"
+
+  gitlab_fqdn                 = ""
+  gitlab_registry_bucket_name = ""
+}
+
 module "init-snippet-hostname" {
   source = "../modules/init-snippet-hostname"
 

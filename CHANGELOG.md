@@ -4,6 +4,8 @@
 
 ### Modules
 
+* `init-snippet-gitlab-docker-compose`: The same as `init-snippet-gitlab-docker`, but uses a `docker-compose.yml` file instead of an `rc.local`.
+
 ### Examples
 
 
