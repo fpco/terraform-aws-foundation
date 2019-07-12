@@ -4,7 +4,13 @@
 
 ### Modules
 
+* `vpc-legacy`: drop deprecated module
+
 ### Examples
+
+* `gitlab-ha`: Update `Makefile`
+* `vpc-gateway`: correct module path reference
+* `legacy`: drop deprecated example
 
 
 # v0.8.2
