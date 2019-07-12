@@ -1,7 +1,10 @@
+MAKEOPTS = -s
+
 .PHONY: all shell generate-ssh-key render-tfvars network plan apply render-ssh-config init-ebs-volume create-activate-swap terminate-gitlab-server register-gitlab-runner destroy clean help
 
 .DEFAULT_GOAL = help
 
+export TERRAFORM = terraform-0.12.2
 include vars.mk
 
 PATH:=${PWD}/bin:${PATH}
@@ -46,59 +49,59 @@ render-tfvars:
 
 ## Use Terraform to create the VPC and core network resources in a specific order
 network:
-	@terraform init
-	@terraform plan -out=tf.out -target=module.vpc.module.public-subnets
-	@terraform apply tf.out
-	@terraform plan -out=tf.out -target=module.vpc.module.public-gateway
-	@terraform apply tf.out
-	@terraform plan -out=tf.out -target=module.vpc
-	@terraform apply tf.out
-	@rm -rf tf.out
+	$(TERRAFORM) init
+	$(TERRAFORM) plan -out=tf.out -target=module.vpc.module.public-subnets
+	$(TERRAFORM) apply tf.out
+	$(TERRAFORM) plan -out=tf.out -target=module.vpc.module.public-gateway
+	$(TERRAFORM) apply tf.out
+	$(TERRAFORM) plan -out=tf.out -target=module.vpc
+	$(TERRAFORM) apply tf.out
+	rm -rf tf.out
 
 ## Use Terraform to generate a planfile tf.out
 plan:
-	@terraform plan -out=tf.out
+	$(TERRAFORM) plan -out=tf.out
 
 ## Use Terraform to apply the tf.out planfile
 apply:
-	@terraform apply tf.out
+	$(TERRAFORM) apply tf.out
 
 ## Generate the ssh_config both for Git operations and instance maintenance
 render-ssh-config:
-	@export SERVER_NAME=$$(terraform output gitlab_server_name) && \
+	export SERVER_NAME=$$(terraform output gitlab_server_name) && \
 	 export SERVER_IP=$$(./server-ip.sh $$SERVER_NAME $$REGION) && \
 	 envsubst <ssh_config.tpl >ssh_config
 
 ## SSH to the gitlab server and use parted and similar tools to setup a partition and filesystem on the EBS volume (run only once per volume)
 init-ebs-volume:
-	@ssh -F ssh_config gitlab-server-sysadmin "sudo parted --script /dev/xvdf -- mklabel msdos && \
+	ssh -F ssh_config gitlab-server-sysadmin "sudo parted --script /dev/xvdf -- mklabel msdos && \
 	 sudo parted --script /dev/xvdf -- mkpart primary 0 -1                && \
 	 sudo mkfs -t ext4 -F /dev/xvdf1                                      && \
 	 sudo e2label /dev/xvdf1 gitlab"
 
 ## SSH to the gitlab server and create/activate a swap file for the server
 create-activate-swap:
-	@ssh -F ssh_config gitlab-server-sysadmin "sudo dd if=/dev/zero of=/var/swap.file bs=1M count=2048 && sudo mkswap /var/swap.file && sudo chmod 600 /var/swap.file && sudo swapon /var/swap.file"
+	ssh -F ssh_config gitlab-server-sysadmin "sudo dd if=/dev/zero of=/var/swap.file bs=1M count=2048 && sudo mkswap /var/swap.file && sudo chmod 600 /var/swap.file && sudo swapon /var/swap.file"
 
 ## SSH to the gitlab server and halt the host so it is terminated
 terminate-gitlab-server:
-	@ssh -F ssh_config gitlab-server-sysadmin "sudo halt & exit"
+	ssh -F ssh_config gitlab-server-sysadmin "sudo halt & exit"
 
 ## SSH to the gitlab server and register the CI runner with the server
 register-gitlab-runner:
-	@ssh -F ssh_config gitlab-server-sysadmin "sudo gitlab-runner register"
+	ssh -F ssh_config gitlab-server-sysadmin "sudo gitlab-runner register"
 
 ## Use Terraform to destory all resources in the test env
 destroy:
-	@terraform destroy -force
+	$(TERRAFORM) destroy -force
 
 ## rm -rf everything
 clean: destroy
-	@rm -rf terraform.tfstate terraform.tfstate.backup .terraform
-	@rm -rf tf.out terraform.tfvars
-	@rm -rf id_rsa id_rsa.pub ssh_config
-	@rm -rf ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt gitlab.csr *.pem
-	@rm -rf bin
+	rm -rf terraform.tfstate terraform.tfstate.backup .terraform
+	rm -rf tf.out terraform.tfvars
+	rm -rf id_rsa id_rsa.pub ssh_config
+	rm -rf ca-csr.json cert-csr.json ca.csr upload-gen-cert-arn.txt gitlab.csr *.pem
+	rm -rf bin
 
 ## Show help screen.
 help:
