@@ -4,6 +4,8 @@
 
 ### Modules
 
+* `iam-group`: add new module to create a group and manage the members and policy attachments for that group
+* `iam-users`: add new module to create a bunch of IAM user resources from a list of usernames
 * `vpc-legacy`: drop deprecated module
 
 ### Examples
