@@ -1,7 +1,7 @@
 # start snippet - configure and run consul
 ${init_prefix}
 mkdir /etc/consul.d
-cat <<EOT >> ${config_file}
+cat <<EOT >> "${config_file}"
 {
   "datacenter": "${datacenter}",
   "data_dir": "${data_dir}",
