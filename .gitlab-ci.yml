@@ -11,3 +11,4 @@ test:
     - scripts/ci/examples/tfbuild.sh
     - scripts/ci/examples/tftest.sh
     - scripts/ci/examples/tfclean.sh
+  when: manual
