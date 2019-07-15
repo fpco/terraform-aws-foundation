@@ -115,3 +115,40 @@ variable "load_balancers" {
   description = "The list of load balancers names to pass to the ASG module"
   type        = "list"
 }
+
+## DLM variables
+variable "dlm_create_dlm_iam_role" {
+  description = "Creates DLM IAm role and permissions to create snapshots, the role can be create one time pero AWS account"
+  default     = "false"
+}
+
+variable "dml_description" {
+  description = "DLM lifecycle policy description"
+  default     = "DLM lifecycle policy"
+}
+
+variable "dlm_ebs_target_tags" {
+  description = "Tags to filter the volume that we want to take the snapshot."
+  default     = {}
+}
+
+variable "dlm_schedule_create_interval" {
+  description = "Snapshots schedule interval"
+  default     = 24
+}
+
+variable "dlm_schedule_create_time" {
+  description = "Time at which the snapshot will take."
+  type        = "list"
+  default     = ["23:45"]
+}
+
+variable "dlm_schedule_retain_rule" {
+  description = "Snapshots schedule retein rule, how many snapshots are retaining"
+  default     = 14
+}
+
+variable "dlm_schedule_copy_tags" {
+  description = "Copy all user-defined tags on a source volume to snapshots of the volume created by this policy."
+  default     = false
+}

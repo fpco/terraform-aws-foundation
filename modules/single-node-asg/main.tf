@@ -22,6 +22,7 @@ module "service-data" {
   encrypted   = "${var.data_volume_encrypted}"
   kms_key_id  = "${var.data_volume_kms_key_id}"
   snapshot_id = "${var.data_volume_snapshot_id}"
+  extra_tags  = {"createSnapshot" = "${var.name_prefix}"}
 }
 
 module "server" {
@@ -61,6 +62,19 @@ module "init-attach-ebs" {
   region    = "${var.region}"
   volume_id = "${module.service-data.volume_id}"
 }
+
+ module "dlm-policy" {
+   source = "../dlm-lifecycle-policy"
+
+   name_prefix              = "${var.name_prefix}"
+   dlm_description          = "${var.dlm_description}"
+   ebs_target_tags          = {"createSnapshot" = "${var.name_prefix}"}
+   create_dlm_iam_role      = "${var.dlm_create_dlm_iam_role}"
+   schedule_create_interval = "${var.dlm_schedule_create_interval}"
+   schedule_create_time     = "${var.dlm_schedule_create_time}"
+   schedule_retain_rule     = "${var.dlm_schedule_retain_rule}"
+   schedule_tags_to_add     = "${merge(map("Name", "${var.name_prefix}-${name-sufix}-dlm", "SnapshotCreator", "DLM lifecycle"))}"
+ }
 
 # Data source for AWS subnet
 data "aws_subnet" "server-subnet" {
