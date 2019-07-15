@@ -1,25 +1,25 @@
 #!/bin/sh
 # create a unique hostname
 HN_PREFIX="${hostname_prefix}"
-INSTANCE_ID="`ec2metadata --instance-id`"
-HOSTNAME="$HN_PREFIX-$INSTANCE_ID"
+INSTANCE_ID="$(ec2metadata --instance-id)"
+HOSTNAME="$${HN_PREFIX}-$${INSTANCE_ID}"
 VERBOSE="--log-level=${log_level}"
-PRIVATE_IP="`ec2metadata --local-ipv4`"
+PRIVATE_IP="$(ec2metadata --local-ipv4)"
 LOG_PREFIX="OPSTACK:"
 
 # crack open a log!
-echo "$LOG_PREFIX hello world from $HOSTNAME"
-echo "$LOG_PREFIX welcome to the provisioning log from cloud init!"
-echo "$LOG_PREFIX `date`"
+echo "$${LOG_PREFIX} hello world from $${HOSTNAME}"
+echo "$${LOG_PREFIX} welcome to the provisioning log from cloud init!"
+echo "$${LOG_PREFIX} $(date)"
 
-echo "$LOG_PREFIX update salt minion id to $HOSTNAME"
-echo $HOSTNAME > /etc/salt/minion_id
+echo "$${LOG_PREFIX} update salt minion id to $${HOSTNAME}"
+echo "$${HOSTNAME}" > /etc/salt/minion_id
 
 #########################################################
 # Update Salt Pillar with details from this instance
 cat <<EOT > /srv/pillar/bootstrap.sls
 # written during cloud-init
-hostname: $HOSTNAME
+hostname: $${HOSTNAME}
 
 # setup consul
 consul:
@@ -56,7 +56,7 @@ consul:
   webui: ${consul_webui}
 
 consul_template:
-  consul_addr: $PRIVATE_IP:8500
+  consul_addr: $${PRIVATE_IP}:8500
   client_token: ${client_token}
 
 # extra_pillar goes here..
@@ -64,7 +64,7 @@ ${extra_pillar}
 EOT
 
 # share the results
-echo "$LOG_PREFIX wrote out the following /srv/pillar/bootstrap.sls:"
+echo "$${LOG_PREFIX} wrote out the following /srv/pillar/bootstrap.sls:"
 cat /srv/pillar/bootstrap.sls
 #########################################################
 
@@ -74,20 +74,20 @@ ufw status verbose
 #########################################################
 
 APPLY_FORMULA="salt-call --local state.sls"
-echo "$LOG_PREFIX ensure /etc/hosts has our hostname"
-sed -i "s/localhost/localhost $HOSTNAME/" /etc/hosts
-echo "$LOG_PREFIX apply the hostname salt formula"
-$APPLY_FORMULA hostname $VERBOSE
-echo "$LOG_PREFIX restart dnsmasq to be sure it is online"
+echo "$${LOG_PREFIX} ensure /etc/hosts has our hostname"
+sed -i "s/localhost/localhost $${HOSTNAME}/" /etc/hosts
+echo "$${LOG_PREFIX} apply the hostname salt formula"
+$${APPLY_FORMULA} hostname $${VERBOSE}
+echo "$${LOG_PREFIX} restart dnsmasq to be sure it is online"
 service dnsmasq restart
-echo "$LOG_PREFIX apply the consul.service salt formula to run a leader"
-$APPLY_FORMULA consul.service $VERBOSE
-echo "$LOG_PREFIX pause while consul joins.."
+echo "$${LOG_PREFIX} apply the consul.service salt formula to run a leader"
+$${APPLY_FORMULA} consul.service $${VERBOSE}
+echo "$${LOG_PREFIX} pause while consul joins.."
 sleep 5
-echo "$LOG_PREFIX restart salt-minion now that consul agent is online"
+echo "$${LOG_PREFIX} restart salt-minion now that consul agent is online"
 service salt-minion restart
-echo "$LOG_PREFIX configure/restart consul-template service"
-$APPLY_FORMULA consul.template-tool.service $VERBOSE
+echo "$${LOG_PREFIX} configure/restart consul-template service"
+$${APPLY_FORMULA} consul.template-tool.service $${VERBOSE}
 
 # extra_init goes here..
 ${extra_init}

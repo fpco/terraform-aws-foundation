@@ -1,6 +1,6 @@
 # start snippet - consul leader
 ${init_prefix}
-cat <<EOT >> ${bootstrap_pillar_file}
+cat <<EOT >> "${bootstrap_pillar_file}"
 # setup consul
 consul:
   datacenter: ${datacenter}
@@ -39,5 +39,5 @@ EOT
 echo "${log_prefix} restart dnsmasq to be sure it is online"
 service dnsmasq restart
 echo "${log_prefix} apply the consul.service salt formula to run a leader"
-salt-call --local state.sls consul.service --log-level=${log_level}
+salt-call --local state.sls consul.service --log-level="${log_level}"
 ${init_suffix}
