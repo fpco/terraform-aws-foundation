@@ -11,7 +11,7 @@
 * `gitlab-ha`: Update `Makefile`
 * `vpc-gateway`: correct module path reference
 * `legacy`: drop deprecated example
-
+* `s3-full-access-policy`: setup CI for building and running tests
 
 # v0.8.2
 
