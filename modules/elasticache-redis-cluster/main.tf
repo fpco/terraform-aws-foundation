@@ -29,7 +29,7 @@
  * }
  *
  * module "my-ec-cluster" {
- *     source = "../tf-modules/elasticache-redis-cluster"
+ *     source = "../modules/elasticache-redis-cluster"
  *     name = "${var.name}-redis-ec"
  *     region = "${var.region}"
  *     cidr_a = "10.10.10.0/24"

@@ -1,6 +1,129 @@
+# (Unreleased)
+
+### Summary
+
+### Modules
+
+* `vpc-legacy`: drop deprecated module
+
+### Examples
+
+* `gitlab-ha`: Update `Makefile`
+* `vpc-gateway`: correct module path reference
+* `legacy`: drop deprecated example
+
+
+# v0.8.2
+
+### Summary
+
+* Some minor module updates, a couple of new modules, and a couple of new examples
+* New contributing guide and issue templates
+
+### Modules
+
+* `ami-ubuntu`: Add `bionic` (`18.04`) to the list of LTS AMIs
+* `credstash-grant-reader` and `credstash-grant-writer`: Add new modules using AWS resources instead of bash scripts
+
+### Examples
+
+* `kops-with-vpc`: add new example, kops in a vpc made by terraform (#177)
+* `lifecycle-hooks`: add new example, with lifecycle hooks for ASGs
+
+# v0.8.1
+
+### Summary
+
+* Two minor updates
+
+### Modules
+
+* `credstash-grant`: add support for the AWS_PROFILE envvar
+
+### Examples
+
+* `gitlab-ha`: Update `Makefile` to respect the user's preferred shell when
+  spawing an interactive shell.
+
+# v0.8.0
+
+### Summary
+
+* breaking changes to modules that use ASG and previously had `desired_capacity`,
+  this parameter is dropped to ensure scaling policies are ok.
+* overhaul gitlab examples, see [pr-164][pr-164], [pr-167][pr-167] and [pr-168][pr-168]
+
+### Modules
+
+* `asg`: remove `desired_capacity` input
+* `asg`: add `termination_policies` input
+* `consul-cluster`: remove `desired_capacity` input
+* `consul-leaders`: remove `desired_capacity` input
+* `kube-stack`: remove `controller_desired_capacity`  and `worker_desired_capacity` inputs
+* `kube-controller-asg`: add new module
+
+### Examples
+
+* refactor the workflow in the `gitlab-asg` example, adding support for TLS and much more
+* rename `gitlab-asg` example --> `gitlab-simple-ha`, [pr-164][pr-164]
+* duplicate `gitlab-simple-ha` as `gitlab-ha`, both can now get updates independent
+  of one another, [pr-167][pr-167]
+* update `gitlab-simple-ha` to use EIP instead of ELB, drop TLS, [pr-168][pr-168]
+
+[pr-164]: https://github.com/fpco/terraform-aws-foundation/pull/164
+[pr-167]: https://github.com/fpco/terraform-aws-foundation/pull/167
+[pr-168]: https://github.com/fpco/terraform-aws-foundation/pull/168
+
+
+# v0.7.6
+
+### Summary
+
+* enhancements to various modules
+
+### Modules
+
+* `ec2-auto-recover-instance`: fixup interpolation
+* `kube-stack`: updates for ELB
+
+
+# v0.7.5.1
+
+### Summary
+
+* quick bugfix release
+
+### Modules
+
+* `vpc-scenario-2`: drop redundant azs
+* `aws-ipsec-vpn`: connection type is hardcoded to 'ipsec.1'
+
+
+# v0.7.5
+
+### Summary
+
+* enhancements to various modules
+* move `terraform-vpc` to examples and update packer build
+
+### Modules
+
+* `r53-subdomain`: added zone name outputs
+* `single-node-asg`: drop az from the EBS volume name (it was redundant)
+* `aws-ipsec-vpn`: add support for govcloud and FIPS endpoints
+* `init-snippet-curator`:
+  * bugfix for `master_only`
+  * parametize index retention units
+  * pin pip at 9.x
+
+### Examples
+
+* move `terraform-vpc` to `examples`
+
+
 # v0.7.4
 
-### Summary:
+### Summary
 
 * Refine test suite and get CI build green
 * Improve type checking in module variables

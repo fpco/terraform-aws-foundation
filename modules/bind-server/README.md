@@ -14,13 +14,14 @@ TODO: support uploading additional files, such as DNS zones
 ### Example
 
     module "dns" {
-      source  = "../../vendor/fpco/terraform-aws/tf-modules/bind-server"
-      name = "dns"
-      ami = "ami-7c803d1c" #Ubuntu 16.04
-      subnet_ids = "${module.vpc.private_subnets}"
-      private_ips  = ["${var.private_dns_ips}"]
+      source  = "fpco/foundation/aws//modules/bind-server"
+
+      name               = "dns"
+      ami                = "ami-7c803d1c" #Ubuntu 16.04
+      subnet_ids         = "${module.vpc.private_subnets}"
+      private_ips        = ["${var.private_dns_ips}"]
       security_group_ids = ["${aws_security_group.dns.id}"]
-      key_name = "${aws_key_pair.admin.id}"
+      key_name           = "${aws_key_pair.admin.id}"
       named_conf_options = "${file("${path.module}/files/dns/named.conf.options")}"
     }
 

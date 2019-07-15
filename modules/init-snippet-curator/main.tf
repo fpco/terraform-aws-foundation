@@ -18,12 +18,20 @@ data "template_file" "curator-setup" {
   template = "${file("${path.module}/snippet.tpl.sh")}"
 
   vars {
+    index_retention_unit   = "${var.index_retention_unit}"
     index_retention_period = "${var.index_retention_period}"
     extra_curator_actions  = "${var.extra_curator_actions}"
     elasticsearch_host     = "${var.elasticsearch_host}"
     elasticsearch_port     = "${var.elasticsearch_port}"
-    master_only            = true
+    master_only            = "${var.master_only}"
   }
+}
+
+variable  "index_retention_unit" {
+  default     = "days"
+  description = "Units (seconds, minutes, hours, days, etc.) corresponding to index retention period."
+  type        = "string"
+  # See https://www.elastic.co/guide/en/elasticsearch/client/curator/current/filtertype_age.html for options
 }
 
 variable "index_retention_period" {
@@ -47,7 +55,7 @@ variable "elasticsearch_port" {
 }
 
 variable "master_only" {
-  default     = true
+  default     = "True"
   description = "If installed on master eligible nodes, will only run if current node is an elected master"
 }
 

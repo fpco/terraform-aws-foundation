@@ -10,12 +10,6 @@
  *
  */
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "policy_name" {
   description = "Name of the policy."
   type        = "string"
@@ -49,14 +43,16 @@ output "arn" {
   value = "${aws_iam_policy.assume-role.arn}"
 }
 
+data "aws_partition" "current" {}
+
 data "aws_iam_policy_document" "assume-role" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
     resources = [
-      "${formatlist("arn:${var.aws_cloud}:iam::%s:role/%s",var.account_ids,var.role_name)}",
-      "${formatlist("arn:${var.aws_cloud}:iam::%s:role/%s",var.account_id,var.role_names)}",
+      "${formatlist("arn:${data.aws_partition.current.partition}:iam::%s:role/%s",var.account_ids,var.role_name)}",
+      "${formatlist("arn:${data.aws_partition.current.partition}:iam::%s:role/%s",var.account_id,var.role_names)}",
     ]
   }
 }

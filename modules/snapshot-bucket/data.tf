@@ -1,3 +1,5 @@
+data "aws_partition" "current" {}
+
 data "aws_iam_policy_document" "s3" {
   statement {
     effect    = "Allow"
@@ -15,6 +17,6 @@ data "aws_iam_policy_document" "s3" {
       "s3:CreateMultipartUpload",
     ]
 
-    resources = ["arn:${var.aws_cloud}:s3:::${var.name}/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${var.name}/*"]
   }
 }

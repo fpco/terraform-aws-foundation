@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "../../vpc"
+  source = "../../modules/vpc"
 
   azs                 = ["${var.vpc_azs}"]
   cidr                = "${var.vpc_cidr}"
@@ -17,7 +17,7 @@ module "vpc" {
 }
 
 module "vpn-gateway" {
-  source = "../../vpn-gateway"
+  source = "../../modules/vpn-gateway"
 
   name_prefix        = "${var.name_prefix}"
   instance_type      = "t2.nano"

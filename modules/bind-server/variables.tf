@@ -1,9 +1,3 @@
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "ami" {
   description = "AMI to use for instances.  Tested with Ubuntu 16.04."
   type        = "string"

@@ -37,11 +37,6 @@ variable "min_nodes" {
   description = "The minimum number of nodes in the auto-scaling group"
 }
 
-variable "desired_capacity" {
-  default     = 7
-  description = "The desired number of nodes in the auto-scaling group"
-}
-
 variable "consul_secret_key" {
   description = "Secret key to secure cluster communication, generate this with `consul keygen`"
 }

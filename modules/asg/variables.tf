@@ -53,12 +53,6 @@ variable "min_nodes" {
   type        = "string"
 }
 
-variable "desired_capacity" {
-  default     = ""
-  description = "The desired number of nodes in each group"
-  type        = "string"
-}
-
 variable "public_ip" {
   default     = "true"
   description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"
@@ -111,4 +105,10 @@ variable "extra_tags" {
   #     map("key", "k1", "value", "value1", "propagate_at_launch", true),
   #     map("key", "k2", "value", "value2", "propagate_at_launch", true)
   #   ),
+}
+
+variable "termination_policies" {
+  default     = []
+  description = "A list of policies to decide how the instances in the auto scale group should be terminated. The allowed values are OldestInstance, NewestInstance, OldestLaunchConfiguration, ClosestToNextInstanceHour, Default."
+  type        = "list"
 }

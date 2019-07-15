@@ -10,7 +10,6 @@
  */
 
 module "data-node-ebs-volumes" {
-  aws_cloud    = "${var.is_govcloud ? "aws-us-gov" : "aws"}"
   source       = "../persistent-ebs-volumes"
   name_prefix  = "${var.name_prefix}-data-node"
   volume_count = "${var.data_node_count}"
@@ -54,7 +53,6 @@ resource "aws_autoscaling_group" "data-node-asg" {
   name                 = "${var.name_prefix}-data-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
   max_size             = 1
   min_size             = 1
-  desired_capacity     = 1
   launch_configuration = "${element(aws_launch_configuration.data-node-lc.*.name, count.index)}"
   health_check_type    = "ELB"
   vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]

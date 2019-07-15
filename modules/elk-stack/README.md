@@ -51,7 +51,7 @@ KMS key, `kms_key_arn` of which will be produced by terrraform as output and
 needs to be supplied here as `credstash_kms_key_arn`:
 
 ```shell
-$ cd fpco-terraform-aws/tf-modules/credstash-setup
+$ cd terraform-aws-foundation/modules/credstash-setup
 $ terraform apply
 ...
 $ terraform show | grep "arn =" | grep ":key/" | awk '{print $3}'

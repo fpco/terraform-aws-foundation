@@ -13,8 +13,7 @@
 
 module "service-data" {
   source      = "../persistent-ebs"
-  name_prefix = "${var.name_prefix}-${var.name_suffix}-data-${data.aws_subnet.server-subnet.availability_zone}"
-  aws_cloud   = "${var.aws_cloud}"
+  name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
   region      = "${var.region}"
   az          = "${data.aws_subnet.server-subnet.availability_zone}"
   size        = "${var.data_volume_size}"
@@ -40,7 +39,6 @@ module "server" {
   public_ip        = "${var.public_ip}"
   key_name         = "${var.key_name}"
   elb_names        = ["${var.load_balancers}"]
-  desired_capacity = 1
   max_nodes        = 1
   min_nodes        = 1
   root_volume_type = "${var.root_volume_type}"

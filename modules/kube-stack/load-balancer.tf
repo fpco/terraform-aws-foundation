@@ -4,20 +4,13 @@ resource "aws_elb" "kube-controllers" {
   security_groups = ["${var.lb_security_group_ids}"]
   internal        = "${var.private_load_balancer}"
 
-  #listener {
-  #  instance_port = 6443
-  #  instance_protocol = "https"
-  #  lb_port = 8080
-  #  lb_protocol = "http"
-  #  #ssl_certificate_id = "${data.aws_acm_certificate.kube-cert.arn}"
-  #}
-
   listener {
     instance_port     = 6443
     instance_protocol = "tcp"
     lb_port           = 443
     lb_protocol       = "tcp"
   }
+
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 3
@@ -25,11 +18,18 @@ resource "aws_elb" "kube-controllers" {
     target              = "TCP:6443"
     interval            = 20
   }
+
   cross_zone_load_balancing   = false
   idle_timeout                = 60
   connection_draining         = true
   connection_draining_timeout = 60
+
   tags {
     Name = "${var.name_prefix}-kube-api"
   }
+}
+
+resource "aws_autoscaling_attachment" "controllers" {
+  autoscaling_group_name = "${module.controller-asg.id}"
+  elb                    = "${aws_elb.kube-controllers.id}"
 }

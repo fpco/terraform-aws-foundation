@@ -21,6 +21,8 @@ resource "aws_s3_bucket" "cloudtrail" {
 
 data "aws_region" "current" {}
 
+data "aws_partition" "current" {}
+
 data "aws_iam_policy_document" "cloudtrail-bucket" {
   statement {
     sid    = "AWSCloudTrailAclCheck"
@@ -32,7 +34,7 @@ data "aws_iam_policy_document" "cloudtrail-bucket" {
     }
 
     actions   = ["s3:GetBucketAcl"]
-    resources = ["arn:${var.aws_cloud}:s3:::${var.name_prefix}-cloudtrail"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${var.name_prefix}-cloudtrail"]
   }
 
   statement {
@@ -45,7 +47,7 @@ data "aws_iam_policy_document" "cloudtrail-bucket" {
     }
 
     actions   = ["s3:PutObject"]
-    resources = ["arn:${var.aws_cloud}:s3:::${var.name_prefix}-cloudtrail/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${var.name_prefix}-cloudtrail/*"]
 
     condition {
       test     = "StringEquals"

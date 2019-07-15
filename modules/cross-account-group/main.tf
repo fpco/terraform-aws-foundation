@@ -5,12 +5,6 @@
  *
  */
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
-  type        = "string"
-}
-
 variable "name" {
   description = "name of the group"
   type        = "string"
@@ -50,7 +44,6 @@ resource "aws_iam_group_policy_attachment" "manage-own-credentials-with-mfa" {
 
 module "assume-group-role-policy" {
   source      = "../cross-account-assume-role-policy"
-  aws_cloud   = "${var.aws_cloud}"
   policy_name = "assume-${var.name}-${var.role_name}-role"
   role_name   = "${var.role_name}"
   account_ids = ["${var.account_ids}"]

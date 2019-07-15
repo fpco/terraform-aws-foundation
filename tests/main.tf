@@ -260,7 +260,7 @@ module "elk-stack" {
   credstash_put_cmd           = ""
   credstash_reader_policy_arn = ""
   elasticsearch_dns_name      = ""
-  elasticsearch_internal_alb  = ""
+  elasticsearch_internal_alb  = {}
   kibana_alb                  = ""
   logstash_dns_name           = ""
   private_subnet_ids          = []
@@ -347,7 +347,8 @@ module "init-snippet-exec" {
 module "init-snippet-gitlab-docker" {
   source = "../modules/init-snippet-gitlab-docker"
 
-  gitlab_domain = ""
+  gitlab_domain        = ""
+  registry_bucket_name = ""
 }
 
 module "init-snippet-hostname" {

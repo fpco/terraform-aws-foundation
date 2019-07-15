@@ -154,12 +154,10 @@ resource "aws_elb" "web" {
 module "web" {
   source           = "../../modules/asg"
   ami              = "${module.ubuntu-xenial-ami.id}"
-  azs              = "${slice(data.aws_availability_zones.available.names, 0, 3)}"
   azs              = "${local.azs}"
   name_prefix      = "${var.name}-web"
   elb_names        = ["${aws_elb.web.name}"]
   instance_type    = "t2.nano"
-  desired_capacity = "${length(module.vpc.public_subnet_ids)}"
   max_nodes        = "${length(module.vpc.public_subnet_ids)}"
   min_nodes        = "${length(module.vpc.public_subnet_ids)}"
   public_ip        = false

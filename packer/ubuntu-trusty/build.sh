@@ -8,7 +8,7 @@ AMI_BUILD_CONF="$(pwd)/example-build-config.json"
 
 # variables to combine with the build config
 # lookup the first few in our terraform build env
-cd ../terraform-vpc
+cd ../../examples/terraform-vpc
 export SOURCE_AMI="$(terraform output trusty_ami_id)"
 export VPC_ID="$(terraform output vpc_id)"
 export SUBNET_ID="$(terraform output subnet_id)"

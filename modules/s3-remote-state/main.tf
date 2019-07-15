@@ -4,8 +4,9 @@
  * This module creates a private S3 bucket and IAM policy to access that bucket.
  * The bucket can be used as a remote storage bucket for `terraform`, `kops`, or
  * similar tools.
- * 
+ *
  */
+
 variable "bucket_name" {
   description = "the name to give the bucket"
 }
@@ -20,19 +21,30 @@ variable "versioning" {
   description = "enables versioning for objects in the S3 bucket"
 }
 
-variable "aws_cloud" {
-  description = "set to 'aws-us-gov' if using GovCloud, otherwise leave the default"
-  default     = "aws"
+variable "region" {
+  default     = ""
+  description = "Region where the S3 bucket will be created"
+  type        = "string"
+}
+
+variable "force_destroy" {
+  description = "Whether to allow a forceful destruction of this bucket"
+  default     = false
 }
 
 resource "aws_s3_bucket" "remote-state" {
   bucket = "${var.bucket_name}"
   acl    = "private"
+  region = "${var.region}"
+  force_destroy = "${var.force_destroy}"
 
   versioning {
     enabled = "${var.versioning}"
   }
 }
+
+# Lookup the current AWS partition
+data "aws_partition" "current" {}
 
 data "aws_iam_policy_document" "s3-full-access" {
   statement {
@@ -49,7 +61,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       identifiers = ["${compact(var.principals)}"]
     }
 
-    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}"]
   }
 
   statement {
@@ -75,7 +87,7 @@ data "aws_iam_policy_document" "s3-full-access" {
       identifiers = ["${compact(var.principals)}"]
     }
 
-    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}/*"]
   }
 }
 
@@ -94,7 +106,7 @@ data "aws_iam_policy_document" "bucket-full-access" {
       "s3:ListBucketMultipartUploads",
     ]
 
-    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}"]
   }
 
   statement {
@@ -108,7 +120,7 @@ data "aws_iam_policy_document" "bucket-full-access" {
       "s3:AbortMultipartUpload",
     ]
 
-    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}/*"]
   }
 }
 
@@ -127,7 +139,7 @@ data "aws_iam_policy_document" "bucket-full-access-with-mfa" {
       "s3:ListBucketMultipartUploads",
     ]
 
-    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}"]
   }
 
   statement {
@@ -141,7 +153,7 @@ data "aws_iam_policy_document" "bucket-full-access-with-mfa" {
       "s3:AbortMultipartUpload",
     ]
 
-    resources = ["arn:${var.aws_cloud}:s3:::${aws_s3_bucket.remote-state.id}/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.remote-state.id}/*"]
 
     condition {
       test     = "Bool"

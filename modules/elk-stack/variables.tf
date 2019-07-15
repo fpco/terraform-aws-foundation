@@ -4,12 +4,6 @@ variable "name_prefix" {
   type        = "string"
 }
 
-variable "is_govcloud" {
-  description = "Boolean, if this is running on GovCloud or not"
-  default     = "false"
-  type        = "string"
-}
-
 variable "vpc_id" {
   description = "VPC ID for the ELK stack"
   type        = "string"
@@ -117,7 +111,6 @@ variable "elasticsearch_extra_config" {
 variable "elasticsearch_internal_alb" {
   type        = "map"
   description = "Internal ALB information for Elasticsearch API. See `elasticsearch.internal_alb` variable for more info."
-  type        = "string"
 }
 
 variable "elasticsearch_external_alb" {

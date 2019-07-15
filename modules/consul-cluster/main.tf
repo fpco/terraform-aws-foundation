@@ -23,12 +23,11 @@
  * ```
  * # cluster of "workers", built on a cluster of consul agents
  * module "cworkers-a" {
- *     source = "../tf-modules/consul-cluster"
+ *     source = "../modules/consul-cluster"
  *     ami = "${var.ami}"
  *     name = "${var.name}"
  *     max_nodes = 5
  *     min_nodes = 3
- *     desired_capacity = 3
  *     key_name = "${aws_key_pair.tests.key_name}"
  *     region = "${var.region}"
  *     cidr_minions_a = "${var.cidr_minions_a}"
@@ -46,7 +45,6 @@ module "agent-asg" {
   source             = "../asg"
   ami                = "${var.ami}"
   azs                = ["${var.region}a", "${var.region}c"]
-  desired_capacity   = "${var.desired_capacity}"
   elb_names          = ["${var.load_balancers}"]
   instance_type      = "${var.instance_type}"
   max_nodes          = "${var.max_nodes}"

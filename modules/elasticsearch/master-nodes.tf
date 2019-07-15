@@ -7,7 +7,6 @@
  */
 
 module "master-node-ebs-volumes" {
-  aws_cloud    = "${var.is_govcloud ? "aws-us-gov" : "aws"}"
   source       = "../persistent-ebs-volumes"
   name_prefix  = "${var.name_prefix}-master-node"
   volume_count = "${var.master_node_count}"
@@ -56,7 +55,6 @@ resource "aws_autoscaling_group" "master-node-asg" {
   name                 = "${var.name_prefix}-master-node-${format("%02d", count.index)}-${element(data.aws_subnet.private.*.availability_zone, count.index)}"
   max_size             = 1
   min_size             = 1
-  desired_capacity     = 1
   launch_configuration = "${element(aws_launch_configuration.master-node-lc.*.name, count.index)}"
   health_check_type    = "EC2"
   vpc_zone_identifier  = ["${element(var.private_subnet_ids, count.index)}"]

@@ -16,8 +16,6 @@
  *     ᐅ terraform apply tf.out
  *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.public-subnets
  *     ᐅ terraform apply tf.out
- *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.public-gateway
- *     ᐅ terraform apply tf.out
  *     ᐅ terraform plan -out=tf.out -target=module.vpc.module.private-subnets
  *     ᐅ terraform apply tf.out
  *
@@ -32,6 +30,16 @@ module "vpc" {
   enable_dns_support   = "${var.enable_dns_support}"
   dns_servers          = ["${var.dns_servers}"]
   extra_tags           = "${var.extra_tags}"
+}
+
+module "private-subnets" {
+  source      = "../subnets"
+  azs         = "${var.azs}"
+  vpc_id      = "${module.vpc.vpc_id}"
+  public      = false
+  name_prefix = "${var.name_prefix}-vpn"
+  cidr_blocks = "${var.private_subnet_cidrs}"
+  extra_tags  = "${var.extra_tags}"
 }
 
 module "public-subnets" {
@@ -51,25 +59,19 @@ module "public-gateway" {
   public_subnet_ids = ["${module.public-subnets.ids}"]
 }
 
-module "private-subnets" {
-  source      = "../subnets"
-  azs         = "${var.azs}"
-  vpc_id      = "${module.vpc.vpc_id}"
-  public      = false
-  name_prefix = "${var.name_prefix}-private"
-  cidr_blocks = "${var.private_subnet_cidrs}"
-  extra_tags  = "${var.extra_tags}"
-}
-
-module "nat-gateway" {
-  source             = "../nat-gateways"
-  vpc_id             = "${module.vpc.vpc_id}"
-  name_prefix        = "${var.name_prefix}"
-  nat_count          = "${length(module.private-subnets.ids)}"
-  public_subnet_ids  = ["${module.public-subnets.ids}"]
-  private_subnet_ids = ["${module.private-subnets.ids}"]
-  extra_tags         = "${var.extra_tags}"
-}
+# TODO: Attach the Public subnet to web intances and
+# create the SG to access instances from remote network
+#resource "aws_eip" "nat" {
+#  count = "${length(var.public_subnet_cidrs)}"
+#  vpc   = true
+#}
+#
+#resource "aws_nat_gateway" "nat" {
+#  count         = "${length(var.private_subnet_cidrs)}"
+#  subnet_id     = "${element(module.public-subnets.ids, count.index)}"
+#  allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
+#  tags = "${merge(map("Name", "${var.name_prefix}-nat"), "${var.extra_tags}")}"
+#}
 
 ## TODO: Move these next two resources into the IPSEC/VPN module..?
 # Route private subnets through the VPN gateway
@@ -77,9 +79,13 @@ resource "aws_route_table" "private-vpn" {
   vpc_id           = "${module.vpc.vpc_id}"
   propagating_vgws = ["${module.vpn.vpn_gw_id}"]
 
-  tags = {
-    Name = "${var.name_prefix}-private-vpn"
+  #Added route for external private gateway.
+  route {
+    cidr_block     = "0.0.0.0/0"
+    gateway_id = "${module.vpn.aws_vpn_gateway_id}"
   }
+
+  tags = "${merge(map("Name", "${var.name_prefix}-private-vpn-${format("%02d", count.index)}"), "${var.extra_tags}")}"
 }
 
 resource "aws_route_table_association" "private-vpn" {
@@ -88,6 +94,7 @@ resource "aws_route_table_association" "private-vpn" {
   route_table_id = "${aws_route_table.private-vpn.id}"
 }
 
+# VPN
 module "vpn" {
   source           = "../aws-ipsec-vpn"
   name             = "${var.name_prefix}"
@@ -96,3 +103,4 @@ module "vpn" {
   remote_device_ip = "${var.vpn_remote_ip}"
   static_routes    = ["${var.vpn_static_routes}"]
 }
+

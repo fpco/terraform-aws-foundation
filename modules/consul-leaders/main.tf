@@ -29,7 +29,6 @@ module "leader-asg" {
   azs                = ["${var.region}a", "${var.region}c"]
   elb_names          = ["${var.load_balancers}"]
   instance_type      = "${var.instance_type}"
-  desired_capacity   = "${var.desired_capacity}"
   max_nodes          = "${var.max_nodes}"
   min_nodes          = "${var.min_nodes}"
   key_name           = "${var.key_name}"
