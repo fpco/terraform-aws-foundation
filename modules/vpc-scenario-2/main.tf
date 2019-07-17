@@ -78,7 +78,7 @@ module "nat-gateway" {
   source             = "../nat-gateways"
   vpc_id             = "${module.vpc.vpc_id}"
   name_prefix        = "${var.name_prefix}"
-  nat_count          = "${length(var.private_subnet_cidrs)}"
+  nat_count          = "${length(var.public_subnet_cidrs)}"
   public_subnet_ids  = ["${module.public-subnets.ids}"]
   private_subnet_ids = ["${module.private-subnets.ids}"]
   extra_tags         = "${merge(
