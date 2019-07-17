@@ -7,6 +7,27 @@
 * `iam-group`: add new module to create a group and manage the members and policy attachments for that group
 * `iam-users`: add new module to create a bunch of IAM user resources from a list of usernames
 * `vpc-legacy`: drop deprecated module
+* The following modules have templates that were updated to resolve issues related to
+  [this upstream release of the template provider][1]:
+  * `consul-agent-generic-init`
+  * `consul-leaders-generic-init`
+  * `ha-management-cluster`
+  * `init-snippet-attach-ebs-volume`
+  * `init-snippet-config-consul-leader`
+  * `init-snippet-config-upstart-consul`
+  * `init-snippet-consul-agent`
+  * `init-snippet-consul-leader`
+  * `init-snippet-consul-template`
+  * `init-snippet-hostname-simple`
+  * `init-snippet-hostname`
+  * `init-snippet-install-consul`
+  * `init-snippet-install-ops`
+  * `init-snippet-nexus`
+  * `init-snippet-nomad-agent`
+  * `init-snippet-prometheus`
+  * `init-snippet-write-bootstrap-pillar`
+
+[1]: https://github.com/terraform-providers/terraform-provider-template/blob/master/CHANGELOG.md#200-january-14-2019
 
 ### Examples
 
