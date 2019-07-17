@@ -32,6 +32,7 @@
 
 ### Examples
 
+* `vpc-scenario-2`: Update for improved testing of the scenario and related modules
 * `gitlab-ha`: Update `Makefile`
 * `vpc-gateway`: correct module path reference
 * `legacy`: drop deprecated example
