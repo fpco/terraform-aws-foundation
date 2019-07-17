@@ -26,6 +26,7 @@
   * `init-snippet-nomad-agent`
   * `init-snippet-prometheus`
   * `init-snippet-write-bootstrap-pillar`
+* `vpc-scenario-2`: minor bugfix for NAT count
 
 [1]: https://github.com/terraform-providers/terraform-provider-template/blob/master/CHANGELOG.md#200-january-14-2019
 
