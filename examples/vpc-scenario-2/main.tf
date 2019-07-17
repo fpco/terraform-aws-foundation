@@ -67,7 +67,7 @@ module "vpc" {
 
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
-  release = "14.04"
+  release = "16.04"
 }
 
 resource "aws_key_pair" "main" {
@@ -112,6 +112,13 @@ module "web-http-elb-sg-rule" {
   port              = "3000"
   description       = "Allow ELB HTTP to web app on port 3000"
   cidr_blocks       = ["${module.vpc.public_cidr_blocks}"]
+  security_group_id = "${module.web-sg.id}"
+}
+
+# allow SSH from bastion in public subnets to web instances
+module "web-ssh-rule" {
+  source            = "../../modules/ssh-sg"
+  cidr_blocks       = ["${module.vpc.public_cidr_blocks}"] #["0.0.0.0/0"] #
   security_group_id = "${module.web-sg.id}"
 }
 
@@ -171,6 +178,22 @@ module "web" {
 
   user_data = <<END_INIT
 #!/bin/bash
+${module.init-simple-hostname.init_snippet}
+${module.init-warp-hello-world.init_snippet}
+END_INIT
+}
+
+module "init-simple-hostname" {
+  source = "../../modules/init-snippet-hostname-simple"
+
+  hostname_prefix = "web"
+}
+
+
+module "init-warp-hello-world" {
+  source = "../../modules/init-snippet-exec"
+
+  init = <<END_INIT
 echo "hello!"
 apt-get install -y \
     apt-transport-https \
@@ -192,7 +215,6 @@ docker run                   \
     -p $(ec2metadata --local-ipv4):3000:3000 \
     yesodweb/warp            \
     warp --docroot /var/www/html
-
 END_INIT
 }
 
@@ -203,5 +225,20 @@ locals {
 
 output "elb_dns" {
   value       = "${aws_elb.web.dns_name}"
-  description = "make the ELB accessible on the outside"
+  description = "URL, where to find the ELB"
+}
+
+output "asg_name" {
+  value       = "${module.web.name}"
+  description = "Name of the web ASG, for looking up IP addresses"
+}
+
+output "region" {
+  value       = "${var.region}"
+  description = "Region we deployed to"
+}
+
+output "bastion_eip" {
+  value       = "${aws_eip.bastion.public_ip}"
+  description = "EIP of the bastion host"
 }
