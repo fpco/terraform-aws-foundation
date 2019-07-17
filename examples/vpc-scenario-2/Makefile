@@ -47,6 +47,23 @@ apply: check-plan-file
 test:
 	@curl -v http://$$(terraform output elb_dns)/
 
+## Use ops http polling to block until ELB is available, should happen in 5 minutes or less
+poll:
+	echo "will now poll that URL until we see 200 (and timeout after 5 minutes)"
+	ops http poll --interval 5 --retry 60 http://$(shell terraform output elb_dns)/
+
+## use existing targets to run it all (hopefully)
+all: ssh-key init plan-subnets apply plan-gateways apply plan apply poll
+
+## Use ops to lookup IPs of the EC2 nodes in the ASG
+lookup-ips:
+	ops aws ec2 asg ips --region $(shell terraform output region) --private $(shell terraform output asg_name)
+
+## Use ops to terminate all of the EC2 nodes in the ASG
+terminate-ec2-nodes:
+	ops aws ec2 asg terminate --region $(shell terraform output region) $(shell terraform output asg_name)
+
+
 ## terraform destroy everything
 destroy:
 	@terraform destroy
