@@ -30,6 +30,7 @@ resource "aws_autoscaling_group" "cluster" {
   health_check_type         = "EC2"
   launch_configuration      = aws_launch_configuration.cluster.name
   load_balancers            = var.elb_names
+  target_group_arns         = var.alb_target_group_arns
   max_size                  = var.max_nodes
   min_size                  = var.min_nodes
   name_prefix               = "${var.name_prefix}-${var.name_suffix}"
