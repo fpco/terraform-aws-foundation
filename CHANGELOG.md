@@ -6,9 +6,10 @@
 
 * `single-port-sg`: Add support for UDP rules
 * `kube-controller-sg`: Update to sync with `single-port-sg` module
+* `ami-centos`: simple module to get the ami id of the specified release of CentOS.
 
 ### Examples
-
+* `ami-centos-test`: New testing example for `ami-centos`.
 
 # v0.8.3
 
