@@ -1,12 +1,11 @@
 /**
  * ## NAT Gateways
  *
- * Use `aws_eip` and `aws_nat_gateway` to create a NAT Gateway for each subnets
+ * Use `aws_eip` and `aws_nat_gateway` to create a NAT Gateway for each subnet
  * included in the `public_subnet_ids` variable. An `aws_route_table` is then
  * created for each NAT gateway and a `aws_route_table_association` to associate
- * the table with each of the subnets in the `private_subnet_ids`.
- *
- * **TODO: CHECK TO SEE IF THIS MODULE COULD EVER HAVE ISSUES WITH AZ/SUBNETS CROSSING BETWEEN THE PUBLIC/PRIVATE PAIRS**
+ * the table with each of the subnets in the list of `private_subnet_ids`. Note
+ * that is is OK to provide more private subnets than NAT gateways/public subnets.
  *
  */
 
@@ -46,7 +45,7 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private-rta" {
-  count          = var.nat_count
+  count          = length(var.private_subnet_ids)
   subnet_id      = element(var.private_subnet_ids, count.index)
   route_table_id = element(aws_route_table.private.*.id, count.index)
 }
