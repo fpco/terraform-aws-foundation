@@ -20,7 +20,7 @@ vault server -dev
 * The AWS access and secret keys for an IAM user which the AWS Secret
   Backend for Vault will use for issuing new credentials. If you don't
   have any, you can create one using [vault-iam
-  module](../../modules/vault-iam). You need to put the access keys in
+  example](../vault-iam). You need to put the access keys in
   [variables.tf](./variables.tf)
 
 

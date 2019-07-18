@@ -30,7 +30,7 @@ module "vault_iam_user_policy" {
         "iam:RemoveUserFromGroup"
       ],
       "Resource": [
-        "arn:aws:iam::793514493597:user/vtest-*"
+        "arn:aws:iam::xxxxxxx:user/vtest-*"
       ]
     }
   ]
