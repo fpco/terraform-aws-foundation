@@ -53,7 +53,16 @@ poll:
 	ops http poll --interval 5 --retry 60 http://$(shell terraform output elb_dns)/
 
 ## use existing targets to run it all (hopefully)
-all: ssh-key init plan-subnets apply plan-gateways apply plan apply poll
+all:
+	$(MAKE) ssh-key
+	$(MAKE) init
+	$(MAKE) plan-subnets
+	$(MAKE) apply
+	$(MAKE) plan-gateways
+	$(MAKE) apply
+	$(MAKE) plan
+	$(MAKE) apply
+	$(MAKE) poll
 
 ## Use ops to lookup IPs of the EC2 nodes in the ASG
 lookup-ips:
