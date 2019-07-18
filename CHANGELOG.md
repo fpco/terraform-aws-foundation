@@ -4,8 +4,18 @@
 
 ### Modules
 
-* `iam-group`: add new module to create a group and manage the members and policy attachments for that group
-* `iam-users`: add new module to create a bunch of IAM user resources from a list of usernames
+* `single-port-sg`: Add support for UDP rules
+* `kube-controller-sg`: Update to sync with `single-port-sg` module
+
+### Examples
+
+
+# v0.8.3
+
+### Modules
+
+* `iam-group`: add new module to create a group and manage the members and policy attachments for that group, only for Terraform v0.12.x
+* `iam-users`: add new module to create a bunch of IAM user resources from a list of usernames, only for Terraform v0.12.x
 * `vpc-legacy`: drop deprecated module
 * The following modules have templates that were updated to resolve issues related to
   [this upstream release of the template provider][1]:
