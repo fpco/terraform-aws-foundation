@@ -1,7 +1,7 @@
-# IAM user and associated policy
+# IAM user and policy
 
-This module creates IAM user and associates supplied IAM policy with
-the created user.
+This module creates IAM user and policy and associates it with the
+created user.
 
 Further resources:
 

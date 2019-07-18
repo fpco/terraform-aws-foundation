@@ -6,8 +6,12 @@ resource "aws_iam_user" "iam_user" {
   }
 }
 
-resource "aws_iam_user_policy" "iam_user_policy" {
+resource "aws_iam_policy" "iam_policy" {
   name   = "${var.iam_policy_name}"
-  user   = "${aws_iam_user.iam_user.name}"
   policy = "${var.iam_user_policy}"
+}
+
+resource "aws_iam_user_policy_attachment" "iam_user_policy" {
+  user       = "${aws_iam_user.iam_user.name}"
+  policy_arn = "${aws_iam_policy.iam_policy.arn}"
 }
