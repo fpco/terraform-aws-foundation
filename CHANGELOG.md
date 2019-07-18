@@ -1,5 +1,15 @@
 # (Unreleased)
 
+# v0.9.0
+
+### Summary
+
+Initial support for Terraform v0.12.x and HCL 2. Probably got bugs.
+
+All modules and examples have been updated. Tests have been run, but that does
+not mean bug free. More testing will likely find additional issues. New releases
+will be made to accomodate.
+
 # v0.8.5
 
 ### Summary
