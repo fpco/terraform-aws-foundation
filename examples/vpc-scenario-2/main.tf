@@ -68,7 +68,7 @@ module "vpc" {
 
 module "ubuntu-xenial-ami" {
   source  = "../../modules/ami-ubuntu"
-  release = "16.04"
+  release = "18.04"
 }
 
 resource "aws_key_pair" "main" {
