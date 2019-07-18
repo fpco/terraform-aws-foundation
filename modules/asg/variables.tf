@@ -80,6 +80,12 @@ variable "elb_names" {
   type        = list(string)
 }
 
+variable "alb_target_group_arns" {
+  default     = []
+  description = "list of target_group for application load balancer to associate with the ASG (by ARN)"
+  type        = list(string)
+}
+
 variable "root_volume_type" {
   default     = "gp2"
   description = "The type of EBS volume to use for the root block device"

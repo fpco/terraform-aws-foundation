@@ -7,6 +7,7 @@ The module supports:
 
 * spanning N Availability Zones
 * load balancers may be associated with the ASG
+* Application load balancer defining the variable alb_target_group_arn
 * the health checks are not yet parametized, (easy to change)
 * the Launch Configuration supports an arbitrary list of security groups
 * `lifecycle` and `create_before_destroy` are used to ensure updates are graceful
