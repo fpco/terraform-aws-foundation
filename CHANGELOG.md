@@ -1,5 +1,9 @@
 # (Unreleased)
 
+### Modules
+
+* `autoscaling-policy-metric-alarm-pair`: New module abstracts the autoscaling function from example load-asg. The example now is using this module.
+
 # v0.9.0
 
 ### Summary
