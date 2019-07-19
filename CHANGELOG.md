@@ -10,6 +10,9 @@
 ### Modules
 
 * `ami-centos`: simple module to get the ami id of the specified release of CentOS.
+* `single-port-sg`: Add support for UDP rules
+* `kube-controller-sg`: Update to sync with `single-port-sg` module
+* `autoscaling-policy-metric-alarm-pair`: New module abstracts the autoscaling function from example load-asg. The example now is using this module.
 
 ### Examples
 

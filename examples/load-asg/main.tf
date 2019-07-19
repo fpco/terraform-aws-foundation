@@ -112,22 +112,22 @@ module "ubuntu-xenial-ami" {
 }
 
 module "web-asg" {
-  source            = "../../modules/asg"
-  ami               = "${module.ubuntu-xenial-ami.id}"
-  azs               = "${local.azs}"
-  name_prefix       = "${var.name}-${var.web_app_name}"
-  elb_names         = ["${aws_elb.web.name}"]
-  instance_type     = "${var.instance_type}"
-  max_nodes         = "10"
-  min_nodes         = "2"
-  public_ip         = false
-  key_name          = "${aws_key_pair.main.key_name}"
-  subnet_ids        = ["${module.vpc.public_subnet_ids}"]
+  source        = "../../modules/asg"
+  ami           = "${module.ubuntu-xenial-ami.id}"
+  azs           = "${local.azs}"
+  name_prefix   = "${var.name}-${var.web_app_name}"
+  elb_names     = ["${aws_elb.web.name}"]
+  instance_type = "${var.instance_type}"
+  max_nodes     = "10"
+  min_nodes     = "2"
+  public_ip     = false
+  key_name      = "${aws_key_pair.main.key_name}"
+  subnet_ids    = ["${module.vpc.public_subnet_ids}"]
 
   security_group_ids = ["${module.web-sg.id}"]
 
-  root_volume_type  = "gp2"
-  root_volume_size  = "8"
+  root_volume_type = "gp2"
+  root_volume_size = "8"
 
   user_data = <<END_INIT
 #!/bin/bash
@@ -162,107 +162,16 @@ http-server -p 8080
 END_INIT
 }
 
-
-## Autoscaling Policies
-
-# ASG Policy Up
-
-resource "aws_autoscaling_policy" "cpu_up" {
-  name = "${var.name}-asg-policy-cpu-up"
-  autoscaling_group_name = "${module.web-asg.name}"
-  adjustment_type     = "ChangeInCapacity"
-  cooldown            = 300
-  scaling_adjustment  = 3
-  policy_type         = "SimpleScaling"
+module "web_cpu_autoscaling" {
+  source = "../../modules/autoscaling-policy-metric-alarm-pair"
+  name = "${var.name}"
+  asg_name = "${module.web-asg.name}"
+  metric = "CPUUtilization"
 }
 
-resource "aws_autoscaling_policy" "mem_up" {
-  name = "${var.name}-asg-policy-mem-up"
-  autoscaling_group_name = "${module.web-asg.name}"
-  adjustment_type     = "ChangeInCapacity"
-  cooldown            = 300
-  scaling_adjustment  = 3
-  policy_type         = "SimpleScaling"
-}
-
-# Cloudwatch Monitor CPU Up
-resource "aws_cloudwatch_metric_alarm" "web_cpu_scale_up" {
-  alarm_name = "${var.name}-cpu-scale-up-alarm"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "3"
-  metric_name = "CPUUtilization"
-  namespace = "AWS/EC2"
-  period = "60"
-  statistic = "Average"
-  threshold = "60"
-  dimensions {
-    AutoScalingGroupName = "${module.web-asg.name}"
-  }
-  alarm_actions = ["${aws_autoscaling_policy.cpu_up.arn}"]
-}
-
-# Cloudwatch Monitor Memory Up
-resource "aws_cloudwatch_metric_alarm" "web_mem_scale_up" {
-  alarm_name = "${var.name}-mem-scale-up-alarm"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "3"
-  metric_name = "MemoryUtilization"
-  namespace = "AWS/EC2"
-  period = "60"
-  statistic = "Average"
-  threshold = "60"
-  dimensions {
-    AutoScalingGroupName = "${module.web-asg.name}"
-  }
-  alarm_actions = ["${aws_autoscaling_policy.mem_up.arn}"]
-}
-
-# ASG Policy Down
-resource "aws_autoscaling_policy" "cpu_down" {
-  name = "${var.name}-asg-policy-cpu-down"
-  autoscaling_group_name = "${module.web-asg.name}"
-  adjustment_type     = "ChangeInCapacity"
-  cooldown            = 300
-  scaling_adjustment  = -2
-  policy_type         = "SimpleScaling"
-}
-
-resource "aws_autoscaling_policy" "mem_down" {
-  name = "${var.name}-asg-policy-mem-down"
-  autoscaling_group_name = "${module.web-asg.name}"
-  adjustment_type     = "ChangeInCapacity"
-  cooldown            = 300
-  scaling_adjustment  = -2
-  policy_type         = "SimpleScaling"
-}
-# Cloudwatch CPU Monitor Down
-resource "aws_cloudwatch_metric_alarm" "web_cpu_scale_down" {
-  alarm_name = "${var.name}-cpu-scale-down-alarm"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods = "3"
-  metric_name = "CPUUtilization"
-  namespace = "AWS/EC2"
-  period = "60"
-  statistic = "Average"
-  threshold = "30"
-  dimensions {
-    AutoScalingGroupName = "${module.web-asg.name}"
-  }
-  alarm_actions = ["${aws_autoscaling_policy.cpu_down.arn}"]
-}
-
-# Cloudwatch Memory Monitor Down
-resource "aws_cloudwatch_metric_alarm" "web_mem_scale_down" {
-  alarm_name = "${var.name}-mem-scale-down-alarm"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods = "3"
-  metric_name = "MemoryUtilization"
-  namespace = "AWS/EC2"
-  period = "60"
-  statistic = "Average"
-  threshold = "30"
-  dimensions {
-    AutoScalingGroupName = "${module.web-asg.name}"
-  }
-  alarm_actions = ["${aws_autoscaling_policy.mem_down.arn}"]
+module "web_mem_autoscaling" {
+  source = "../../modules/autoscaling-policy-metric-alarm-pair"
+  name = "${var.name}"
+  asg_name = "${module.web-asg.name}"
+  metric = "MemoryUtilization"
 }
