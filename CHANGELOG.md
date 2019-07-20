@@ -1,15 +1,33 @@
 # (Unreleased)
 
+# v0.8.5
+
 ### Summary
+
+* Disable tests for the new new IAM user/group modules, which do not support v0.11.x
+* New module for looking up CentOS AMIs on AWS
+
+### Modules
+
+* `ami-centos`: simple module to get the ami id of the specified release of CentOS.
+
+### Examples
+
+* `ami-centos-test`: New testing example for `ami-centos`.
+
+
+# v0.8.4
+
+### Summary
+
+Breaking change in the `single-port-sg` module (if you are using UDP, TCP should
+not see any break).
 
 ### Modules
 
 * `single-port-sg`: Add support for UDP rules
 * `kube-controller-sg`: Update to sync with `single-port-sg` module
-* `ami-centos`: simple module to get the ami id of the specified release of CentOS.
 
-### Examples
-* `ami-centos-test`: New testing example for `ami-centos`.
 
 # v0.8.3
 
