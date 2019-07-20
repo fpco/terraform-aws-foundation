@@ -293,16 +293,16 @@ module "ha-management-cluster" {
   worker_cidr_blocks = []
 }
 
-module "iam-group" {
-  source     = "../modules/iam-group"
-  group_name = ""
-  members    = []
-}
+#module "iam-group" {
+#  source     = "../modules/iam-group"
+#  group_name = ""
+#  members    = []
+#}
 
-module "iam-users" {
-  source    = "../modules/iam-users"
-  user_list = []
-}
+#module "iam-users" {
+#  source    = "../modules/iam-users"
+#  user_list = []
+#}
 
 module "init-snippet-attach-ebs-volume" {
   source = "../modules/init-snippet-attach-ebs-volume"
