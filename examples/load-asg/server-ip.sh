@@ -12,7 +12,7 @@ FILTERS=$(
 	cat <<-EOF
 		[
 			{
-				"Name": "tag:Name",
+				"Name": "tag:aws:autoscaling:groupName",
 				"Values": ["$SERVER_NAME"]
 			},
 			{
