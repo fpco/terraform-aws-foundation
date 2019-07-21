@@ -1,11 +1,14 @@
+data "aws_region" "current" {}
+
 locals {
   name_prefix = "${var.application}-${var.environment}"
+  region      = data.aws_region.current.name
 }
 
 resource "aws_s3_bucket" "vault-test-bucket" {
-  bucket = "${locals.name_prefix}-bucket"
+  bucket = "${local.name_prefix}-bucket"
   acl    = "private"
-  region = "us-east-2"
+  region = local.region
 
   tags = {
     Environment = var.environment
@@ -16,7 +19,7 @@ resource "aws_s3_bucket" "vault-test-bucket" {
 # it's best to restrict it's scope so that only some IAM users are
 # able to assume this role.
 resource "aws_iam_role" "vault_bucket_role" {
-  name = "${locals.name_prefix}-bucket-role"
+  name = "${local.name_prefix}-bucket-role"
 
   assume_role_policy = <<EOF
 {
@@ -41,7 +44,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "vault_bucket_policy" {
-  name = "${locals.name_prefix}-bucket-policy"
+  name = "${local.name_prefix}-bucket-policy"
   role = aws_iam_role.vault_bucket_role.id
   policy = <<EOF
 {

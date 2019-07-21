@@ -3,6 +3,8 @@ resource "aws_iam_access_key" "vaultkey" {
   count = var.key_count
 }
 
+data "aws_caller_identity" "current" {}
+
 module "vault_iam_user_policy" {
   source          = "../../modules/iam-user-policy/"
   user_name       = "vault_user"
@@ -30,7 +32,7 @@ module "vault_iam_user_policy" {
         "iam:RemoveUserFromGroup"
       ],
       "Resource": [
-        "arn:aws:iam::xxxxxxx:user/vtest-*"
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/vtest-*"
       ]
     }
   ]

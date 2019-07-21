@@ -17,13 +17,7 @@ variable "vault_address" {
 
 variable "vault_token" {
   description = "Vault token needed for authorization to the server"
-  default     = "xxx"
-}
-
-variable "region" {
-  description = "AWS Region"
   type        = string
-  default     = "us-east-2"
 }
 
 variable "secret_backend_path" {

@@ -4,8 +4,12 @@
 
 ### Modules
 
+* `iam-user-policy`: Module for IAM user and corresponding policy
+
 ### Examples
 
+* `vault-iam`: New example which creates a admin user for vault with policy suitable for it.
+* `vault-s3-private`: New example showing vault and IAM integration with restricted access.
 
 # v0.8.2
 

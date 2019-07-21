@@ -788,3 +788,11 @@ module "web-alb" {
   subnet_ids             = []
   vpc_id                 = ""
 }
+
+module "iam-user-policy" {
+  source          = "../modules/iam-user-policy/"
+  user_name       = ""
+  environment     = ""
+  iam_policy_name = ""
+  iam_user_policy = ""
+}

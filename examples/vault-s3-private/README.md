@@ -92,7 +92,7 @@ security_token     xxx
 Now let's try to see all the files in our bucket:
 
 ``` shellsession
-$ env AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=xxx AWS_SESSION_TOKEN=xxx aws s3 ls s3://vault-fpco-test-bucket
+$ env AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=xxx AWS_SESSION_TOKEN=xxx aws s3 ls s3://s3-vault-demo-dev-bucket
 ```
 
 It gives you no output since there are no files. But the command
