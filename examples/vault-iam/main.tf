@@ -1,12 +1,12 @@
 resource "aws_iam_access_key" "vaultkey" {
-  user  = "${module.vault_iam_user_policy.user_name}"
-  count = "${var.key_count}"
+  user  = module.vault_iam_user_policy.user_name
+  count = var.key_count
 }
 
 module "vault_iam_user_policy" {
   source          = "../../modules/iam-user-policy/"
   user_name       = "vault_user"
-  stage           = "dev"
+  environment     = "dev"
   iam_policy_name = "vault_user_policy"
   iam_user_policy = <<EOF
 {
@@ -36,4 +36,6 @@ module "vault_iam_user_policy" {
   ]
 }
 EOF
+
 }
+
