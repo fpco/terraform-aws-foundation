@@ -4,6 +4,8 @@
 
 ### Modules
 
+* `iam-instance-profile`: Abstract the usage pattern of IAM instance profile.
+
 ### Examples
 
 
@@ -39,7 +41,6 @@
 ### Examples
 
 * `load-asg`: updated to use new `autoscaling-policy-metric-alarm-pair` module
-
 
 # v0.9.0
 

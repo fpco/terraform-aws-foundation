@@ -25,29 +25,9 @@ resource "aws_ebs_volume" "main" {
   )
 }
 
-output "iam_profile_id" {
-  value       = aws_iam_instance_profile.attach_ebs.id
-  description = "`id` exported from the `aws_iam_instance_profile`"
-}
-
-output "iam_profile_arn" {
-  value       = aws_iam_instance_profile.attach_ebs.arn
-  description = "`arn` exported from the `aws_iam_instance_profile`"
-}
-
-output "iam_profile_policy_document" {
-  value       = aws_iam_role_policy.attach_ebs.policy
-  description = "`policy` exported from the `aws_iam_role_policy`"
-}
-
-output "iam_role_arn" {
-  value       = aws_iam_role.attach_ebs.arn
-  description = "`arn` exported from the `aws_iam_role`"
-}
-
-output "iam_role_name" {
-  value       = aws_iam_role.attach_ebs.name
-  description = "`name` exported from the `aws_iam_role`"
+resource "aws_iam_role_policy_attachment" "attach_ebs" {
+  role       = var.iam_instance_profile_role_name
+  policy_arn = aws_iam_policy.attach_ebs_policy.arn
 }
 
 output "volume_id" {

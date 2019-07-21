@@ -56,3 +56,7 @@ variable "extra_tags" {
   type        = map(string)
 }
 
+variable "iam_instance_profile_role_name" {
+  description = "The role to attach policy needed by this module."
+  type        = string
+}

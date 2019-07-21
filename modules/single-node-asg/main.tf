@@ -12,16 +12,22 @@
  */
 
 module "service-data" {
-  source      = "../persistent-ebs"
-  name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
-  region      = var.region
-  az          = data.aws_subnet.server-subnet.availability_zone
-  size        = var.data_volume_size
-  iops        = var.data_volume_iops
-  volume_type = var.data_volume_type
-  encrypted   = var.data_volume_encrypted
-  kms_key_id  = var.data_volume_kms_key_id
-  snapshot_id = var.data_volume_snapshot_id
+  source                         = "../persistent-ebs"
+  name_prefix                    = "${var.name_prefix}-${var.name_suffix}-data"
+  region                         = var.region
+  az                             = data.aws_subnet.server-subnet.availability_zone
+  size                           = var.data_volume_size
+  iops                           = var.data_volume_iops
+  volume_type                    = var.data_volume_type
+  encrypted                      = var.data_volume_encrypted
+  kms_key_id                     = var.data_volume_kms_key_id
+  snapshot_id                    = var.data_volume_snapshot_id
+  iam_instance_profile_role_name = module.instance_profile.iam_role_name
+}
+
+module "instance_profile" {
+  source      = "../iam-instance-profile"
+  name_prefix = "${var.name_prefix}-${var.name_suffix}"
 }
 
 module "server" {
@@ -44,8 +50,7 @@ module "server" {
   root_volume_type = var.root_volume_type
   root_volume_size = var.root_volume_size
 
-  #
-  iam_profile = module.service-data.iam_profile_id
+  iam_profile = module.instance_profile.iam_profile_id
 
   user_data = <<END_INIT
 #!/bin/bash

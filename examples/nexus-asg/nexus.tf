@@ -16,16 +16,17 @@
 
 variable "region" {
   description = "The region to put resources in"
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "az" {
   description = "The availability zone to put resources in"
-  default     = "us-east-1a"
+  default     = "us-east-2b"
 }
 
 variable "key_name" {
   description = "The keypair used to ssh into the asg intances"
+  default     = "shida-east-2"
 }
 
 module "vpc" {
