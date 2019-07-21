@@ -20,30 +20,37 @@ resource "aws_ebs_volume" "main" {
   tags = "${merge(map("Name", "${var.name_prefix}-${var.az}"), "${var.extra_tags}")}"
 }
 
+module "iam_instance_profile" {
+  source             = "../iam-instance-profile"
+  assume_role_policy = "${data.aws_iam_policy_document.attach_ebs.json}"
+  policy             = "${data.aws_iam_policy_document.attach_ebs_policy.json}"
+  name_prefix        = "persistent-ebs"
+}
+
 output "iam_profile_id" {
-  value       = "${aws_iam_instance_profile.attach_ebs.id}"
+  value       = "${module.iam_instance_profile.iam_profile_id}"
   description = "`id` exported from the `aws_iam_instance_profile`"
 }
 
-output "iam_profile_arn" {
-  value       = "${aws_iam_instance_profile.attach_ebs.arn}"
-  description = "`arn` exported from the `aws_iam_instance_profile`"
-}
+# output "iam_profile_arn" {
+#   value       = "${aws_iam_instance_profile.attach_ebs.arn}"
+#   description = "`arn` exported from the `aws_iam_instance_profile`"
+# }
 
-output "iam_profile_policy_document" {
-  value       = "${aws_iam_role_policy.attach_ebs.policy}"
-  description = "`policy` exported from the `aws_iam_role_policy`"
-}
+# output "iam_profile_policy_document" {
+#   value       = "${aws_iam_role_policy.attach_ebs.policy}"
+#   description = "`policy` exported from the `aws_iam_role_policy`"
+# }
 
-output "iam_role_arn" {
-  value       = "${aws_iam_role.attach_ebs.arn}"
-  description = "`arn` exported from the `aws_iam_role`"
-}
+# output "iam_role_arn" {
+#   value       = "${aws_iam_role.attach_ebs.arn}"
+#   description = "`arn` exported from the `aws_iam_role`"
+# }
 
-output "iam_role_name" {
-  value       = "${aws_iam_role.attach_ebs.name}"
-  description = "`name` exported from the `aws_iam_role`"
-}
+# output "iam_role_name" {
+#   value       = "${aws_iam_role.attach_ebs.name}"
+#   description = "`name` exported from the `aws_iam_role`"
+# }
 
 output "volume_id" {
   value       = "${aws_ebs_volume.main.id}"

@@ -1,5 +1,8 @@
 # (Unreleased)
 
+### Modules
+* `iam-instance-profile`: Abstract the usage pattern of IAM instance profile.
+
 # v0.8.5
 
 ### Summary
