@@ -1,16 +1,16 @@
 variable "most_recent" {
-  default     = "true"
+  default     = true
   description = "boolean, maps to `most_recent` parameter for `aws_ami` data source"
-  type        = "string"
+  type        = bool
 }
 
 variable "release" {
   description = "default centos release to target"
-  type        = "string"
+  type        = string
 }
 
 data "aws_ami" "centos" {
-  most_recent = "${var.most_recent}"
+  most_recent = var.most_recent
 
   filter {
     name   = "virtualization-type"
@@ -28,6 +28,7 @@ data "aws_ami" "centos" {
 }
 
 output "id" {
-  value       = "${data.aws_ami.centos.id}"
+  value       = data.aws_ami.centos.id
   description = "ID of the AMI"
 }
+
