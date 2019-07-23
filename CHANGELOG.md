@@ -1,8 +1,30 @@
 # (Unreleased)
 
+### Summary
+
+
 ### Modules
 
-* `autoscaling-policy-metric-alarm-pair`: New module abstracts the autoscaling function from example load-asg. The example now is using this module.
+
+### Examples
+
+
+# v0.9.1
+
+### Summary
+
+* Improve support for autoscaling ASG.
+* Fixup `ami-centos` module for `v0.12.x`
+
+### Modules
+
+* `autoscaling-policy-metric-alarm-pair`: Add a new module that provides the autoscaling functions extracted from the `load-asg` example.
+* `ami-centos`: simple module to get the ami id of the specified release of CentOS.
+
+### Examples
+
+* `load-asg`: updated to use new `autoscaling-policy-metric-alarm-pair` module
+
 
 # v0.9.0
 
