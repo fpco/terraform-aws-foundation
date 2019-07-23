@@ -8,7 +8,7 @@ module "ami" {
 }
 
 resource "aws_instance" "test" {
-  ami             = "${module.ami.id}"
+  ami             = module.ami.id
   instance_type   = "t2.micro"
   key_name        = "shida-west-1"
   security_groups = ["ssh_only"]
@@ -25,5 +25,6 @@ resource "aws_security_group" "ssh_only" {
 }
 
 output "ip" {
-  value = "${aws_instance.test.public_ip}"
+  value = aws_instance.test.public_ip
 }
+
