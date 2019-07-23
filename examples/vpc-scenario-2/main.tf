@@ -16,7 +16,7 @@ variable "name" {
 
 variable "region" {
   description = "Region where the project will be deployed"
-  default     = "us-east-2"
+  default     = "us-west-2"
 }
 
 variable "vpc_cidr" {
@@ -120,7 +120,7 @@ module "web-http-elb-sg-rule" {
 module "web-ssh-rule" {
   source            = "../../modules/ssh-sg"
   cidr_blocks       = module.vpc.public_cidr_blocks #["0.0.0.0/0"] #
-  security_group_id = "${module.web-sg.id}"
+  security_group_id = module.web-sg.id
 }
 
 # open egress for web instances (outbound from nodes)
