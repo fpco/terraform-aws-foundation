@@ -11,10 +11,6 @@ resource "aws_instance" "bastion" {
     volume_size = "20"
   }
 
-  lifecycle = {
-    ignore_changes = ["ami", "user_data"]
-  }
-
   user_data = <<END_INIT
 #!/bin/bash
 echo "hello init"
