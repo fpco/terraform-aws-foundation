@@ -24,6 +24,13 @@ resource "aws_nat_gateway" "nat" {
   count         = var.nat_count
   subnet_id     = element(data.aws_subnet.public.*.id, count.index)
   allocation_id = element(aws_eip.nat.*.id, count.index)
+
+  tags = merge(
+    {
+      "Name" = "${var.name_prefix}-${format("%02d", count.index + 1)}"
+    },
+    var.extra_tags,
+  )
 }
 
 # Route tables. One per NAT gateway.
