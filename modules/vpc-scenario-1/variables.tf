@@ -32,13 +32,13 @@ variable "extra_tags" {
 variable "enable_dns_hostnames" {
   default     = true
   description = "boolean, enable/disable VPC attribute, enable_dns_hostnames"
-  type        = string
+  type        = bool
 }
 
 variable "enable_dns_support" {
   default     = true
   description = "boolean, enable/disable VPC attribute, enable_dns_support"
-  type        = string
+  type        = bool
 }
 
 variable "dns_servers" {
@@ -47,3 +47,8 @@ variable "dns_servers" {
   type        = list(string)
 }
 
+variable "map_on_launch" {
+  default     = true
+  description = "Map public subnet addresses to instances."
+  type = bool
+}

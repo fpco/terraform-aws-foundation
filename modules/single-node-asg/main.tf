@@ -11,6 +11,10 @@
  *
  */
 
+resource "aws_eip" "eip" {
+  count = var.assign_eip ? 1 : 0
+}
+
 module "service-data" {
   source                         = "../persistent-ebs"
   name_prefix                    = "${var.name_prefix}-${var.name_suffix}-data"
@@ -42,20 +46,21 @@ module "server" {
   ami              = var.ami
   subnet_ids       = [var.subnet_id]
   azs              = [data.aws_subnet.server-subnet.availability_zone]
-  public_ip        = var.public_ip
   key_name         = var.key_name
   elb_names        = var.load_balancers
   max_nodes        = 1
   min_nodes        = 1
   root_volume_type = var.root_volume_type
   root_volume_size = var.root_volume_size
-
-  iam_profile = module.instance_profile.iam_profile_id
+  iam_profile      = module.instance_profile.iam_profile_id
 
   user_data = <<END_INIT
 #!/bin/bash
 ${var.init_prefix}
+apt update
+apt install -y awscli
 ${module.init-attach-ebs.init_snippet}
+${var.assign_eip ? "aws ec2 associate-address --instance-id \"$(ec2metadata --instance-id)\" --region \"${var.region}\" --allocation-id \"${element(aws_eip.eip.*.id,0)}\"" : ""}
 ${var.init_suffix}
 END_INIT
 
@@ -73,3 +78,23 @@ data "aws_subnet" "server-subnet" {
   id = var.subnet_id
 }
 
+resource "aws_iam_role_policy_attachment" "associate_eip" {
+  role       = module.instance_profile.iam_role_name
+  policy_arn = aws_iam_policy.associate_eip_policy.arn
+}
+
+resource "aws_iam_policy" "associate_eip_policy" {
+  name   = "associate_address"
+  policy = data.aws_iam_policy_document.associate_eip_policy_doc.json
+}
+
+data "aws_iam_policy_document" "associate_eip_policy_doc" {
+  statement {
+    sid = ""
+    effect = "Allow"
+    actions = [
+      "ec2:AssociateAddress"
+    ]
+    resources = ["*"]
+  }
+}

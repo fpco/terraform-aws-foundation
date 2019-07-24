@@ -39,6 +39,7 @@ module "public-subnets" {
   name_prefix = "${var.name_prefix}-public"
   cidr_blocks = var.public_subnet_cidrs
   extra_tags  = var.extra_tags
+  public      = var.map_on_launch
 }
 
 module "public-gateway" {

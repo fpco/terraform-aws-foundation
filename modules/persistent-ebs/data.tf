@@ -22,7 +22,6 @@ data "aws_iam_policy_document" "attach_ebs_policy_doc" {
 }
 
 resource "aws_iam_policy" "attach_ebs_policy" {
-  name = "attach_ebs"
-
+  name   = "attach_ebs"
   policy = data.aws_iam_policy_document.attach_ebs_policy_doc.json
 }
