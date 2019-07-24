@@ -15,7 +15,7 @@ resource "aws_subnet" "main" {
   availability_zone = element(var.azs, count.index)
   tags = merge(
     {
-      "Name" = "${var.name_prefix}-${format("%02d", count.index)}-${element(var.azs, count.index)}"
+      "Name" = "${var.name_prefix}-${format("%02d", count.index + 1)}-${element(var.azs, count.index)}"
     },
     var.extra_tags,
   )
