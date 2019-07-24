@@ -2,11 +2,26 @@
 
 ### Summary
 
+### Modules
+
+### Examples
+
+
+# v0.9.2
+
+### Summary
+
+* Bug fixes for some network modules
 
 ### Modules
 
+* subnets: use name subnets like 01, 02, 03, not with zero index (eg 00)
+* nat-gateways: support adding tags for the aws_nat_gateway resource
+* nat-gateways: accept a longer list of private subnets than public/NAT GWs
 
 ### Examples
+
+* examples/vpc-scenario-2: fixup `all` target
 
 
 # v0.9.1
