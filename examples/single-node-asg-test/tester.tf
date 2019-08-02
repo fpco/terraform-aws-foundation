@@ -37,7 +37,7 @@ module "snasg" {
   key_name           = var.key_name
   subnet_id          = module.vpc.public_subnet_ids[0]
   security_group_ids = [aws_security_group.eiptest.id]
-  assign_eip         = true
+  assign_eip         = false # true case is tested in bastion-test example
 }
 
 module "ubuntu-ami" {
