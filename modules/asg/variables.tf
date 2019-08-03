@@ -38,7 +38,7 @@ variable "placement_group" {
 }
 
 variable "user_data" {
-  default     = ""
+  default     = "#!/bin/sh"
   description = "The user_data string to pass to cloud-init"
   type        = string
 }
