@@ -77,7 +77,7 @@ variable "elb_names" {
 
 variable "alb_target_group_arns" {
   default     = []
-  description = "list of target_group for application load balancer to associate with the ASG (by ARN)"
+  description = "A list of aws_alb_target_group ARNs, for use with Application or Network Load Balancing."
   type        = list(string)
 }
 
