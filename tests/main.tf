@@ -304,6 +304,11 @@ module "iam-users" {
   user_list = []
 }
 
+module "iam-instance-profile" {
+  source      = "../modules/iam-instance-profile"
+  name_prefix = ""
+}
+
 module "init-snippet-attach-ebs-volume" {
   source = "../modules/init-snippet-attach-ebs-volume"
 
