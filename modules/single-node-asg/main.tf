@@ -56,19 +56,23 @@ module "service-data" {
 module "server" {
   source = "../asg"
 
-  # the prefix and suffix names are combined in the `asg` module to create the full name
-  name_prefix        = var.name_prefix
-  name_suffix        = "${var.name_suffix}-${local.az}"
-  placement_group    = var.placement_group
-  public_ip          = var.public_ip
-  iam_profile        = module.instance_profile.iam_profile_id
-  instance_type      = var.instance_type
-  ami                = var.ami
-  azs                = [local.az]
-  elb_names          = var.load_balancers
-  key_name           = var.key_name
-  max_nodes          = 1
-  min_nodes          = 1
+  ami       = var.ami
+  azs       = [local.az]
+  elb_names = var.load_balancers
+  key_name  = var.key_name
+  # The IAM Instance Profile w/ attach_ebs role
+  iam_profile   = module.instance_profile.iam_profile_id
+  instance_type = var.instance_type
+  # 1 EC2 instance <> 1 EBS volume 
+  max_nodes       = 1
+  min_nodes       = 1
+  placement_group = var.placement_group
+  public_ip       = var.public_ip
+  # the prefix and suffix names are combined in
+  # the `asg` module to create the full name
+  name_prefix = var.name_prefix
+  name_suffix = "${var.name_suffix}-${local.az}"
+
   root_volume_type   = var.root_volume_type
   root_volume_size   = var.root_volume_size
   security_group_ids = var.security_group_ids
@@ -85,7 +89,7 @@ END_INIT
 
 # Render init snippet - boxed module to attach the EBS volume to the node
 module "init-attach-ebs" {
-  source    = "../init-snippet-attach-ebs-volume"
-  region    = var.region
+  source = "../init-snippet-attach-ebs-volume"
+  region = var.region
   volume_id = module.service-data.volume_id
 }
