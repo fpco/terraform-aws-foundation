@@ -11,6 +11,11 @@
  *
  */
 
+# Data source for AWS subnet
+data "aws_subnet" "server-subnet" {
+  id = var.subnet_id
+}
+
 # Create an IAM Instance profile we can use on EC2, associated with the ASG
 module "instance_profile" {
   source      = "../iam-instance-profile"
@@ -36,26 +41,25 @@ module "service-data" {
 
 # Create an ASG with just 1 EC2 instance
 module "server" {
-  source             = "../asg"
+  source = "../asg"
+
+  # the prefix and suffix names are combined in the `asg` module to create the full name
+  name_prefix        = var.name_prefix
+  name_suffix        = "${var.name_suffix}-${data.aws_subnet.server-subnet.availability_zone}"
+  placement_group    = var.placement_group
+  public_ip          = var.public_ip
   iam_profile        = module.instance_profile.iam_profile_id
+  instance_type      = var.instance_type
+  ami                = var.ami
+  azs                = [data.aws_subnet.server-subnet.availability_zone]
+  elb_names          = var.load_balancers
+  key_name           = var.key_name
+  max_nodes          = 1
+  min_nodes          = 1
+  root_volume_type   = var.root_volume_type
+  root_volume_size   = var.root_volume_size
   security_group_ids = var.security_group_ids
-
-  # combine the prefix and suffix for the full name
-  name_prefix      = var.name_prefix
-  name_suffix      = "${var.name_suffix}-${data.aws_subnet.server-subnet.availability_zone}"
-  placement_group  = var.placement_group
-  instance_type    = var.instance_type
-  ami              = var.ami
-  subnet_ids       = [var.subnet_id]
-  azs              = [data.aws_subnet.server-subnet.availability_zone]
-  public_ip        = var.public_ip
-  key_name         = var.key_name
-  elb_names        = var.load_balancers
-  max_nodes        = 1
-  min_nodes        = 1
-  root_volume_type = var.root_volume_type
-  root_volume_size = var.root_volume_size
-
+  subnet_ids         = [var.subnet_id]
 
   user_data = <<END_INIT
 #!/bin/bash
@@ -68,13 +72,7 @@ END_INIT
 
 # Render init snippet - boxed module to attach the EBS volume to the node
 module "init-attach-ebs" {
-  source = "../init-snippet-attach-ebs-volume"
-  region = var.region
+  source    = "../init-snippet-attach-ebs-volume"
+  region    = var.region
   volume_id = module.service-data.volume_id
 }
-
-# Data source for AWS subnet
-data "aws_subnet" "server-subnet" {
-  id = var.subnet_id
-}
-
