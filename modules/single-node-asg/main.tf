@@ -11,6 +11,13 @@
  *
  */
 
+# Create an IAM Instance profile we can use on EC2, associated with the ASG
+module "instance_profile" {
+  source      = "../iam-instance-profile"
+  name_prefix = "${var.name_prefix}-${var.name_suffix}"
+}
+
+# Create a single EBS volume that can be used in a single/specific AZ, for the ASG
 module "service-data" {
   source      = "../persistent-ebs"
   name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
@@ -22,10 +29,15 @@ module "service-data" {
   encrypted   = var.data_volume_encrypted
   kms_key_id  = var.data_volume_kms_key_id
   snapshot_id = var.data_volume_snapshot_id
+
+  # EBS module will create an IAM policy and associate with this role
+  iam_instance_profile_role_name = module.instance_profile.iam_role_name
 }
 
+# Create an ASG with just 1 EC2 instance
 module "server" {
   source             = "../asg"
+  iam_profile        = module.instance_profile.iam_profile_id
   security_group_ids = var.security_group_ids
 
   # combine the prefix and suffix for the full name
@@ -44,8 +56,6 @@ module "server" {
   root_volume_type = var.root_volume_type
   root_volume_size = var.root_volume_size
 
-  #
-  iam_profile = module.service-data.iam_profile_id
 
   user_data = <<END_INIT
 #!/bin/bash
@@ -56,7 +66,7 @@ END_INIT
 
 }
 
-# boxed module to attach the EBS volume to the node
+# Render init snippet - boxed module to attach the EBS volume to the node
 module "init-attach-ebs" {
   source = "../init-snippet-attach-ebs-volume"
   region = var.region
