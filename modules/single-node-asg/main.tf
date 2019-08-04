@@ -11,23 +11,36 @@
  *
  */
 
-# Data source for AWS subnet
+# Data source for the AWS subnet we deploy the EC2 instances into
 data "aws_subnet" "server-subnet" {
   id = var.subnet_id
+}
+
+# To centralize and make obvious, these values, and the names for AWS resources
+locals {
+  # To give us a short-hand refernce to the AZ
+  az = data.aws_subnet.server-subnet.availability_zone
+
+  # The "name_prefix" we provide to the persistent-ebs module
+  data_volume_name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
+
+  # The `name_prefix` we provide to the `iam-instance-profile` module
+  # The persistent-ebs module appends the AZ to the data node name, other modules don't do that
+  name_prefix_with_az = "${var.name_prefix}-${var.name_suffix}-${local.az}"
 }
 
 # Create an IAM Instance profile we can use on EC2, associated with the ASG
 module "instance_profile" {
   source      = "../iam-instance-profile"
-  name_prefix = "${var.name_prefix}-${var.name_suffix}"
+  name_prefix = local.name_prefix_with_az
 }
 
 # Create a single EBS volume that can be used in a single/specific AZ, for the ASG
 module "service-data" {
   source      = "../persistent-ebs"
-  name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
+  name_prefix = local.data_volume_name_prefix
   region      = var.region
-  az          = data.aws_subnet.server-subnet.availability_zone
+  az          = local.az
   size        = var.data_volume_size
   iops        = var.data_volume_iops
   volume_type = var.data_volume_type
@@ -45,13 +58,13 @@ module "server" {
 
   # the prefix and suffix names are combined in the `asg` module to create the full name
   name_prefix        = var.name_prefix
-  name_suffix        = "${var.name_suffix}-${data.aws_subnet.server-subnet.availability_zone}"
+  name_suffix        = "${var.name_suffix}-${local.az}"
   placement_group    = var.placement_group
   public_ip          = var.public_ip
   iam_profile        = module.instance_profile.iam_profile_id
   instance_type      = var.instance_type
   ami                = var.ami
-  azs                = [data.aws_subnet.server-subnet.availability_zone]
+  azs                = [local.az]
   elb_names          = var.load_balancers
   key_name           = var.key_name
   max_nodes          = 1
