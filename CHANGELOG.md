@@ -4,6 +4,11 @@
 
 ### Modules
 
+* `iam-instance-profile`: Add new module, abstract the usage pattern of IAM instance profile.
+* `single-node-asg`: update to use new `iam-instance-profile` module
+* `persistent-ebs`: update to use new `iam-instance-profile` module and sync with recent updates to the `single-node-asg` module
+
+
 ### Examples
 
 
@@ -50,6 +55,7 @@ Initial support for Terraform v0.12.x and HCL 2. Probably got bugs.
 All modules and examples have been updated. Tests have been run, but that does
 not mean bug free. More testing will likely find additional issues. New releases
 will be made to accomodate.
+
 
 # v0.8.5
 
