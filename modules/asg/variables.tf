@@ -112,3 +112,8 @@ variable "termination_policies" {
   type        = list(string)
 }
 
+variable "health_check_type" {
+  default     = "EC2"
+  description = "\"EC2\" or \"ELB\". Controls how health checking is done."
+  type        = string
+}
