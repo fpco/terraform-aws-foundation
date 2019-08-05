@@ -27,7 +27,7 @@ resource "aws_autoscaling_group" "cluster" {
   availability_zones        = var.azs
   force_delete              = true
   health_check_grace_period = 300
-  health_check_type         = "EC2"
+  health_check_type         = var.health_check_type
   launch_configuration      = aws_launch_configuration.cluster.name
   load_balancers            = var.elb_names
   max_size                  = var.max_nodes
