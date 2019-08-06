@@ -119,7 +119,7 @@ module "web-http-elb-sg-rule" {
 # allow SSH from bastion in public subnets to web instances
 module "web-ssh-rule" {
   source            = "../../modules/ssh-sg"
-  cidr_blocks       = ["${module.vpc.public_cidr_blocks}"] #["0.0.0.0/0"] #
+  cidr_blocks       = module.vpc.public_cidr_blocks #["0.0.0.0/0"] #
   security_group_id = "${module.web-sg.id}"
 }
 
