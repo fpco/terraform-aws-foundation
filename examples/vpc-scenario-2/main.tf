@@ -131,8 +131,6 @@ module "web-open-egress-sg-rule" {
 
 # Load Balancer
 resource "aws_elb" "web" {
-  name = "${var.name}-public-elb"
-
   health_check {
     healthy_threshold   = 2
     interval            = 15
@@ -159,6 +157,10 @@ resource "aws_elb" "web" {
 
   # ELBs in the public subnets, separate from the web ASG in private subnets
   subnets = module.vpc.public_subnet_ids
+
+  tags = {
+    Name = "${var.name}-public-elb"
+  }
 }
 
 module "web" {
