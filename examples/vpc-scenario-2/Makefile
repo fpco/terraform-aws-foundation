@@ -1,6 +1,10 @@
+MAKEOPTS = -s
+
 .PHONY: ssh-key init plan-subnets plan-gateways plan apply test destroy clean
 
 .DEFAULT_GOAL = help
+
+export TERRAFORM = terraform-0.12.4
 
 # Hardcoding value of 3 minutes when we check if the plan file is stale
 STALE_PLAN_FILE := `find "tf.out" -mmin -3 | grep -q tf.out`
@@ -14,38 +18,38 @@ check-plan-file:
 
 ## Create ssh key
 ssh-key:
-	@ssh-keygen -q -N "" -b 4096 -C "SSH key for vpc-scenario-2 example" -f ./id_rsa
+	ssh-keygen -q -N "" -b 4096 -C "SSH key for vpc-scenario-2 example" -f ./id_rsa
 
 ## Runs terraform get and terraform init for env
 init:
-	@terraform get
-	@terraform init
+	$(TERRAFORM) get
+	$(TERRAFORM) init
 
 ## use 'terraform plan' to 'target' the public/private subnets in the vpc module
 plan-subnets:
-	@terraform plan \
+	$(TERRAFORM) plan \
 		-target="module.vpc.module.public-subnets" \
 		-target="module.vpc.module.private-subnets" \
 		-out=tf.out
 
 ## use 'terraform plan' to 'target' the public and NAT gateways in the vpc module
 plan-gateways:
-	@terraform plan \
+	$(TERRAFORM) plan \
 		-target="module.vpc.module.public-gateway" \
 		-target="module.vpc.module.nat-gateway" \
 		-out=tf.out
 
 ## terraform plan (makes everything)
 plan:
-	@terraform plan -out=tf.out
+	$(TERRAFORM) plan -out=tf.out
 
 ## terraform apply
 apply: check-plan-file
-	@terraform apply tf.out
+	$(TERRAFORM) apply tf.out
 
 ## use curl to hit the ELB to confirm the VPC came online ok
 test:
-	@curl -v http://$$(terraform output elb_dns)/
+	curl -v http://$(shell $(TERRAFORM) output elb_dns)/
 
 ## Use ops http polling to block until ELB is available, should happen in 5 minutes or less
 poll:
@@ -66,25 +70,24 @@ all:
 
 ## Use ops to lookup IPs of the EC2 nodes in the ASG
 lookup-ips:
-	ops aws ec2 asg ips --region $(shell terraform output region) --private $(shell terraform output asg_name)
+	ops aws ec2 asg ips --region $(shell $(TERRAFORM) output region) --private $(shell $(TERRAFORM) output asg_name)
 
 ## Use ops to terminate all of the EC2 nodes in the ASG
 terminate-ec2-nodes:
-	ops aws ec2 asg terminate --region $(shell terraform output region) $(shell terraform output asg_name)
+	ops aws ec2 asg terminate --region $(shell $(TERRAFORM) output region) $(shell $(TERRAFORM) output asg_name)
 
 
 ## terraform destroy everything
 destroy:
-	@terraform destroy
+	$(TERRAFORM) destroy
 
 ## rm -rf all files and state
-clean:
-	@rm -f tf.out
-	@rm -f id_rsa
-	@rm -f id_rsa.pub
-	@rm -f terraform.tfvars
-	@rm -f terraform.*.backup
-	@rm -f terraform.tfstate
+clean: destroy
+	rm -f tf.out
+	rm -f id_rsa
+	rm -f id_rsa.pub
+	rm -f terraform.tfvars
+	rm -f terraform.tfstate
 
 ## Show help screen.
 help:
