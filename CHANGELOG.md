@@ -4,13 +4,37 @@
 
 ### Modules
 
+### Examples
+
+
+# v0.9.3
+
+### Summary
+
+* New module for IAM
+* Fixes to ASG, single-node-ASG and persistent-ebs modules
+* Drop deprecated nexus-asg example
+* Fixes for VPC Scenario 2 example
+
+
+### Modules
+
 * `iam-instance-profile`: Add new module, abstract the usage pattern of IAM instance profile.
-* `single-node-asg`: update to use new `iam-instance-profile` module
+* `single-node-asg`:
+  * update to use new `iam-instance-profile` module
+  * whitespace fixup
+  * use `locals{}` block to improve readability
 * `persistent-ebs`: update to use new `iam-instance-profile` module and sync with recent updates to the `single-node-asg` module
+* `asg`: parametize target group and health check type
 
 
 ### Examples
 
+* `nexus-asg`: Drop deprecated example.
+* `vpc-scenario-2`:
+  * Fix updates missed during v0.12.x upgrade
+  * Improve `Makefile`
+  * Set name tag on ELB
 
 # v0.9.2
 
