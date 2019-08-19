@@ -4,6 +4,8 @@
 
 ### Modules
 
+* `iam-instance-profile`: Add role ouput for IAM instance profile module.
+
 ### Examples
 
 
