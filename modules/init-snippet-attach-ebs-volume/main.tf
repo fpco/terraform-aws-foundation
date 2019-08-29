@@ -10,9 +10,14 @@
  */
 
 # variables used by this snippet of init shellcode
-variable "device_path" {
+variable "device_attach_path" {
   default     = "/dev/xvdf"
-  description = "path, to the device's path in /dev/"
+  description = "path, to attach the device through aws ec2 command"
+}
+
+variable "device_virtual_path" {
+  default     = "/dev/xvdf"
+  description = "path, the OS virtual path in /dev/"
 }
 
 variable "init_prefix" {
@@ -53,14 +58,15 @@ data "template_file" "init_snippet" {
   template = "${file("${path.module}/snippet.tpl")}"
 
   vars {
-    device_path   = "${var.device_path}"
-    init_prefix   = "${var.init_prefix}"
-    init_suffix   = "${var.init_suffix}"
-    log_prefix    = "${var.log_prefix}"
-    log_level     = "${var.log_level}"
-    region        = "${var.region}"
-    volume_id     = "${var.volume_id}"
-    wait_interval = "${var.wait_interval}"
+    device_attach_path    = "${var.device_attach_path}"
+    device_virtual_path   = "${var.device_virtual_path}"
+    init_prefix           = "${var.init_prefix}"
+    init_suffix           = "${var.init_suffix}"
+    log_prefix            = "${var.log_prefix}"
+    log_level             = "${var.log_level}"
+    region                = "${var.region}"
+    volume_id             = "${var.volume_id}"
+    wait_interval         = "${var.wait_interval}"
   }
 }
 

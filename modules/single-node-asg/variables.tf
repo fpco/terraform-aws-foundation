@@ -13,6 +13,18 @@ variable "ami" {
   type        = "string"
 }
 
+variable "ebs_device_attach_path" {
+  default     = "/dev/xvdf"
+  description = "path, to attach the device through aws ec2 command"
+  type        = "string"
+}
+
+variable "ebs_device_virtual_path" {
+  default     = "/dev/xvdf"
+  description = "path, the OS virtual path in /dev/"
+  type        = "string"
+}
+
 variable "instance_type" {
   description = "The type of AWS instance (size)"
   type        = "string"

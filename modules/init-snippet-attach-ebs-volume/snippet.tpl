@@ -7,9 +7,9 @@ echo "${log_prefix} will attach $${VOLUME_ID} via the AWS API in ${region}"
 aws ec2 attach-volume                     \
           --volume-id "$${VOLUME_ID}"     \
           --instance-id "$${INSTANCE_ID}" \
-          --device '${device_path}'
+          --device '${device_attach_path}'
 
-while ! ls '${device_path}'; do
+while ! ls '${device_virtual_path}'; do
   sleep '${wait_interval}'
 done
 ${init_suffix}
