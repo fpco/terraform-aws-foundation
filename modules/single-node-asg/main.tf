@@ -57,9 +57,10 @@ END_INIT
 
 # boxed module to attach the EBS volume to the node
 module "init-attach-ebs" {
-  source    = "../init-snippet-attach-ebs-volume"
-  region    = "${var.region}"
-  volume_id = "${module.service-data.volume_id}"
+  source      = "../init-snippet-attach-ebs-volume"
+  device_path = "${var.ebs_device_path}"
+  region      = "${var.region}"
+  volume_id   = "${module.service-data.volume_id}"
 }
 
 # Data source for AWS subnet
