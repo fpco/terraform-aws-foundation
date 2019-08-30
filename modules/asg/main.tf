@@ -43,6 +43,30 @@ resource "aws_autoscaling_group" "cluster" {
 
   vpc_zone_identifier = var.subnet_ids
 
+  dynamic "initial_lifecycle_hook" {
+    for_each = var.enable_launching_hook ? [1] : []
+    content {
+      name                    = "${var.name_prefix}-lifecycle-launching"
+      default_result          = "CONTINUE"
+      heartbeat_timeout       = 60
+      lifecycle_transition    = "autoscaling:EC2_INSTANCE_LAUNCHING"
+      notification_target_arn = var.lifecycle_sns_topic_arn
+      role_arn                = var.aws_role_arn
+    }
+  }
+
+  dynamic "initial_lifecycle_hook" {
+    for_each = var.enable_terminating_hook ? [1] : []
+    content {
+      name                    = "${var.name_prefix}-lifecycle-terminating"
+      default_result          = "CONTINUE"
+      heartbeat_timeout       = 60
+      lifecycle_transition    = "autoscaling:EC2_INSTANCE_TERMINATING"
+      notification_target_arn = var.lifecycle_sns_topic_arn
+      role_arn                = var.aws_role_arn
+    }
+  }
+
   tags = concat(
     [
       {

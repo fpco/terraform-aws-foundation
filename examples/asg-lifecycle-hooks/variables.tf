@@ -3,19 +3,9 @@ variable "extra_tags" {
   default     = {}
 }
 
-variable "lifecycle_name_prefix" {
-  description = "Prefix used for resource names."
-  default     = "lifecycled-eg"
-}
-
 variable "name_prefix" {
   description = "Prefix used for resource names."
   default     = "asg-lc"
-}
-
-variable "name" {
-  description = "name of the project, use as prefix to names of resources created"
-  default     = "test-lifecycle-project"
 }
 
 variable "region" {

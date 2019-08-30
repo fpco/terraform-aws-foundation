@@ -123,3 +123,27 @@ variable "health_check_type" {
   description = "\"EC2\" or \"ELB\". Controls how health checking is done."
   type        = string
 }
+
+variable "enable_launching_hook" {
+  default     = false
+  description = "Specifies if launching hook needs to be enabled for this ASG"
+  type        = bool
+}
+
+variable "enable_terminating_hook" {
+  default     = false
+  description = "Specifies if terminating hook needs to be enabled for this ASG"
+  type        = bool
+}
+
+variable "lifecycle_sns_topic_arn" {
+  default     = ""
+  description = "ARN for the SNS topic serving as a lifecycle hook notificaiton target"
+  type        = string
+}
+
+variable "aws_role_arn" {
+  default     = ""
+  description = "ARN for the AWS Role (should allow access to lifecycle_sns_topic_arn)"
+  type        = string
+}

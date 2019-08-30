@@ -11,6 +11,9 @@ The module supports:
 * the health checks are not yet parametized, (easy to change)
 * the Launch Configuration supports an arbitrary list of security groups
 * `lifecycle` and `create_before_destroy` are used to ensure updates are graceful
+* lifecycle hooks which get enabled using `enable_launching_hook` and/or
+  `enable_terminating_hook`, don't forget to set proper `lifecycle_sns_topic_arn`
+  and `aws_role_arn` for setting up SNS
 * public IPs may be enabled/disabled
 * supports appending `extra_tags`
 * all important details (instance type, ami, key, user data, iam profile) are
