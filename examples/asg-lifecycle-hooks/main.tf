@@ -20,7 +20,7 @@ data "template_file" "main" {
 
   vars = {
     region          = data.aws_region.current.name
-    stack_name      = "${var.lifecycle_name_prefix}-asg"
+    stack_name      = "${var.name_prefix}-asg"
     lifecycle_topic = aws_sns_topic.main.arn
     elb_name        = aws_elb.web.name
   }
@@ -28,7 +28,7 @@ data "template_file" "main" {
 
 module "vpc" {
   source      = "../../modules/vpc-scenario-1"
-  name_prefix = var.name
+  name_prefix = var.name_prefix
   region      = var.region
   cidr        = var.vpc_cidr
   azs         = local.azs
@@ -67,15 +67,15 @@ data "aws_ami" "linux2" {
 }
 
 resource "aws_key_pair" "main" {
-  key_name   = var.name
+  key_name   = var.name_prefix
   public_key = file(var.ssh_pubkey)
 }
 
 # Security group for the elastic load balancer, web instance, only accessible from ELB
 module "elb-sg" {
   source      = "../../modules/security-group-base"
-  description = "Allow public access to ELB in ${var.name}"
-  name        = "${var.name}-elb"
+  description = "Allow public access to ELB in ${var.name_prefix}"
+  name        = "${var.name_prefix}-elb"
   vpc_id      = module.vpc.vpc_id
 }
 
@@ -111,7 +111,7 @@ module "web-http-elb-sg-rule" {
 
 # Load Balancer
 resource "aws_elb" "web" {
-  name = "${var.name}-elb"
+  name = "${var.name_prefix}-elb"
 
   health_check {
     healthy_threshold   = 2
@@ -144,28 +144,27 @@ resource "aws_sns_topic" "main" {
   name = "${var.name_prefix}-lifecycle"
 }
 
-module "asg-lifecycle" {
-  source                = "../../modules/asg-lifecycle"
-  name_prefix           = var.lifecycle_name_prefix
-  azs                   = local.azs
-  elb_names             = [aws_elb.web.name]
-  subnet_ids            = module.vpc.public_subnet_ids
-  instance_count        = "2"
-  instance_ami          = data.aws_ami.linux2.id
-  instance_type         = "t2.nano"
-  instance_key          = aws_key_pair.main.key_name
-  elb_sg_id             = module.elb-sg.id
-  asg_template_file     = data.template_file.main.rendered
-  sns_topic_arn         = aws_sns_topic.main.arn
-  vpc_id                = module.vpc.vpc_id
-  elb_arn               = aws_elb.web.arn
-  aws_role_arn          = aws_iam_role.lifecycle_hook.arn
-  aws_instance_ec2_name = aws_iam_instance_profile.ec2.name
-  aws_sg_id             = aws_security_group.main.id
+module "asg" {
+  source             	  = "../../modules/asg"
+  name_prefix        	  = var.name_prefix
+  azs                	  = local.azs
+  elb_names          	  = [aws_elb.web.name]
+  subnet_ids         	  = module.vpc.public_subnet_ids
+  min_nodes          	  = 1
+  max_nodes          	  = 4
+  ami                	  = data.aws_ami.linux2.id
+  instance_type      	  = "t2.nano"
+  key_name           	  = aws_key_pair.main.key_name
+  user_data          	  = data.template_file.main.rendered
+  enable_terminating_hook = true
+  lifecycle_sns_topic_arn = aws_sns_topic.main.arn
+  aws_role_arn       	  = aws_iam_role.lifecycle_hook.arn
+  iam_profile        	  = aws_iam_instance_profile.ec2.name
+  security_group_ids 	  = [module.elb-sg.id, aws_security_group.main.id]
 }
 
 resource "aws_security_group" "main" {
-  name        = "${var.lifecycle_name_prefix}-sg"
+  name        = "${var.name_prefix}-sg"
   description = "Allow access to lifecycled instances"
   vpc_id      = module.vpc.vpc_id
 
@@ -249,12 +248,12 @@ data "aws_iam_policy_document" "permissions" {
 }
 
 resource "aws_iam_instance_profile" "ec2" {
-  name = "${var.lifecycle_name_prefix}-ec2-instance-profile"
+  name = "${var.name_prefix}-ec2-instance-profile"
   role = aws_iam_role.ec2.name
 }
 
 resource "aws_iam_role" "ec2" {
-  name               = "${var.lifecycle_name_prefix}-ec2-role"
+  name               = "${var.name_prefix}-ec2-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
 }
 
@@ -278,12 +277,12 @@ data "aws_iam_policy_document" "ec2_assume" {
 
 # Execution role and policies for the lifecycle hook
 resource "aws_iam_role" "lifecycle_hook" {
-  name               = "${var.lifecycle_name_prefix}-lifecycle-role"
+  name               = "${var.name_prefix}-lifecycle-role"
   assume_role_policy = data.aws_iam_policy_document.asg_assume.json
 }
 
 resource "aws_iam_role_policy" "lifecycle_hook" {
-  name   = "${var.lifecycle_name_prefix}-lifecycle-asg-permissions"
+  name   = "${var.name_prefix}-lifecycle-asg-permissions"
   role   = aws_iam_role.lifecycle_hook.id
   policy = data.aws_iam_policy_document.asg_permissions.json
 }
