@@ -9,6 +9,6 @@ output "iam_policy_arn" {
 }
 
 output "iam_profile_policy_document" {
-  value       = aws_iam_role_policy.attach_ebs.policy
-  description = "`policy` exported from the `aws_iam_role_policy`"
+  value       = aws_iam_policy.attach_ebs.policy
+  description = "`policy` exported from the `aws_iam_policy`"
 }
