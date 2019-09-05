@@ -3,6 +3,11 @@ output "asg_name" {
   description = "`name` exported from the Server `aws_autoscaling_group`"
 }
 
+output "asg_id" {
+  value       = "${module.server.id}"
+  description = "ID of the ASG"
+}
+
 output "asg_iam_profile_arn" {
   value       = "${module.service-data.iam_profile_arn}"
   description = "`arn` exported from the Service Data `aws_iam_profile`"
