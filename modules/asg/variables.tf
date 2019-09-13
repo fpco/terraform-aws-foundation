@@ -93,6 +93,12 @@ variable "root_volume_size" {
   type        = string
 }
 
+variable "additional_block_devices" {
+  default     = []
+  description = "Additional EBS volumes to use as instance block devices"
+  type        = list(object({device_name = string, volume_type = string, volume_size = string }))
+}
+
 // List of maps, as extra tags to append to the Auto-Scaling Group
 variable "extra_tags" {
   default     = []
