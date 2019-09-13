@@ -98,9 +98,9 @@ resource "aws_launch_configuration" "cluster" {
   dynamic "ebs_block_device" {
     for_each = var.additional_block_devices
     content {
-      device_name = ebs_block_device.device_name
-      volume_type = ebs_block_device.volume_type
-      volume_size = ebs_block_device.volume_size
+      device_name = ebs_block_device.value.device_name
+      volume_type = ebs_block_device.value.volume_type
+      volume_size = ebs_block_device.value.volume_size
     }
   }
 
