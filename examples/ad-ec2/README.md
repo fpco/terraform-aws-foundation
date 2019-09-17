@@ -3,7 +3,8 @@
 The terraform code is built on top of
 [vpc-scenario1](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario1.html)
 with two additional private subnets and a NAT gateway on a public
-subnet.
+subnet. This example demonstrate how an Windows EC2 instance
+seamlessly joins an Active directory when it gets newly spawned.
 
 ## Environment creation and deployment
 
@@ -102,7 +103,7 @@ that the EC2 instance has actually joined the AD. You can further verify that yo
 
 * Start the "CMD" program.
 * Type "set user".
-* You will recieve a output from the above command. Look at the line
+* You will receive a output from the above command. Look at the line
   start with `USERDOMAIN:` entry. If it contains your computer's name,
   then you're logged in to the computer. If it contains the Active
   Directory's name, you're logged in to the Active Directory. In our
@@ -131,4 +132,4 @@ $ make clean
 
 * [AWS docs on AWS Managed Microsoft AD](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_getting_started.html)
 * [AWS docs on Joining an EC2 instance](https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_join_instance.html)
-* [AWS docss on Systems manager and AD](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-systems-manager-dx-domain/)
+* [AWS docs on Systems manager and AD](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-systems-manager-dx-domain/)
