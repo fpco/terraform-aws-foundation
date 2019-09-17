@@ -82,6 +82,9 @@ data "aws_iam_policy_document" "power-user-with-mfa" {
     actions = [
       "iam:ListAccount*",
       "iam:GetAccount*",
+      "iam:GetUser",
+      "iam:GetRole",
+      "iam:GetPolicy",
       "iam:ListUsers",
       "iam:ListRoles",
       "organizations:DescribeOrganization",
@@ -121,6 +124,9 @@ data "aws_iam_policy_document" "power-user-no-mfa" {
     actions = [
       "iam:ListAccount*",
       "iam:GetAccount*",
+      "iam:GetUser",
+      "iam:GetRole",
+      "iam:GetPolicy",
       "iam:ListUsers",
       "iam:ListRoles",
       "organizations:DescribeOrganization",
