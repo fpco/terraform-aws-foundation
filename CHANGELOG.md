@@ -13,6 +13,11 @@
 
 ### Examples
 
+* `ad-ec2`: Demonstrate how an Windows EC2 instance seamlessly joins
+  an Active directory when it gets newly spawned.
+* `ad-asg`: Demonstrate how an Windows EC2 instance from an ASG
+  seamlessly joins an Active directory when it gets newly spawned.
+
 
 # v0.9.7
 
@@ -103,7 +108,6 @@
 * Drop deprecated nexus-asg example
 * Fixes for VPC Scenario 2 example
 
-
 ### Modules
 
 * `iam-instance-profile`: Add new module, abstract the usage pattern of IAM instance profile.
@@ -114,7 +118,6 @@
 * `persistent-ebs`: update to use new `iam-instance-profile` module and sync with recent updates to the `single-node-asg` module
 * `asg`: parametize target group and health check type
 
-
 ### Examples
 
 * `nexus-asg`: Drop deprecated example.
@@ -122,6 +125,7 @@
   * Fix updates missed during v0.12.x upgrade
   * Improve `Makefile`
   * Set name tag on ELB
+
 
 # v0.9.2
 

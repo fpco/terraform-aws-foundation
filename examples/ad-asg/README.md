@@ -57,10 +57,6 @@ Active directory. There are two ways to test it:
 * RDP to your instance and verify
 * RDP using Active Directory authentication
 
-Note that once the terraform apply is completed, it takes some minutes
-(approximately _ minutes in my experience) for the instance to join
-the Active directory.
-
 ### Method 1
 
 On a Linux client machine, something like
