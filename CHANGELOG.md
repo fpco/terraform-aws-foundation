@@ -9,6 +9,7 @@
   from user list
 * `tf-cloud-credential`: minor interpolation cleanup, added module to tests
 * `setup-meta-infrastructure`: Parameterize password length and age for iam password policy.
+* `iam-instance-profile`: Add role ID ouput for IAM instance profile module.
 
 ### Examples
 
