@@ -17,7 +17,7 @@ data "aws_iam_role" "dlm_lifecycle_role" {
 }
 
 # DLM lifecycle schedule
-resource "aws_dlm_lifecycle_policy" "gitlab-ebs-lifecycle-policy" {
+resource "aws_dlm_lifecycle_policy" "ebs-lifecycle-policy" {
   description        = var.description
   execution_role_arn = data.aws_iam_role.dlm_lifecycle_role.arn
   state              = "ENABLED"

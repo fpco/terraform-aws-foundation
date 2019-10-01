@@ -54,7 +54,7 @@ variable "policy_retain_rule" {
 variable "policy_copy_tags" {
   description = "Copy all user-defined tags on a source volume to snapshots of the volume created by this policy."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "policy_tags_to_add" {
