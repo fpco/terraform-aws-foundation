@@ -11,33 +11,38 @@
 *
 */
 
+# Get the data of role to pass the resource
+data "aws_iam_role" "dlm_lifecycle_role" {
+  name         = var.role_name
+}
+
 # DLM lifecycle schedule
 resource "aws_dlm_lifecycle_policy" "gitlab-ebs-lifecycle-policy" {
-  description        = "${var.dml_description}"
-  execution_role_arn = "${data.aws_iam_role.dlm_lifecycle_role.arn}"
+  description        = var.description
+  execution_role_arn = data.aws_iam_role.dlm_lifecycle_role.arn
   state              = "ENABLED"
 
   policy_details {
-    resource_types = "${var.dml_resource_type}"
+    resource_types = var.resource_type
 
     schedule {
-      name = "${var.name_prefix} ${var.schedule_name}"
+      name = "${var.name_prefix} ${var.policy_name}"
 
       create_rule {
-        interval      = "${var.schedule_create_interval}"
-        interval_unit = "${var.schedule_create_interval_unit}"
-        times         = "${var.schedule_create_time}"
+        interval      = var.policy_interval
+        interval_unit = var.policy_interval_unit
+        times         = var.policy_times
       }
 
       retain_rule {
-        count = "${var.schedule_retain_rule}"
+        count = var.policy_retain_rule
       }
 
-      tags_to_add = "${var.schedule_tags_to_add}"
-      copy_tags   = "${var.schedule_copy_tags}"
+      tags_to_add = var.policy_tags_to_add
+      copy_tags   = var.policy_copy_tags
     }
 
-    target_tags = "${var.ebs_target_tags}"
+    target_tags = var.ebs_target_tags
 
   }
 }
