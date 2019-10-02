@@ -38,17 +38,19 @@ resource "aws_route_table" "private" {
   count  = var.nat_count
   vpc_id = var.vpc_id
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = element(aws_nat_gateway.nat.*.id, count.index)
-  }
-
   tags = merge(
     {
       "Name" = "${var.name_prefix}-private-${format("%02d", count.index)}"
     },
     var.extra_tags,
   )
+}
+
+resource "aws_route" "private_nat_gateway" {
+  count                     = var.nat_count
+  route_table_id            = aws_route_table.private[count.index].id
+  destination_cidr_block    = "0.0.0.0/0"
+  nat_gateway_id            = element(aws_nat_gateway.nat.*.id, count.index)
 }
 
 resource "aws_route_table_association" "private-rta" {

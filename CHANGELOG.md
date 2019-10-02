@@ -7,6 +7,13 @@
 * `setup-meta-infrastructure`: add "iam:Get{User,Role,Policy}" permissions for power-users
 * `iam-instance-profile`: Add role ouput for IAM instance profile module.
 * lifecycle hooks added to `asg` and so `asg-lifecycle` was removed
+* `nat-gateways`: **Breaking change**: move the inline route route in the route
+  table to a separate route, so that users of the module can add extra routes
+  to it without causing conflicts.  Note: after you upgrade, you will likely
+  get an error that the `aws_route.private_nat_gateway` route already exists.
+  You will need to _manually_ remove the conflicting route (which was created
+  by the old inline route), for example in the AWS console, and then re-apply
+  to add it back.
 
 ### Examples
 
