@@ -8,6 +8,7 @@
 * `iam-users`: fixed error from zipmap in outputs when a user gets deleted
   from user list
 * `tf-cloud-credential`: minor interpolation cleanup, added module to tests
+* `setup-meta-infrastructure`: Parameterize password length and age for iam password policy.
 
 ### Examples
 
