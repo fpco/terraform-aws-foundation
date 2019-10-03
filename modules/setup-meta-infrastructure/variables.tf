@@ -64,3 +64,14 @@ variable "set_password_policy" {
   type        = string
 }
 
+variable "min_password_length" {
+  description = "Minimum length to require for user passwords"
+  default     = 12
+  type        = number
+}
+
+variable "max_password_age" {
+  description = "The number of days that an user password is valid"
+  default     = 90
+  type        = number
+}
