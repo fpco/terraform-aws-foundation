@@ -124,7 +124,7 @@ module "openvpn-rule" {
 }
 
 module "openvpn-egress" {
-  source = "../../../modules/open-egress-sg"
+  source            = "../../../modules/open-egress-sg"
   security_group_id = "${module.openvpn-sg.id}"
 }
 module "vpc-public-gateway" {
@@ -180,14 +180,14 @@ resource "aws_instance" "vpn-machine" {
   }
 
   associate_public_ip_address = "true"
-  vpc_security_group_ids      = ["${module.vpc-sg.id}","${module.openvpn-sg.id}"]
+  vpc_security_group_ids      = ["${module.vpc-sg.id}", "${module.openvpn-sg.id}"]
   subnet_id                   = "${element(module.vpc-public-subnets.ids, count.index)}"
 
   tags {
     Name = "${var.name}-vpn-server-${count.index}"
   }
 
-  user_data     = "${data.template_file.openvpn-setup.rendered}"
+  user_data = "${data.template_file.openvpn-setup.rendered}"
 
   provisioner "remote-exec" {
     connection {
@@ -200,6 +200,6 @@ resource "aws_instance" "vpn-machine" {
 }
 
 output "openvpn-public-eip" {
-  value = "${aws_instance.vpn-machine.public_ip}"
+  value       = "${aws_instance.vpn-machine.public_ip}"
   description = "OpenVPN Public IP"
 }

@@ -4,7 +4,7 @@
  */
 variable "name" {
   description = "the name of the account or deployment to use with this policy"
-  type = string
+  type        = string
 }
 
 variable "bucket_names" {

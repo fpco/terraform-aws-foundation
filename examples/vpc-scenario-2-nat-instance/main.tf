@@ -313,22 +313,22 @@ END_INIT
 #}
 
 output "elb_dns" {
-  value = aws_elb.web.dns_name
+  value       = aws_elb.web.dns_name
   description = "make the ELB accessible on the outside"
 }
 
 output "nat_ip" {
-  value = module.nat-instance.public_ips[0]
+  value       = module.nat-instance.public_ips[0]
   description = "Public IP of NAT instance"
 }
 
 output "region" {
-  value = var.region
+  value       = var.region
   description = "region deployed to"
 }
 
 output "web_asg_name" {
-  value = "${var.name}-web-cluster"
+  value       = "${var.name}-web-cluster"
   description = "name of the web service autoscaling group"
 }
 

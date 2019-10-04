@@ -13,47 +13,47 @@
 variable "device_path" {
   default     = "/dev/xvdf"
   description = "path, to the device's path in /dev/"
-  type = string
+  type        = string
 }
 
 variable "init_prefix" {
   default     = ""
   description = "initial init (shellcode) to prefix this snippet with"
-  type = string
+  type        = string
 }
 
 variable "init_suffix" {
   default     = ""
   description = "init (shellcode) to append to the end of this snippet"
-  type = string
+  type        = string
 }
 
 variable "log_level" {
   default     = "info"
   description = "default log level verbosity for apps that support it"
-  type = string
+  type        = string
 }
 
 variable "log_prefix" {
   default     = "OPS: "
   description = "string to prefix log messages with"
-  type = string
+  type        = string
 }
 
 variable "region" {
   description = "AWS region the volume is in"
-  type = string
+  type        = string
 }
 
 variable "wait_interval" {
   default     = "5"
   description = "time (in seconds) to wait when looping to find the device"
-  type = number
+  type        = number
 }
 
 variable "volume_id" {
   description = "ID of the EBS volume to attach"
-  type = string
+  type        = string
 }
 
 # render init script for a cluster using our generic template

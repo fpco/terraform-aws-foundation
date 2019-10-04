@@ -126,9 +126,9 @@ data "aws_route53_zone" "selected" {
 
 resource "aws_route53_record" "workspace" {
   zone_id = data.aws_route53_zone.selected.zone_id
-  name = "${var.name_prefix}.${data.aws_route53_zone.selected.name}"
-  type = "CNAME"
-  ttl = "300"
+  name    = "${var.name_prefix}.${data.aws_route53_zone.selected.name}"
+  type    = "CNAME"
+  ttl     = "300"
   records = [aws_instance.workspace.public_dns]
 }
 

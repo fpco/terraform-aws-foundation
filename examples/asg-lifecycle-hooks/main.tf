@@ -145,22 +145,22 @@ resource "aws_sns_topic" "main" {
 }
 
 module "asg" {
-  source             	  = "../../modules/asg"
-  name_prefix        	  = var.name_prefix
-  azs                	  = local.azs
-  elb_names          	  = [aws_elb.web.name]
-  subnet_ids         	  = module.vpc.public_subnet_ids
-  min_nodes          	  = 1
-  max_nodes          	  = 4
-  ami                	  = data.aws_ami.linux2.id
-  instance_type      	  = "t2.nano"
-  key_name           	  = aws_key_pair.main.key_name
-  user_data          	  = data.template_file.main.rendered
+  source                  = "../../modules/asg"
+  name_prefix             = var.name_prefix
+  azs                     = local.azs
+  elb_names               = [aws_elb.web.name]
+  subnet_ids              = module.vpc.public_subnet_ids
+  min_nodes               = 1
+  max_nodes               = 4
+  ami                     = data.aws_ami.linux2.id
+  instance_type           = "t2.nano"
+  key_name                = aws_key_pair.main.key_name
+  user_data               = data.template_file.main.rendered
   enable_terminating_hook = true
   lifecycle_sns_topic_arn = aws_sns_topic.main.arn
-  aws_role_arn       	  = aws_iam_role.lifecycle_hook.arn
-  iam_profile        	  = aws_iam_instance_profile.ec2.name
-  security_group_ids 	  = [module.elb-sg.id, aws_security_group.main.id]
+  aws_role_arn            = aws_iam_role.lifecycle_hook.arn
+  iam_profile             = aws_iam_instance_profile.ec2.name
+  security_group_ids      = [module.elb-sg.id, aws_security_group.main.id]
 }
 
 resource "aws_security_group" "main" {
@@ -318,6 +318,7 @@ locals {
   azs = slice(
     data.aws_availability_zones.available.names,
     0,
-    local.az_count)
+    local.az_count
+  )
 }
 

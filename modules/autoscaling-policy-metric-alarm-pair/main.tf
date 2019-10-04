@@ -1,76 +1,76 @@
 variable "name" {
   description = "Prefix of the AutoScaling Policy."
-  type = string
+  type        = string
 }
 
 variable "asg_name" {
   description = "Name of the AutoScaling Group that this policy would apply to."
-  type = string
+  type        = string
 }
 
 variable "metric" {
   description = "CPUUtilization or MemoryUtilization"
-  type = string
+  type        = string
 }
 
 variable "up_evaluation_periods" {
   default     = 3
   description = ""
-  type = number
+  type        = number
 }
 
 variable "up_period" {
   default     = 60
   description = ""
-  type = number
+  type        = number
 }
 
 variable "up_threshold" {
   default     = 60
   description = ""
-  type = number
+  type        = number
 }
 
 variable "up_scaling_adjustment" {
   default     = 3
   description = ""
-  type = number
+  type        = number
 }
 
 variable "up_cooldown" {
   default     = 300
   description = ""
-  type = number
+  type        = number
 }
 
 variable "down_evaluation_periods" {
   default     = 3
   description = ""
-  type = number
+  type        = number
 }
 
 variable "down_period" {
   default     = 60
   description = ""
-  type = number
+  type        = number
 }
 
 variable "down_threshold" {
   default     = 30
   description = ""
-  type = number
+  type        = number
 }
 
 variable "down_scaling_adjustment" {
   default     = 2
   description = ""
-  type = number
+  type        = number
 }
 
 variable "down_cooldown" {
   default     = 300
   description = ""
-  type = number
+  type        = number
 }
 
 resource "aws_autoscaling_policy" "scale_up" {

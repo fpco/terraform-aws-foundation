@@ -49,12 +49,12 @@ data "template_file" "init_snippet" {
   template = file("${path.module}/snippet.tpl")
 
   vars = {
-    consul_version  = var.consul_version
-    base_url        = var.base_url
-    data_dir        = var.data_dir
-    init_prefix     = var.init_prefix
-    init_suffix     = var.init_suffix
-    log_prefix      = var.log_prefix
+    consul_version = var.consul_version
+    base_url       = var.base_url
+    data_dir       = var.data_dir
+    init_prefix    = var.init_prefix
+    init_suffix    = var.init_suffix
+    log_prefix     = var.log_prefix
   }
 }
 

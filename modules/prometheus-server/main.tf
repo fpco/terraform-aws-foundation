@@ -51,14 +51,14 @@ END_INIT
 }
 
 module "init-hostname" {
-  source = "../init-snippet-hostname"
+  source          = "../init-snippet-hostname"
   hostname_prefix = "prometheus"
 }
 
 module "init-attach-ebs" {
-  source = "../init-snippet-attach-ebs-volume"
+  source    = "../init-snippet-attach-ebs-volume"
   volume_id = module.prometheus-data.volume_id
-  region = var.region
+  region    = var.region
 }
 
 module "init-prometheus" {
@@ -72,7 +72,7 @@ salt-call --local mount.set_fstab /prometheus /dev/xvdf1 ext4
 END_INIT
 
 
-prometheus_pillar = <<END_PILLAR
+  prometheus_pillar = <<END_PILLAR
 ${var.prometheus_pillar}
 END_PILLAR
 

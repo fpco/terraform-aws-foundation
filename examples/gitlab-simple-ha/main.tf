@@ -88,7 +88,7 @@ ${module.init-install-ops.init_snippet}
 END_INIT
 
 
-init_suffix = <<END_INIT
+  init_suffix = <<END_INIT
 aws ec2 associate-address --allocation-id=${aws_eip.gitlab.id} --instance-id=$(ec2metadata --instance-id) --allow-reassociation --region=${var.region}
 mkdir -p /gitlab
 mount /dev/xvdf1 /gitlab

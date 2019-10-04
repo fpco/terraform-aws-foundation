@@ -10,43 +10,43 @@
 variable "upstart_config" {
   default     = "/etc/init/consul.conf"
   description = "file path to upstart config"
-  type = string
+  type        = string
 }
 
 variable "consul_user" {
   default     = "consul"
   description = "user to run consul as"
-  type = string
+  type        = string
 }
 
 variable "consul_bin" {
   default     = "/usr/local/bin/consul"
   description = "path to consul executable"
-  type = string
+  type        = string
 }
 
 variable "config_file" {
   default     = "/etc/consul.json"
   description = "path to consul config file"
-  type = string
+  type        = string
 }
 
 variable "config_dir" {
   default     = "/etc/consul.d"
   description = "path for consul configs (.d directory)"
-  type = string
+  type        = string
 }
 
 variable "init_prefix" {
   default     = ""
   description = "initial init (shellcode) to prefix this snippet with"
-  type = string
+  type        = string
 }
 
 variable "init_suffix" {
   default     = ""
   description = "init (shellcode) to append to the end of this snippet"
-  type = string
+  type        = string
 }
 
 # render init script snippet from the template

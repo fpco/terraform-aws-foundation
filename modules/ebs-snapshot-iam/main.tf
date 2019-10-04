@@ -68,7 +68,7 @@ EOF
 }
 
 output "user_arn" {
-  value = aws_iam_user.snap-ebs.arn
+  value       = aws_iam_user.snap-ebs.arn
   description = "ARN of the IAM user created for the EBS snapshots service"
 }
 

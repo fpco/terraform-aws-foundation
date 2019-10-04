@@ -148,7 +148,8 @@ resource "null_resource" "bind" {
       formatlist("sudo mkdir -p \"$(dirname '%s')\"", var.log_files),
       formatlist("sudo touch \"$(dirname '%s')\"", var.log_files),
       formatlist("sudo chown bind \"$(dirname '%s')\"", var.log_files),
-      ["sudo killall -HUP named"])
+      ["sudo killall -HUP named"]
+    )
   }
 }
 

@@ -105,7 +105,7 @@ resource "aws_instance" "web" {
   associate_public_ip_address = "true"
 
   vpc_security_group_ids = [
-    module.web-sg.id  
+    module.web-sg.id
   ]
 
   tags = {
@@ -131,9 +131,9 @@ END_INIT
     ]
 
     connection {
-      host = coalesce(self.public_ip, self.private_ip)
-      type = "ssh"
-      user = "ubuntu"
+      host        = coalesce(self.public_ip, self.private_ip)
+      type        = "ssh"
+      user        = "ubuntu"
       private_key = file(var.ssh_key)
     }
   }

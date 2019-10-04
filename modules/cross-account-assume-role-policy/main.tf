@@ -61,7 +61,8 @@ data "aws_iam_policy_document" "assume-role" {
         "arn:${data.aws_partition.current.partition}:iam::%s:role/%s",
         var.account_id,
         var.role_names,
-      ))
+      )
+    )
   }
 }
 

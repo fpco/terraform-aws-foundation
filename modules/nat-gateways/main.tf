@@ -47,10 +47,10 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route" "private_nat_gateway" {
-  count                     = var.nat_count
-  route_table_id            = aws_route_table.private[count.index].id
-  destination_cidr_block    = "0.0.0.0/0"
-  nat_gateway_id            = element(aws_nat_gateway.nat.*.id, count.index)
+  count                  = var.nat_count
+  route_table_id         = aws_route_table.private[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = element(aws_nat_gateway.nat.*.id, count.index)
 }
 
 resource "aws_route_table_association" "private-rta" {

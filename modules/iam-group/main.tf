@@ -21,7 +21,7 @@ variable "policy_arns" {
 }
 
 resource "aws_iam_group" "g" {
-  name  = var.group_name
+  name = var.group_name
 }
 
 ### The list of users are each members of this group

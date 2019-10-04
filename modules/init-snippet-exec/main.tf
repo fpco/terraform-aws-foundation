@@ -9,7 +9,7 @@
 
 variable "init" {
   description = "init shellcode for this snippet"
-  type = string
+  type        = string
 }
 
 data "template_file" "init_snippet" {

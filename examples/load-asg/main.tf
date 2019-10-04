@@ -10,7 +10,8 @@ locals {
   azs = slice(
     data.aws_availability_zones.available.names,
     0,
-    local.az_count)
+    local.az_count
+  )
 }
 
 module "vpc" {
@@ -168,16 +169,16 @@ END_INIT
 }
 
 module "web_cpu_autoscaling" {
-  source = "../../modules/autoscaling-policy-metric-alarm-pair"
-  name = var.name
+  source   = "../../modules/autoscaling-policy-metric-alarm-pair"
+  name     = var.name
   asg_name = module.web-asg.name
-  metric = "CPUUtilization"
+  metric   = "CPUUtilization"
 }
 
 module "web_mem_autoscaling" {
-  source = "../../modules/autoscaling-policy-metric-alarm-pair"
-  name = var.name
+  source   = "../../modules/autoscaling-policy-metric-alarm-pair"
+  name     = var.name
   asg_name = module.web-asg.name
-  metric = "MemoryUtilization"
+  metric   = "MemoryUtilization"
 }
 

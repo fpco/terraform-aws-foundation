@@ -150,7 +150,7 @@ docker run --detach \
   --volume ${var.gitlab_data_path}/config:/etc/gitlab \
   --volume ${var.gitlab_data_path}/logs:/var/log/gitlab \
   --volume ${var.gitlab_data_path}/data:/var/opt/gitlab \
-  --env GITLAB_OMNIBUS_CONFIG=\"${element(concat(data.template_file.omnibus_config_elb.*.rendered,data.template_file.omnibus_config_eip.*.rendered),0,)}\" \
+  --env GITLAB_OMNIBUS_CONFIG=\"${element(concat(data.template_file.omnibus_config_elb.*.rendered, data.template_file.omnibus_config_eip.*.rendered), 0, )}\" \
   ${var.gitlab_image_repo}:${var.gitlab_image_tag}"
 echo "$cmd" > /etc/rc.local
 chmod +x /etc/rc.local

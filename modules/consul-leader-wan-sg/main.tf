@@ -12,7 +12,7 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
-  type = string
+  type        = string
 }
 
 variable "cidr_blocks" {
@@ -23,7 +23,7 @@ variable "cidr_blocks" {
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, consuls WAN serf port 8302"
-  type = string
+  type        = string
 }
 
 # TCP/UDP for serf WAN communication

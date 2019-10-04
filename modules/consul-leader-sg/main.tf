@@ -37,7 +37,7 @@
 
 variable "security_group_id" {
   description = "security group to attach the ingress rules to"
-  type = string
+  type        = string
 }
 
 variable "cidr_blocks" {
@@ -48,7 +48,7 @@ variable "cidr_blocks" {
 variable "description" {
   description = "use this string to generate a description for the SG rules"
   default     = "Allow ingress, consul leaders"
-  type = string
+  type        = string
 }
 
 # Server RPC, used by servers to handle incoming requests from other agents.

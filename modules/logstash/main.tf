@@ -169,7 +169,7 @@ resource "aws_launch_configuration" "logstash-lc" {
   image_id      = var.ami
   instance_type = var.instance_type
   key_name      = var.key_name
-  
+
   security_groups      = concat([aws_security_group.logstash-sg.id], var.extra_sg_ids)
   iam_instance_profile = aws_iam_instance_profile.logstash-profile.id
   user_data            = data.template_file.logstash-setup.rendered

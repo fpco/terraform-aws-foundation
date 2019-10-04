@@ -60,24 +60,24 @@ END_INIT
 }
 
 module "ec2-nat" {
-source = "../ec2-auto-recover-instances"
+  source = "../ec2-auto-recover-instances"
 
-# name scheme looks like "name-ec2-nat-01" and so on
-name_prefix        = var.name_prefix
-name_format        = "%s-ec2-nat-%02d"
-extra_tags         = var.extra_tags
-ami                = module.ubuntu-ami.id
-key_name           = var.key_name
-instance_type      = var.instance_type
-iam_profiles       = var.iam_profiles
-security_group_ids = var.security_group_ids
-subnet_ids         = var.public_subnet_ids
+  # name scheme looks like "name-ec2-nat-01" and so on
+  name_prefix        = var.name_prefix
+  name_format        = "%s-ec2-nat-%02d"
+  extra_tags         = var.extra_tags
+  ami                = module.ubuntu-ami.id
+  key_name           = var.key_name
+  instance_type      = var.instance_type
+  iam_profiles       = var.iam_profiles
+  security_group_ids = var.security_group_ids
+  subnet_ids         = var.public_subnet_ids
 
-# let AWS choose IPs for these instances
-private_ips       = []
-source_dest_check = false # NAT requires this
-public_ip         = true  # NAT requires this
-root_volume_size  = var.root_volume_size
-user_data         = data.template_file.nat-init.*.rendered
+  # let AWS choose IPs for these instances
+  private_ips       = []
+  source_dest_check = false # NAT requires this
+  public_ip         = true  # NAT requires this
+  root_volume_size  = var.root_volume_size
+  user_data         = data.template_file.nat-init.*.rendered
 }
 

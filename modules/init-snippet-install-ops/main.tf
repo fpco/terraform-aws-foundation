@@ -9,31 +9,31 @@
 variable "ops_version" {
   default     = "0.4.1"
   description = "version of ops, to install"
-  type = string
+  type        = string
 }
 
 variable "base_url" {
   default     = "https://download.fpcomplete.com/ops"
   description = "base of the download URL to ops executable"
-  type = string
+  type        = string
 }
 
 variable "init_prefix" {
   default     = ""
   description = "initial init (shellcode) to prefix this snippet with"
-  type = string
+  type        = string
 }
 
 variable "init_suffix" {
   default     = ""
   description = "init (shellcode) to append to the end of this snippet"
-  type = string
+  type        = string
 }
 
 variable "log_prefix" {
   default     = "OPS: "
   description = "string to prefix log messages with"
-  type = string
+  type        = string
 }
 
 # render init script snippet from the template

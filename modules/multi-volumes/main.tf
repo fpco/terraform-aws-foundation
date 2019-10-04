@@ -15,22 +15,22 @@
 
 variable "instance_id" {
   description = "Instance to attach volumes to"
-  type = string
+  type        = string
 }
 
 variable "availability_zone" {
   description = "Availability zone to create volumes in"
-  type = string
+  type        = string
 }
 
 variable "sizes" {
   description = "Comma-separated list of volume sizes"
-  type = string
+  type        = string
 }
 
 variable "name" {
   description = "Prefix for names of volumes (will have '_n' where n is the volume number appended)"
-  type = string
+  type        = string
 }
 
 # This is a used with lookup and signum in order to to conditionally create data
