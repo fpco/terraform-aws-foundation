@@ -10,6 +10,7 @@ variable "name_suffix" {
 }
 
 variable "key_name" {
+  default     = ""
   description = "The name of the (AWS) SSH key to associate with the instance"
   type        = string
 }

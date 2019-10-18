@@ -14,6 +14,9 @@
   You will need to _manually_ remove the conflicting route (which was created
   by the old inline route), for example in the AWS console, and then re-apply
   to add it back.
+* `asg`: Add default value for `key_name`. The default value is an
+  empty string which indicates the instance in the ASG has no key
+  associated with it.
 
 ### Examples
 
