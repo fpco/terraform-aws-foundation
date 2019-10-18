@@ -1,4 +1,4 @@
-variable "workspace_name_prefix" {
+variable "name_prefix" {
   type        = string
   description = "The name prefix to use for the workspace"
 }
@@ -13,7 +13,7 @@ variable "iam_access_key" {
     id     = string
     secret = string
   })
-  description = "The aws_iam_access_key to use as credentials for workspace."
+  description = "The aws_iam_access_key id/secret pair to use as credentials for the workspace."
 }
 
 variable "region" {
