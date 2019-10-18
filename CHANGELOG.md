@@ -24,6 +24,17 @@
   specific vpc seamlessly joins an Active directory (in a different
   vpc) when it gets newly spawned.
 
+
+# v0.9.6
+
+### Summary
+
+* New module for associating existing AWS credentials with a Terraform Cloud workspace.
+
+### Modules
+
+* `tf-cloud-credentials`: Adds module
+
 # v0.9.3
 
 ### Summary
