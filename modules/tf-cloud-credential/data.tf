@@ -1,4 +1,4 @@
-resource "tfe_workspace" "workspace" {
-  name         = var.workspace_name_prefix
+data "tfe_workspace" "workspace" {
+  name         = var.name_prefix
   organization = var.organization
 }
