@@ -87,6 +87,7 @@
   You will need to _manually_ remove the conflicting route (which was created
   by the old inline route), for example in the AWS console, and then re-apply
   to add it back.
+* `tf-cloud-credentials`: Switches the module to use a datasource to lookup an existing TF Cloud workspace instead of trying to create one.
 
 ### Examples
 
