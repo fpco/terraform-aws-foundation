@@ -18,6 +18,9 @@
 ### Examples
 
 * `ad-ec2`: Demonstrate how an Windows EC2 instance seamlessly joins an Active directory when it gets newly spawned.
+* `ad-asg-different-vpc`: Demonstrate how an Windows EC2 instance in a
+  specific vpc seamlessly joins an Active directory (in a different
+  vpc) when it gets newly spawned.
 
 # v0.9.3
 
