@@ -1,0 +1,5 @@
+# cloud-config
+# Reference: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
+
+runcmd:
+ - [ sh, -c, 'echo "${ad_password}" | sudo realm join -U Admin@${ad_domain} ${ad_domain}']

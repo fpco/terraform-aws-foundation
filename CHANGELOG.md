@@ -18,6 +18,7 @@
 ### Examples
 
 * `ad-ec2`: Demonstrate how an Windows EC2 instance seamlessly joins an Active directory when it gets newly spawned.
+* `ad-linux-asg`: Demonstrate how an Linux EC2 instance (from an ASG) joins an Active directory when it gets newly spawned.
 
 # v0.9.3
 
