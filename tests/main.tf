@@ -6,7 +6,6 @@ module "asg" {
   source = "../modules/asg"
 
   ami                = ""
-  azs                = []
   key_name           = ""
   max_nodes          = ""
   min_nodes          = ""

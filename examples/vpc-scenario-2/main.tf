@@ -166,7 +166,6 @@ resource "aws_elb" "web" {
 module "web" {
   source        = "../../modules/asg"
   ami           = module.ubuntu-xenial-ami.id
-  azs           = local.azs
   name_prefix   = "${var.name}-web"
   elb_names     = [aws_elb.web.name]
   instance_type = "t2.nano"

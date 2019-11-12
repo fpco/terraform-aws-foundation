@@ -244,7 +244,6 @@ resource "aws_elb" "web" {
 module "web" {
   source             = "../../modules/asg"
   ami                = module.ubuntu-xenial-ami.id
-  azs                = slice(data.aws_availability_zones.available.names, 0, 3)
   name_prefix        = var.name
   name_suffix        = "webapp-server"
   elb_names          = [aws_elb.web.name]
