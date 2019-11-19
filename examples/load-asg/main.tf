@@ -118,7 +118,6 @@ module "ubuntu-xenial-ami" {
 module "web-asg" {
   source        = "../../modules/asg"
   ami           = module.ubuntu-xenial-ami.id
-  azs           = local.azs
   name_prefix   = "${var.name}-${var.web_app_name}"
   elb_names     = [aws_elb.web.name]
   instance_type = var.instance_type
