@@ -14,6 +14,8 @@
   You will need to _manually_ remove the conflicting route (which was created
   by the old inline route), for example in the AWS console, and then re-apply
   to add it back.
+* `vpc`: Added variable `domain_name` to enable setting a custom domain_name
+  in the VPC DHCP Options Set.
 
 ### Examples
 
