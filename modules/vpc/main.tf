@@ -7,6 +7,10 @@
  *
  */
 
+locals {
+  domain_name = (var.domain_name != "" ? var.domain_name : "${var.region}.compute.internal")
+}
+
 resource "aws_vpc" "main" {
   cidr_block           = var.cidr
   enable_dns_hostnames = var.enable_dns_hostnames
@@ -22,7 +26,7 @@ resource "aws_vpc" "main" {
 
 // move these two into their own module? or combine with aws_vpc in a module?
 resource "aws_vpc_dhcp_options" "main" {
-  domain_name         = "${var.region}.compute.internal"
+  domain_name         = local.domain_name
   domain_name_servers = var.dns_servers
   ntp_servers         = var.ntp_servers
 
