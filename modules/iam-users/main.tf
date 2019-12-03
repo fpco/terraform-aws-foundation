@@ -16,5 +16,5 @@ resource "aws_iam_user" "u" {
 
 output "users" {
   description = "The list of IAM user objects that exist"
-  value       = zipmap(var.user_list, aws_iam_user.u.*)
+  value       = zipmap(var.user_list, slice(aws_iam_user.u.*, 0, length(var.user_list)))
 }
