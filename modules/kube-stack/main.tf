@@ -41,7 +41,6 @@
 # an auto-scaling group for kube controllers
 module "controller-asg" {
   source             = "../asg"
-  azs                = var.availability_zones
   ami                = var.controller_ami
   name_prefix        = var.name_prefix == "" ? "" : var.name_prefix
   elb_names          = [aws_elb.kube-controllers.name]
@@ -90,7 +89,6 @@ END_INIT
 module "worker-asg" {
   source = "../asg"
 
-  azs                = var.availability_zones
   ami                = var.worker_ami
   name_prefix        = var.name_prefix == "" ? "" : var.name_prefix
   iam_profile        = var.worker_iam_profile
