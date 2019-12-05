@@ -721,6 +721,15 @@ module "subnets" {
   vpc_id      = ""
 }
 
+module "tf-cloud-credential" {
+  source = "../modules/tf-cloud-credential"
+  
+  name_prefix    = ""
+  organization   = ""
+  iam_access_key = { id = "", secret = "" }
+  region         = ""
+}  
+
 module "vpc" {
   source = "../modules/vpc"
 
