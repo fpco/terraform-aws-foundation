@@ -1,3 +1,13 @@
+provider "aws" {
+  version = "~> 2.18"
+  region  = var.region
+}
+
+variable "region" {
+  description = "Region where the project will be deployed"
+  type = string
+}
+
 module "ami-ubuntu" {
   source = "../modules/ami-ubuntu"
 }
@@ -183,7 +193,7 @@ module "dnsmasq-server" {
   ami                = ""
   key_name           = ""
   name_prefix        = ""
-  private_ips        = ""
+  private_ips        = []
   security_group_ids = []
   subnet_ids         = []
 }
@@ -228,10 +238,10 @@ module "elasticsearch" {
   credstash_kms_key_arn       = ""
   credstash_reader_policy_arn = ""
   elasticsearch_dns_name      = ""
-  elasticsearch_version       = ""
-  internal_alb                = ""
+  elasticsearch_version       = "0"
+  internal_alb                = {}
   key_name                    = ""
-  logstash_beats_address      = []
+  logstash_beats_address      = ""
   node_ami                    = ""
   private_subnet_ids          = []
   public_subnet_ids           = []
@@ -242,11 +252,11 @@ module "elk-r53" {
   source = "../modules/elk-r53"
 
   elasticsearch_dns_name = ""
-  elasticsearch_lb       = ""
+  elasticsearch_lb       = {}
   kibana_dns_name        = ""
-  kibana_lb              = ""
+  kibana_lb              = {}
   logstash_dns_name      = ""
-  logstash_lb            = ""
+  logstash_lb            = {}
   route53_zone_id        = ""
 }
 
@@ -260,7 +270,7 @@ module "elk-stack" {
   credstash_reader_policy_arn = ""
   elasticsearch_dns_name      = ""
   elasticsearch_internal_alb  = {}
-  kibana_alb                  = ""
+  kibana_alb                  = {}
   logstash_dns_name           = ""
   private_subnet_ids          = []
   public_subnet_ids           = []
@@ -288,8 +298,8 @@ module "ha-management-cluster" {
   cidr_a             = ""
   cidr_c             = ""
   key_name           = ""
-  security_group_ids = []
-  worker_cidr_blocks = []
+  security_group_ids = ""
+  worker_cidr_blocks = ""
 }
 
 module "iam-group" {
@@ -415,7 +425,7 @@ module "init-snippet-write-bootstrap-pillar" {
 module "kibana" {
   source = "../modules/kibana"
 
-  alb                       = ""
+  alb                       = {}
   ami                       = ""
   credstash_get_cmd         = ""
   credstash_install_snippet = ""
@@ -434,9 +444,9 @@ module "kube-controller-iam" {
 module "kube-controller-sg" {
   source = "../modules/kube-controller-sg"
 
-  cidr_blocks_api  = ""
-  cidr_blocks_etcd = ""
-  cidr_blocks_ssh  = ""
+  cidr_blocks_api  = []
+  cidr_blocks_etcd = []
+  cidr_blocks_ssh  = []
   name_prefix      = ""
   vpc_id           = ""
 }
@@ -451,7 +461,7 @@ module "kube-load-balancer-sg" {
 module "kubernetes-vpc" {
   source = "../modules/kubernetes-vpc"
 
-  azs            = ""
+  azs            = []
   cidr           = ""
   env            = ""
   kube_fqdn      = ""
@@ -463,14 +473,14 @@ module "kubernetes-vpc" {
 module "kube-stack" {
   source = "../modules/kube-stack"
 
-  availability_zones            = ""
+  availability_zones            = []
   controller_ami                = ""
   controller_iam_profile        = ""
-  controller_security_group_ids = ""
-  controller_subnet_ids         = ""
+  controller_security_group_ids = []
+  controller_subnet_ids         = []
   key_name                      = ""
   lb_security_group_ids         = []
-  lb_subnet_ids                 = ""
+  lb_subnet_ids                 = []
   worker_ami                    = ""
   worker_iam_profile            = ""
   worker_security_group_ids     = []
@@ -484,8 +494,8 @@ module "kube-worker-iam" {
 module "kube-worker-sg" {
   source = "../modules/kube-worker-sg"
 
-  cidr_blocks_open_ingress = ""
-  cidr_blocks_ssh          = ""
+  cidr_blocks_open_ingress = []
+  cidr_blocks_ssh          = []
   name_prefix              = ""
   vpc_id                   = ""
 }
@@ -529,7 +539,7 @@ module "multi-volumes" {
   availability_zone = ""
   instance_id       = ""
   name              = ""
-  sizes             = []
+  sizes             = ""
 }
 
 module "nat-gateways" {
@@ -584,17 +594,18 @@ module "packer-vpc" {
 module "persistent-ebs" {
   source = "../modules/persistent-ebs"
 
-  az          = ""
-  name_prefix = ""
+  az                             = ""
+  name_prefix                    = ""
+  iam_instance_profile_role_name = ""
 }
 
 module "persistent-ebs-volumes" {
   source = "../modules/persistent-ebs-volumes"
 
-  azs          = ""
+  azs          = []
   name_prefix  = ""
   snapshot_ids = []
-  volume_count = ""
+  volume_count = 0
 }
 
 module "ping-request-sg" {
@@ -694,7 +705,7 @@ module "single-node-asg" {
 module "single-port-sg" {
   source = "../modules/single-port-sg"
 
-  cidr_blocks       = ""
+  cidr_blocks       = []
   description       = ""
   port              = ""
   security_group_id = ""
@@ -715,8 +726,8 @@ module "ssh-sg" {
 module "subnets" {
   source = "../modules/subnets"
 
-  azs         = ""
-  cidr_blocks = ""
+  azs         = []
+  cidr_blocks = []
   name_prefix = ""
   vpc_id      = ""
 }
@@ -739,7 +750,7 @@ module "vpc-network" {
 module "vpc-scenario-1" {
   source = "../modules/vpc-scenario-1"
 
-  azs                 = ""
+  azs                 = []
   cidr                = ""
   name_prefix         = ""
   public_subnet_cidrs = []
@@ -749,7 +760,7 @@ module "vpc-scenario-1" {
 module "vpc-scenario-2" {
   source = "../modules/vpc-scenario-2"
 
-  azs                 = ""
+  azs                 = []
   cidr                = ""
   name_prefix         = ""
   public_subnet_cidrs = []
@@ -759,7 +770,7 @@ module "vpc-scenario-2" {
 module "vpc-scenario-3" {
   source = "../modules/vpc-scenario-3"
 
-  azs                 = ""
+  azs                 = []
   cidr                = ""
   name_prefix         = ""
   public_subnet_cidrs = []
@@ -771,7 +782,7 @@ module "vpc-scenario-3" {
 module "vpc-scenario-4" {
   source = "../modules/vpc-scenario-4"
 
-  azs                 = ""
+  azs                 = []
   cidr                = ""
   name_prefix         = ""
   public_subnet_cidrs = []
@@ -797,7 +808,7 @@ module "vpn-gateway" {
 module "web-alb" {
   source = "../modules/web-alb"
 
-  dns_name               = ""
+  dns_name               = "test-web-alb.net"
   http_target_group_arn  = ""
   https_target_group_arn = ""
   subnet_ids             = []

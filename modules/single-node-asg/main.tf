@@ -57,7 +57,6 @@ module "server" {
   source = "../asg"
 
   ami       = var.ami
-  azs       = [local.az]
   elb_names = var.load_balancers
   key_name  = var.key_name
   # The IAM Instance Profile w/ attach_ebs role

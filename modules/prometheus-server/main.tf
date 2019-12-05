@@ -15,6 +15,18 @@ module "prometheus-data" {
   encrypted   = var.data_volume_encrypted
   kms_key_id  = var.data_volume_kms_key_id
   snapshot_id = var.data_volume_snapshot_id
+  iam_instance_profile_role_name = module.instance_profile.iam_role_name
+}
+
+# Data source for the AWS subnet we deploy the EC2 instances into
+data "aws_subnet" "server-subnet" {
+  id = var.subnet_id
+}
+
+# Create an IAM Instance profile we can use on EC2, associated with the Prometheus Server ASG
+module "instance_profile" {
+  source      = "../iam-instance-profile"
+  name_prefix = "${var.name}-${data.aws_subnet.server-subnet.availability_zone}"
 }
 
 module "prometheus-server" {
@@ -27,7 +39,6 @@ module "prometheus-server" {
   instance_type    = var.instance_type
   ami              = var.ami
   subnet_ids       = [var.subnet_id]
-  azs              = ["${var.region}${var.az}"]
   public_ip        = var.public_ip
   key_name         = var.key_name
   elb_names        = var.load_balancers
@@ -37,7 +48,7 @@ module "prometheus-server" {
   root_volume_size = var.root_volume_size
 
   #
-  iam_profile = module.prometheus-data.iam_profile_id
+  iam_profile = module.instance_profile.iam_profile_id
 
   user_data = <<END_INIT
 #!/bin/bash

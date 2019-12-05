@@ -64,8 +64,8 @@ service nginx reload
 # Create a cron job for checking the status of Kibana and nginx for ELB Health Checks
 cat <<EOF > /etc/kibana/status-cronjob.sh
 #!/bin/bash
-KIBANA_RESPONSE_CODE=\$(curl --write-out %{http_code} --silent --output /dev/null localhost:5601)
-NGINX_RESPONSE_CODE=\$(curl --write-out %{http_code} --silent --output /dev/null $LOCAL_DNS:5602)
+KIBANA_RESPONSE_CODE=\$(curl --write-out %%{http_code} --silent --output /dev/null localhost:5601)
+NGINX_RESPONSE_CODE=\$(curl --write-out %%{http_code} --silent --output /dev/null $LOCAL_DNS:5602)
 if [ "\$KIBANA_RESPONSE_CODE" == 200 ] && [ "\$NGINX_RESPONSE_CODE" == 401 ]; then
   echo "Status: Good" > /var/www/html/kibana-status/index.html
 else
