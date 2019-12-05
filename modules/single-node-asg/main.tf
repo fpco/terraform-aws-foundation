@@ -45,7 +45,7 @@ module "server" {
   # The IAM Instance Profile w/ attach_ebs role
   iam_profile   = module.instance_profile.iam_profile_id
   instance_type = var.instance_type
-  # 1 EC2 instance <> 1 EBS volume 
+  # 1 EC2 instance <> 1 EBS volume
   max_nodes       = 1
   min_nodes       = 1
   placement_group = var.placement_group
