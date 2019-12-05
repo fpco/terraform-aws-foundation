@@ -59,12 +59,6 @@ variable "data_volume_encrypted" {
   type        = string
 }
 
-variable "data_volume_kms_key_id" {
-  default     = ""
-  description = "ID of the KMS key to use when encyprting the EBS block device"
-  type        = string
-}
-
 variable "data_volume_snapshot_id" {
   default     = ""
   description = "The ID of the snapshot to base the EBS block device on"
@@ -77,15 +71,9 @@ variable "data_volume_iops" {
   type        = string
 }
 
-variable "init_prefix" {
+variable "user_data" {
   default     = ""
-  description = "init shell to run before setting VOLUME_ID and REGION exports"
-  type        = string
-}
-
-variable "init_suffix" {
-  default     = ""
-  description = "init shell to run after setting VOLUME_ID and REGION exports"
+  description = "The user_data string to pass to cloud-init"
   type        = string
 }
 

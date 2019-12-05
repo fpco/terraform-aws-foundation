@@ -31,12 +31,6 @@ variable "data_volume_encrypted" {
   type = bool
 }
 
-variable "data_volume_kms_key_id" {
-  default     = ""
-  description = "ID of the KMS key to use when encyprting the EBS block device"
-  type = string
-}
-
 variable "data_volume_snapshot_id" {
   default     = ""
   description = "The ID of the snapshot to base the EBS block device on"
