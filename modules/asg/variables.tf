@@ -59,11 +59,6 @@ variable "public_ip" {
   type        = string
 }
 
-variable "azs" {
-  description = "list of availability zones to associate with the ASG"
-  type        = list(string)
-}
-
 variable "subnet_ids" {
   description = "list of subnets to associate with the ASG (by id)"
   type        = list(string)

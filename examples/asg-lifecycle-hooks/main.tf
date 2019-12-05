@@ -147,7 +147,6 @@ resource "aws_sns_topic" "main" {
 module "asg" {
   source             	  = "../../modules/asg"
   name_prefix        	  = var.name_prefix
-  azs                	  = local.azs
   elb_names          	  = [aws_elb.web.name]
   subnet_ids         	  = module.vpc.public_subnet_ids
   min_nodes          	  = 1

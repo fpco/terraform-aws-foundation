@@ -26,7 +26,6 @@
 module "leader-asg" {
   source             = "../asg"
   ami                = var.ami
-  azs                = ["${var.region}a", "${var.region}c"]
   elb_names          = var.load_balancers
   instance_type      = var.instance_type
   max_nodes          = var.max_nodes

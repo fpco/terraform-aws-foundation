@@ -1,3 +1,9 @@
+variable "bootstrap_pillar_file" {
+  default     = "/srv/pillar/bootstrap.sls"
+  description = "path, to the 'bootstrap' pillar file"
+  type        = string
+}
+
 variable "cidr_prefix_a" {
   description = "CIDR block prefix to seed IP details in the formula, subnet a"
   type = string

@@ -43,3 +43,8 @@ variable "ntp_servers" {
   type        = list(string)
 }
 
+variable "domain_name" {
+  default     = ""
+  description = "string, domain name for the DHCP options resource"
+  type        = string
+}
