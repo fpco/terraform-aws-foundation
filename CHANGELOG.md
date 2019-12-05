@@ -5,6 +5,18 @@
 
 ### Modules
 
+
+### Examples
+
+
+# v0.9.8
+
+### Summary
+
+* Fixes and updates to a few modules, mostly related to IAM.
+
+### Modules
+
 * `iam-users`: fixed error from zipmap in outputs when a user gets deleted
   from user list
 * `tf-cloud-credential`: minor interpolation cleanup, added module to tests
@@ -12,6 +24,8 @@
 * `iam-instance-profile`: Add role ID ouput for IAM instance profile module.
 
 ### Examples
+
+* No changes.
 
 
 # v0.9.7
