@@ -77,6 +77,12 @@ variable "data_volume_iops" {
   type        = string
 }
 
+variable "ebs_device_path" {
+  default     = "/dev/xvdf"
+  description = "Path to the device's path in /dev/ that will be passed to the init-snippet-attach-ebs-volume module. You may need to use /dev/nvme1n1 or similar for nitro-based instance types"
+  type = string
+}
+
 variable "init_prefix" {
   default     = ""
   description = "init shell to run before setting VOLUME_ID and REGION exports"

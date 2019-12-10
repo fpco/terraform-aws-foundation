@@ -91,4 +91,5 @@ module "init-attach-ebs" {
   source = "../init-snippet-attach-ebs-volume"
   region = var.region
   volume_id = module.service-data.volume_id
+  device_path = var.ebs_device_path
 }
