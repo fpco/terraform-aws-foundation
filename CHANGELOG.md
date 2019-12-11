@@ -2,6 +2,16 @@
 
 ### Summary
 
+### Modules
+
+### Examples
+
+
+# v0.9.9
+
+### Summary
+
+New feature for `asg` module and bugfix for `tf-cloud-credentials` module.
 
 ### Modules
 
@@ -10,6 +20,8 @@
   existing TF Cloud workspace instead of trying to create one.
 
 ### Examples
+
+* No changes.
 
 
 # v0.9.8
