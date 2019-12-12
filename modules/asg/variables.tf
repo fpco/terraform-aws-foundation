@@ -96,14 +96,14 @@ variable "root_volume_size" {
 variable "additional_block_devices" {
   default     = []
   description = "Additional EBS volumes to use as instance block devices"
-  type        = list(object({device_name = string, volume_type = string, volume_size = string }))
+  type        = list(object({ device_name = string, volume_type = string, volume_size = string, encrypted = bool }))
 }
 
 // List of maps, as extra tags to append to the Auto-Scaling Group
 variable "extra_tags" {
   default     = []
   description = "Extra tags that will be added to ASG, as a list of maps"
-  type        = list(object({key=string, value=string, propagate_at_launch=bool}))
+  type        = list(object({ key = string, value = string, propagate_at_launch = bool }))
   # see the example in this TF doc for more info:
   # https://www.terraform.io/docs/providers/aws/r/autoscaling_group.html
   # should be provided in the following form:
