@@ -3,6 +3,7 @@
 ### Summary
 
 ### Modules
+* `asg`: Add EBS encryption support
 
 ### Examples
 

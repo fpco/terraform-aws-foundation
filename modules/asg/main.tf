@@ -100,6 +100,7 @@ resource "aws_launch_configuration" "cluster" {
       device_name = ebs_block_device.value.device_name
       volume_type = ebs_block_device.value.volume_type
       volume_size = ebs_block_device.value.volume_size
+      encrypted   = ebs_block_device.value.encrypted
     }
   }
 
