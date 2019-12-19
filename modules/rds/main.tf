@@ -49,6 +49,9 @@ variable "tags" {
   default = {}
 }
 
+variable "engine_version" {
+  type = string
+}
 
 resource "aws_db_subnet_group" "rds_private_subnet" {
   subnet_ids = var.subnet_ids
@@ -59,6 +62,7 @@ resource "aws_db_instance" "default" {
   allocated_storage      = var.db_storage_size
   storage_type           = var.db_storage_type
   engine                 = var.db_engine
+  engine_version         = var.engine_version
   instance_class         = var.db_instance_type
   db_subnet_group_name   = aws_db_subnet_group.rds_private_subnet.name
   multi_az               = true
@@ -72,4 +76,8 @@ resource "aws_db_instance" "default" {
 
 output "endpoint" {
   value = aws_db_instance.default.endpoint
+}
+
+output "db_id" {
+  value = aws_db_instance.default.id
 }
