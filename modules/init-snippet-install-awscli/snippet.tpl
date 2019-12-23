@@ -1,6 +1,5 @@
 # start snippet - install awscli python cli tools
 ${init_prefix}
-apt-get install -y python-pip
-pip install --upgrade pip==9.0.3
-pip install awscli
+apt install -y python3-pip
+pip3 install awscli
 ${init_suffix}
