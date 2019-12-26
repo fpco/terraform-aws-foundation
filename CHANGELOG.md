@@ -3,6 +3,7 @@
 ### Summary
 
 ### Modules
+* `asg`: Add EBS encryption support
 
 * `asg`: Add root volume encryption support
 
