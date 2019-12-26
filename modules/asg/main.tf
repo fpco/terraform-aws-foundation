@@ -92,6 +92,7 @@ resource "aws_launch_configuration" "cluster" {
   root_block_device {
     volume_type = var.root_volume_type
     volume_size = var.root_volume_size
+    encrypted = var.root_encrypted
   }
 
   dynamic "ebs_block_device" {

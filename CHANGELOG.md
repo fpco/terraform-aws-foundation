@@ -4,6 +4,8 @@
 
 ### Modules
 
+* `asg`: Add root volume encryption support
+
 ### Examples
 
 

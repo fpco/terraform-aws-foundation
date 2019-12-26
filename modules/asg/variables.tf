@@ -93,6 +93,12 @@ variable "root_volume_size" {
   type        = string
 }
 
+variable "root_encrypted" {
+  default     = false
+  description = "Whether the volume should be encrypted or not. (Default: false)."
+  type        = bool
+}
+
 variable "additional_block_devices" {
   default     = []
   description = "Additional EBS volumes to use as instance block devices"
