@@ -56,7 +56,7 @@ variable "min_nodes" {
 variable "public_ip" {
   default     = true
   description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"
-  type        = string
+  type        = bool
 }
 
 variable "subnet_ids" {
