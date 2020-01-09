@@ -141,7 +141,7 @@ data "template_file" "master-node-config" {
     cluster_tag        = "${var.name_prefix}-elasticsearch-cluster"
     extra_config       = <<EXTRA_CONFIG
 # Only set the region for Elasticsearch 5.x, since it is deprecated in 6.x
-${element(split(".", var.elasticsearch_version), 0) < 6 ? "cloud.aws.region: ${data.aws_region.current.name}" : ""}
+${tonumber(element(split(".", var.elasticsearch_version), 0)) < 6 ? "cloud.aws.region: ${data.aws_region.current.name}" : ""}
 
 ${var.extra_config}
 EXTRA_CONFIG
