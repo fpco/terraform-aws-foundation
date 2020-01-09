@@ -56,7 +56,7 @@ variable "min_nodes" {
 variable "public_ip" {
   default     = true
   description = "Boolean flag to enable/disable `map_public_ip_on_launch` in each `aws_subnet`"
-  type        = string
+  type        = bool
 }
 
 variable "subnet_ids" {
@@ -91,6 +91,12 @@ variable "root_volume_size" {
   default     = "15"
   description = "The size of the EBS volume (in GB) for the root block device"
   type        = string
+}
+
+variable "root_encrypted" {
+  default     = false
+  description = "Whether the volume should be encrypted or not. (Default: false)."
+  type        = bool
 }
 
 variable "additional_block_devices" {

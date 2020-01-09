@@ -16,9 +16,8 @@ The module supports:
   and `aws_role_arn` for setting up SNS
 * public IPs may be enabled/disabled
 * supports appending `extra_tags`
-* all important details (instance type, ami, key, user data, iam profile, additional
-  volumes encryption) are
-  specified as variables in the modules.
+* all important details (instance type, ami, key, user data, iam profile, root and
+  additional volumes encryption) are specified as variables in the modules.
 
 Note that, Terraform does not run a rolling update when an ASG/LC pair have
 changed. After the ASG/LC have been updated, the EC2 instances running before
