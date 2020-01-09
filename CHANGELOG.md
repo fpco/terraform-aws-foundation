@@ -3,9 +3,12 @@
 ### Summary
 
 ### Modules
-* `asg`: Add EBS encryption support
+
+* `asg`: Add support for encrypting the root and attached EBS volumes.
 
 ### Examples
+
+* No changes
 
 
 # v0.9.9
