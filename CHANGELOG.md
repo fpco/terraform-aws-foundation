@@ -4,7 +4,22 @@
 
 ### Modules
 
-* `asg`: Add support for encrypting the root and attached EBS volumes.
+### Examples
+
+
+# v0.9.10
+
+### Summary
+
+* Support encrypted EBS volumes on ASG, for root _and_ data volumes.
+* Update linting tests
+* Update 2 init snippets
+
+### Modules
+
+* `init-snippet-attach-ebs-volume`: Retrying attaching EBS
+* `asg`: Add support for encrypting the root and additional attached EBS volumes.
+* `init-snippet-install-awscli`: Uses Python3 for awscli. (#281)
 
 ### Examples
 
