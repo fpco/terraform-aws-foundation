@@ -45,7 +45,7 @@ locals {
 }
 
 # ingress rule for tcp, if enabled
-resource "aws_security_group_rule" "tcp-ingress" {
+resource "aws_security_group_rule" "tcp_ingress" {
   count             = local.tcp
   type              = "ingress"
   description       = "${var.description} (tcp)"
@@ -57,7 +57,7 @@ resource "aws_security_group_rule" "tcp-ingress" {
 }
 
 # ingress rule for udp, if enabled
-resource "aws_security_group_rule" "udp-ingress" {
+resource "aws_security_group_rule" "udp_ingress" {
   count             = local.udp
   type              = "ingress"
   description       = "${var.description} (udp)"
