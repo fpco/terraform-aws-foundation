@@ -7,6 +7,22 @@
 ### Examples
 
 
+# v0.9.11
+
+### Summary
+
+Quick release to address resource name bug in `single-port-sg` module. Will
+review the others for the next release.
+
+### Modules
+
+* `single-port-sg`: fixup - to _ in resource names
+
+### Examples
+
+* No changes
+
+
 # v0.9.10
 
 ### Summary
