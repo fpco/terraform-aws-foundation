@@ -80,6 +80,9 @@ module "server" {
 
   user_data = <<END_INIT
 #!/bin/bash
+# exec > /tmp/init.log
+# exec 2> /tmp/init-err.log
+# set -x
 ${var.init_prefix}
 ${module.init-attach-ebs.init_snippet}
 ${var.init_suffix}
