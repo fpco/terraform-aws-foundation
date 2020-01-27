@@ -3,6 +3,7 @@ ${init_prefix}
 export AWS_DEFAULT_REGION=${region}
 VOLUME_ID=${volume_id}
 INSTANCE_ID="$(ec2metadata --instance-id)"
+
 echo "${log_prefix} will attach $${VOLUME_ID} via the AWS API in ${region}"
 while ! aws ec2 attach-volume                     \
           --volume-id "$${VOLUME_ID}"     \
@@ -11,8 +12,15 @@ while ! aws ec2 attach-volume                     \
   echo "Attaching command failed to run. Retrying."
   sleep '${wait_interval}'
 done
+echo "${log_prefix} $${VOLUME_ID} attached."
 
-while ! ls '${device_path}'; do
-  sleep '${wait_interval}'
+vol_id="$(echo "$${VOLUME_ID}" | tr -d '-')"
+while [ ! -e /dev/disk/by-id/*-Amazon_Elastic_Block_Store_$${vol_id} ]; do
+  sleep '${wait_interval}' 
 done
+
+dev_id="$(ls /dev/disk/by-id/*-Amazon_Elastic_Block_Store_$${vol_id} | head -1)"
+dev_name="/dev/$(readlink "$${dev_id}" | tr / '\n' | tail -1)"
+[ "$${dev_name}" == "${device_path}" ] || ln -s "$${dev_name}" "$${device_path}"
+
 ${init_suffix}
