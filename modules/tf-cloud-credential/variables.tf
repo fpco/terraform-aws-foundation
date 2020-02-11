@@ -1,11 +1,6 @@
-variable "name_prefix" {
+variable "workspace_id" {
   type        = string
-  description = "The name prefix to use for the workspace"
-}
-
-variable "organization" {
-  type        = string
-  description = "The workspace organization"
+  description = "Id of workspace to put variables in."
 }
 
 variable "iam_access_key" {
