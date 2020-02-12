@@ -6,6 +6,20 @@
 
 ### Examples
 
+# v0.9.12
+
+### Summary 
+
+Small release to update the `tf-cloud-credential` module to use the `workspace_id`
+instead of the workspace name to set credentials for that workspace.
+
+### Modules
+
+* `tf-cloud-credential` in https://github.com/fpco/terraform-aws-foundation/pull/293
+
+### Examples
+
+* No chnages
 
 # v0.9.11
 
