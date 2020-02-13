@@ -19,7 +19,7 @@ instead of the workspace name to set credentials for that workspace.
 
 ### Examples
 
-* No chnages
+* No changes
 
 # v0.9.11
 
