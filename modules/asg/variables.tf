@@ -154,3 +154,9 @@ variable "aws_role_arn" {
   description = "ARN for the AWS Role (should allow access to lifecycle_sns_topic_arn)"
   type        = string
 }
+
+variable "protect_from_scale_in" {
+  default     = false
+  description = "Allows setting instance protection. The autoscaling group will not select instances with this setting for terminination during scale in events."
+  type        = bool
+}

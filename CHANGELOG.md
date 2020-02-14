@@ -4,6 +4,8 @@
 
 ### Modules
 
+* `asg`: add `protect_from_scale_in` to allow instance termination protection
+
 ### Examples
 
 # v0.9.13

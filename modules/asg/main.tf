@@ -35,6 +35,7 @@ resource "aws_autoscaling_group" "cluster" {
   name_prefix               = "${var.name_prefix}-${var.name_suffix}"
   placement_group           = var.placement_group
   termination_policies      = var.termination_policies
+  protect_from_scale_in     = var.protect_from_scale_in
 
   lifecycle {
     create_before_destroy = true
