@@ -115,5 +115,5 @@ resource "aws_launch_configuration" "cluster" {
 resource "aws_autoscaling_attachment" "main" {
   count                  = length(var.alb_target_group_arns)
   autoscaling_group_name = aws_autoscaling_group.cluster.name
-  alb_target_group_arn   = var.alb_target_group_arns.main[count.index]
+  alb_target_group_arn   = var.alb_target_group_arns[count.index]
 }
