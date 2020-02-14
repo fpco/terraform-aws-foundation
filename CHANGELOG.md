@@ -5,6 +5,7 @@
 ### Modules
 
 * `asg`: add `protect_from_scale_in` to allow instance termination protection
+* `asg`: add `suspended_processes`
 
 ### Examples
 

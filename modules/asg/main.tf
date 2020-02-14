@@ -36,6 +36,7 @@ resource "aws_autoscaling_group" "cluster" {
   placement_group           = var.placement_group
   termination_policies      = var.termination_policies
   protect_from_scale_in     = var.protect_from_scale_in
+  suspended_processes       = var.suspended_processes
 
   lifecycle {
     create_before_destroy = true
