@@ -29,7 +29,6 @@ resource "aws_autoscaling_group" "cluster" {
   health_check_type         = var.health_check_type
   launch_configuration      = aws_launch_configuration.cluster.name
   load_balancers            = var.elb_names
-  target_group_arns         = var.alb_target_group_arns
   max_size                  = var.max_nodes
   min_size                  = var.min_nodes
   name_prefix               = "${var.name_prefix}-${var.name_suffix}"
@@ -110,4 +109,11 @@ resource "aws_launch_configuration" "cluster" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+# Attach ASG to the load balancer target group
+resource "aws_autoscaling_attachment" "main" {
+  count                  = length(var.alb_target_group_arns)
+  autoscaling_group_name = aws_autoscaling_group.cluster.name
+  alb_target_group_arn   = var.alb_target_group_arns.main[count.index]
 }
