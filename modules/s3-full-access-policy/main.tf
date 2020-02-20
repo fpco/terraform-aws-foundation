@@ -50,11 +50,12 @@ data "aws_iam_policy_document" "s3-full-access" {
     effect = "Allow"
 
     actions = [
-      "s3:ListObjects",
+      # "s3:ListObjects", # TODO this might not be a valid action
+      # See https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazons3.html
       "s3:PutObject",
       "s3:GetObject",
       "s3:DeleteObject",
-      "s3:CreateMultipartUpload",
+      # "s3:CreateMultipartUpload", # TODO this might not be a valid action
       "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload",
     ]

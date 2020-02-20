@@ -13,7 +13,6 @@ variable "bucket_name" {
 }
 
 variable "principals" {
-  default     = []
   description = "list of user/role ARNs to get full access to the bucket"
   type        = list(string)
 }
@@ -72,8 +71,6 @@ data "aws_iam_policy_document" "s3-full-access" {
   statement {
     effect = "Allow"
 
-    # find an authoritative list of valid Actions for a AWS bucket policy,
-    # I haven't been able to locate one, and the two commented out are invalid
     actions = [
       "s3:PutObject",
       "s3:GetObject",
