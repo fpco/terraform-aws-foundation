@@ -6,6 +6,21 @@
 
 ### Examples
 
+# v0.9.13
+
+### Summary
+
+Fix an issue with the `ami-centos` module where it would pull similarly named ami's
+from untrusted 3rd parties
+
+### Modules
+
+* `ami-centos` in https://github.com/fpco/terraform-aws-foundation/pull/299
+
+### Examples
+
+* No changes
+
 # v0.9.12
 
 ### Summary 
