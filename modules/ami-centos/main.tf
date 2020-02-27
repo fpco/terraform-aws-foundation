@@ -23,6 +23,8 @@ data "aws_ami" "centos" {
   }
 
   # this filter is here to guarantee that ami's come from the official CentOS.org
+  # we can be sure of the ami's authenticity by filtering by the products id's unique to
+  # CentOS.org, which can be found on their web site at https://wiki.centos.org/Cloud/AWS
   filter {
     name   = "product-code"
     values = [
