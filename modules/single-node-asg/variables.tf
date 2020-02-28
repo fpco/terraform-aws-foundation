@@ -116,3 +116,8 @@ variable "load_balancers" {
   type        = list(string)
 }
 
+variable "alb_target_group_arns" {
+  default     = []
+  description = "list of target_group for application load balancer to associate with the ASG (by ARN)"
+  type        = list(string)
+}
