@@ -35,11 +35,25 @@ variable "force_destroy" {
   type        = bool
 }
 
+variable "kms_key_id" {
+  description = "The ARN of a KMS Key to use for encrypting the state"
+  type        = string
+}
+
 resource "aws_s3_bucket" "remote-state" {
   bucket        = var.bucket_name
   acl           = "private"
   region        = var.region
   force_destroy = var.force_destroy
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        kms_master_key_id = var.kms_key_id
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
 
   versioning {
     enabled = var.versioning
