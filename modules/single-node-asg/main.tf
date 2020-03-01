@@ -72,11 +72,10 @@ module "server" {
   name_prefix = var.name_prefix
   name_suffix = "${var.name_suffix}-${local.az}"
 
-  root_volume_type      = var.root_volume_type
-  root_volume_size      = var.root_volume_size
-  security_group_ids    = var.security_group_ids
-  subnet_ids            = [var.subnet_id]
-  alb_target_group_arns = var.alb_target_group_arns
+  root_volume_type   = var.root_volume_type
+  root_volume_size   = var.root_volume_size
+  security_group_ids = var.security_group_ids
+  subnet_ids         = [var.subnet_id]
 
   user_data = <<END_INIT
 #!/bin/bash
