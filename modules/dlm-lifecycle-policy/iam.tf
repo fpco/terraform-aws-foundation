@@ -1,9 +1,3 @@
-variable "iam_role_name" {
-  description = "The IAM role name for the DLM lifecyle policy"
-  type        = string
-  default     = "dlm-lifecycle-role"
-}
-
 # Create the iam role
 resource "aws_iam_role" "dlm_lifecycle_role" {
   name                = var.iam_role_name
@@ -54,3 +48,4 @@ resource "aws_iam_role_policy" "dlm_lifecycle_policy" {
 }
 EOF
 }
+

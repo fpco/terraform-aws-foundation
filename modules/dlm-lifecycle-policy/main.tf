@@ -11,15 +11,10 @@
 *
 */
 
-# Get the data of role to pass the resource
-data "aws_iam_role" "dlm_lifecycle_role" {
-  name         = var.role_name
-}
-
 # DLM lifecycle schedule
 resource "aws_dlm_lifecycle_policy" "ebs-lifecycle-policy" {
   description        = var.description
-  execution_role_arn = data.aws_iam_role.dlm_lifecycle_role.arn
+  execution_role_arn = aws_iam_role.dlm_lifecycle_role.arn
   state              = "ENABLED"
 
   policy_details {
