@@ -63,7 +63,8 @@ variable "policy_tags_to_add" {
   default     = {"SnapshotCreator" = "DLM lifecycle"}
 }
 
-variable "role_name" {
+variable "iam_role_name" {
   description = "The IAM role name for the DLM lifecyle policy"
   type        = string
+  default     = "dlm-lifecycle-role"
 }
