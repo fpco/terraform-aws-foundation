@@ -9,6 +9,33 @@
 
 ### Examples
 
+# v0.9.14
+
+### Summary
+
+New modules and function extendings.
+
+### Modules
+
+* dlm-lifecycle-policy: Merge dlm-lifecycle-iam-role.
+
+* init-snippet-install-docker-yum: CentOS script to install docker/docker-compose.
+
+* init-snippet-attach-ebs-volume: Working on CentOS now. Generates required device name now despite Linux differences.
+
+* single-node-asg: Output the attached EBS Name tag for DLM to match.
+
+* rds: RDS database.
+
+* s3-remote-state: fix for #286.
+
+* asg: add protect_from_scale_in and suspended_processes attrs.
+
+### Examples
+
+* No changes
+
+
 # v0.9.13
 
 ### Summary
