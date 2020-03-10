@@ -10,9 +10,9 @@ variable "security_group_id" {
   type        = string
 }
 
-variable "cidr_blocks" {
-  description = "List of CIDR block ranges that the SG allows ingress from"
-  type        = list(string)
+variable "source_security_group_id" {
+  description = "The SG that this SG allows ingress from"
+  type        = string
 }
 
 variable "description" {
@@ -44,24 +44,24 @@ locals {
 
 # ingress rule for tcp, if enabled
 resource "aws_security_group_rule" "tcp_ingress" {
-  count             = local.tcp
-  type              = "ingress"
-  description       = "${var.description} (tcp)"
-  from_port         = var.port
-  to_port           = var.port
-  protocol          = "tcp"
-  cidr_blocks       = var.cidr_blocks
-  security_group_id = var.security_group_id
+  count                    = local.tcp
+  type                     = "ingress"
+  description              = "${var.description} (tcp)"
+  from_port                = var.port
+  to_port                  = var.port
+  protocol                 = "tcp"
+  security_group_id        = var.security_group_id
+  source_security_group_id = var.source_security_group_id
 }
 
 # ingress rule for udp, if enabled
 resource "aws_security_group_rule" "udp_ingress" {
-  count             = local.udp
-  type              = "ingress"
-  description       = "${var.description} (udp)"
-  from_port         = var.port
-  to_port           = var.port
-  protocol          = "udp"
-  cidr_blocks       = var.cidr_blocks
-  security_group_id = var.security_group_id
+  count                    = local.udp
+  type                     = "ingress"
+  description              = "${var.description} (udp)"
+  from_port                = var.port
+  to_port                  = var.port
+  protocol                 = "udp"
+  security_group_id        = var.security_group_id
+  source_security_group_id = var.source_security_group_id
 }
