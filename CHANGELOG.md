@@ -4,10 +4,22 @@
 
 ### Modules
 
-* `asg`: add `protect_from_scale_in` to allow instance termination protection
-* `asg`: add `suspended_processes`
+### Examples
+
+# v0.9.15
+
+### Summary
+
+Bugfix and new function.
+
+### Modules
+
+* init-snippet-attach-ebs-volume: bugfix
+
+* s3-remote-state: Support KMS
 
 ### Examples
+
 
 # v0.9.14
 
