@@ -77,6 +77,8 @@ module "server" {
   security_group_ids = var.security_group_ids
   subnet_ids         = [var.subnet_id]
 
+  alb_target_group_arns = var.alb_target_group_arns
+
   user_data = <<END_INIT
 #!/bin/bash
 # exec > /tmp/init.log
