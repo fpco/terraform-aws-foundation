@@ -4,10 +4,23 @@
 
 ### Modules
 
-* `asg`: add `protect_from_scale_in` to allow instance termination protection
-* `asg`: add `suspended_processes`
+### Examples
+
+# v0.9.15
+
+### Summary
+
+Updates to the ASG module
+
+### Modules
+
+* `asg` : Switch up how targets groups are associated with the ASG
+* `asg` : add `protect_from_scale_in` to allow instance termination protection
+* `asg` : add `suspended_processes`
 
 ### Examples
+
+* No changes
 
 # v0.9.14
 
