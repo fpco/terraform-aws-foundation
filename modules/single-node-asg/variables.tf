@@ -29,6 +29,12 @@ variable "name_suffix" {
   type        = string
 }
 
+variable "alb_target_group_arns" {
+  default     = []
+  description = "list of target_group for application load balancer to associate with the ASG (by ARN)"
+  type        = list(string)
+}
+
 variable "root_volume_type" {
   default     = "gp2"
   description = "Type of EBS volume to use for the root block device"
