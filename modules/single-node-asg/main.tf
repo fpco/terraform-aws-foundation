@@ -62,7 +62,7 @@ module "server" {
   # The IAM Instance Profile w/ attach_ebs role
   iam_profile   = module.instance_profile.iam_profile_id
   instance_type = var.instance_type
-  # 1 EC2 instance <> 1 EBS volume 
+  # 1 EC2 instance <> 1 EBS volume
   max_nodes       = 1
   min_nodes       = 1
   placement_group = var.placement_group
@@ -76,6 +76,8 @@ module "server" {
   root_volume_size   = var.root_volume_size
   security_group_ids = var.security_group_ids
   subnet_ids         = [var.subnet_id]
+
+  alb_target_group_arns = var.alb_target_group_arns
 
   user_data = <<END_INIT
 #!/bin/bash
