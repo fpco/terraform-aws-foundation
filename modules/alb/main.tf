@@ -8,6 +8,6 @@ resource "aws_lb" "alb" {
 }
 
 resource "aws_security_group" "alb_sg" {
-  name_prefix = "${var.name_prefix}-alb_sb"
+  name_prefix = "${var.name_prefix}-alb_sg"
   vpc_id      = var.vpc_id
 }
