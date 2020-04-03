@@ -42,45 +42,9 @@ variable "root_volume_type" {
 }
 
 variable "root_volume_size" {
-  default     = "8"
+  default     = 8
   description = "Size (in GB) of EBS volume to use for the root block device"
-  type        = string
-}
-
-variable "data_volume_type" {
-  default     = "gp2"
-  description = "Type of EBS volume to use for the EBS volume"
-  type        = string
-}
-
-variable "data_volume_size" {
-  default     = "10"
-  description = "Size (in GB) of EBS volume to use for the EBS volume"
-  type        = string
-}
-
-variable "data_volume_encrypted" {
-  default     = true
-  description = "Boolean, whether or not to encrypt the EBS block device"
-  type        = string
-}
-
-variable "data_volume_kms_key_id" {
-  default     = ""
-  description = "ID of the KMS key to use when encyprting the EBS block device"
-  type        = string
-}
-
-variable "data_volume_snapshot_id" {
-  default     = ""
-  description = "The ID of the snapshot to base the EBS block device on"
-  type        = string
-}
-
-variable "data_volume_iops" {
-  default     = ""
-  description = "The amount of IOPS to provision for the EBS block device"
-  type        = string
+  type        = number
 }
 
 variable "init_prefix" {
@@ -120,4 +84,9 @@ variable "load_balancers" {
   default     = []
   description = "The list of load balancers names to pass to the ASG module"
   type        = list(string)
+}
+
+variable "data_volumes" {
+  type = list(map(any))
+  description = "Definition of the data volumes. `name` and `device` are required."
 }
