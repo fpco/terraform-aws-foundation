@@ -4,6 +4,10 @@
 
 ### Modules
 
+* nat-gateways: Add additional variables `enable_nat_creation` and
+  `nat_eip` for enabling support for migrating EIP between NAT
+  gateways.
+
 ### Examples
 
 # v0.9.15
