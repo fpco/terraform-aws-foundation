@@ -29,3 +29,14 @@ variable "extra_tags" {
   type        = map(string)
 }
 
+variable "enable_nat_creation" {
+  default     = true
+  description = "boolean, enable/disable NAT creation"
+  type        = string
+}
+
+variable "nat_eip" {
+  description = "The public IP of the specific EIP to retrieve. If non empty, this list should have same number of EIP as the number of var.public_subnet_ids."
+  type        = list(string)
+  default     = []
+}
