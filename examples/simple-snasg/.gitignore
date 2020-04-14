@@ -1,0 +1,11 @@
+.terraform
+tf.out
+terraform.tfstate
+terraform.tfvars
+*.tfstate.backup
+id_rsa
+id_rsa.pub
+*.sw[o,p]
+
+# You will need to provide you own
+aws-env.config
