@@ -10,9 +10,12 @@
  */
 
 locals {
+  # Variable which controls if NAT and it's dependent resources has to be created or not
   total_nat_count = var.enable_nat_creation ? var.nat_count : 0
+  # Number of new NATs to be created in case var.nat_eip is empty.
   total_new_nat   = var.enable_nat_creation ? (length(var.nat_eip) == 0 ? local.total_nat_count : 0) : 0
-  nat_ids         = var.enable_nat_creation ? (length(var.nat_eip) == 0 ? aws_eip.nat.*.id : values(data.aws_eip.nat)[*].id) : []
+  # Gives the EIP ids. It would be either populated via data source or newly created (which is controlled by var.nat_eip).
+  eip_ids         = var.enable_nat_creation ? (length(var.nat_eip) == 0 ? aws_eip.nat.*.id : values(data.aws_eip.nat)[*].id) : []
 }
 
 # AWS Managed NAT Gateways
@@ -34,7 +37,7 @@ data "aws_subnet" "public" {
 resource "aws_nat_gateway" "nat" {
   count         = local.total_nat_count
   subnet_id     = element(data.aws_subnet.public.*.id, count.index)
-  allocation_id = element(local.nat_ids, count.index)
+  allocation_id = element(local.eip_ids, count.index)
 
   tags = merge(
     {
