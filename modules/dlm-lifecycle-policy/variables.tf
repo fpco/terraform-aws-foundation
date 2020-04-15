@@ -1,6 +1,6 @@
 variable "name_prefix" {
   description = "Name to prefix the DML lifecycle"
-  type        = "string"
+  type        = string
 }
 
 variable "ebs_target_tags" {
@@ -59,7 +59,7 @@ variable "policy_copy_tags" {
 
 variable "policy_tags_to_add" {
   description = "Tags to add to the snapshot"
-  type        = "map"
+  type        = map
   default     = {"SnapshotCreator" = "DLM lifecycle"}
 }
 
