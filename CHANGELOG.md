@@ -4,11 +4,28 @@
 
 ### Modules
 
+### Examples
+
+# v0.9.16
+
+### Summary
+
+* Improvements to 2 existing modules.
+* 1 new module.
+* 1 new example.
+
+### Modules
+
 * nat-gateways: Add additional variables `enable_nat_creation` and
   `nat_eip` for enabling support for migrating EIP between NAT
   gateways.
+* `single-node-asg`: Pass the `alb_target_group_arns` to the `asg` module
+* `single-port-sg-src`: This new module is a fork of the existin `single-port-sg` module (to support `source_security_group`).
+*  `setup-meta-infrastructure`: Add all `Get*` and `List*` actions to `power-user` 
 
 ### Examples
+
+* `simple-snag`:  Add a basic example for the Single-Node AutoScaling Group module/pattern 
 
 # v0.9.15
 
