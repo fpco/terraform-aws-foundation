@@ -42,9 +42,9 @@ variable "root_volume_type" {
 }
 
 variable "root_volume_size" {
-  default     = "8"
+  default     = 8
   description = "Size (in GB) of EBS volume to use for the root block device"
-  type        = string
+  type        = number
 }
 
 variable "data_volume_type" {
@@ -54,9 +54,9 @@ variable "data_volume_type" {
 }
 
 variable "data_volume_size" {
-  default     = "10"
+  default     = 10
   description = "Size (in GB) of EBS volume to use for the EBS volume"
-  type        = string
+  type        = number
 }
 
 variable "data_volume_encrypted" {
@@ -126,4 +126,14 @@ variable "assign_eip" {
   default     = false
   description = "Whether or not associating an EIP with the node."
   type        = bool
+}
+
+variable "data_volumes" {
+  type = list(map(any))
+  description = "Definition of the data volumes. `name` and `device` are required."
+}
+
+variable "compatible_with_single_volume" {
+  default = true
+  description = "Using variables for single volumes or not."
 }

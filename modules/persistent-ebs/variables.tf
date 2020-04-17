@@ -60,3 +60,22 @@ variable "iam_instance_profile_role_name" {
   description = "The role to attach policy needed by this module."
   type        = string
 }
+
+variable "volumes" {
+  type = list(map(any))
+### Note: what should be contained.
+#    type        = string,
+#    iops        = number,
+#    size        = number,
+#    encrypted   = bool,
+#    kms_key_id  = string,
+#    snapshot_id = string,
+#    name        = string
+  description = "Definition of volumes. `name` is required."
+  default     = []
+}
+
+variable "compatible_with_single_volume" {
+  default = true
+  description = "Using variables for single volumes or not."
+}

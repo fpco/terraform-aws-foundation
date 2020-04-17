@@ -21,12 +21,30 @@ locals {
   # To give us a short-hand refernce to the AZ
   az = data.aws_subnet.server-subnet.availability_zone
 
-  # The "name_prefix" we provide to the persistent-ebs module
-  data_volume_name_prefix = "${var.name_prefix}-${var.name_suffix}-data"
-
   # The `name_prefix` we provide to the `iam-instance-profile` module
   # The persistent-ebs module appends the AZ to the data node name, other modules don't do that
   name_prefix_with_az = "${var.name_prefix}-${var.name_suffix}-${local.az}"
+
+  data_volume_default = {
+    type        = "gp2"
+    iops        = 0
+    size        = 10
+    encrypted   = true
+    kms_key_id  = ""
+    snapshot_id = ""
+  }
+
+  data_volumes_default_no_comp = [for x in var.data_volumes : merge(local.data_volume_default, x)]
+  data_volumes_default = var.compatible_with_single_volume ? [{
+    type        = var.data_volume_type,
+    iops        = var.data_volume_iops,
+    size        = var.data_volume_size,
+    encrypted   = var.data_volume_encrypted,
+    kms_key_id  = var.data_volume_kms_key_id,
+    snapshot_id = var.data_volume_snapshot_id,
+    name        = "${local.name_prefix_with_az}-default",
+    device      = "/dev/xvdf"
+  }] : local.data_volumes_default_no_comp
 }
 
 # Create an IAM Instance profile we can use on EC2, associated with the ASG
@@ -38,15 +56,11 @@ module "instance_profile" {
 # Create a single EBS volume that can be used in a single/specific AZ, for the ASG
 module "service-data" {
   source      = "../persistent-ebs"
-  name_prefix = local.data_volume_name_prefix
+  name_prefix = "${var.name_prefix}-${var.name_suffix}"
   region      = var.region
   az          = local.az
-  size        = var.data_volume_size
-  iops        = var.data_volume_iops
-  volume_type = var.data_volume_type
-  encrypted   = var.data_volume_encrypted
-  kms_key_id  = var.data_volume_kms_key_id
-  snapshot_id = var.data_volume_snapshot_id
+  volumes     = local.data_volumes_default
+  compatible_with_single_volume = false
 
   # EBS module will create an IAM policy and associate with this role
   iam_instance_profile_role_name = module.instance_profile.iam_role_name
@@ -107,11 +121,11 @@ module "server" {
   user_data = <<END_INIT
 #!/bin/bash
 # exec > /tmp/init.log
-# exec 2> /tmp/init-err.log
+exec 2>&1
 # set -x
 apt update
+${module.install-awscli.init_snippet}
 ${var.init_prefix}
-${module.init-install-awscli.init_snippet}
 while ! ${var.assign_eip ? "aws ec2 associate-address --instance-id \"$(ec2metadata --instance-id)\" --region \"${var.region}\" --allocation-id \"${element(aws_eip.eip.*.id, 0)}\"" : "true"}; do
   sleep 1
 done
@@ -123,11 +137,13 @@ END_INIT
 
 # Render init snippet - boxed module to attach the EBS volume to the node
 module "init-attach-ebs" {
-  source    = "../init-snippet-attach-ebs-volume"
-  region    = var.region
-  volume_id = module.service-data.volume_id
+  source       = "../init-snippet-attach-ebs-volume"
+  region       = var.region
+  volume_ids   = module.service-data.volume_ids
+  device_paths = [for x in local.data_volumes_default : x.device]
+  compatible_with_single_volume = false
 }
 
-module "init-install-awscli" {
+module "install-awscli" {
   source = "../init-snippet-install-awscli"
 }
