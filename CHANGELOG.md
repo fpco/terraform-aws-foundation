@@ -4,6 +4,9 @@
 
 ### Modules
 
+* nat-gateways: Fix association issue caused between `nat_eip` and
+  public subnets. This only affects resources using the `nat_eip` variable.
+
 ### Examples
 
 # v0.9.16
