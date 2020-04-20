@@ -15,7 +15,7 @@ locals {
   # Number of new NATs to be created in case var.nat_eip is empty.
   total_new_nat   = var.enable_nat_creation ? (length(var.nat_eip) == 0 ? local.total_nat_count : 0) : 0
   # Gives the EIP ids. It would be either populated via data source or newly created (which is controlled by var.nat_eip).
-  eip_ids         = var.enable_nat_creation ? (length(var.nat_eip) == 0 ? aws_eip.nat.*.id : values(data.aws_eip.nat)[*].id) : []
+  eip_ids         = var.enable_nat_creation ? (length(var.nat_eip) == 0 ? aws_eip.nat.*.id : data.aws_eip.nat.*.id) : []
 }
 
 # AWS Managed NAT Gateways
@@ -25,8 +25,8 @@ resource "aws_eip" "nat" {
 }
 
 data "aws_eip" "nat" {
-  for_each  = length(var.nat_eip) != 0 ? toset(var.nat_eip) : toset([])
-  public_ip = each.value
+  count     = length(var.nat_eip)
+  public_ip = element(var.nat_eip, count.index)
 }
 
 data "aws_subnet" "public" {
