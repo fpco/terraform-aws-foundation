@@ -4,6 +4,9 @@
 
 ### Modules
 
+* `ec2-connect-tunnel`: singe node ASG to allow SSH using EC2 Instance Connect
+* `ec2-connect-role`: IAM role to allow EC2 Instance Connect
+
 ### Examples
 
 # v0.9.16
