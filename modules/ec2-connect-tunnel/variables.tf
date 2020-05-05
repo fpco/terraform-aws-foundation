@@ -34,6 +34,18 @@ variable "subnet_id" {
   type        = string
 }
 
+variable "init_prefix" {
+  default     = ""
+  description = "init shell to run before executing the main part of instance init"
+  type        = string
+}
+
+variable "init_suffix" {
+  default     = ""
+  description = "init shell to run after the main part of instance init"
+  type        = string
+}
+
 variable "extra_tags" {
   description = "map of name,value pairs to tag the security group (append to Name tag)"
   default     = {}

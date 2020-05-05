@@ -13,8 +13,10 @@ module "asg" {
   data_volumes       = []
   assign_eip         = true
 
+  init_prefix = var.init_prefix
   init_suffix = <<END_INIT_SUFFIX
 echo "Installing ec2-instance-connect"
 apt install ec2-instance-connect
+${var.init_suffix}
 END_INIT_SUFFIX
 }
