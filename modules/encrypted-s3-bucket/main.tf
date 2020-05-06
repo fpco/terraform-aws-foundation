@@ -83,3 +83,8 @@ resource "aws_iam_role_policy_attachment" "s3_writer" {
   role       = var.writer_role_name
   policy_arn = aws_iam_policy.s3_writer.arn
 }
+
+output "s3_bucket_name" {
+  value       = aws_s3_bucket.enc.bucket
+  description = "Name of the encrypted bucket"
+}
