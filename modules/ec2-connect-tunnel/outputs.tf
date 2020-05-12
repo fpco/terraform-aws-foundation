@@ -9,20 +9,16 @@ output "sg_id" {
 }
 
 output "asg_name" {
-  value       = module.asg.name
-  description = "`name` exported from the Server `aws_autoscaling_group`"
+  value       = module.asg.asg_name
+  description = "name of the tunnel ASG"
 }
 
 output "asg_iam_role_name" {
   value       = module.asg.asg_iam_role_name
-  description = "`name` exported from the Service Data `aws_iam_role`"
+  description = "name of ASG IAM role"
 }
 
 output "data_volume_name_tag" {
   value       = module.asg.data_volume_name_tag
   description = "Name tag value for attached data volume."
-}
-
-output "eip_address" {
-  value = module.asg.eip_address
 }
