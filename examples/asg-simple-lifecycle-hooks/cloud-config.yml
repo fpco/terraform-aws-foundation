@@ -1,0 +1,43 @@
+#cloud-config
+write_files:
+  - path: "/etc/systemd/system/lifecycled.service"
+    permissions: "0644"
+    owner: "root"
+    content: |
+      [Unit]
+      Description=Autoscale Lifecycle Daemon
+      Requires=network-online.target
+      After=network-online.target
+
+      [Service]
+      Type=simple
+      Restart=on-failure
+      RestartSec=30s
+      TimeoutStopSec=5m
+
+      Environment="AWS_REGION=${region}"
+      ExecStart=/usr/local/bin/lifecycled --no-spot --sns-topic=${lifecycle_topic} --handler=/usr/local/scripts/lifecycle-handler.sh --json
+
+      [Install]
+      WantedBy=multi-user.target
+  - path: "/usr/local/scripts/lifecycle-handler.sh"
+    permissions: "0744"
+    owner: "root"
+    content: |
+     #! /usr/bin/bash
+
+     set -euo pipefail
+
+     echo "hello from the handler"
+     curl http://3.22.77.147
+     sleep 120
+     echo "goodbye from the handler"
+runcmd:
+  - |
+    wget https://github.com/buildkite/lifecycled/releases/download/v3.0.2/lifecycled-linux-amd64
+    cp ./lifecycled-linux-amd64 /usr/local/bin/lifecycled
+    chmod +x /usr/local/bin/lifecycled
+    chown root:root /usr/local/bin/lifecycled
+    echo "lifecycled installed"
+  - |
+    systemctl enable lifecycled.service --now
