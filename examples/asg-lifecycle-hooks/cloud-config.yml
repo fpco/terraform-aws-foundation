@@ -1,9 +1,5 @@
 #cloud-config
 write_files:
-  - path: "/index.html"
-    permissions: "0644"
-    owner: "root"
-    content: "hello world"
   - path: "/etc/systemd/system/lifecycled.service"
     permissions: "0644"
     owner: "root"
@@ -32,10 +28,10 @@ write_files:
 
      set -euo pipefail
 
-     echo "hello from the handler, received $${@-nothing}"
-     curl http://localhost:3000
-     echo
-     sleep 10
+     echo "hello from the handler"
+     # Have a side effect which you can observe
+     # Example side effect: curl http://x.x.x.x
+     sleep 120
      echo "goodbye from the handler"
 runcmd:
   - |
@@ -46,8 +42,3 @@ runcmd:
     echo "lifecycled installed"
   - |
     systemctl enable lifecycled.service --now
-  - |
-    wget https://www.busybox.net/downloads/binaries/1.28.1-defconfig-multiarch/busybox-x86_64
-    chmod +x busybox-x86_64
-    nohup ./busybox-x86_64 httpd -f -p 3000 &
-    curl http://localhost:3000
