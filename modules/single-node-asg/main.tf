@@ -68,7 +68,7 @@ module "server" {
   elb_names = var.load_balancers
   key_name  = var.key_name
   # The IAM Instance Profile w/ attach_ebs role
-  iam_profile   = module.instance_profile.iam_profile_id
+  iam_profile   = module.instance-profile.iam_profile_id
   instance_type = var.instance_type
   # 1 EC2 instance <> 1 EBS volume
   max_nodes       = 1
