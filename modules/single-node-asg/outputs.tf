@@ -4,7 +4,7 @@ output "asg_name" {
 }
 
 output "asg_iam_role_name" {
-  value       = module.instance_profile.iam_role_name
+  value       = module.instance-profile.iam_role_name
   description = "`name` exported from the Service Data `aws_iam_role`"
 }
 

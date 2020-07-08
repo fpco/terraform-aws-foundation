@@ -38,7 +38,7 @@ locals {
 }
 
 # Create an IAM Instance profile we can use on EC2, associated with the ASG
-module "instance_profile" {
+module "instance-profile" {
   source      = "../iam-instance-profile"
   name_prefix = local.name_prefix_with_az
 }
