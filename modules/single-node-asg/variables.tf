@@ -25,7 +25,8 @@ variable "placement_group" {
 }
 
 variable "name_suffix" {
-  description = "suffix to include when naming the various resources"
+  description = "suffix to include when naming the various resources, ignored if left as empty string"
+  default     = ""
   type        = string
 }
 

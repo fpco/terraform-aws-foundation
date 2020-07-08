@@ -21,9 +21,14 @@ locals {
   # To give us a short-hand refernce to the AZ
   az = data.aws_subnet.server-subnet.availability_zone
 
+  # with or without the suffix, eg, if suffix is empty, skip it and avoid the extra -
+  name_prefix_with_suffix    = "${var.name_prefix}-${var.name_suffix}"
+  name_prefix_without_suffix = "${var.name_prefix}"
+  name_prefix = "${var.name_suffix != "" ? local.name_prefix_without_suffix : local.name_prefix_with_suffix}"
+
   # The `name_prefix` we provide to the `iam-instance-profile` module
   # The persistent-ebs module appends the AZ to the data node name, other modules don't do that
-  name_prefix_with_az = "${var.name_prefix}-${var.name_suffix}-${local.az}"
+  name_prefix_with_az = "${local.name_prefix}-${local.az}"
 
   data_volume_default = {
     type        = "gp2"
@@ -46,7 +51,7 @@ module "instance-profile" {
 # Create a single EBS volume that can be used in a single/specific AZ, for the ASG
 module "service-data" {
   source      = "../persistent-ebs"
-  name_prefix = "${var.name_prefix}-${var.name_suffix}"
+  name_prefix = local.name_prefix_with_az
   region      = var.region
   az          = local.az
   volumes     = local.data_volumes_default
@@ -72,8 +77,7 @@ module "server" {
   public_ip       = var.public_ip
   # the prefix and suffix names are combined in
   # the `asg` module to create the full name
-  name_prefix = var.name_prefix
-  name_suffix = "${var.name_suffix}-${local.az}"
+  name_prefix = local.name_prefix_with_az
 
   root_volume_type   = var.root_volume_type
   root_volume_size   = var.root_volume_size
