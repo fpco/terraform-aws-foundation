@@ -57,7 +57,7 @@ module "service-data" {
   volumes     = local.data_volumes_default
 
   # EBS module will create an IAM policy and associate with this role
-  iam_instance_profile_role_name = module.instance_profile.iam_role_name
+  iam_instance_profile_role_name = module.instance-profile.iam_role_name
 }
 
 # Create an ASG with just 1 EC2 instance
