@@ -1,5 +1,5 @@
 resource "aws_kms_key" "s3_enc" {
-  description             = "Key for S3 buckets"
+  description             = "Key for encrypting data on the ${var.bucket_name} S3 bucket"
   deletion_window_in_days = 10
 }
 
