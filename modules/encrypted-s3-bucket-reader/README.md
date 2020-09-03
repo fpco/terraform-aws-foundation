@@ -1,3 +1,3 @@
 # s3-enc
 
-This module provided a server encryption enabled S3 bucket, and necessary policies attached to provided roles.
+This module provides an IAM policy and role attachment that grants access to KMS keys and read permissions for a specific encrypted S3 bucket.
