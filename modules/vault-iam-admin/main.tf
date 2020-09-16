@@ -6,7 +6,7 @@ locals {
 
 # default IAM policy
 module "vault-iam-policy" {
-  source                   = "../../modules/vault-iam-policy"
+  source                   = "../vault-iam-policy"
   vault_iam_container_name = var.vault_iam_container_name
 }
 
