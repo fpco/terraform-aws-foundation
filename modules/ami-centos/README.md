@@ -5,16 +5,19 @@ release of Centos. Use it like:
 
 ```
 module "centos-7-ami" {
-  source  = "../../modules/ami-centos"
+  source         = "../../modules/ami-centos"
+  release        = 7
+  image_provider = "CentOS"
 }
 ```
 
 Or:
 
 ```
-module "centos-6-ami" {
-  source  = "../../modules/ami-centos"
-  release = "6"
+module "centos-8-ami" {
+  source         = "../../modules/ami-centos"
+  release        = 8
+  image_provider = "AWS"
 }
 ```
 
@@ -22,7 +25,7 @@ To use the AMI on EC2, reference it by ID like this: `${module.centos-7-ami.id}`
 
 The module will filter the AMI by the following criteria:
 
-* provided by Centos.org
+* provided by Centos.org or AWS
 * the most recent release
 * hvm-type AMIs
 * amd64
